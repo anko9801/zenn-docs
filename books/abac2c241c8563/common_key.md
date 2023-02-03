@@ -43,7 +43,10 @@ S-box
 - AES-NI
   - 回路に組み込むことで高速化
 
-## PKCS #7 パディング
+## AES の暗号利用モード
+https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89
+
+### PKCS #7 パディング
 ~~最適化の為にパディングの最も左のバイトが判定の基準となる。逆にそれ以外は参照しない。~~
 全部見るらしいので次のようなイディオムを使うとよいかも
 
@@ -69,41 +72,45 @@ AES オンラインシミュレータほしいかも
 $P = P_1\|\cdots\|P_n$
 
 ### AES-ECB (Electronic CodeBlock)
-暗号化
 
 $$
-C_i = E_K(P_i)
+\begin{aligned}
+C_i & = E_K(P_i) \\
+P_i & = E_K(C_i)
+\end{aligned}
 $$
-
-復号化
-
-$$
-P_i = D_K(C_i)
-$$
-
-
-![](https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB:ECB_encryption.svg)
 
 ### AES-CBC (Cipher Block Chaining)
-暗号化
 
 $$
-C_i = \begin{cases}
+\begin{aligned}
+C_i & = \begin{cases}
   IV & (i = 0) \\
   E_K(P_i\oplus C_{i-1}) & (i > 0)
-\end{cases}
+\end{cases} \\
+P_i & = E_K(C_i)\oplus C_{i-1}
+\end{aligned}
 $$
 
-復号化
+### AES-OFB (Output Feedback)
 
 $$
-P_i = D_K(C_i)\oplus C_{i-1}
+\begin{aligned}
+  C_i & = P_i\oplus E_K^i(IV) \\
+  P_i & = C_i\oplus E_K^i(IV)
+\end{aligned}
 $$
 
-### AES-OFB
-### AES-CTR
-### PCBC (Propagating Cipher Block Chaining)
-### CFB (Cipher Feedback)
+### AES-CFB (Cipher Feedback)
+
+$$
+\begin{aligned}
+  C_0 & = IV \\
+  C_i & = P_i\oplus E_K(C_{i-1}) \\
+  P_i & = C_i\oplus E_K(C_{i-1})
+\end{aligned}
+$$
+
 ### AES-GCM (Galois/Counter Mode)
 
 入力
@@ -152,25 +159,22 @@ $$
 
 上から平文の長さだけ取ってくると認証タグとなる。
 
-![[Pasted image 20221225174723.png]]
-
-### AES-OFB
-
-$$
-C_i = E_k^i(\mathrm{iv})\oplus P_i
-$$
-
-### 解き方
+## 攻撃
+### Padding Oracle Attack
 Padding Oracle Attack を使って暗号/復号化関数 $E_k$ を作る。
 すると鍵を考えなくてもいい感じになり、上の式を辿るだけで解けるようになる。
 
-
-## 参考文献
-- [暗号利用モード](https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89)
-- [Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC](https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38d.pdf)
+### BEAST Attack
+### Lucky Thirteen Attack
+### POODLE Attack
+### ghash
+### Integral Cryptanalysis
+### Differencial cryptanalysis
+これはハッシュ関数の実装に踏み込む手法である. スケッチとしては何かしらのパラメータが同じなどの特殊な場合のとき, 簡約化ができ, 単純な算術演算による条件式をいくつか生成できる. これを SMT で解くらしい.
 
 Grover's algorithm: $2^{K}\to 2^{K/2}$
 鍵長を倍の長さにすることで同じセキュリティを担保できる。
 
-Differencial cryptanalysis
-これはハッシュ関数の実装に踏み込む手法である. スケッチとしては何かしらのパラメータが同じなどの特殊な場合のとき, 簡約化ができ, 単純な算術演算による条件式をいくつか生成できる. これを SMT で解くらしい.
+## 参考文献
+- [暗号利用モード](https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89)
+- [Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC](https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38d.pdf)
