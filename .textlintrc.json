@@ -1,0 +1,9 @@
+{
+  "filters": {},
+  "rules": {
+    "no-dropping-the-ra": true,
+    "textlint-rule-ja-no-space-between-full-width": true,
+    "preset-ja-technical-writing": true,
+    "textlint-rule-preset-icsmedia": true
+  }
+}

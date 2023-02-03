@@ -1,0 +1,18 @@
+title: "Cryptoマスター養成講座"
+summary: "CTF"
+topics: []
+published: false
+price: 0 # 有料の場合200〜5000
+# 本に含めるチャプターを順番に並べましょう
+chapters:
+  - introduction
+  - common_key
+  - math
+  - rsa
+  - computability
+  - ecc
+  - hash
+  - random
+  - suite
+  - blockchain
+  - environment
