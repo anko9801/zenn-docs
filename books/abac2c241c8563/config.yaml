@@ -11,6 +11,7 @@ chapters:
   - rsa
   - computability
   - ecc
+  - lattice
   - hash
   - random
   - suite

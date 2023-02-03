@@ -808,6 +808,8 @@ $$
 
 https://inaz2.hatenablog.com/entry/2016/01/26/222303
 
+## パディングによるエラー内容を返してはいけない (Bleichenbacher's Attack)
+
 ## 暗号文を復号した結果の偶奇を知られてはいけない (LSB Decryption Oracle Attack)
 
 全てが分かっていなくとも偶奇さえ分かれば任意の暗号文を復号できる。

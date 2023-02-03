@@ -518,55 +518,38 @@ $n-1 = 16 = 2^4 \times 1$ より $s = 4, d = 1$
 素数については必ず成功し、合成数のときは誤る可能性が $1/4$ 以下ということが示せるので、 $k$ 回試行すれば誤り率は $4^{-k}$ 以下となります。つまり、ある値に対して10回素数判定法を回せば99.9999046%成功するということです。
 
 ## 素因数分解
+
+### 試行割算法
 1. $p = 2, 3,\ldots$ に対して ($p\times p\leq N$ の範囲で) $N$ が $p$ の倍数ならば $p$ で割れるだけ割り、その回数 $e$ 整数組 (p,e) を記録する
 2. N が 1 でないならば、整数組 (N,1) を記録する
 
 ```python
-# 素因数分解
-# 460 = 2^2 x 5 x 23 の場合
-# 返り値は [(2, 2), (5, 1), (23, 1)]
-def prime_factorize(N):
-    # 答えを表す可変長配列
-    res = []
-
-    # √N まで試し割っていく
+def trial_division(N: int):
+    res: list[tuple[int, int]] = []
     for p in range(2, N):
-        # p * p <= N の範囲でよい
         if p * p > N:
             break
-
-        # N が p で割り切れないならばスキップ
         if N % p != 0:
             continue
-
-        # N の素因数 p に対する指数を求める
         e = 0
         while N % p == 0:
-            # 指数を 1 増やす
             e += 1
-
-            # N を p で割る
             N //= p
-
-        # 答えに追加
         res.append((p, e))
-
-    # 素数が最後に残ることがありうる
-    if N != 1:
-        res.append((N, 1))
-
+    res.append((N, 1))
     return res
 
-# 460 を素因数分解する
-N = 460
-pf = prime_factorize(N)
 
-# 出力
-print('{} = '.format(N), end='')
-for (p, e) in pf:
-    print('{}^{} '.format(p, e), end='')
-print()
+print(trial_division(460))
 ```
+
+### $p-1$ 法、$p+1$ 法
+
+### 楕円曲線法
+
+### 2次ふるい法
+
+### 数体ふるい法
 
 ### Shor のアルゴリズム
 
@@ -865,7 +848,9 @@ $$
 1. サイズ基底簡約
 2. 条件に合うように基底ベクトルの交換
 
-具体例
+具体的な応用方法は良記事があります。
+
+https://qiita.com/kusano_k/items/5509bff6e426e5043591
 
 ### BKZ(Block Korkine-Zolotareff) 基底簡約
 
@@ -1325,6 +1310,3 @@ $\mathbb{Q}$: 有理数の集合
 $\mathbb{R}$: 実数の集合
 $\mathbb{C}$: 複素数の集合
 
-### LWE格子暗号
-
-機械学習理論から派生した求解困難な問題で、有限体 $\mathbb{F}_q$ 上の秘密ベクトル $\mathbf{s} \in \mathbb{F}_q^n$ に関するランダムな連立線形「近似」方程式が与えられたとき、その秘密ベクトルを復元する問題である。
