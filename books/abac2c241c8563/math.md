@@ -519,12 +519,15 @@ $n-1 = 16 = 2^4 \times 1$ より $s = 4, d = 1$
 
 ## 素因数分解
 
-### 試行割算法
-1. $p = 2, 3,\ldots$ に対して ($p\times p\leq N$ の範囲で) $N$ が $p$ の倍数ならば $p$ で割れるだけ割り、その回数 $e$ 整数組 (p,e) を記録する
-2. N が 1 でないならば、整数組 (N,1) を記録する
+### 試し割り法
+
+1. $N$ を $2$ 以上 $\sqrt{N}$ 以下の整数で下から順に割れるだけ割り続け、割った数 $p$ とその回数 $e$ を記録する。
+2. 最後に残った $N$ が $1$ ではないならば記録する。
+
+この計算量は $\mathcal{O}(\sqrt{N})$ となる。 $\sqrt{N}$ までの素数リストが既にあるならば素数定理によって計算量は $\mathcal{O}(\sqrt{N}/\log{\sqrt{N}})$ に落ちる。
 
 ```python
-def trial_division(N: int):
+def trial_division(N: int) -> list[tuple[int, int]]:
     res: list[tuple[int, int]] = []
     for p in range(2, N):
         if p * p > N:
@@ -543,13 +546,78 @@ def trial_division(N: int):
 print(trial_division(460))
 ```
 
-### $p-1$ 法、$p+1$ 法
+### Pollard の $p-1$ 法
+> **Prop.**
+> $N$ がある素因数 $p$ をもつとき $M$ が $p-1$ の倍数であれば $\gcd(a^M - 1, N)$ は $p$ の倍数となる。
+
+**Proof.**
+フェルマーの小定理より $a^M = 1 \pmod p$ であるから $a^M - 1$ は $p$ の倍数である。よって $\gcd(a^M - 1, N)$ は $p$ の倍数となる。$\Box$
+
+もちろん $p$ の値は分からないので約数をたくさん持つような $M$ を用意して $p-1$ が Smooth なとき
+
+
+```python
+def eratosthenes(N: int) -> list[int]:
+    isprime = [True] * (N + 1)
+    isprime[0], isprime[1] = False, False
+
+    res: list[int] = []
+    for p in range(2, N + 1):
+        if not isprime[p]:
+            continue
+        res.append(p)
+        q = 2 * p
+        while q <= N:
+            isprime[q] = False
+            q += p
+    return res
+
+
+def p_1(N: int) -> int:
+    primes = eratosthenes(1000000)
+    m = 3
+    for p in primes:
+        if p <= 1000:
+            m *= pow(m, p**10, N)
+        elif p <= 100000:
+            m *= pow(m, p**2, N)
+        else:
+            m *= pow(m, p, N)
+    return gcd(m - 1, N)
+
+
+N = 10**61 - 1
+print(N)
+m = p_1(N)
+print(m)
+print(factor(lift(m)))
+```
+
+### Hugh Williams の $p+1$ 法
+> $M$ が $p+1$ の倍数であれば Lucas 列 $y_i$ に対し、 $\gcd(y_M, N)$ は $p$ の倍数となる。ただし Lucas 列は次のように定義される。
+>
+> $$
+\begin{aligned}
+  y_0 & = 0, y_1 = 1, y_{n+1} = ay_n + by_{n-1} \\
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+  \alpha,\beta & = \frac{a \pm \sqrt{a^2 + 4b}}{2} \\
+  y_n & = \frac{\alpha^n - \beta^n}{\alpha - \beta}
+\end{aligned}
+$$
+
+約数の多い $M$ を用意して $\gcd(y_M, N)$ が出てくる。確率は？
 
 ### 楕円曲線法
 
-### 2次ふるい法
+### 二次ふるい法 (QS; Quadratic Sieve)
+$x^2 = y^2 \pmod N$ となる $x, y$ が見つけられたとすると $x^2 - y^2 = (x + y)(x - y)$ が $N$ の倍数つまり $\gcd(x + y, N)$
 
-### 数体ふるい法
+### 一般数体ふるい法 (GNFS; General Number Field Sieve)
+
 
 ### Shor のアルゴリズム
 
@@ -1300,7 +1368,7 @@ Coppersmith Method はRSAをそのまま与えても解けませんが何かし�
 ## 参考
 - [元論文](https://static.aminer.org/pdf/PDF/000/192/854/finding_a_small_root_of_a_univariate_modular_equation.pdf)
 - [katagaitai workshop 2018 winter](http://elliptic-shiho.github.io/slide/katagaitai_winter_2018.pdf)
-
+- [Factoring Integers with Elliptic Curves - HW Lenstra, Jr.](https://wstein.org/edu/Fall2001/124/lenstra/lenstra.pdf)
 
 
 ## 記号
@@ -1309,4 +1377,5 @@ $\mathbb{Z}$: 整数の集合
 $\mathbb{Q}$: 有理数の集合
 $\mathbb{R}$: 実数の集合
 $\mathbb{C}$: 複素数の集合
+
 

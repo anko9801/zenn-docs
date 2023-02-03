@@ -72,6 +72,7 @@ AES オンラインシミュレータほしいかも
 $P = P_1\|\cdots\|P_n$
 
 ### AES-ECB (Electronic CodeBlock)
+並列化可能
 
 $$
 \begin{aligned}

@@ -34,6 +34,8 @@ Python 2.7.13
 asdf reshim
 ```
 
+pylance
+
 - `PyCryptodome`
 - `gmpy2`
 - `pwntools`
