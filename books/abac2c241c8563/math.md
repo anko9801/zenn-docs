@@ -688,11 +688,6 @@ $$
 - CVP
 - near CVP
 
-### LWE格子暗号
-
-機械学習理論から派生した求解困難な問題で、有限体 $\mathbb{F}_q$ 上の秘密ベクトル $\mathbf{s} \in \mathbb{F}_q^n$ に関するランダムな連立線形「近似」方程式が与えられたとき、その秘密ベクトルを復元する問題である。
-
-
 ### Gram-Schmidt の直交化 (GSO: Gram-Schmidt Orthonormalization)
 
 
@@ -815,7 +810,7 @@ $$
 
 この問題はNP困難
 
-#### 最短ベクトルの数え上げ
+### 最短ベクトルの数え上げ
 
 まずは全探索してみます。
 考えてみると帰納的に求めるのでは正確な最短ベクトルは求められないでしょう。
@@ -823,6 +818,12 @@ $$
 
 効率的に数え上げる為には基底簡約すると良いということが知られています。
 
+### サイズ基底簡約
+GSO ベクトルを簡約 -> 基底ベクトルを簡約
+GSO 係数 $μ_{i,j}$ について
+
+Euclid の互除法を用いて基底の簡約化をする。
+具体例
 $n$ 次元格子 $L$ の基底 $\\{\mathbf{b_1},\ldots,\mathbf{b_n}\\}$ を GSO 係数 $\mu_{i,j}$ が
 
 $$
@@ -850,29 +851,9 @@ B = [vector([5, -3, -7]), vector([2, -7, -7]), vector([3, -10, 0])]
 print(size_reduction(B))
 ```
 
-#### Lagrange 基底簡約 (Gaussian Reduction)
+### Lagrange 基底簡約 (Gaussian Reduction)
 
-サイズ基底簡約
-GSO ベクトルを簡約 -> 基底ベクトルを簡約
-GSO 係数 $μ_{i,j}$ について
-
-$$
-\|μ_{i,j}\| \leq \frac{1}{2} \qquad (\forall 0 \leq i < j < n)
-$$
-
-Euclid の互除法を用いて基底の簡約化をする。
-具体例
-$n$ 次元格子 $L$ の基底 $\\{\mathbf{b_1},\ldots,\mathbf{b_n}\\}$ を GSO 係数 $\mu_{i,j}$ が
-
-$$
-|\mu_{i,j}| \leq \frac{1}{2} \quad (1 \leq \forall j < \forall i \leq n)
-$$
-
-を満たすとき、基底 $\\{\mathbf{b_1},\ldots,\mathbf{b_n}\\}$ はサイズ簡約されているという。
-
-
-
-LLL(Lenstra-Lenstra-Lovasz) 基底簡約
+### LLL(Lenstra-Lenstra-Lovasz) 基底簡約
 
 Lagrange 基底簡約に Lovasz 条件を追加した基底簡約を LLL 基底簡約と呼びます。
 Lovasz条件 $\frac{1}{4} < \delta < 1$ として
@@ -886,22 +867,18 @@ $$
 
 具体例
 
-BKZ(Block Korkine-Zolotareff) 基底簡約
+### BKZ(Block Korkine-Zolotareff) 基底簡約
 
-HKZ(Hermite-Korkine-Zolotareff) 基底簡約
+### HKZ(Hermite-Korkine-Zolotareff) 基底簡約
 
 1. サイズ基底簡約
 2. 条件に合うように基底ベクトルの交換
 
-### Closest Vector Problem(CVP)
+## Closest Vector Problem(CVP)
 
-#### Babai’s Algorithm
+### Babai’s Algorithm
 
-#### Kannan’s embedding method
-
-
-
-## LLL
+### Kannan’s embedding method
 
 ## Coppersmith の定理
 
@@ -1347,3 +1324,7 @@ $\mathbb{Z}$: 整数の集合
 $\mathbb{Q}$: 有理数の集合
 $\mathbb{R}$: 実数の集合
 $\mathbb{C}$: 複素数の集合
+
+### LWE格子暗号
+
+機械学習理論から派生した求解困難な問題で、有限体 $\mathbb{F}_q$ 上の秘密ベクトル $\mathbf{s} \in \mathbb{F}_q^n$ に関するランダムな連立線形「近似」方程式が与えられたとき、その秘密ベクトルを復元する問題である。

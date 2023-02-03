@@ -8,19 +8,19 @@ CTF では AES 暗号の攻撃のみに焦点を当てているものが多い�
 暗号化
 
 $$
-\begin{align}
+\begin{aligned}
   R_{r+1} & = L_r \oplus F(R_r, k_r) \\
   L_{r+1} & = R_r
-\end{align}
+\end{aligned}
 $$
 
 復号化
 
 $$
-\begin{align}
+\begin{aligned}
   L_{r} & = R_{r+1} \oplus F(L_{r+1}, k_r) \\
   R_{r} & = L_{r+1}
-\end{align}
+\end{aligned}
 $$
 
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Feistel.png/220px-Feistel.png)
@@ -99,12 +99,13 @@ $$
 $$
 P_i = D_K(C_i)\oplus C_{i-1}
 $$
+
 ### AES-OFB
 ### AES-CTR
 ### PCBC (Propagating Cipher Block Chaining)
 ### CFB (Cipher Feedback)
-
 ### AES-GCM (Galois/Counter Mode)
+
 入力
 - 平文 $P$
 - 認証データ (AAD; Additional Authenticated Data) $A$
