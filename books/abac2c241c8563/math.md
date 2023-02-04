@@ -17,7 +17,7 @@ title: "暗号技術を支える計算機代数"
 
 数学科2年前半までの数学を使います。曖昧な解説はしないつもりなので覚悟のある方だけきてください。予習必要かも、楕円曲線はここでは解説しきれない。出来る限り最短経路となるのでわかりにくいという部分が出てくると思います。質問が飛んできたら
 
-## 群論
+## 群論の基礎
 
 > **Def. 群**
 > 空集合でない集合 $G$ と $G$ 上の演算が定義されていて次を満たすとき $G$ は群であるという。
@@ -555,51 +555,55 @@ $x^2 = y^2 \pmod N$ となる $x, y$ が見つけられたとすると $x^2 - y^
 ### Shor のアルゴリズム
 
 ## 離散対数問題
-離散対数問題 (DLP: Discrete Logarithm Problem) とは巡回群 $G$ について $a, b\in G$ が与えられるので $a^n = b$ となる最小の $n\in \mathbb{N}$ を求める問題である。
+離散対数問題 (DLP: Discrete Logarithm Problem) とは位数 $N$ の巡回群 $G$ について $a, b\in G$ が与えられるので $a^n = b$ となる最小の $n\in \mathbb{N}$ を求める問題である。
 
-例えば、有限体 $\mathbb{F}_q$ のDLP
-
-楕円曲線 $E$ 上でのDLP
+有限体 $\mathbb{F}_p$ の DLP は FFDLP; Finite Field DLP と呼ばれる。巡回群の位数は $p-1$ となる。
+楕円曲線 $E$ 上での DLP は ECDLP; Elliptic Curve DLP と呼ばれる。巡回群の位数は Hasse の定理より $|\#E/\mathbb{F}_p - (p+1)|\leq 2\sqrt{p}$ と制限される。
 
 ### Baby-step Giant-step
 
-半分全列挙を用いて $O(\sqrt{N}\log{N})$ でDLPが解ける。
+半分全列挙を用いる方法。
 
-位数 $N$ の巡回群 $G$ について $a, b\in G$ が与えられるので $a^n = b$ となる最小の $n\in \mathbb{N}$ を求める問題を考える。このとき $m = \lceil\sqrt{N}\rceil$ とおき、$n$ を $m$ で割ると $n = qm + r \ (q, r\in[0, \lceil\sqrt{N}\rceil)\ )$ と表せられる。すると $r$ に対して $ba^{-r}$ を全列挙し、そのリストに対して $a^{qm}$ が含まれているような $q$ を探索すると高速に解が求まる。
+$m = \lceil\sqrt{N}\rceil$ とおく。DLP の解 $n$ を $m$ で割って $n = qm + r$ とおく。
 
-例えば、有限体 $\mathbb{F}_p$ 上なら乗法群の位数 $p-1$ から
+$$
+\begin{aligned}
+b & = a^{qm + r} & (q, r\in[0, m-1])
+\end{aligned}
+$$
 
-楕円曲線 $E$ 上であれば加法群の位数 $\#E$ から
-
-$O(\sqrt{N}\log N)$
+このとき $ba^{-r}$, $a^{qm}$ を全列挙し、どちらかのリストの要素をもう1つのリストで検索して解を探索する。この計算量は $O(\sqrt{N}\log N)$ となる。
 
 ### Pollard's rho 法
 
-初期点 $x_0$ と適当な副作用のない疑似乱数関数 $f(x)$ を決めて $x_{i+1} = f(x_i)$ となるように数列 $(x_0, x_1, \ldots)$ を生成する。このとき $0 \leq \exists i < \exists j < N$, $x_i = x_j$ となる $i,j$ を見つけられたらDLPが解けるという仕組みです。
+誕生日のパラドックスを用いる方法。
 
-よく用いられる関数 $f(x)$ は次のようなものがあります。ただし、$G_1, G_2, G_3$ は巡回群 $G$ の集合をランダムに振り分けられるように3つに区別したものです。
+誕生日が同じ 2 人を見つけたいときに確率 $P\%$ を超えるには人を何人集めればよいのかという問題です。鳩ノ巣原理から $366$ 人いれば必ず同じ誕生日の人が出てきます。$50\%$ を超えるには $23$ 人で十分です。
+
+1. 疑似乱数関数 $f(x)$ を決めて数列 $x_0, x_{i+1} = f(x_i)$ を生成する。
+2. $x_i = x_j$ となる $i, j\ (0\leq i<j<N)$ を発見したとき以下の方法で DLP が求まる。
+
+このアルゴリズムで使われる代表的な疑似乱数関数 $f(x)$ について紹介する。まず巡回群 $G$ を疑似乱数的に $G_1, G_2, G_3$ と振り分けた集合とします。
 
 $$
 f(x)=
 \begin{cases}
-bx & (x \in G_1 \mathrm{のとき}) \\
-x^2 & (x \in G_2 \mathrm{のとき}) \\
-ax & (x \in G_3 \mathrm{のとき}) \\
+bx & (x \in G_1) \\
+x^2 & (x \in G_2) \\
+ax & (x \in G_3)\\
 \end{cases}
 $$
 
-このとき $x_0 = a$ とすると $x_i$ は $x_i = a^{s_i}b^{t_i}$, $s_i, t_i \in \mathbb{N}$ と表せられる。すると $x_i = x_j$ において $n$ は巡回群の位数 $N$ を用いて次のように表せられる。
+このとき $x_0 = a$ とすると $x_i = a^{s_i}b^{t_i} = a^{s_i + nt_i}\ (s_i, t_i \in \mathbb{N})$ と書ける。$x_i = x_j$ のとき
 
 $$
 \begin{aligned}
-x_i &= a^{s_i}b^{t_i} = a^{s_i + nt_i} \\
-x_j &= a^{s_j + nt_j} \\
-a^{s_i - s_j} &= a^{n(t_j - t_i)} \\
-n &= \frac{s_i - s_j}{t_j - t_i} \pmod N
+x_ix_j^{-1} & = a^{(s_i + nt_i) - (s_j + nt_j)} = 1 \\
+n &= \frac{s_i - s_j}{t_j - t_i} & \pmod N
 \end{aligned}
 $$
 
-これよりDLPが解ける。
+となり $n$ が分かる。
 Pollard-$\rho$ 法の $\rho$ は文字 $\rho$ の形が由来となっている。
 
 ### Pollard's Kangaroo 法 (Lambda 法)
@@ -628,26 +632,18 @@ E(B) &= \sum_{k=1}^N k\cdot\frac{k}{N}e^{-k^2/2N} \\
 \end{aligned}
 $$
 
-- The Arithmetic of Elliptic Curves. p.383
-
 
 ### Pohlig-Hellman
 
-中国剰余定理を用いて大きな群を複数の小さな群の直積に分割する。
+> **Prop.**
+> 巡回群の位数が $|G| = \prod_{i = 1}^n p_i^{e_{i}}$ と素因数分解できるとき $G \cong \prod_{i = 1}^n \mathbb{Z}/p_i^{e_{i}}\mathbb{Z}$ となる。
 
-```python
-fact = factor(G.order())
-ord = int(G.order())
-dlogs = []
-for p, e in fact:
-    t = ord // p ^ e
-    dlog = discrete_log(t * Q, t * G, operation="+")
-    dlogs += [dlog]
-
-print(crt(dlogs, primes))
-```
+アーベルの構造定理により証明できる。詳細は群論を学んでほしい。
+これより中国剰余定理から $\mathcal{O}(\max{p_i^{e_i}})$ に落ちる。
 
 ### 指数計算法 (Index Calculus Algorithm)
+
+有限体上の DLP でのみ有効な方法。
 
 1. 小さな素因数 $p_j$ を用いて $yg^k = \prod_{j = 1}^m p_j^{e_{j}} \pmod p$ と書けるような $k$ を見つける。
 2. $g^{k_i} = \prod_{j = 1}^m p_j^{e_{ij}} \pmod{p}$ と素因数分解できるような $k_i$ を $m$ 個以上見つける。
@@ -659,7 +655,7 @@ $$
 \begin{pmatrix}
   k_1 \\
   \vdots \\
-  k_m \\
+  k_n \\
 \end{pmatrix} & =
 \begin{pmatrix}
   e_{11} & \cdots & e_{m1} \\
@@ -1198,6 +1194,7 @@ $$
 - [katagaitai workshop 2018 winter](http://elliptic-shiho.github.io/slide/katagaitai_winter_2018.pdf)
 - [Factoring Integers with Elliptic Curves - HW Lenstra, Jr.](https://wstein.org/edu/Fall2001/124/lenstra/lenstra.pdf)
 - Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer https://arxiv.org/abs/quant-ph/9508027
+- The Arithmetic of Elliptic Curves
 
 
 ## 記号
