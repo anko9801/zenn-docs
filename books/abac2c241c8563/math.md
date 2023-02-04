@@ -557,8 +557,8 @@ $x^2 = y^2 \pmod N$ となる $x, y$ が見つけられたとすると $x^2 - y^
 ## 離散対数問題
 離散対数問題 (DLP: Discrete Logarithm Problem) とは位数 $N$ の巡回群 $G$ について $a, b\in G$ が与えられるので $a^n = b$ となる最小の $n\in \mathbb{N}$ を求める問題である。
 
-有限体 $\mathbb{F}_p$ の DLP は FFDLP; Finite Field DLP と呼ばれる。巡回群の位数は $p-1$ となる。
-楕円曲線 $E$ 上での DLP は ECDLP; Elliptic Curve DLP と呼ばれる。巡回群の位数は Hasse の定理より $|\#E/\mathbb{F}_p - (p+1)|\leq 2\sqrt{p}$ と制限される。
+- 有限体 $\mathbb{F}_p$ の DLP は FFDLP; Finite Field DLP と呼ばれる。巡回群の位数は $p-1$ となる。
+- 楕円曲線 $E$ 上での DLP は ECDLP; Elliptic Curve DLP と呼ばれる。巡回群の位数は Hasse の定理より $|\#E/\mathbb{F}_p - (p+1)|\leq 2\sqrt{p}$ と制限される。
 
 ### Baby-step Giant-step
 
@@ -574,11 +574,28 @@ $$
 
 このとき $ba^{-r}$, $a^{qm}$ を全列挙し、どちらかのリストの要素をもう1つのリストで検索して解を探索する。この計算量は $O(\sqrt{N}\log N)$ となる。
 
-### Pollard's rho 法
+### Pollard's $\rho$ 法
 
 誕生日のパラドックスを用いる方法。
 
-誕生日が同じ 2 人を見つけたいときに確率 $P\%$ を超えるには人を何人集めればよいのかという問題です。鳩ノ巣原理から $366$ 人いれば必ず同じ誕生日の人が出てきます。$50\%$ を超えるには $23$ 人で十分です。
+> **Prop. 誕生日のパラドックス**
+> 誕生日が同じ 2 人を見つけたいときに確率 $P$ を超えるには人を何人集めればよいのかという問題です。鳩ノ巣原理から $366$ 人いれば必ず同じ誕生日の人が出てきます。$50\%$ を超えるには $23$ 人で十分です。
+
+**Proof.**
+
+計算量の期待値集合 $S$ に対してそれぞれ相違な $x_0, x_1, \ldots, x_{k-1}$ を選ぶ事象 $A$ と
+
+$$
+\begin{aligned}
+P(A) &= \prod_{i = 0}^{k-1}\left(1-\frac{i}{N}\right) \approx \prod_{i = 0}^{k-1}e^{-i/N} \approx e^{-k^2/2N} \\
+P(B) &= \frac{k}{N}e^{-k^2/2N} \\
+E(B) &= \sum_{k=1}^N k\cdot\frac{k}{N}e^{-k^2/2N} \\
+&\approx \sqrt{N}\int_0^\infty t^2e^{-t^2/2} dt \\
+&= \sqrt{\frac{\pi N}{2}}
+\end{aligned}
+$$
+
+$\Box$
 
 1. 疑似乱数関数 $f(x)$ を決めて数列 $x_0, x_{i+1} = f(x_i)$ を生成する。
 2. $x_i = x_j$ となる $i, j\ (0\leq i<j<N)$ を発見したとき以下の方法で DLP が求まる。
@@ -606,32 +623,19 @@ $$
 となり $n$ が分かる。
 Pollard-$\rho$ 法の $\rho$ は文字 $\rho$ の形が由来となっている。
 
-### Pollard's Kangaroo 法 (Lambda 法)
-$\rho$ 法は動く点が1つの値だったのに対し、 $\lambda$ 法は2つの値がランダムに動いていき、一方がもう一方の点に衝突したときDLPが解ける。
+### Pollard's Kangaroo 法 ($\lambda$ 法)
+$\rho$ 法は動く点が1つの値だったのに対し、 $\lambda$ 法は2つの値がランダムに動いていき、一方がもう一方の点に衝突したとき DLP が解ける。
 
 $$
 \begin{aligned}
-x_0 &= g^{a_0} & y_0 &= g^{b_0} \\
-x_{i+1} &= x_ig^{r(x_i)} & y_{i+1} &= y_i g^{r(y_i)} \\
+x_0 & = a^\alpha & y_0 & = b \\
+x_{i+1} & = x_ia^{f(x_i)} & y_{i+1} & = y_ia^{f(y_i)} \\
+x_i & = a^{\alpha + \sum_{k=1}^{i} f(x_k)} & y_i & = a^{n + \sum_{k=1}^{i} f(y_k)}
 \end{aligned}
 $$
 
-$x_i = y_j$ となるとき
-
-$O(\sqrt{N})$
-
-計算量の期待値集合 $S$ に対してそれぞれ相違な $x_0, x_1, \ldots, x_{k-1}$ を選ぶ事象 $A$ と
-
-$$
-\begin{aligned}
-P(A) &= \prod_{i = 0}^{k-1}\left(1-\frac{i}{N}\right) \approx \prod_{i = 0}^{k-1}e^{-i/N} \approx e^{-k^2/2N} \\
-P(B) &= \frac{k}{N}e^{-k^2/2N} \\
-E(B) &= \sum_{k=1}^N k\cdot\frac{k}{N}e^{-k^2/2N} \\
-&\approx \sqrt{N}\int_0^\infty t^2e^{-t^2/2} dt \\
-&= \sqrt{\frac{\pi N}{2}}
-\end{aligned}
-$$
-
+$x_i = y_j$ となるとき $n = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j} f(y_k)$ となる。
+$N$ や $f$ を取り替えて
 
 ### Pohlig-Hellman
 
