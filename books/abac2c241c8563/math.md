@@ -497,7 +497,7 @@ $p-1$ が Smooth number のとき有効な素因数分解法です。
 **Proof.**
 フェルマーの小定理より $a^k = 1 \pmod p$ であるから $a^k - 1 \pmod N$ は $p$ の倍数である。よって $\gcd(a^k - 1, N)$ は $p$ の倍数となる。$\Box$
 
-もちろん $p$ の値は分からないので約数をたくさん持つような $M$ を用意して、$N$ のどれかの大きな素因数 $p$ に対して $p-1$ の倍数となったとき $\gcd(a^k - 1, N)$ が
+もちろん $p$ の値は分からないので約数をたくさん持つような $M$ を用意して、$N$ のどれかの大きな素因数 $p$ に対して $p-1$ の倍数となったとき $\gcd(a^k - 1, N)$ を計算することで $p$ を取り出せる。
 
 果たしてそんなうまくいくのだろうか？これを初めて聞いたとき大きな数は大体大きな素因数持ってるだろうからほとんど上手くいかなそうと感じました。
 
@@ -511,31 +511,40 @@ https://gist.github.com/anko9801/8f53ff0e4af8d866d3fc93b4fbfefb68
 $p + 1$ が Smooth number のとき有効な素因数分解法です。
 
 > **Prop.**
-> $k$ が $p+1$ の倍数であれば Lucas 列 $y_i$ に対し、 $\gcd(y_k, N)$ は $p$ の倍数となる。ただし Lucas 列は次のように定義される。
+> $k$ が $p+1$ の倍数であれば Lucas 数列 $u_i, v_i$ に対し、 $u_k$ は $p$ の倍数となる。ただし Lucas 数列は次のように定義される。
 >
 > $$
 \begin{aligned}
-  y_0 & = 0, y_1 = 1, y_{n+1} = ay_n + by_{n-1} \\
+  u_0 & = 0, u_1 = 1, u_{n+1} = au_n - bu_{n-1} \\
+  v_0 & = 2, v_1 = a, v_{n+1} = av_n - bv_{n-1}
 \end{aligned}
 $$
 
 **Proof.**
+Lucas 数列について
+
+$$
+\begin{aligned}
+\end{aligned}
+$$
 
 
 $$
 \begin{aligned}
-  \alpha,\beta & = \frac{a \pm \sqrt{a^2 + 4b}}{2} \\
+  \alpha,\beta & = \frac{a \pm \sqrt{a^2 - 4b}}{2} \\
   y_n & = \frac{\alpha^n - \beta^n}{\alpha - \beta}
 \end{aligned}
 $$
 
-約数の多い $M$ を用意して $\gcd(y_M, N)$ が出てくる。確率は？
+約数の多い $k$ を用意して $\gcd(y_k, N)$ が出てくる。確率は？
 
 ### 楕円曲線法
 一般に有効な素因数分解法です。
 
 > **Prop.**
-> $k$ が $\#E/(\mathbb{Z}/n\mathbb{Z})$ の倍数であれば $kP = \mathcal{O}$ となる。この内部計算で $x_1 - x_2$ が $p$ の倍数となる。
+> $k$ が $\#E/(\mathbb{Z}/N\mathbb{Z})$ の倍数であれば $kP = \mathcal{O}$ となる。このとき内部計算時に $x_1 - x_2$ が $p$ の倍数となる。
+
+$N$ が 2, 3 の倍数でないとき、楕円曲線 $y^2 = x^3 + ax + b \pmod N$ について $a, b$ を様々な値を与えて $kP$ を計算する。
 
 ### 二次ふるい法 (QS; Quadratic Sieve)
 $x^2 = y^2 \pmod N$ となる $x, y$ が見つけられたとすると $x^2 - y^2 = (x + y)(x - y)$ が $N$ の倍数つまり $\gcd(x + y, N)$
