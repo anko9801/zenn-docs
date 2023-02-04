@@ -9,9 +9,9 @@ chapters:
   - common_key
   - math
   - rsa
-  - computability
   - ecc
   - lattice
+  - computability
   - hash
   - random
   - suite

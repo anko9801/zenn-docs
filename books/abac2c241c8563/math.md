@@ -185,13 +185,10 @@ $$
 
 $$
 \begin{aligned}
-& \begin{cases}
-x = q_1m_1 + r_1 \\
-x = q_2m_2 + r_2
-\end{cases} \\
-&\quad x = q_1m_1 + r_1 & \pmod{m_2} \\
-&\quad q_1 = (r_2 - r_1)m_1^{-1} & \pmod{m_2} \\
-&\quad x = (r_2 - r_1)(m_1^{-1} \bmod{m_2})m_1 + r_1 & \pmod{m_1m_2} \\
+x & = q_1m_1 + r_1 \\
+r_2 & = q_1m_1 + r_1 & \pmod{m_2} \\
+q_1 & = (r_2 - r_1)m_1^{-1} & \pmod{m_2} \\
+x & = (r_2 - r_1)(m_1^{-1} \bmod{m_2})m_1 + r_1 & \pmod{m_1m_2} \\
 \end{aligned}
 $$
 
@@ -387,62 +384,6 @@ b' << 1  = ?????10
 
 [Tonelli-Shanks のアルゴリズム - 37zigenのHP](https://37zigen.com/tonelli-shanks-algorithm/)
 
-## 環論
-ユークリッドの互除法
-
-## 多項式環
-
-さて多変数連立n次方程式の場合はどうでしょう。Coppersmithも使うこともできますが、精度は出にくいです。これに対して使われる道具は多項式GCD, 終結式, Gröbner基底があります。
-
-### 多項式GCD
-
-まずは多項式GCDです。
-例えば $x$ について同じ解を持つ次のような方程式を考えてみましょう。
-
-$$
-\begin{cases}
-f_1 = x^e - c_1 & \pmod{N} \\
-f_2 = (x + y)^e - c_2 & \pmod{N} \\
-\end{cases} \\
-$$
-
-これは多項式GCDを取ると解けます。その名の通り、ある2つの方程式に公約式があったとき、最も次数が大きい公約式を返します。Half-GCDというアルゴリズムを用いると $O(N(\log{N})^2)$ でGCDが取れます。(N is 何)
-
-$$
-\begin{aligned}
-&\begin{cases}
-f_1 = x^e - c_1 & \pmod{N} \\
-f_2 = (x + y)^e - c_2 & \pmod{N} \\
-\end{cases} \\
-\iff
-&\begin{cases}
-f_1 = (x - m)g_1 & \pmod{N} \\
-f_2 = (x - m)g_2 & \pmod{N} \\
-\end{cases} \\
-&\gcd(f_1, f_2) = x - m
-\end{aligned}
-$$
-
-### 終結式
-式増やしてgcd
-
-### Gröbner基底
-
-Gröbner基底のお気持ちは多項式イデアルを格子にしたものに対して順序を与えて基底簡約するものです。
-
-$$
-T = \lbrace x_1^{e_1}x_2^{e_2}\cdots x_l^{e_l}\mid e_1,e_2,\cdots,e_l\in\mathbb{Z}_{\geq 0}\rbrace
-$$
-
-Buchberger's Algorithmと呼ばれています。
-
-表に解き方をまとめるとこんな感じです。
-
-|            |           1変数          |               多変数              |
-|:----------:|:------------------------:|:---------------------------------:|
-| 線型方程式 | 拡張ユークリッドの互除法 |                LLL                |
-|  n次方程式 |    Coppersmith Method    | 多項式GCD, 終結式, Gröbner基底 |
-
 
 ## 素数生成
 
@@ -518,8 +459,14 @@ $n-1 = 16 = 2^4 \times 1$ より $s = 4, d = 1$
 素数については必ず成功し、合成数のときは誤る可能性が $1/4$ 以下ということが示せるので、 $k$ 回試行すれば誤り率は $4^{-k}$ 以下となります。つまり、ある値に対して10回素数判定法を回せば99.9999046%成功するということです。
 
 ## 素因数分解
+試し割り法を基本にして
+- $\rho$ 法
+- $p - 1$ 法, $p + 1$ 法 $\implies$ 楕円曲線法
+- Fermat 法 $\implies$ 二次ふるい法 $\implies$ 一般数体ふるい法
 
 ### 試し割り法
+
+愚直に素数を小さい順に割っていく方法です。大体の場合これで十分速いです。
 
 1. $N$ を $2$ 以上 $\sqrt{N}$ 以下の整数で下から順に割れるだけ割り続け、割った数 $p$ とその回数 $e$ を記録する。
 2. 最後に残った $N$ が $1$ ではないならば記録する。
@@ -547,14 +494,16 @@ print(trial_division(460))
 ```
 
 ### Pollard の $p-1$ 法
+$p-1$ が Smooth number のとき有効な素因数分解法です。
+
 > **Prop.**
 > $N$ がある素因数 $p$ をもつとき $M$ が $p-1$ の倍数であれば $\gcd(a^M - 1, N)$ は $p$ の倍数となる。
 
 **Proof.**
 フェルマーの小定理より $a^M = 1 \pmod p$ であるから $a^M - 1$ は $p$ の倍数である。よって $\gcd(a^M - 1, N)$ は $p$ の倍数となる。$\Box$
 
-もちろん $p$ の値は分からないので約数をたくさん持つような $M$ を用意して $p-1$ が Smooth なとき
-
+もちろん $p$ の値は分からないので約数をたくさん持つような $M$ を用意して、$N$ のどれかの大きな素因数 $p$ に対して $p-1$ の倍数となったとき
+果たしてそんなうまくいくのだろうか？これを初めて聞いたとき大きな数は大体大きな素因数持ってるだろうからほとんど上手くいかなそうと感じました。
 
 ```python
 def eratosthenes(N: int) -> list[int]:
@@ -933,191 +882,13 @@ https://qiita.com/kusano_k/items/5509bff6e426e5043591
 
 ### Kannan’s embedding method
 
-## Coppersmith の定理
-
-> **Thm. Howgrave-Grahamの補題**
-> $N$ を法、 $g(x) \in \mathbb{Z}[x]$ を整数多項式とし、含まれる単項式の数を $\omega$ とする。$g(x)$ に対してある $X$ が存在し、$g(x_0) = 0 \pmod{N}$ なる $x_0 \in \mathbb{Z}$ について $|x_0| \leq X$ であると仮定する。このとき
->
-> $$
-\|g(xX)\| < \frac{N}{\sqrt{\omega}}
-$$
->
-> が成立するならば $g(x_0) = 0$ が整数方程式として成立する。ただし
->
-> $$
-\|g(x)\| = \left\|\sum_{i=0}^{\deg g(x)}g_i\right\| = \sqrt{\sum_{i=0}^{\deg g(x)}g_i^2}
-$$
->
-> であり、 $\deg g(x)$ は $g(x)$ の次数である。
-
-**Proof.**
-
-$$
-\begin{aligned}
-|g(x_0)| &= \left|\sum_{i=0}^{\deg g(x_0)}g_ix_0^i\right| \\
-&\leq \sum_{i}|g_ix_0^i| \\
-&\leq \sum_{i}|g_i|X^i \\
-&= \sum_{i}(1\cdot|g_i|X^i) \\
-&\leq \sqrt{\sum_{i, g_i \neq 0}1} \sqrt{\sum_{i}(|g_i|X^i)^2} && \left(\because \text{コーシー＝シュワルツの不等式}\right) \\
-&= \sqrt{\omega}\|g(xX)\| < N && \left(\because \|g(xX)\| < \frac{N}{\sqrt{\omega}}\right)
-\end{aligned}
-$$
-
-$g(x_0) = 0 \pmod N$ より $g(x_0) = 0$ となる。 $\Box$
 
 
-つまり、「剰余の方程式は係数がある程度小さければそのまま整数方程式となるよ」と言っています。ここで勘のいい人はLLLを用いて係数を小さくすれば整数方程式に変換できて解けるのでは...！？と気付くでしょう。実際に考えてみましょう。
+## 方程式
+$n$ 次方程式について $m$ 個だけ連立されてあるとき
 
-とりあえず状況を整理すると、LLLに入れる値は各係数として、LLLを使う為には複数の方程式が必要になってきます。そしてそれらの方程式は同じ解を持つ必要があります。現在、その解が分からないのですが、どうしたらそんな方程式が作れるでしょうか。
-
-実は $\bmod {N}$ では難しいので、$\bmod {N^m}$ に持ち上げることで同じ解の方程式を増やすことができます。
-
-> **Lemma.**
-> $N$ を法、$f(x)$ を多項式とする。自然数 $m, l$ について
->
-> $$
-g_{i,j}(x) := N^{m−i}x^j f^i(x) \ (0 \leq i \leq m, 0 \leq j\leq l)
-$$
->
-> とおく。このとき、 $f(x_0) = 0 \pmod N$ をみたす $x_0 \in \mathbb{Z}$ について、 $g_{i,j}(x_0) = 0 \pmod{N^m}$ となる。
-
-**Proof.**
-
-$f(x_0) = 0 \pmod N$ なので $f(x_0) = kN$ とおける。
-
-$$
-\begin{aligned}
-g_{i,j}(x_0) &= N^{m−i}x_0^j f^i(x_0) \\
-&= N^{m−i}x_0^j (kN)^i \\
-&= k^ix_0^j N^m \\
-g_{i,j}(x_0) &= 0 \pmod{N^m} \\
-\end{aligned}
-$$
-
-$\Box$
-
-これで方程式を増やすことができました！ちゃんとLLLで動くかちょっと不安ですがとりあえずやってみます。
-
-小さくしたい方程式は $g_{i,j}(xX)$ であることに注意して。
-$g_{i,j}(x)$ の $k$ 次の係数のことを $g_{i,j}^{(k)}$ と表すことにします。
-
-$$
-\begin{pmatrix}
-g_{0,0}^{(0)} & g_{0,0}^{(1)}X & g_{0,0}^{(2)}X^2 & g_{0,0}^{(3)}X^3 & g_{0,0}^{(4)}X^4 & g_{0,0}^{(5)}X^5 \\
-g_{0,1}^{(0)} & g_{0,1}^{(1)}X & g_{0,1}^{(2)}X^2 & g_{0,1}^{(3)}X^3 & g_{0,1}^{(4)}X^4 & g_{0,1}^{(5)}X^5 \\
-g_{1,0}^{(0)} & g_{1,0}^{(1)}X & g_{1,0}^{(2)}X^2 & g_{1,0}^{(3)}X^3 & g_{1,0}^{(4)}X^4 & g_{1,0}^{(5)}X^5 \\
-g_{1,1}^{(0)} & g_{1,1}^{(1)}X & g_{1,1}^{(2)}X^2 & g_{1,1}^{(3)}X^3 & g_{1,1}^{(4)}X^4 & g_{1,1}^{(5)}X^5 \\
-g_{2,0}^{(0)} & g_{2,0}^{(1)}X & g_{2,0}^{(2)}X^2 & g_{2,0}^{(3)}X^3 & g_{2,0}^{(4)}X^4 & g_{2,0}^{(5)}X^5 \\
-g_{2,1}^{(0)} & g_{2,1}^{(1)}X & g_{2,1}^{(2)}X^2 & g_{2,1}^{(3)}X^3 & g_{2,1}^{(4)}X^4 & g_{2,1}^{(5)}X^5 \\
-\end{pmatrix}
-$$
-
-これをLLLに通してあげると無事小さな値の方程式が返ってきます。これがHowgrave-Grahamの補題を満たしていれば整数方程式となります。後は増減表書いたりして探索すれば解けます。
-
-これらの操作はCoppersmithの定理と呼ばれています。
-
-> **Thm. Coppersmithの定理**
-> $N$ を法とし $f(x)$ をモニックな 1変数 $\delta$ 多項式とする。このとき $f(x_0) = 0 \pmod{N}$ と次の条件を満たすような $x_0$ を効率よく求めることができる
->
-> $$
-|x_0| \leq N^{\frac{1}{\delta}}
-$$
-
-さらにCoppersmithの定理には拡張できることが2つあります。
-
-- 未知の法について解ける。素因数分解が出来ないほど大きな数を法としたときに既知の法の約数を法とする式の解を求められます。法が小さいほど方程式に対する制約がゆるくなります。
-- 多変数の方程式も解ける。これは変数が1つだけでしたが、複数の変数でもできます。変数の数が多いほど方程式に対する制約がキツくなります。
-
-これらは Howgrave-Grahamの補題 などを見直すことで簡単に拡張できます。興味ある方は考えてみてください。
-
-これらをまとめてCoppersmith Methodと呼びます。
-
-Berlekamp-Zassenhause法
-
-
-## 一般の方程式を解く
-
-ここからが本題です！！
-RSAというe次方程式の解を求めるだけに絞らず、任意の方程式を解くことができたらうれしいですよね。さっそく考えてみましょう。
-
-$$
-\begin{cases}
-2x + 3y = 2 & \pmod{13} \\
-3x + 5y = 1 & \pmod{13} \\
-\end{cases}
-$$
-
-まずは簡単そうな連立方程式を解くことを考えてみます。上の方程式を加減法を用いて解いてみます。中学生の頃を思い出しますね。
-
-$$
-\begin{aligned}
-&\begin{cases}
-2x + 3y = 2 & \pmod{13} \\
-3x + 5y = 1 & \pmod{13} \\
-\end{cases} \\
-\iff&\begin{cases}
-6x + 9y = 6 & \pmod{13} \\
-6x + 10y = 2 & \pmod{13} \\
-\end{cases} \\
-\iff&\begin{cases}
-x = 7 & \pmod{13} \\
-y = 9 & \pmod{13} \\
-\end{cases} \\
-\end{aligned}
-$$
-
-普通の方程式と同様に解けました！
-より一般の連立方程式を解く為に行列を用いて解いてみます。拡大係数行列にしてガウスの消去法を行います！大学1年の復習ですね。
-
-$$
-\begin{aligned}
-\begin{pmatrix}
-2 & 3 \\
-3 & 5 \\
-\end{pmatrix}
-\begin{pmatrix}
-x \\
-y \\
-\end{pmatrix}
-&=\begin{pmatrix}
-2 \\
-1 \\
-\end{pmatrix} \\
-
-\left(
-\begin{array}{cc|c}
-2 & 3 & 2 \\
-3 & 5 & 1 \\
-\end{array}
-\right)
-&\to
-\left(
-\begin{array}{cc|c}
-0 & -1 & 4 \\
-1 & 2 & -1 \\
-\end{array}
-\right) \\
-
-&\to
-\left(
-\begin{array}{cc|c}
-1 & 0 & 7 \\
-0 & 1 & 9 \\
-\end{array}
-\right) \\
-
-\begin{pmatrix}
-x \\
-y \\
-\end{pmatrix}
-&=\begin{pmatrix}
-7 \\
-9 \\
-\end{pmatrix} \\
-\end{aligned}
-$$
-
-一般の連立方程式は次のように解けます。行列の次元が行数と一致すれば逆行列が存在します。
+一次連立方程式について行列の次元 rank と連立させた式の数と一致すれば逆行列が存在します。
+係数行列
 
 $$
 \begin{aligned}
@@ -1126,32 +897,16 @@ A\mathbf{x} &= \mathbf{b} \\
 \end{aligned}
 $$
 
+$1$ 次方程式
+
 $$
-\begin{aligned}
-A = \begin{pmatrix}
-a_{11} & a_{12} & \ldots & a_{1n} \\
-a_{21} & a_{22} & \ldots & a_{2n} \\
-\vdots & \vdots & \ddots & \vdots \\
-a_{m1} & a_{m2} & \ldots & a_{mn}
-\end{pmatrix}
-&&
-\mathbf{x} = \begin{pmatrix}
-x_1 \\
-\vdots \\
-x_n \\
-\end{pmatrix}
-&&
-\mathbf{b} = \begin{pmatrix}
-b_1 \\
-\vdots \\
-b_m \\
-\end{pmatrix}
-\pmod{p}
-\end{aligned}
+\begin{cases}
+2x + 3y = 2 & \pmod{13} \\
+3x + 5y = 1 & \pmod{13} \\
+\end{cases}
 $$
 
-なるほど。次元が式の数と一致する連立1次方程式は必ず解けそうですね。
-
+より一般の連立方程式を解く為に行列を用いて解いてみます。拡大係数行列にしてガウスの消去法を行います。
 では与えられる1次方程式が1つのみであればどうでしょうか。複数の解が出てきますが、その中で具体的な解を1つ返したいと思います。
 
 $$
@@ -1242,26 +997,25 @@ a_nx^n + \ldots + a_1x + a_0 = 0 \pmod N
 $$
 
 $x, y = x^2, z = x^3, \ldots$ というように変数を設定してLLLで乗り切るという方法が1つあります。しかし $x, y, z$ には関係性という情報を失っています。それをうまく使ってあげたいですね。
-そこでHowgrave-Grahamの補題というものがあります。
 
------
+## Coppersmith の定理
 
-#### Thm. Howgrave-Grahamの補題
-$N$ を法、 $g(x) \in \mathbb{Z}[x]$ を整数多項式とし、含まれる単項式の数を $\omega$ とする。$g(x)$ に対してある $X$ が存在し、$g(x_0) = 0 \pmod{N}$ なる $x_0 \in \mathbb{Z}$ について $|x_0| \leq X$ であると仮定する。このとき
-
-$$
+> **Thm. Howgrave-Grahamの補題**
+> $N$ を法、 $g(x) \in \mathbb{Z}[x]$ を整数多項式とし、含まれる単項式の数を $\omega$ とする。$g(x)$ に対してある $X$ が存在し、$g(x_0) = 0 \pmod{N}$ なる $x_0 \in \mathbb{Z}$ について $|x_0| \leq X$ であると仮定する。このとき
+>
+> $$
 \|g(xX)\| < \frac{N}{\sqrt{\omega}}
 $$
-
-が成立するならば $g(x_0) = 0$ が整数方程式として成立する。ただし
-
-$$
+>
+> が成立するならば $g(x_0) = 0$ が整数方程式として成立する。ただし
+>
+> $$
 \|g(x)\| = \left\|\sum_{i=0}^{\deg g(x)}g_i\right\| = \sqrt{\sum_{i=0}^{\deg g(x)}g_i^2}
 $$
+>
+> であり、 $\deg g(x)$ は $g(x)$ の次数である。
 
-であり、 $\deg g(x)$ は $g(x)$ の次数である。
-
-証明
+**Proof.**
 
 $$
 \begin{aligned}
@@ -1274,9 +1028,7 @@ $$
 \end{aligned}
 $$
 
-$g(x_0) = 0 \pmod N$ より $g(x_0) = 0$ となる。
-
------
+$g(x_0) = 0 \pmod N$ より $g(x_0) = 0$ となる。 $\Box$
 
 つまり、「剰余の方程式は係数がある程度小さければそのまま整数方程式となるよ」と言っています。ここで勘のいい人はLLLを用いて係数を小さくすれば整数方程式に変換できて解けるのでは...！？と気付くでしょう。実際に考えてみましょう。
 
@@ -1284,18 +1036,16 @@ $g(x_0) = 0 \pmod N$ より $g(x_0) = 0$ となる。
 
 実は $\bmod {N}$ では難しいので、$\bmod {N^m}$ に持ち上げることで同じ解の方程式を増やすことができます。
 
------
-
-#### Lemma
-$N$ を法、$f(x)$ を多項式とする。自然数 $m, l$ について
-
-$$
+> **Lemma.**
+> $N$ を法、$f(x)$ を多項式とする。自然数 $m, l$ について
+>
+> $$
 g_{i,j}(x) := N^{m−i}x^j f^i(x) \ (0 \leq i \leq m, 0 \leq j\leq l)
 $$
+>
+> とおく。このとき、 $f(x_0) = 0 \pmod N$ をみたす $x_0 \in \mathbb{Z}$ について、 $g_{i,j}(x_0) = 0 \pmod{N^m}$ となる。
 
-とおく。このとき、 $f(x_0) = 0 \pmod N$ をみたす $x_0 \in \mathbb{Z}$ について、 $g_{i,j}(x_0) = 0 \pmod{N^m}$ となる。
-
-証明
+**Proof.**
 
 $f(x_0) = 0 \pmod N$ なので $f(x_0) = kN$ とおける。
 
@@ -1308,7 +1058,7 @@ g_{i,j}(x_0) &= 0 \pmod{N^m} \\
 \end{aligned}
 $$
 
------
+$\Box$
 
 これで方程式を増やすことができました！ちゃんとLLLで動くかちょっと不安ですがとりあえずやってみます。
 
@@ -1326,29 +1076,15 @@ g_{2,1}^{(0)} & g_{2,1}^{(1)}X & g_{2,1}^{(2)}X^2 & g_{2,1}^{(3)}X^3 & g_{2,1}^{
 \end{pmatrix}
 $$
 
-これをLLLに通してあげると無事小さな値の方程式が返ってきます。これがHowgrave-Grahamの補題を満たしていれば整数方程式となります。後は適当に増減表書いたりして探索すれば解けます。
-
-### ほんまか？
+これをLLLに通してあげると無事小さな値の方程式が返ってきます。これがHowgrave-Grahamの補題を満たしていれば整数方程式となります。後は増減表書いたりして探索すれば解けます。
 
 これらの操作はCoppersmithの定理と呼ばれています。
 
------
-
-#### Thm. Coppersmithの定理
-$N$ を法とし $f(x)$ をモニックな 1変数 $\delta$ 多項式とする。このとき $f(x_0) = 0 \pmod{N}$ と次の条件を満たすような $x_0$ を効率よく求めることができる
-
-$$
+> **Thm. Coppersmithの定理**
+> $N$ を法とし $f(x)$ をモニックな 1変数 $\delta$ 多項式とする。このとき $f(x_0) = 0 \pmod{N}$ と次の条件を満たすような $x_0$ を効率よく求めることができる
+>
+> $$
 |x_0| \leq N^{\frac{1}{\delta}}
-$$
-
------
-
-これで一般のn次方程式について小さな解を求めることができるようになりました！
-
-// TODO ここに具体例
-
-$$
-ax^5 + bx + c = 0
 $$
 
 さらにCoppersmithの定理には拡張できることが2つあります。
@@ -1360,15 +1096,83 @@ $$
 
 これらをまとめてCoppersmith Methodと呼びます。
 
+Berlekamp-Zassenhause法
+
 これを使って様々な攻撃ができます。
 Coppersmith Method はRSAをそのまま与えても解けませんが何かしらの値が一部分だけ分かっていると解けるというものです。
 
 解きたい方程式の法の数の下限 $\beta$ と解が存在しうる上限 $X$ を決めて関数を与えると解が返ってきます。
 
-## 参考
+## 環論
+ユークリッドの互除法
+
+## 多項式環
+
+さて多変数連立n次方程式の場合はどうでしょう。Coppersmithも使うこともできますが、精度は出にくいです。これに対して使われる道具は多項式GCD, 終結式, Gröbner基底があります。
+
+### 多項式GCD
+
+まずは多項式GCDです。
+例えば $x$ について同じ解を持つ次のような方程式を考えてみましょう。
+
+$$
+\begin{cases}
+f_1 = x^e - c_1 & \pmod{N} \\
+f_2 = (x + y)^e - c_2 & \pmod{N} \\
+\end{cases} \\
+$$
+
+これは多項式GCDを取ると解けます。その名の通り、ある2つの方程式に公約式があったとき、最も次数が大きい公約式を返します。Half-GCDというアルゴリズムを用いると $O(N(\log{N})^2)$ でGCDが取れます。(N is 何)
+
+$$
+\begin{aligned}
+&\begin{cases}
+f_1 = x^e - c_1 & \pmod{N} \\
+f_2 = (x + y)^e - c_2 & \pmod{N} \\
+\end{cases} \\
+\iff
+&\begin{cases}
+f_1 = (x - m)g_1 & \pmod{N} \\
+f_2 = (x - m)g_2 & \pmod{N} \\
+\end{cases} \\
+&\gcd(f_1, f_2) = x - m
+\end{aligned}
+$$
+
+### 終結式
+式増やしてgcd
+
+### Gröbner 基底
+
+Gröbner 基底のお気持ちは多項式を基底簡約するものです。
+Buchberger's Algorithm
+Buchberger の業績を Gröbner 教授が奪って発表した
+
+$$
+T = \lbrace x_1^{e_1}x_2^{e_2}\cdots x_l^{e_l}\mid e_1,e_2,\cdots,e_l\in\mathbb{Z}_{\geq 0}\rbrace
+$$
+
+- $\mathrm{lt}(f)$: 先頭項 (leading term)
+- $\mathrm{lc}(f)$: 先頭係数 (leading coefficient)
+- $\mathrm{lm}(f)$: 先頭単項式 (leading monomial)
+
+$f = 5x_1^2x_3 - 2x_1x_3 + 3x_2x_3 \in \mathbb{Q}[x_1, x_2, x_3]$ のとき $\mathrm{lt}(f) = x_1^2x_3$, $\mathrm{lc}(f) = 5$, $\mathrm{lm}(f) = 5x_1^2x_3$ となる。
+
+と呼ばれています。
+
+表に解き方をまとめるとこんな感じです。
+
+|            |           1変数          |               多変数              |
+|:----------:|:------------------------:|:---------------------------------:|
+| 線型方程式 | 拡張ユークリッドの互除法 |                LLL                |
+|  n次方程式 |    Coppersmith Method    | 多項式GCD, 終結式, Gröbner基底 |
+
+
+## 参考文献
 - [元論文](https://static.aminer.org/pdf/PDF/000/192/854/finding_a_small_root_of_a_univariate_modular_equation.pdf)
 - [katagaitai workshop 2018 winter](http://elliptic-shiho.github.io/slide/katagaitai_winter_2018.pdf)
 - [Factoring Integers with Elliptic Curves - HW Lenstra, Jr.](https://wstein.org/edu/Fall2001/124/lenstra/lenstra.pdf)
+- Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer https://arxiv.org/abs/quant-ph/9508027
 
 
 ## 記号
@@ -1377,5 +1181,3 @@ $\mathbb{Z}$: 整数の集合
 $\mathbb{Q}$: 有理数の集合
 $\mathbb{R}$: 実数の集合
 $\mathbb{C}$: 複素数の集合
-
-

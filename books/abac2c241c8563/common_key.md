@@ -162,12 +162,16 @@ $$
 
 ## 攻撃
 ### Padding Oracle Attack
+
+Oracle は企業の Oracle ではなくて神託と呼ばれる神様が発した言葉のこと
+
 Padding Oracle Attack を使って暗号/復号化関数 $E_k$ を作る。
 すると鍵を考えなくてもいい感じになり、上の式を辿るだけで解けるようになる。
 
+POODLE Attack (Padding Oracle On Downgraded Legacy Encryption) CBC モード自体は安全なのですが、プロトコルの作り方や組み合わせ方によっては安全ではなくなる
+
 ### BEAST Attack
 ### Lucky Thirteen Attack
-### POODLE Attack
 ### ghash
 ### Integral Cryptanalysis
 ### Differencial cryptanalysis
