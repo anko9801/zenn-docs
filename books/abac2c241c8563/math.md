@@ -649,6 +649,37 @@ print(crt(dlogs, primes))
 
 ### 指数計算法 (Index Calculus Algorithm)
 
+1. 小さな素因数 $p_j$ を用いて $yg^k = \prod_{j = 1}^m p_j^{e_{j}} \pmod p$ と書けるような $k$ を見つける。
+2. $g^{k_i} = \prod_{j = 1}^m p_j^{e_{ij}} \pmod{p}$ と素因数分解できるような $k_i$ を $m$ 個以上見つける。
+
+$$
+\begin{aligned}
+  g^{k_i} & = \prod_{j = 1}^m p_j^{e_{ij}} & \pmod p \\
+  k_i & = \sum_{j = 1}^m e_{ij}\log_g{p_j} & \pmod{p-1} \\
+\begin{pmatrix}
+  k_1 \\
+  \vdots \\
+  k_m \\
+\end{pmatrix} & =
+\begin{pmatrix}
+  e_{11} & \cdots & e_{m1} \\
+  \vdots & \ddots & \vdots \\
+  e_{1n} & \cdots & e_{mn}\\
+\end{pmatrix}
+\begin{pmatrix}
+  \log_g p_1 \\
+  \vdots \\
+  \log_g p_m \\
+\end{pmatrix} & \pmod{p-1}
+\end{aligned}
+$$
+
+これよりガウスの消去法から $\log_g p_1, \ldots, \log_g p_n$ が求まる。よって次の式より $x$ が求まる。
+
+$$
+x = \sum_{j = 1}^me_j\log_g{p_j} - k \pmod {p-1}
+$$
+
 ### 数体ふるい法
 - [General purpose integer factoring](https://eprint.iacr.org/2017/1087)
 
