@@ -495,9 +495,9 @@ $p-1$ が Smooth number のとき有効な素因数分解法です。
 > $N$ がある素因数 $p$ をもつとき $k$ が $p-1$ の倍数であれば $a^k - 1 \pmod N$ は $p$ の倍数となる。
 
 **Proof.**
-フェルマーの小定理より $a^k = 1 \pmod p$ であるから $a^k - 1 \pmod N$ は $p$ の倍数である。よって $\gcd(a^k - 1, N)$ は $p$ の倍数となる。$\Box$
+フェルマーの小定理より $a^k = 1 \pmod p$ であるから $a^k - 1 \pmod N$ は $p$ の倍数である。$\Box$
 
-もちろん $p$ の値は分からないので約数をたくさん持つような $M$ を用意して、$N$ のどれかの大きな素因数 $p$ に対して $p-1$ の倍数となったとき $\gcd(a^k - 1, N)$ を計算することで $p$ を取り出せる。
+もちろん $p$ の値は分からないので約数をたくさん持つような $M$ を用意して、$N$ のどれかの大きな素因数 $p$ に対して $p-1$ の倍数となったとき $\gcd(a^k - 1, N)$ を計算することで $p$ を取り出せます。
 
 果たしてそんなうまくいくのだろうか？これを初めて聞いたとき大きな数は大体大きな素因数持ってるだろうからほとんど上手くいかなそうと感じました。
 
@@ -525,18 +525,31 @@ Lucas 数列について
 
 $$
 \begin{aligned}
-\end{aligned}
-$$
-
-
-$$
-\begin{aligned}
   \alpha,\beta & = \frac{a \pm \sqrt{a^2 - 4b}}{2} \\
   y_n & = \frac{\alpha^n - \beta^n}{\alpha - \beta}
 \end{aligned}
 $$
 
-約数の多い $k$ を用意して $\gcd(y_k, N)$ が出てくる。確率は？
+$$
+\begin{aligned}
+  2^{n-1}x_n & = \sum_k^n {}_nC_{2k}a^{n-2k}d^k \\
+  2^{n-1}y_n & = \sum_k^n {}_nC_{2k+1}a^{n-2k-1}d^k
+\end{aligned}
+$$
+
+$n = p$ と素数となるとき
+
+$$
+\begin{aligned}
+  x_p & = \sum_{k=0}^{(p-1)/2} {}_pC_{2k}a^{p-2k}d^k = a & \pmod p \\
+  y_p & = \sum_{k=0}^{(p-1)/2} {}_pC_{2k+1}a^{p-2k-1}d^k = d^{(p-1)/2} & \pmod p
+\end{aligned}
+$$
+
+$d^{(p-1)/2} = -1$ のとき $y_{p+1} = ay_p + by_{p-1} = -a + (x_p - y_{p+1}) = -y_{p+1}$ より $y_{p+1} = 0$
+$d^{(p-1)/2} = 1$ のとき $by_{p-1} = y_{p+1} - ay_p = (x_p - by_{p-1}) - ay_p = -by_{p-1}$ より $y_{p-1} = 0$
+
+約数の多い $k$ を用意して $\gcd(y_k, N)$ が出てくる。確率はどれくらい？
 
 ### 楕円曲線法
 一般に有効な素因数分解法です。
@@ -544,18 +557,20 @@ $$
 > **Prop.**
 > $k$ が $\#E/(\mathbb{Z}/N\mathbb{Z})$ の倍数であれば $kP = \mathcal{O}$ となる。このとき内部計算時に $x_1 - x_2$ が $p$ の倍数となる。
 
-$N$ が 2, 3 の倍数でないとき、楕円曲線 $y^2 = x^3 + ax + b \pmod N$ について $a, b$ を様々な値を与えて $kP$ を計算する。
+$N$ が 2, 3 の倍数でないとします。楕円曲線 $y^2 = x^3 + ax + b \pmod N$ について $a, b$ に様々な値を与えて $kP$ を計算します。
+
+計算量は準指数時間 $\mathcal{O}(\exp(c(\log p)^{1/2}(\log\log p)^{1/2}))$ らしい。
 
 ### 二次ふるい法 (QS; Quadratic Sieve)
 $x^2 = y^2 \pmod N$ となる $x, y$ が見つけられたとすると $x^2 - y^2 = (x + y)(x - y)$ が $N$ の倍数つまり $\gcd(x + y, N)$
 
 ### 一般数体ふるい法 (GNFS; General Number Field Sieve)
-
+計算量は $\mathcal{O}(\exp(c(\log n)^{1/3}(\log\log n)^{2/3}))$
 
 ### Shor のアルゴリズム
 
 ## 離散対数問題
-離散対数問題 (DLP: Discrete Logarithm Problem) とは位数 $N$ の巡回群 $G$ について $a, b\in G$ が与えられるので $a^n = b$ となる最小の $n\in \mathbb{N}$ を求める問題である。
+離散対数問題 (DLP: Discrete Logarithm Problem) とは位数 $N$ の巡回群 $G$ について $g, y\in G$ が与えられるので $g^x = y$ となる最小の $x\in \mathbb{N}$ を求める問題である。
 
 - 有限体 $\mathbb{F}_p$ の DLP は FFDLP; Finite Field DLP と呼ばれる。巡回群の位数は $p-1$ となる。
 - 楕円曲線 $E$ 上での DLP は ECDLP; Elliptic Curve DLP と呼ばれる。巡回群の位数は Hasse の定理より $|\#E/\mathbb{F}_p - (p+1)|\leq 2\sqrt{p}$ と制限される。
@@ -568,11 +583,11 @@ $m = \lceil\sqrt{N}\rceil$ とおく。DLP の解 $n$ を $m$ で割って $n = 
 
 $$
 \begin{aligned}
-b & = a^{qm + r} & (q, r\in[0, m-1])
+y & = g^{qm + r} & (q, r\in[0, m-1])
 \end{aligned}
 $$
 
-このとき $ba^{-r}$, $a^{qm}$ を全列挙し、どちらかのリストの要素をもう1つのリストで検索して解を探索する。この計算量は $O(\sqrt{N}\log N)$ となる。
+このとき $yg^{-r}$, $g^{qm}$ を全列挙し、どちらかのリストの要素をもう1つのリストで検索して解を探索する。この計算量は $O(\sqrt{N}\log N)$ となる。
 
 ### Pollard's $\rho$ 法
 
@@ -582,7 +597,6 @@ $$
 > 誕生日が同じ 2 人を見つけたいときに確率 $P$ を超えるには人を何人集めればよいのかという問題です。鳩ノ巣原理から $366$ 人いれば必ず同じ誕生日の人が出てきます。$50\%$ を超えるには $23$ 人で十分です。
 
 **Proof.**
-
 計算量の期待値集合 $S$ に対してそれぞれ相違な $x_0, x_1, \ldots, x_{k-1}$ を選ぶ事象 $A$ と
 
 $$
@@ -597,30 +611,30 @@ $$
 
 $\Box$
 
-1. 疑似乱数関数 $f(x)$ を決めて数列 $x_0, x_{i+1} = f(x_i)$ を生成する。
-2. $x_i = x_j$ となる $i, j\ (0\leq i<j<N)$ を発見したとき以下の方法で DLP が求まる。
+1. 疑似乱数関数 $f(a)$ を決めて数列 $a_0, a_{i+1} = f(a_i)$ を生成する。
+2. $a_i = a_j$ となる $i, j\ (0\leq i<j<N)$ を発見したとき以下の方法で DLP が求まる。
 
 このアルゴリズムで使われる代表的な疑似乱数関数 $f(x)$ について紹介する。まず巡回群 $G$ を疑似乱数的に $G_1, G_2, G_3$ と振り分けた集合とします。
 
 $$
-f(x)=
+f(a)=
 \begin{cases}
-bx & (x \in G_1) \\
-x^2 & (x \in G_2) \\
-ax & (x \in G_3)\\
+ya & (a \in G_1) \\
+a^2 & (a \in G_2) \\
+ga & (a \in G_3)
 \end{cases}
 $$
 
-このとき $x_0 = a$ とすると $x_i = a^{s_i}b^{t_i} = a^{s_i + nt_i}\ (s_i, t_i \in \mathbb{N})$ と書ける。$x_i = x_j$ のとき
+このとき $a_0 = g$ とすると $a_i = g^{s_i}y^{t_i} = g^{s_i + xt_i}\ (s_i, t_i \in \mathbb{N})$ と書ける。$a_i = a_j$ のとき
 
 $$
 \begin{aligned}
-x_ix_j^{-1} & = a^{(s_i + nt_i) - (s_j + nt_j)} = 1 \\
-n &= \frac{s_i - s_j}{t_j - t_i} & \pmod N
+a_ia_j^{-1} & = g^{(s_i + xt_i) - (s_j + xt_j)} = 1 \\
+x &= \frac{s_i - s_j}{t_j - t_i} & \pmod N
 \end{aligned}
 $$
 
-となり $n$ が分かる。
+となり $x$ が分かる。
 Pollard-$\rho$ 法の $\rho$ は文字 $\rho$ の形が由来となっている。
 
 ### Pollard's Kangaroo 法 ($\lambda$ 法)
@@ -628,14 +642,13 @@ $\rho$ 法は動く点が1つの値だったのに対し、 $\lambda$ 法は2つ
 
 $$
 \begin{aligned}
-x_0 & = a^\alpha & y_0 & = b \\
-x_{i+1} & = x_ia^{f(x_i)} & y_{i+1} & = y_ia^{f(y_i)} \\
-x_i & = a^{\alpha + \sum_{k=1}^{i} f(x_k)} & y_i & = a^{n + \sum_{k=1}^{i} f(y_k)}
+x_0 & = g^\alpha & y_0 & = y \\
+x_{i+1} & = x_ig^{f(x_i)} & y_{i+1} & = y_ia^{f(y_i)} \\
 \end{aligned}
 $$
 
-$x_i = y_j$ となるとき $n = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j} f(y_k)$ となる。
-$N$ や $f$ を取り替えて
+$x_i = y_j$ となるとき $x = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j} f(y_k)$ となる。
+見つからなければ $N$ や $f$ を取り替えて繰り返す。
 
 ### Pohlig-Hellman
 
