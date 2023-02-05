@@ -464,7 +464,7 @@ $n-1 = 16 = 2^4 \times 1$ より $s = 4, d = 1$
 素数については必ず成功し、合成数のときは誤る可能性が $1/4$ 以下ということが示せるので、 $k$ 回試行すれば誤り率は $4^{-k}$ 以下となります。つまり、ある値に対して10回素数判定法を回せば99.9999046%成功するということです。
 
 ## 素因数分解
-試し割り法を基本にして
+試し割り法を基本にして $\rho$ 法や楕円曲線法、数体ふるい法などがあります。まず試し割り法で 2, 3 の倍数は除いてから他の方法を選択するとよいです。
 
 ```mermaid
 flowchart LR
@@ -476,6 +476,12 @@ flowchart LR
     id21 --> id4(楕円曲線法)
     id3 --> id5(二次ふるい法) --> id6(一般数体ふるい法)
 ```
+
+計算量はよく $L$ 記法を用いて表現される。なぜかはわからない。計算量解析苦手なので。
+
+$$
+L_n[\alpha, c] = \exp(c(\log n)^\alpha(\log\log n)^{1-\alpha})
+$$
 
 ### 試し割り法
 
@@ -546,8 +552,22 @@ $$
 \end{aligned}
 $$
 
-$d^{(p-1)/2} = -1$ のとき $y_{p+1} = ay_p + by_{p-1} = -a + (x_p - y_{p+1}) = -y_{p+1}$ より $y_{p+1} = 0$
-$d^{(p-1)/2} = 1$ のとき $by_{p-1} = y_{p+1} - ay_p = (x_p - by_{p-1}) - ay_p = -by_{p-1}$ より $y_{p-1} = 0$
+$$
+\begin{aligned}
+  y_{p+1} & = ay_p + by_{p-1} = -a + (x_p - y_{p+1}) = -y_{p+1} & \implies y_{p+1} & = 0 & (d^{(p-1)/2} = -1) \pmod p \\
+  by_{p-1} & = y_{p+1} - ay_p = (x_p - by_{p-1}) - ay_p = -by_{p-1} & \implies y_{p-1} & = 0 & (d^{(p-1)/2} = 1) \pmod p
+\end{aligned}
+$$
+
+繰り返し二乗法っぽく $y_k$ を $\mathcal{O}(\log k)$ で計算できる。
+
+$$
+\begin{aligned}
+  y_{2n} & = 2y_ny_{n+1} - ay_n^2 \\
+  y_{2n+1} & = y_{n+1}^2 + by_n^2 \\
+  y_{2n+2} & = ay_{n+1}^2 + 2by_ny_{n+1}
+\end{aligned}
+$$
 
 約数の多い $k$ を用意して $\gcd(y_k, N)$ が出てくる。確率はどれくらい？
 
@@ -559,21 +579,25 @@ $d^{(p-1)/2} = 1$ のとき $by_{p-1} = y_{p+1} - ay_p = (x_p - by_{p-1}) - ay_p
 
 $N$ が 2, 3 の倍数でないとします。楕円曲線 $y^2 = x^3 + ax + b \pmod N$ について $a, b$ に様々な値を与えて $kP$ を計算します。
 
-計算量は準指数時間 $\mathcal{O}(\exp(c(\log p)^{1/2}(\log\log p)^{1/2}))$ らしい。
+計算量は準指数時間 $\mathcal{O}(\exp((1 + c)(\log p)^{1/2}(\log\log p)^{1/2}))$ らしい。
 
 ### 二次ふるい法 (QS; Quadratic Sieve)
-$x^2 = y^2 \pmod N$ となる $x, y$ が見つけられたとすると $x^2 - y^2 = (x + y)(x - y)$ が $N$ の倍数つまり $\gcd(x + y, N)$
+ある範囲 $\sqrt{N} - \epsilon < x < \sqrt{N} + \epsilon$ の中で $x^2 - N$ が $B$-smooth となるような数をいくつか取ってくる。それらを素因数分解し、いくつかの数の積がちょうど平方数となるように選択する。その平方数を $y^2$ とすると $x^2 = y^2 \pmod N$ となり $x\pm y$ のどちらかは $p$ の倍数となる。
+
+$\gcd(x \pm y, N)$
+
+なんかしらんけど計算量は $\mathcal{O}(\exp((1 + c)(\log n)^{1/2}(\log\log n)^{1/2}))$ らしいです。
 
 ### 一般数体ふるい法 (GNFS; General Number Field Sieve)
-計算量は $\mathcal{O}(\exp(c(\log n)^{1/3}(\log\log n)^{2/3}))$
+計算量は $\mathcal{O}(\exp((1 + c)(\log n)^{1/3}(\log\log n)^{2/3}))$
 
 ### Shor のアルゴリズム
 
 ## 離散対数問題
-離散対数問題 (DLP: Discrete Logarithm Problem) とは位数 $N$ の巡回群 $G$ について $g, y\in G$ が与えられるので $g^x = y$ となる最小の $x\in \mathbb{N}$ を求める問題である。
+離散対数問題 (DLP: Discrete Logarithm Problem) とは位数 $N$ の巡回群 $G$ について $g, y\in G$ が与えられるので $g^x = y$ となる最小の $x\in \mathbb{N}$ を求める問題です。
 
-- 有限体 $\mathbb{F}_p$ の DLP は FFDLP; Finite Field DLP と呼ばれる。巡回群の位数は $p-1$ となる。
-- 楕円曲線 $E$ 上での DLP は ECDLP; Elliptic Curve DLP と呼ばれる。巡回群の位数は Hasse の定理より $|\#E/\mathbb{F}_p - (p+1)|\leq 2\sqrt{p}$ と制限される。
+- 有限体 $\mathbb{F}_p$ の DLP は FFDLP; Finite Field DLP と呼ばれる。巡回群 $\mathbb{F}_p$ の位数は $p-1$ となる。
+- 楕円曲線 $E$ 上での DLP は ECDLP; Elliptic Curve DLP と呼ばれる。巡回群 $E/\mathbb{F}_p$ の位数は Hasse の定理より $|\#E/\mathbb{F}_p - (p+1)|\leq 2\sqrt{p}$ に制限される。
 
 ### Baby-step Giant-step
 
@@ -587,7 +611,7 @@ y & = g^{qm + r} & (q, r\in[0, m-1])
 \end{aligned}
 $$
 
-このとき $yg^{-r}$, $g^{qm}$ を全列挙し、どちらかのリストの要素をもう1つのリストで検索して解を探索する。この計算量は $O(\sqrt{N}\log N)$ となる。
+このとき $yg^{-r}$, $g^{qm}$ を全列挙し、どちらかのリストの要素をもう1つのリストで検索して $yg^{-r} = g^{qm}$ となる組を探索し、解を得る。この計算量は $O(\sqrt{N}\log N)$ となる。
 
 ### Pollard's $\rho$ 法
 
@@ -597,19 +621,19 @@ $$
 > 誕生日が同じ 2 人を見つけたいときに確率 $P$ を超えるには人を何人集めればよいのかという問題です。鳩ノ巣原理から $366$ 人いれば必ず同じ誕生日の人が出てきます。$50\%$ を超えるには $23$ 人で十分です。
 
 **Proof.**
-計算量の期待値集合 $S$ に対してそれぞれ相違な $x_0, x_1, \ldots, x_{k-1}$ を選ぶ事象 $A$ と
+$N$ 種類の元から $k$ 個の元を取ってきたとき $k-1$ 個までそれぞれ相違なり, $k$ 個目で同じとなる確率は $t \ll 1$ のときの近似 $1 - t\approx e^{-t}$ を行うことで次のようになる。
 
 $$
-\begin{aligned}
-P(A) &= \prod_{i = 0}^{k-1}\left(1-\frac{i}{N}\right) \approx \prod_{i = 0}^{k-1}e^{-i/N} \approx e^{-k^2/2N} \\
-P(B) &= \frac{k}{N}e^{-k^2/2N} \\
-E(B) &= \sum_{k=1}^N k\cdot\frac{k}{N}e^{-k^2/2N} \\
-&\approx \sqrt{N}\int_0^\infty t^2e^{-t^2/2} dt \\
-&= \sqrt{\frac{\pi N}{2}}
-\end{aligned}
+P(A) = \frac{k}{N}\prod_{i = 0}^{k-1}\left(1-\frac{i}{N}\right) \approx \frac{k}{N}\prod_{i = 0}^{k-1}e^{-i/N} = \frac{k}{N}e^{-k(k-1)/2N} \approx \frac{k}{N}e^{-k^2/2N}
 $$
 
-$\Box$
+試行回数 $k$ に対する期待値は $t = k/\sqrt{N}$ と変数変換し、ガウス積分することで求まる。
+
+$$
+E(A) \approx \sum_{k=1}^N k\cdot\frac{k}{N}e^{-k^2/2N} = \sum_{k=1}^N t^2e^{-t^2/2} \approx \sqrt{N}\int_0^\infty t^2e^{-t^2/2}dt = \sqrt{\frac{\pi N}{2}}
+$$
+
+よって期待値は $\sqrt{\frac{\pi N}{2}}$ となる。 $\Box$
 
 1. 疑似乱数関数 $f(a)$ を決めて数列 $a_0, a_{i+1} = f(a_i)$ を生成する。
 2. $a_i = a_j$ となる $i, j\ (0\leq i<j<N)$ を発見したとき以下の方法で DLP が求まる。
@@ -636,6 +660,7 @@ $$
 
 となり $x$ が分かる。
 Pollard-$\rho$ 法の $\rho$ は文字 $\rho$ の形が由来となっている。
+償却計算量は $\mathcal{O}(\sqrt{\frac{\pi N}{2}})$ です。
 
 ### Pollard's Kangaroo 法 ($\lambda$ 法)
 $\rho$ 法は動く点が1つの値だったのに対し、 $\lambda$ 法は2つの値がランダムに動いていき、一方がもう一方の点に衝突したとき DLP が解ける。
@@ -659,7 +684,6 @@ $x_i = y_j$ となるとき $x = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j}
 これより中国剰余定理から $\mathcal{O}(\max{p_i^{e_i}})$ に落ちる。
 
 ### 指数計算法 (Index Calculus Algorithm)
-
 有限体上の DLP でのみ有効な方法。
 
 1. 小さな素因数 $p_j$ を用いて $yg^k = \prod_{j = 1}^m p_j^{e_{j}} \pmod p$ と書けるような $k$ を見つける。
@@ -692,6 +716,8 @@ $$
 $$
 x = \sum_{j = 1}^me_j\log_g{p_j} - k \pmod {p-1}
 $$
+
+計算量は $\exp((\sqrt{2}+c)(\log n)^{1/2}(\log\log n)^{1/2})$ となる。
 
 ### 数体ふるい法
 - [General purpose integer factoring](https://eprint.iacr.org/2017/1087)
@@ -911,7 +937,7 @@ https://qiita.com/kusano_k/items/5509bff6e426e5043591
 
 
 
-## 方程式
+## 多項式
 $n$ 次方程式について $m$ 個だけ連立されてあるとき
 
 一次連立方程式について行列の次元 rank と連立させた式の数と一致すれば逆行列が存在します。
@@ -1130,11 +1156,6 @@ Coppersmith Method はRSAをそのまま与えても解けませんが何かし�
 
 解きたい方程式の法の数の下限 $\beta$ と解が存在しうる上限 $X$ を決めて関数を与えると解が返ってきます。
 
-## 環論
-ユークリッドの互除法
-
-## 多項式環
-
 さて多変数連立n次方程式の場合はどうでしょう。Coppersmithも使うこともできますが、精度は出にくいです。これに対して使われる道具は多項式GCD, 終結式, Gröbner基底があります。
 
 ### 多項式GCD
@@ -1207,7 +1228,7 @@ $$
 
 
 ## 参考文献
-- [元論文](https://static.aminer.org/pdf/PDF/000/192/854/finding_a_small_root_of_a_univariate_modular_equation.pdf)
+- [Finding a Small Root of a Univariate Modular Equation](https://static.aminer.org/pdf/PDF/000/192/854/finding_a_small_root_of_a_univariate_modular_equation.pdf)
 - [katagaitai workshop 2018 winter](http://elliptic-shiho.github.io/slide/katagaitai_winter_2018.pdf)
 - [Factoring Integers with Elliptic Curves - HW Lenstra, Jr.](https://wstein.org/edu/Fall2001/124/lenstra/lenstra.pdf)
 - Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer https://arxiv.org/abs/quant-ph/9508027
