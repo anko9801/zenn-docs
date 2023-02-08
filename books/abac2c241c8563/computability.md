@@ -82,6 +82,8 @@ https://www.ambionics.io/blog/php-mt-rand-prediction
 
 それぞれ簡単な仕組みなので全部紹介します。
 
+https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-90a.pdf
+
 #### Hash_DRBG
 
 #### HMAC_DRBG
@@ -103,6 +105,7 @@ $$
 $r_i$ は 32 バイトであり、上位 2 バイトを削除した 30 バイトを連結させて出力する。
 
 しかし、もし NSA がこの点について ECDLP が解けている場合、内部状態を復元できる為、バックドアとなります。
+2006 年に NIST SP800-90A に組み込まれ、2013 年に利用すべきではないと勧告されています。
 
 ## ゼロ知識証明
 ゼロ知識証明の性質
