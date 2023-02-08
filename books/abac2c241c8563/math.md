@@ -692,7 +692,7 @@ $$
 ### 数体ふるい法
 - [General purpose integer factoring](https://eprint.iacr.org/2017/1087)
 
-# 格子
+## 格子
 
 図でイメージ掴むのが速い
 
@@ -822,7 +822,7 @@ $O(N^3)$
 def gram_schmidt():
 ```
 
-## Shortest Vector Problem(SVP)
+### Shortest Vector Problem(SVP)
 
 格子上の非零なベクトルの中で最もノルムが小さなベクトルを見つけ出す問題です。
 そのベクトルを $\mathbf{v}$ とおくと次のように表せられます。
@@ -867,9 +867,8 @@ def size_reduction(B):
                 B[i] -= q * B[j]
                 mu[i] -= q * mu[j]
     return B
-```
 
-```python
+
 B = [vector([5, -3, -7]), vector([2, -7, -7]), vector([3, -10, 0])]
 print(size_reduction(B))
 ```
@@ -901,11 +900,17 @@ https://qiita.com/kusano_k/items/5509bff6e426e5043591
 
 ## Closest Vector Problem(CVP)
 
-### Babai’s Algorithm
 
 ### Kannan’s embedding method
 
 
+### Babai’s Algorithm
+
+$$
+\begin{aligned}
+  w = \sum a_ib_i
+\end{aligned}
+$$
 
 ## 多項式
 $\mathbb{F}_p[x]$

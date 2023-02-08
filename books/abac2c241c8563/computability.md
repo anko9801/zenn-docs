@@ -80,16 +80,22 @@ https://www.ambionics.io/blog/php-mt-rand-prediction
 - CTR_DRBG
 - Dual_EC_DRBG
 
-それぞれ簡単な仕組みなので全部紹介します。
+それぞれの詳細や実装は以下の規格書を読んでもらうことにして、基本的なアイデアを載せます。
 
-https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-90a.pdf
+[NIST SP 800-90A (Recommendation for Random Number Generation Using Deterministic Random Bit Generators)](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-90a.pdf)
 
 #### Hash_DRBG
 
 #### HMAC_DRBG
-$HMAC(K, V\|0x00\|data)$
+$$
+\begin{aligned}
+
+\end{aligned}
+$$
+$HMAC(K, V\|0x00\|input)$
 
 #### CTR_DRBG
+AES-CTR
 
 #### Dual_EC_DRBG
 
