@@ -20,13 +20,11 @@ title: "計算可能性とゼロ知識証明"
 乱数を用いた確率的な計算不能性を用いて担保されることが多いです。例えば鍵生成や Nonce Salt, ワンタイムパッドなど。乱数はどうやって生成しているのか次の節で紹介していきます。
 
 ## 乱数生成
-
-乱数生成器は大きく分けて2つに分けられます。
+乱数生成器は大きく分けて 3 つに分けられます。
 
 - アルゴリズムで生成する決定論的乱数生成器 (DRBG; Deterministic Random Bit Generator)
 - 熱のノイズやリングオシレーター、量子力学的性質などを用いる真性乱数生成器 (TRNG; True Random Number Generator)
-
-また、これらを組み合わせた乱数生成器もしくは DRBG のみを疑似乱数生成器 (PRNG; Pseudo Random Number Generator) と呼びます。
+- DRBG と TRNG を組み合わせた乱数生成器もしくは DRBG のみを疑似乱数生成器 (PRNG; Pseudo Random Number Generator) (実際は DRBG と PRNG は同じ意味らしいが便宜上この定義とする)
 
 私は TRNG の仕組みをあまり知らないので DRBG だけを紹介していこうと思います。
 
