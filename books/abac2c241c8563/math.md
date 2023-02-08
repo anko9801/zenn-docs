@@ -81,28 +81,7 @@ $$
 G_1/\mathrm{Ker}(\phi) \cong \mathrm{Im}(\phi)
 $$
 
-> **Prop.**
-> $p$ を素数とおくと
->
-> $$
-(\mathbb{Z}/p\mathbb{Z})^\times \cong \mathbb{Z}/(p−1)\mathbb{Z}
-$$
-
-**Proof.**
-$(\mathbb{Z}/p\mathbb{Z})^\times$ において位数 $p - 1$ の元 (原始根) が存在することを示す。
-まず $n$ が $p - 1$ の約数であるとき $x^n = 1$ は $n$ 個の解を持つことを示す。仮定より $p - 1 = nk$ とおけ、次のそれぞれの式について解の個数について考える。
-
-$$
-x^{p-1} - 1 = (x^n - 1)((x^n)^{k-1} + \ldots + x^n + 1)
-$$
-
-$x^{p-1} - 1 = 0$ はフェルマーの小定理より $p - 1$ 個
-$(x^n)^{k-1} + \ldots + x^n + 1 = 0$ は代数学の基本定理より $n(k-1)$ 個以下
-よって $x^{n} - 1 = 0$ は解の個数を比較して $n$ 個存在する。
-
-これより $p-1$ と互いに素な数の個数だけ原始根が存在する。
-
-原始根 $a$ を1つ選び、写像 $\phi: \mathbb{Z}\to(\mathbb{Z}/p\mathbb{Z})^\times$ を $\phi(k) = a^k$ とすると、これは準同型である。全射である。$\mathrm{Ker}(\phi) = (p-1)\mathbb{Z}$。よって $(\mathbb{Z}/p\mathbb{Z})^\times \cong \mathbb{Z}/(p−1)\mathbb{Z}$ である。$\Box$
+### 中国剰余定理
 
 > **Thm. 中国剰余定理 (CRT; Chinese Remainder Theorem)**
 > $m, n \neq 0$ が互いに素な整数なら、$\mathbb{Z}/mn\mathbb{Z} \cong \mathbb{Z}/m\mathbb{Z}\times\mathbb{Z}/n\mathbb{Z}$
@@ -207,6 +186,31 @@ https://qiita.com/drken/items/ae02240cd1f8edfc86fd
 - 剰余 $m_i$ が互いに素ではないときの Garner のアルゴリズムを実装せよ。
 :::
 
+### 乗法群
+
+> **Prop.**
+> $p$ を素数とおくと
+>
+> $$
+(\mathbb{Z}/p\mathbb{Z})^\times \cong \mathbb{Z}/(p−1)\mathbb{Z}
+$$
+
+**Proof.**
+$(\mathbb{Z}/p\mathbb{Z})^\times$ において位数 $p - 1$ の元 (原始根) が存在することを示す。
+まず $n$ が $p - 1$ の約数であるとき $x^n = 1$ は $n$ 個の解を持つことを示す。仮定より $p - 1 = nk$ とおけ、次のそれぞれの式について解の個数について考える。
+
+$$
+x^{p-1} - 1 = (x^n - 1)((x^n)^{k-1} + \ldots + x^n + 1)
+$$
+
+$x^{p-1} - 1 = 0$ はフェルマーの小定理より $p - 1$ 個
+$(x^n)^{k-1} + \ldots + x^n + 1 = 0$ は代数学の基本定理より $n(k-1)$ 個以下
+よって $x^{n} - 1 = 0$ は解の個数を比較して $n$ 個存在する。
+
+これより $p-1$ と互いに素な数の個数だけ原始根が存在する。
+
+原始根 $a$ を1つ選び、写像 $\phi: \mathbb{Z}\to(\mathbb{Z}/p\mathbb{Z})^\times$ を $\phi(k) = a^k$ とすると、これは準同型である。全射である。$\mathrm{Ker}(\phi) = (p-1)\mathbb{Z}$。よって $(\mathbb{Z}/p\mathbb{Z})^\times \cong \mathbb{Z}/(p−1)\mathbb{Z}$ である。$\Box$
+
 知っておくと便利な定理があります。
 
 > **Thm. Carmichael の定理**
@@ -225,7 +229,7 @@ $$
 これについても良記事があります。
 https://integers.hatenablog.com/entry/2016/07/24/163831
 https://integers.hatenablog.com/entry/2017/06/08/191649
-
+### Tonelli Shanks のアルゴリズム
 
 > **Def. 平方剰余**
 > $\mathbb{Z}/(p-1)\mathbb{Z}$ が偶数か奇数かを判別する方法
@@ -350,7 +354,11 @@ $p = 13$ のとき $\mathbb{Z}/12\mathbb{Z} = \mathbb{Z}/3\mathbb{Z}\times\mathb
 
 ### Miller–Rabin 素数判定法
 
-素数判定法とはその名の通り、数を与えるとそれが素数かどうかが分かる判定法です。その中で Miller-Rabin 素数判定法は与えられた数 $n$ が素数かどうかを計算時間 $O(k\log^3 n)$ で誤り率 $4^{-k}$ 以下で判定する確率的素数判定アルゴリズムです。
+素数判定法とはその名の通り、数を与えるとそれが素数かどうかが分かる判定法です。
+
+> **Miller-Rabin 素数判定法**
+> 与えられた数 $n$ が素数かどうかを計算時間 $O(k\log^3 n)$ で誤り率 $4^{-k}$ 以下で判定する確率的素数判定アルゴリズムです。
+
 
 $n$ が素数のとき、$n-1$ はそれを $2$ で割れるだけ割った数を $d$ として $n-1 = 2^sd$ と書けます。フェルマーの小定理より $a≠0 \pmod n$ のとき
 

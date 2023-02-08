@@ -35,7 +35,9 @@ asdf reshim
 ```
 
 pylance
+Ruff
 
+- `ruff`
 - `PyCryptodome`
 - `gmpy2`
 - `pwntools`

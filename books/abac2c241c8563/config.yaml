@@ -11,8 +11,8 @@ chapters:
   - rsa
   - ecc
   - lattice
-  - computability
   - hash
+  - computability
   - protocol
   - blockchain
   - environment

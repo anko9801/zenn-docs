@@ -171,6 +171,10 @@ Padding Oracle Attack を使って暗号/復号化関数 $E_k$ を作る。
 POODLE Attack (Padding Oracle On Downgraded Legacy Encryption) CBC モード自体は安全なのですが、プロトコルの作り方や組み合わせ方によっては安全ではなくなる
 
 ### BEAST Attack
+BEAST; Browser Exploit Against SSL/TLS は TLS の脆弱性を用いた攻撃
+Cookie のセッション情報を狙う
+TLS_RSA_WITH_AES_256_CBC_SHAのようなCipherSuite
+
 ### Lucky Thirteen Attack
 ### ghash
 ### Integral Cryptanalysis

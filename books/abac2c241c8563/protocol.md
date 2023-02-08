@@ -91,32 +91,7 @@ $$
 - [Schnorr署名 ―― 30年の時を超えて注目を集める電子署名](https://blog.visvirial.com/articles/721)
 - [RFC8235](https://datatracker.ietf.org/doc/html/rfc8235)
 
-ゼロ知識証明の性質
-- 完全性（Completeness）
-    - 証明者の主張が真であるならば、検証者は真であることが必ずわかること。
-- 健全性（Soundness）
-    - 証明者の主張が偽であれば、検証者はかなり高い確率でそれが偽であること見抜けること。
-- ゼロ知識性（Zero Knowledge）
-	- あらゆる場合において、検証者が証明者から何らかの知識（情報）を盗もうとしても、証明者の主張が真であること以上の知識は得られない
 
-
-名前の通り対話型は有名な洞窟の例のように証明者と検証者がやりとりを繰り返し、証明者が本当に正しい情報を持っているかを確率的に検証する方です。
-
-一方、非対話型のゼロ知識証明は証明者と検証者はやりとりをせずに証明することが可能です。対話を行う代わりに証明者と検証者の間に第三者を置き、CRSと呼ばれる事前に公開される情報を証明者と検証者に送ります。証明者はそのCRSを用いて正しい情報を持っているという証明を生成し、それを検証者に一回だけ送ります。受け取った検証者はそれを検証するだけで非対話なゼロ知識証明が実現できます。事前にCRSを生成することを一般的に信頼されたセットアップといい、第三者は証明者、検証者にとって信頼される存在となります。
-
-zk-SNARKs
-- Succinct（簡潔）
-    - 証明のサイズがステートメントのサイズと比べて非常に小さい
-- Non-interactive（非対話型）
-    - 証明者と検証者の間で何度も対話をする必要がない
-- ARgument
-    - 証明者の計算能力には限りがある
-- Knowledge
-    - 証明者は、知識なしでは証明を生成することは不可能である。
-
-[ZenGo-X/zk-paillier: A collection of Paillier cryptosystem zero knowledge proofs (github.com)](https://github.com/ZenGo-X/zk-paillier)
-
-[zk-SNARKsの理論 (zenn.dev)](https://zenn.dev/kyosuke/articles/a1854b9be26c01df13eb)
 
 ## SSH
 
