@@ -905,7 +905,7 @@ https://qiita.com/kusano_k/items/5509bff6e426e5043591
 1. サイズ基底簡約
 2. 条件に合うように基底ベクトルの交換
 
-## Closest Vector Problem(CVP)
+### Closest Vector Problem(CVP)
 
 
 ### Kannan’s embedding method
