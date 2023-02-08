@@ -80,26 +80,45 @@ https://www.ambionics.io/blog/php-mt-rand-prediction
 - CTR_DRBG
 - Dual_EC_DRBG
 
-それぞれの詳細や実装は以下の規格書を読んでもらうことにして、基本的なアイデアを載せます。
+これらに共通することとして乱数、Nonce、ユーザーによって指定される文字列を入力し、内部状態であるシード値を生成します。このシード値を用いて、指定されたビット数に達するまで乱数を生成し続けて連結させたものを出力します。何回か生成したらシード値の再生成 (reseed) を行い、エントロピーを上げます。攻撃についても同様に内部状態を復元することで乱数予測することができます。
 
+それぞれの詳細や実装は以下の規格書を読んでもらうことにして、基本的なアイデアを掻い摘んで紹介します。
 [NIST SP 800-90A (Recommendation for Random Number Generation Using Deterministic Random Bit Generators)](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-90a.pdf)
 
 #### Hash_DRBG
+bcrypt などのハッシュ関数 $H$ とシード値 $V_0$ を用いて乱数を生成します。
 
-#### HMAC_DRBG
 $$
 \begin{aligned}
-
+  V_{i+1} & = H(V_i + 1)
 \end{aligned}
 $$
-$HMAC(K, V\|0x00\|input)$
+
+インクリメントする理由は逆変換が同じときに脆弱になるからです。
+
+#### HMAC_DRBG
+シード値 $V_0$ を用いて乱数を生成します。
+
+$$
+\begin{aligned}
+  V_{i+1} & = \mathrm{HMAC}(K, V_i)
+\end{aligned}
+$$
+
+HMAC は SHA-256 を使うことが多いです。
 
 #### CTR_DRBG
-AES-CTR
+AES-CTR の暗号化関数 $E_K$ とシード値 $V_0$ を用いて乱数を生成します。
+
+$$
+\begin{aligned}
+  V_{i+1} & = E_K(V_i + 1)
+\end{aligned}
+$$
 
 #### Dual_EC_DRBG
 
-NIST-p256, NIST-p384, NIST-p521 において点 $P, Q$ と初期シード $s_0$ を用いて乱数を生成する。
+NIST-p256, NIST-p384, NIST-p521 において点 $P, Q$ と初期シード $s_0$ を用いて乱数を生成します。
 
 $$
 \begin{aligned}
@@ -108,10 +127,9 @@ $$
 \end{aligned}
 $$
 
-$r_i$ は 32 バイトであり、上位 2 バイトを削除した 30 バイトを連結させて出力する。
+$r_i$ は 32 バイトの数であり、剰余以上の数はその上位 2 バイトを削除した 30 バイトを連結させて出力します。
 
-しかし、もし NSA がこの点について ECDLP が解けている場合、内部状態を復元できる為、バックドアとなります。
-2006 年に NIST SP800-90A に組み込まれ、2013 年に利用すべきではないと勧告されています。
+しかし、もし NSA がこの点について ECDLP が解けている場合、内部状態を復元できる為、バックドアとなります。この為、2006 年に NIST SP800-90A に組み込まれましたが、2013 年に利用すべきではないと勧告されています。
 
 ## ゼロ知識証明
 ゼロ知識証明の性質
