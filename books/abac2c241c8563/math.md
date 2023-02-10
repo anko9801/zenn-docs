@@ -284,9 +284,9 @@ $$
 \end{aligned}
 $$
 
-(本当は同型関数 $\phi: \mathbb{Z}/(p-1)\mathbb{Z} \to \mathbb{Z}/q\mathbb{Z} \times \mathbb{Z}/2^Q\mathbb{Z}$ を用いて $\phi(a) = (a_1, a_2)$ と書きますが、分かりやすさの為に省略します。)
+(本当は同型関数 $\phi: (\mathbb{Z}/p\mathbb{Z})^\times \to \mathbb{Z}/q\mathbb{Z} \times \mathbb{Z}/2^Q\mathbb{Z}$ を用いて $\phi(a) = (a_1, a_2)$ と書きますが、分かりやすさの為に省略します。)
 
-これより $\mathbb{Z}/q\mathbb{Z}$ は解と同じとなります。
+これより $\mathbb{Z}/q\mathbb{Z}$ について解が合いました。
 
 次に $\mathbb{Z}/2^Q\mathbb{Z}$ を合わせます。
 
@@ -301,12 +301,11 @@ $$
 
 このときの $s$ を用いると誤差 $e$ について $1$ となっている一番下のビットは $Q - s$ ビット目とわかります。
 
-ここで平方剰余でない数 $u$ を取ると $u, u^q, u^{2^tq}$ はそれぞれ次のようになります。ただし平方剰余ではないことから $u_2$ は奇数です。
+ここで平方剰余でない数 $u$ を取ると $u, u^{2^tq}$ はそれぞれ次のようになります。ただし $u$ は非平方剰余だから $qu_2$ は奇数です。
 
 $$
 \begin{aligned}
   u & = (u_1, u_2) \\
-  u^q & = (0, qu_2) \\
   u^{2^tq} & = (0, 2^tqu_2) \\
 \end{aligned}
 $$
@@ -672,7 +671,7 @@ $x_i = y_j$ となるとき $x = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j}
 有限体上の DLP でのみ有効な方法。
 
 1. 小さな素因数 $p_j$ を用いて $yg^k = \prod_{j = 1}^m p_j^{e_{j}} \pmod p$ と書けるような $k$ を見つける。
-2. $g^{k_i} = \prod_{j = 1}^m p_j^{e_{ij}} \pmod{p}$ と素因数分解できるような $k_i$ を $m$ 個以上見つける。
+2. $g^{k_i} = \prod_{j = 1}^m p_j^{e_{ij}} \pmod{p}$ と素因数分解できるような $k_i$ を $n$ 個以上見つける。
 
 $$
 \begin{aligned}
@@ -736,6 +735,26 @@ $$
 > 格子基底の基本変形に対し、格子は不変である。
 
 化学の格子っぽいもの
+
+### SVP; Shortest Vector Problem
+
+一般の次元の格子上の非零なベクトルの中で最もノルムが小さなベクトルを見つけ出す問題です。
+そのベクトルを $\mathbf{v}$ とおくと次のように表せられます。
+
+$$
+\mathbf{v} = v_1\mathbf{b}_1 + \ldots + v_n\mathbf{b}_n \qquad (\exists v_1, \ldots , v_n \in \mathbb{Z}) \\
+$$
+
+この問題はNP困難
+
+> **Def. 逐次最小**
+> $n$ 次元格子 $L$ に対して、一次独立な格子ベクトル $\mathbf{b}_1,\ldots,\mathbf{b}_i\in L$ を用いて各 $1\leq i\leq n$ における逐次最小を次のように定義する。
+>
+> $$
+\lambda_i(L) := \min_{\mathbf{b}_1,\ldots,\mathbf{b}_i\in L}\max\lbrace\|\mathbf{b}_1\|,\ldots,\|\mathbf{b}_i\|\rbrace
+$$
+>
+> 特に任意の $1\leq i\leq n$ について $\|\mathbf{b}_i\| = \lambda_i(L)$ を満たすとき逐次最小ベクトルと呼び、それらが基底となっているとき逐次最小基底と呼ぶ。
 
 ### Gram-Schmidt の直交化 (GSO; Gram-Schmidt Orthonormalization)
 
@@ -841,23 +860,6 @@ $$
 >
 > となる。 すると集合 $\pi _ l(L)$ は $\{\pi _ l(\mathbf{b} _ {l}),\ldots,\pi _ l(\mathbf{b} _ {n})\}$ を基底に持つ $n-l+1$ 次元の格子であり, $\pi _ l(L)$ を射影格子 (projected lattice) と呼ぶ。
 
-$O(N^3)$
-
-```python
-def gram_schmidt():
-```
-
-### SVP; Shortest Vector Problem
-
-格子上の非零なベクトルの中で最もノルムが小さなベクトルを見つけ出す問題です。
-そのベクトルを $\mathbf{v}$ とおくと次のように表せられます。
-
-$$
-\mathbf{v} = v_1\mathbf{b}_1 + \ldots + v_n\mathbf{b}_n \qquad (\exists v_1, \ldots , v_n \in \mathbb{Z}) \\
-$$
-
-この問題はNP困難
-
 ### 最短ベクトルの数え上げ
 
 まずは全探索してみます。
@@ -894,7 +896,7 @@ $$
 > を満たすとき、基底 $\\{\mathbf{b_1},\ldots,\mathbf{b_n}\\}$ はサイズ簡約されているという。
 > GSO ベクトルを簡約 -> 基底ベクトルを簡約
 > 1. $q = \lfloor\mu_{ij}\rceil$ として $\mathbf{b}_i\leftarrow\mathbf{b}_i - q\mathbf{b}_j$ と更新する。
-> 2. GSO 係数 $\mu_{il}\leftarrow \mu_{il} - q\mu_{jl}$ を更新する。
+> 2. GSO 係数について $\mu_{il}\leftarrow \mu_{il} - q\mu_{jl}$ と更新する。
 
 ```python
 def size_reduction(B):
@@ -916,7 +918,7 @@ print(size_reduction(B))
 
 ### LLL (Lenstra-Lenstra-Lovasz) 基底簡約
 
-実際は LLL 簡約されていることを定義して、簡約されたときの上限や性質を示し、LLL 簡約された基底を返すアルゴリズムを組み、その well-defined 性や高速化を考えますが、前提知識などが不足していたり長くなるのでアルゴリズムとその特徴を書いて終わらせます。
+実際は LLL 簡約されていることを定義して、簡約されたときの上限などを示し、LLL 簡約された基底を返すアルゴリズムの well-defined 性や高速化を考えますが、前提知識などが不足していたり長くなるのでアルゴリズムとその特徴を天下り的に書いて終わらせます。
 
 > **LLL 基底簡約**
 > Lovasz 条件を $1/4 < \delta < 1$ としたときに次を満たすこととする。
@@ -1161,8 +1163,6 @@ $$
 ### Gröbner 基底
 
 Gröbner 基底のお気持ちは多項式を基底簡約するものです。
-Buchberger's Algorithm
-Buchberger の業績を Gröbner 教授が奪って発表した
 
 $$
 T = \lbrace x_1^{e_1}x_2^{e_2}\cdots x_l^{e_l}\mid e_1,e_2,\cdots,e_l\in\mathbb{Z}_{\geq 0}\rbrace
@@ -1174,13 +1174,19 @@ $$
 
 $f = 5x_1^2x_3 - 2x_1x_3 + 3x_2x_3 \in \mathbb{Q}[x_1, x_2, x_3]$ のとき $\mathrm{lt}(f) = x_1^2x_3$, $\mathrm{lc}(f) = 5$, $\mathrm{lm}(f) = 5x_1^2x_3$ となる。
 
-と呼ばれています。
+
+Buchberger の業績を Gröbner 教授が奪って発表した
+
+> **Buchberger's Algorithm**
+> 1. $G = F$
+> 2.
+> 3.
 
 表に解き方をまとめるとこんな感じです。
 
 |            |           1変数          |               多変数              |
 |:----------:|:------------------------:|:---------------------------------:|
-| 線型方程式 | 拡張ユークリッドの互除法 |                LLL                |
+| 1次方程式 | 拡張ユークリッドの互除法 |                LLL                |
 |  n次方程式 |    Coppersmith Method    | 多項式GCD, 終結式, Gröbner基底 |
 
 :::message
@@ -1230,17 +1236,12 @@ $\widetilde{F}(x, y, 1) = F(x, y)$ とか $\widetilde{F}(\lambda x,\lambda y,\la
 $(x,y,z)$ の同値類
 $\{(x,1,0)\ |\ x \in K\}$ は $y = 1$ の直線と無限遠点 $(1,0,0)$ の和として視覚化できる。
 
-和の定義
 群構造をなす証明
 
-和の定義
-楕円曲線上の点 $P, Q$ に対し、直線 $PQ$ と曲線との交点の $y$ 座標を符号反転した点を $P + Q$ とします。
-
-![[Pasted image 20220907220413.png]]
-
-この定義を踏まえて、具体的に式を立てて計算すると $P(x_1, y_1), Q(x_2, y_2)$ として $R(x_3, y_3) = P + Q$ は次のように計算できます。ただし、$P = Q$ のときの直線 $PQ$ は曲線に対する点 $P$ の接線と考えます。
-
-$$
+> **Def. 楕円曲線上の和**
+> $P(x_1, y_1)$、$Q(x_2, y_2)$ として $R(x_3, y_3) = P + Q$ は次のように計算できます。
+>
+> $$
 \begin{aligned}
 x_3 &= \lambda^2 - x_1 - x_2 \\
 y_3 &= \lambda(x_1 - x_3) - y_1 \\
@@ -1251,6 +1252,8 @@ y_3 &= \lambda(x_1 - x_3) - y_1 \\
 \end{dcases}
 \end{aligned}
 $$
+
+楕円曲線上の点 $P, Q$ に対し、直線 $PQ$ と曲線との交点の $y$ 座標を符号反転した点が $P + Q$ となります。ただし、$P = Q$ のときの直線 $PQ$ は曲線に対する点 $P$ の接線と考えます。
 
 > **Thm. Hasse の定理**
 > $p$ を素数, $E/\mathbb{F}_p$ を楕円曲線とする。
@@ -1317,10 +1320,6 @@ $$
 \end{aligned}
 $$
 
-![[Pasted image 20220907220319.png]]
-
-
-![[Pasted image 20220907220303.png]]
 楕円関数体
 楕円曲線
 
