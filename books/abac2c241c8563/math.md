@@ -29,7 +29,7 @@ $\mathbb{C}$: 複素数の集合
 > **Def. 群**
 > 空集合でない集合 $G$ と $G$ 上の演算が定義されていて次を満たすとき $G$ は群であるという。
 > 1. 単位元と呼ばれる元 $e\in G$ があり、任意の元 $a\in G$ に対し $ae = ea = a$ となる。この $e$ は $e$ や $1$ のように書く。$G$ の群であることを強調して $1_G$ と書くこともある。
-> 2. 任意の元 $a\in G$ に対し逆元と呼ばれる元 $b\in G$ があり、$ab = ba = e$ となる. この $b$ を $a^{-1}$ と書く。
+> 2. 任意の元 $a\in G$ に対し逆元と呼ばれる元 $b\in G$ があり、$ab = ba = e$ となる。 この $b$ を $a^{-1}$ と書く。
 > 3. 結合法則 $a(bc) = (ab)c$
 
 具体例
@@ -707,40 +707,49 @@ $$
 
 図でイメージ掴むのが速い
 
-線形独立な $n$ 個のベクトル $\mathbf{b}_1, \mathbf{b}_2, \ldots , \mathbf{b}_n \in \mathbb{R}^m$ について整数係数の線形結合によって生成されるベクトルの集合を格子 $L$ と定義します。
+> **Def. 格子**
+>  $n$ 個の線形独立なベクトル $\mathbf{b}_1,\ldots,\mathbf{b}_n\in\mathbb{R}^m$ について整数係数の線形結合によって生成されるベクトルの集合を格子 $\mathcal{L}$ と定義します。
+>
+> $$
+\mathcal{L}(\mathbf{b}_1,\ldots, \mathbf{b}_n) := \left\{ \sum_{i=1}^{n} a_i\mathbf{b}_i\in\mathbb{R}^m\ \middle|\ a_i \in \mathbb{Z} \right\}
+$$
+
 
 $$
-L = \left\{ \sum_{i=1}^{n} a_i\mathbf{b}_i \ \middle| \ a_i \in \mathbb{Z} \right\}
+\mathbf{B} = \begin{pmatrix}
+  \mathbf{b}_1 \\
+  \vdots \\
+  \mathbf{b}_n \\
+\end{pmatrix} = \begin{pmatrix}
+  b_{11} & \cdots & b_{1m} \\
+  \vdots & \ddots & \vdots \\
+  b_{n1} & \cdots & b_{nm} \\
+\end{pmatrix}
 $$
+
+> **Prop.**
+> 格子基底の基本変形に対し、格子は不変である。
 
 化学の格子っぽいもの
 
-格子 $L$ に囲まれた空間を1つ
-具体例
-
-- SVP
-- near SVP
-- CVP
-- near CVP
-
 ### Gram-Schmidt の直交化 (GSO; Gram-Schmidt Orthonormalization)
 
-Gram-Schmidt 直交化 (GSO; Gram-Schmidt Orthonormalization) とは実 $m$ 次元ベクトル空間 $\mathbb{R}^m$ の任意の $\mathbb{R}$ ベクトル空間としての基底を直交基底に変換する方法です. $\mathbf{b} _ n$ の直交化は $\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n-1}$ すべてと直交するように元の高さのまま移動させます. GSOのWikipedia のgifがわかりやすいです.
+Gram-Schmidt 直交化 (GSO; Gram-Schmidt Orthonormalization) とは実 $m$ 次元ベクトル空間 $\mathbb{R}^m$ の任意の $\mathbb{R}$ ベクトル空間としての基底を直交基底に変換する方法です。 $\mathbf{b} _ n$ の直交化は $\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n-1}$ すべてと直交するように元の高さのまま移動させます。 GSO の Wikipedia の gif がわかりやすいです。
 
-> **Def. GSOベクトル**
-> $n$ 次元格子 $L\subseteq \mathbb{R}^m$ の順序付き基底 $\{\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n}\}$ に対するGSOベクトル $\mathbf{b} _ {1}^* ,\ldots, \mathbf{b} _ {n}^ *\in\mathbb{R}^m$ をGSO係数 $\mu _ {i,j}$ を用いて次のように定義する.
+> **Def. GSO ベクトル**
+> $n$ 次元格子 $L\subseteq \mathbb{R}^m$ の順序付き基底 $\{\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n}\}$ に対する GSO ベクトル $\mathbf{b} _ {1}^* ,\ldots, \mathbf{b} _ {n}^ *\in\mathbb{R}^m$ を GSO 係数 $\mu _ {i,j}$ を用いて次のように定義する。
 >
 > $$
 \begin{aligned}
 &\begin{dcases}
 \mathbf{b} _ 1^* := \mathbf{b} _ 1 \\
-\mathbf{b} _ i^ * := \mathbf{b} _ i - \sum _ {j=1}^{i-1} \mu _ {i, j} \mathbf{b} _ j^ * & (2\leq i\leq n) \\
+\mathbf{b} _ i^ * := \mathbf{b} _ i - \sum _ {j=1}^{i-1} \mu _ {ij} \mathbf{b} _ j^ * & (2\leq i\leq n) \\
 \end{dcases} \\
-&\quad\mu _ {i, j} := \frac{\langle \mathbf{b} _ i, \mathbf{b}_j^ * \rangle}{\| \mathbf{b} _ j^ * \|^2} \qquad (1\leq j<i\leq n)
+&\quad\mu _ {ij} := \frac{\langle \mathbf{b} _ i, \mathbf{b}_j^ * \rangle}{\| \mathbf{b} _ j^ * \|^2} \qquad (1\leq j<i\leq n)
 \end{aligned}
 $$
 
-行列で書くと次のようになる.
+行列で書くと次のようになる。
 
 $$
 \begin{aligned}
@@ -751,11 +760,11 @@ $$
 \end{pmatrix}
 & =
 \begin{pmatrix}
-1 & 0 & 0 & \cdots & 0 \\
-\mu _ {2,1} & 1 & 0 & \cdots & 0 \\
-\mu _ {3,1} & \mu_{3,2} & 1 & \cdots & 0 \\
-\vdots & \vdots & \vdots & \ddots & \vdots \\
-\mu _ {n,1} & \mu _ {n,2} & \mu _ {n,3} & \cdots & 1 \\
+1 & 0 & 0 & & 0 \\
+\mu _ {21} & 1 & 0 & \cdots & 0 \\
+\mu _ {31} & \mu_{32} & 1 & & 0 \\
+& \vdots & & \ddots & \vdots \\
+\mu _ {n1} & \mu _ {n2} & \mu _ {n3} & \cdots & 1 \\
 \end{pmatrix}
 \begin{pmatrix}
 \mathbf{b} _ 1^ * \\
@@ -765,14 +774,14 @@ $$
 \end{aligned}
 $$
 
-> **Thm. GSOベクトルの基本性質**
-> 1. 任意の $1\leq i<j\leq n$ に対して $\langle\mathbf{b}_ i^* , \mathbf{b} _j^ *\rangle = 0$ が成り立つ.
-> 2. 任意の $1\leq i\leq n$ に対して $\|\mathbf{b}_ i^ * \|\leq\|\mathbf{b} _i\|$ が成り立つ.
-> 3. 任意の $1\leq i\leq n$ に対して $\langle\mathbf{b} _ 1^* ,\ldots,\mathbf{b} _ i^ *\rangle_{\mathbb{R}} = \langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}$ が成り立つ.
-> 4. $\mathrm{vol}(L) = \prod _ {i=1}^n\|\mathbf{b} _ i^*\|$ が成り立つ.
+> **Thm. GSO ベクトルの基本性質**
+> 1. 任意の $1\leq i<j\leq n$ に対して $\langle\mathbf{b}_ i^* , \mathbf{b} _j^ *\rangle = 0$ が成り立つ。
+> 2. 任意の $1\leq i\leq n$ に対して $\|\mathbf{b}_ i^ * \|\leq\|\mathbf{b} _i\|$ が成り立つ。
+> 3. 任意の $1\leq i\leq n$ に対して $\langle\mathbf{b} _ 1^* ,\ldots,\mathbf{b} _ i^ *\rangle_{\mathbb{R}} = \langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}$ が成り立つ。
+> 4. $\mathrm{vol}(L) = \prod _ {i=1}^n\|\mathbf{b} _ i^*\|$ が成り立つ。
 
 **Proof.**
-1. $j$ に関する数学的帰納法により示す. $j=1$ のときは証明すべきことはない. $1,\ldots,j$ について成立していると仮定する. $j+1$ のとき任意の $1\leq i<j+1$ に対して
+まず 1 について $j$ に関する数学的帰納法により示す。 $j=1$ のときは証明すべきことはない。 $1,\ldots,j$ について成立していると仮定する。 $j+1$ のとき任意の $1\leq i<j+1$ に対して
 
 $$
 \begin{aligned}
@@ -783,19 +792,19 @@ $$
 \end{aligned}
 $$
 
-が成り立つ. よって, 数学的帰納法より任意の $1\leq i<j\leq n$ に対して $\langle\mathbf{b} _ i^ * , \mathbf{b} _ j^ * \rangle = 0$ が成り立つ.
+が成り立つ。よって、数学的帰納法より任意の $1\leq i<j\leq n$ に対して $\langle\mathbf{b} _ i^ * , \mathbf{b} _ j^ * \rangle = 0$ が成り立つ。
 
-2. $i=1$ のとき $\mathbf{b} _ 1^* = \mathbf{b} _ 1$ より明らか. $i\geq 2$ のとき
+$i=1$ のとき $\mathbf{b} _ 1^* = \mathbf{b} _ 1$ より明らか。 $i\geq 2$ のとき
 
 $$
 \|\mathbf{b}_ i\|^2 = \|\mathbf{b} _ i^ * \|^2 + \sum_{j=1}^{i-1}\mu _ {i,j}^2\|\mathbf{b}_j^ * \|^2\geq\|\mathbf{b} _ i^ * \|^2
 $$
 
-より成り立つ.
+より成り立つ。
 
-3. 任意の $1\leq k\leq i$ に対し, $\mathbf{b} _ k = \mathbf{b} _ k^* + \sum _ {j=1}^{k-1} \mu _ {k, j}\mathbf{b} _ j^ *$ より, $\mathbf{b} _ k\in\langle\mathbf{b} _ 1^ * ,\ldots,\mathbf{b} _ i^ * \rangle _ {\mathbb{R}}$ がわかる. よって $\langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}\subseteq\langle\mathbf{b} _ 1^ * ,\ldots,\mathbf{b} _ i^ * \rangle _ {\mathbb{R}}$ が成り立つ. 逆向きの包含関係は $i$ に関する数学的帰納法で示す. $i = 1$ のとき $\mathbf{b} _ 1^ * = \mathbf{b} _ 1$ より明らか. $i=k-1$ のとき成り立つと仮定すると $i=k$ のとき $\mathbf{b} _ k^ * = \mathbf{b} _ k - \sum _ {j=1}^{k-1} \mu _ {k, j}\mathbf{b} _ j^ *$ より $\mathbf{b} _ k^ * \in\langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}$ , よって任意の $i$ について示された. よって $\langle\mathbf{b} _ 1^ * ,\ldots,\mathbf{b} _ i^ * \rangle _ {\mathbb{R}}=\langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}$ である.
+1. 任意の $1\leq k\leq i$ に対し, $\mathbf{b} _ k = \mathbf{b} _ k^* + \sum _ {j=1}^{k-1} \mu _ {k, j}\mathbf{b} _ j^ *$ より, $\mathbf{b} _ k\in\langle\mathbf{b} _ 1^ * ,\ldots,\mathbf{b} _ i^ * \rangle _ {\mathbb{R}}$ がわかる。 よって $\langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}\subseteq\langle\mathbf{b} _ 1^ * ,\ldots,\mathbf{b} _ i^ * \rangle _ {\mathbb{R}}$ が成り立つ。 逆向きの包含関係は $i$ に関する数学的帰納法で示す。 $i = 1$ のとき $\mathbf{b} _ 1^ * = \mathbf{b} _ 1$ より明らか。 $i=k-1$ のとき成り立つと仮定すると $i=k$ のとき $\mathbf{b} _ k^ * = \mathbf{b} _ k - \sum _ {j=1}^{k-1} \mu _ {k, j}\mathbf{b} _ j^ *$ より $\mathbf{b} _ k^ * \in\langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}$ , よって任意の $i$ について示された。 よって $\langle\mathbf{b} _ 1^ * ,\ldots,\mathbf{b} _ i^ * \rangle _ {\mathbb{R}}=\langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}$ である。
 
-4. $B=UB^*$ と $\det(U) = 1$, GSOベクトルの直交性より
+2. $B=UB^*$ と $\det(U) = 1$, GSOベクトルの直交性より
 
 $$
 \begin{aligned}
@@ -807,16 +816,16 @@ $$
 $$
 
 > **Thm. Hadamardの不等式**
-> GSOベクトルの基本性質 2, 4 より次のことが分かる.
+> GSOベクトルの基本性質 2, 4 より次のことが分かる。
 >
 > $$
 \mathrm{vol}(L)\leq\prod _ {i=1}^n\|\mathbf{b} _ i\|
 $$
 >
-> 特に $\{\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n}\}$ が直交基底$\iff\mathrm{vol}(L)=\prod _ {i=1}^n\|\mathbf{b} _ i\|$ である.
+> 特に $\{\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n}\}$ が直交基底$\iff\mathrm{vol}(L)=\prod _ {i=1}^n\|\mathbf{b} _ i\|$ である。
 
 > **Def. 射影格子**
-> $n$ 次元格子 $L\subseteq\mathbb{R}^m$ の基底 $\{\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n}\}$ に対し, 各 $1\leq l\leq n$ に対して $\langle\mathbf{b} _ {1},\ldots, \mathbf{b} _ {l-1}\rangle _ \mathbb{R}$ の直交補空間への直交射影を $\pi _ l:\mathbb{R}^m\to\langle\mathbf{b} _ {1},\ldots, \mathbf{b} _ {l-1}\rangle _ \mathbb{R}^\bot$ とする. 定理 2 の 1,3 より
+> $n$ 次元格子 $L\subseteq\mathbb{R}^m$ の基底 $\{\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n}\}$ に対し, 各 $1\leq l\leq n$ に対して $\langle\mathbf{b} _ {1},\ldots, \mathbf{b} _ {l-1}\rangle _ \mathbb{R}$ の直交補空間への直交射影を $\pi _ l:\mathbb{R}^m\to\langle\mathbf{b} _ {1},\ldots, \mathbf{b} _ {l-1}\rangle _ \mathbb{R}^\bot$ とする。 定理 2 の 1,3 より
 >
 > $$
 \begin{aligned}
@@ -825,7 +834,7 @@ $$
 \end{aligned}
 $$
 >
-> となる. すると集合 $\pi _ l(L)$ は $\{\pi _ l(\mathbf{b} _ {l}),\ldots,\pi _ l(\mathbf{b} _ {n})\}$ を基底に持つ $n-l+1$ 次元の格子であり, $\pi _ l(L)$ を射影格子 (projected lattice) と呼ぶ.
+> となる。 すると集合 $\pi _ l(L)$ は $\{\pi _ l(\mathbf{b} _ {l}),\ldots,\pi _ l(\mathbf{b} _ {n})\}$ を基底に持つ $n-l+1$ 次元の格子であり, $\pi _ l(L)$ を射影格子 (projected lattice) と呼ぶ。
 
 $O(N^3)$
 
@@ -900,8 +909,6 @@ $$
 
 具体的な応用方法は良記事があります。
 
-https://qiita.com/kusano_k/items/5509bff6e426e5043591
-
 ### BKZ (Block Korkine-Zolotareff) 基底簡約
 
 ### HKZ (Hermite-Korkine-Zolotareff) 基底簡約
@@ -910,6 +917,11 @@ https://qiita.com/kusano_k/items/5509bff6e426e5043591
 2. 条件に合うように基底ベクトルの交換
 
 ### CVP; Closest Vector Problem
+
+- SVP
+- near SVP
+- CVP
+- near CVP
 
 
 ### Kannan’s embedding method
@@ -1083,7 +1095,6 @@ $$
 Berlekamp-Zassenhause 法
 
 これを使って様々な攻撃ができます。
-Coppersmith Method は RSA をそのまま与えても解けませんが何かしらの値が一部分だけ分かっていると解けるというものです。
 
 解きたい方程式の法の数の下限 $\beta$ と解が存在しうる上限 $X$ を決めて関数を与えると解が返ってきます。
 
@@ -1092,7 +1103,7 @@ Coppersmith Method は RSA をそのまま与えても解けませんが何か�
 
 :::
 
-さて多変数連立n次方程式の場合はどうでしょう。Coppersmithも使うこともできますが、精度は出にくいです。これに対して使われる道具は多項式 GCD, 終結式, Gröbner 基底があります。
+さて多変数連立 $n$ 次方程式の場合はどうでしょう。Coppersmith Method も使うこともできますが、私の体感的には精度が出にくいです。これに対して使われる道具は多項式 GCD, 終結式, Gröbner 基底があります。
 
 ### 多項式 GCD
 
