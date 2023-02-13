@@ -640,7 +640,7 @@ x &= \frac{s_i - s_j}{t_j - t_i} & \pmod N
 \end{aligned}
 $$
 
-となり $x$ が分かる。期待計算量は $\mathcal{O}(\sqrt{N})$ です。
+となり $x$ が分かる。期待計算量は $\mathcal{O}(N^{1/4})$ です。
 
 Pollard-$\rho$ 法の $\rho$ は文字 $\rho$ の形が $a_i$ の由来となっています。
 
@@ -657,7 +657,7 @@ $$
 $x_i = y_j$ となるとき $x = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j} f(y_k)$ となる。
 見つからなければ $N$ や $f$ を取り替えて繰り返す。
 
-同じく期待計算量は $\mathcal{O}(\sqrt{N})$ です。
+同じく期待計算量は $\mathcal{O}(N^{1/4})$ です。
 
 ### Pohlig-Hellman
 

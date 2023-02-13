@@ -82,8 +82,9 @@ $$
 
 
 ### Gentry
-完全準同型
-### TFHE
-完全準同型
+最初期の完全準同型暗号です。
 
-BGV CKKS BFV FHEW CKKS Bootstrapping TFHE
+### TFHE
+現状で最も高速な部類に入る完全準同型暗号です。
+
+他にもいくつかありますが今回はこれだけにします。

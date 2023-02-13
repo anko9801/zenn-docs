@@ -2,23 +2,21 @@
 title: "暗号プロトコル"
 ---
 
-ランダムオラクルモデル
-
-- 選択平文攻撃(Chosen-plaintext attack; CPA)
-- 適応的選択平文攻撃(Adaptive chosen-plaintext attack; CPA2)
-- 選択暗号文攻撃(Chosen-ciphertext attack; CCA1)
-- 適応的選択暗号文攻撃(Adaptive Chosen-ciphertext attack; CCA2)
+- 選択平文攻撃 (Chosen-plaintext attack; CPA)
+- 適応的選択平文攻撃 (Adaptive chosen-plaintext attack; CPA2)
+- 選択暗号文攻撃 (Chosen-ciphertext attack; CCA1)
+- 適応的選択暗号文攻撃 (Adaptive Chosen-ciphertext attack; CCA2)
 - Side-channel attack
 
-↓めちゃくちゃわかりにくい、といってわかりやすさが上がる方法とは？定理証明だと思う.
+↓ めちゃくちゃわかりにくい、といってわかりやすさが上がる方法とは？定理証明だと思う.
 
-- 一方向性(Onewayness; OW)
+- 一方向性 (Onewayness; OW)
 	- 暗号文から平文を求めるのが困難
-- 強秘匿性(Semantic Security; SS)
+- 強秘匿性 (Semantic Security; SS)
 	- 暗号文から平文のどんな部分情報も漏れない
-- 識別不可能性(Indistinguishability; IND)
+- 識別不可能性 (Indistinguishability; IND)
 	- 暗号文が平文AとBのどちらのものかを区別できない
-- 頑強性(Non-Malleability; NM)
+- 頑強性 (Non-Malleability; NM)
 	- 暗号文が与えられた時、ある関係性を持った別の暗号文の生成が不可
 	- stream cipher
 	- RSA暗号 $Enc(m)\cdot t^e \bmod n = Enc(mt)$ padding(OAEP, PKCS 1)
@@ -33,13 +31,13 @@ title: "暗号プロトコル"
 
 ECDH だと $s$ の $x$ 座標をハッシュ化したものを共有鍵として使う。
 
-## Fiat-Shamir 変換
+### Fiat-Shamir 変換
 
 Fiat-Shamir変換は、証明システムを非対話型にするために使用される有名なスキームで、検証者がランダムに選択するチャレンジの値を（ランダムオラクルモデルとして）暗号学的ハッシュ関数を使って決定論的に導出することで、証明システムのプロトコルを非対話型にする。
 
 チャレンジのハッシュ計算の際の入力に、証明するステートメントに関するすべての公開値（ランダムなコミットメント値を含む）を含める必要があるということ（↑の例だと入力は、G、V、P、UserID、OtherInfo）。
 
-## Frozen Heart
+#### Frozen Heart
 
 Frozen Heartは、Fiat-Shamir変換でチャレンジのハッシュ計算の際の入力に、証明するステートメントに関するすべての公開値（ランダムなコミットメント値を含む）を含める必要があるということ（↑の例だと入力は、G、V、P、UserID、OtherInfo）を遵守していないプロトコルや実装による脆弱性。
 
@@ -48,7 +46,7 @@ Frozen Heartは、Fiat-Shamir変換でチャレンジのハッシュ計算の際
 - [Fiat-Shamir変換の安全でない適用による脆弱性Frozen Heart - Develop with pleasure! (hatenablog.com)](https://techmedia-think.hatenablog.com/entry/2022/04/19/193400#:~:text=Fiat%2DShamir%E5%A4%89%E6%8F%9B%E3%81%A8%E3%81%AF,%E9%9D%9E%E5%AF%BE%E8%A9%B1%E5%9E%8B%E3%81%AB%E3%81%99%E3%82%8B%E3%80%82)
 - [Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
 
-## Schnorr Signature
+### Schnorr Signature
 
 非対話型ゼロ知識証明な署名の一種。
 
@@ -59,39 +57,29 @@ Frozen Heartは、Fiat-Shamir変換でチャレンジのハッシュ計算の際
 - 公開鍵 $y = g^x$
 - メッセージ $M$
 
-### 署名
+#### 署名
 
 乱数 $k$ を生成し、次の値を計算する。
 
 $$
 \begin{aligned}
-r &= g^k \\
-e &= H(r \| M) \\
-s &= k - xe
+r & = g^k & e & = H(r \| M) & s & = k - xe
 \end{aligned}
 $$
 
 このとき $(s, e)$ を署名値として公開する。
 
-### 検証
+#### 検証
 
 公開されている値 $(g, y, M)$ と署名 $(s, e)$ を用いて次の値を計算する。
 
 $$
 \begin{aligned}
-r' &= g^sy^e \\
-e' &= H(r' \| M)
+r' &= g^sy^e & e' &= H(r' \| M)
 \end{aligned}
 $$
 
 ここで $e = e'$ となれば署名が有効であると検証されたことになる。
-
-## 参考
-
-- [Schnorr署名 ―― 30年の時を超えて注目を集める電子署名](https://blog.visvirial.com/articles/721)
-- [RFC8235](https://datatracker.ietf.org/doc/html/rfc8235)
-
-
 
 ## SSH
 
@@ -107,7 +95,11 @@ sub key
 Pritty Good Privacy: PGP鍵
 [GPGで自分用の秘密鍵を1つに統一する · JoeMPhilips](http://joemphilips.com/post/gpg_memo/)
 
+物理的に奪われた場合など
+パソコンは奪われて鍵は奪われてないとき有効
 SoloKey, Nitrokey
 
+## 参考文献
 
-
+- [Schnorr署名 ―― 30年の時を超えて注目を集める電子署名](https://blog.visvirial.com/articles/721)
+- [RFC8235](https://datatracker.ietf.org/doc/html/rfc8235)
