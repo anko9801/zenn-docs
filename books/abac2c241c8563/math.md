@@ -931,42 +931,6 @@ $$
 > 1. サイズ基底簡約
 > 2. Lovasz 条件に合うように基底ベクトルの交換
 
-
-### BKZ (Block Korkine-Zolotareff) 基底簡約
-
-### HKZ (Hermite-Korkine-Zolotareff) 基底簡約
-
-1. サイズ基底簡約
-2. 条件に合うように基底ベクトルの交換
-
-### CVP; Closest Vector Problem
-
-- SVP
-- near SVP
-- CVP
-- near CVP
-
-
-### Kannan’s embedding method
-
-> **Kannan's embedding method**
-> CVP の目標ベクトル $w$ と解ベクトル $v$ の差 $e = w - v$ のノルムについて $\|e\| < \lambda_1/2$ が成り立つとき SVP を解くことで求まる。
-
-$$
-\begin{pmatrix}
-  B & \mathbf{0} \\
-  w & M
-\end{pmatrix}
-$$
-
-### Babai’s Algorithm
-
-$$
-\begin{aligned}
-  w = \sum a_ib_i
-\end{aligned}
-$$
-
 ## 多項式
 ここでは剰余上の方程式 $\mathbb{Z}/N\mathbb{Z}[x]$ の解を求める方法について解説します。
 
