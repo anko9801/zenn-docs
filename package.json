@@ -22,6 +22,6 @@
     "textlint-rule-ja-no-space-between-full-width": "^2.2.0",
     "textlint-rule-no-dropping-the-ra": "^3.0.0",
     "textlint-rule-preset-ja-technical-writing": "^7.0.0",
-    "zenn-cli": "^0.1.137"
+    "zenn-cli": "^0.1.139"
   }
 }
