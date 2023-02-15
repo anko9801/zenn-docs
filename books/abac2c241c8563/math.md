@@ -156,7 +156,7 @@ $$
 
 大きな剰余 $n$ と複数の小さな剰余 $m_i (i=1,\ldots,k)$ について $m_i|n$ が成り立つとします。
 
-まず小さくするときは $(x \bmod n)\bmod m_i$ とすればよいです。
+まず小さくするときは $(x \bmod n)\bmod m_i$ とすればよいです。これを**還元**と呼びます。
 
 $$
 \begin{aligned}
@@ -168,7 +168,7 @@ $$
 
 となるからです。注意すべきなのは2つが約数の関係となる剰余でしかこのような式は有効ではないです。例えば有効ではない式として $20 \bmod 15 \bmod 9 \neq 20 \bmod 9$ があります。
 
-逆に小さな剰余から大きな剰余にするにはどうやって計算すればいいでしょうか。このように小さな群から大きな群へ移す操作は持ち上げ (lift) とよばれていて、この群を持ち上げるには次の多項式時間のアルゴリズムが知られています。
+逆に小さな剰余から大きな剰余にするにはどうやって計算すればいいでしょうか。このように小さな群から大きな群へ移す操作は**持ち上げ (lift)** とよばれていて、この群を持ち上げるには次の多項式時間のアルゴリズムが知られています。
 
 > **Garner のアルゴリズム**
 > 整数 $m_1,\ldots,m_k$ に対し、ある整数 $x\in [0, \mathop{\mathrm{lcm}} m_i)$ の $m_i$ に関する剰余 $r_i = x \bmod m_i$ が与えられれば $x$ を $\mathcal{O}(k\log(\max m_i) + k^2)$ で求められる。
@@ -190,7 +190,7 @@ $$
 https://qiita.com/drken/items/ae02240cd1f8edfc86fd
 
 :::message
-**練習問題**
+**演習**
 - $(ap)^e \pmod{pq}$ は $p$ で割り切れることを中国剰余定理によって証明せよ。
 - 剰余 $m_i$ が互いに素ではないときの Garner のアルゴリズムを実装せよ。
 :::
@@ -220,6 +220,23 @@ $(x^n)^{k-1} + \ldots + x^n + 1 = 0$ は代数学の基本定理より $n(k-1)$ 
 
 原始根 $a$ を1つ選び、写像 $\phi: \mathbb{Z}\to(\mathbb{Z}/p\mathbb{Z})^\times$ を $\phi(k) = a^k$ とすると、これは準同型である。全射である。$\mathrm{Ker}(\phi) = (p-1)\mathbb{Z}$。よって $(\mathbb{Z}/p\mathbb{Z})^\times \cong \mathbb{Z}/(p−1)\mathbb{Z}$ である。$\Box$
 
+具体例として $\mathbb{Z}/7\mathbb{Z}$ での対数 $\log_3 n$ について考えてみます。
+
+|     $n$    |   $1$   |   $2$   |   $3$   |   $4$   |   $5$   |   $6$   |
+|:----------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+|  $n = 3^k$ | $3^0$ | $3^2$ | $3^1$ | $3^4$ | $3^5$ | $3^3$ |
+| $\log_3 n$ |   $0$   |   $2$   |   $1$   |   $4$   |   $5$   |   $3$   |
+
+じっくり見てみると、対数を取ったもの同士の $\mathbb{Z}/6\mathbb{Z}$ での足し算はそれに対応する値同士の $\mathbb{Z}/7\mathbb{Z}$ の掛け算と一致しているということが見えてきます。
+
+$$
+\begin{aligned}
+4 &\times 6 = 3 \pmod 7 \\
+&\downarrow \log_3 \\
+4 &+ 3 = 1 \pmod 6 \\
+\end{aligned}
+$$
+
 知っておくと便利な定理があります。
 
 > **Thm. Carmichael の定理**
@@ -240,12 +257,11 @@ https://integers.hatenablog.com/entry/2016/07/24/163831
 https://integers.hatenablog.com/entry/2017/06/08/191649
 ### Tonelli Shanks のアルゴリズム
 
-> **Def. 平方剰余**
-> $\mathbb{Z}/(p-1)\mathbb{Z}$ が偶数か奇数かを判別する方法
+> **Prop. 平方剰余**
+> $\mathbb{Z}/p\mathbb{Z}$ において $n^{(p-1)/2}$ から $n$ の対数 $\mathbb{Z}/(p-1)\mathbb{Z}$ の偶奇を判別できる。
 
-$$
-n^{\frac{p-1}{2}}
-$$
+**Proof.**
+位数が $p-1$ であるから $n$ の位数が 2 の倍数のとき $n^{(p-1)/2} = 1$、そうでないとき $n^{(p-1)/2} = -1$ となる。$\Box$
 
 | $n$ | $2^0$ | $2^1$ | $2^2$ | $2^3$ | $2^4$ | $2^5$ | $2^6$ | $2^7$ | $2^8$ | $2^9$ | $2^{10}$ | $2^{11}$ |
 |:--------:|:-:|:-:|:--:|:--:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
@@ -399,7 +415,7 @@ $$
 $n$ は合成数である」と言えます。
 
 これを用い、次のステップを実行することで確率的な素数判定ができます。
-1. $1\leq a \leq n-1$ でaの値をランダムにとってくる。
+1. $1\leq a \leq n-1$ で $a$ の値をランダムにとってくる。
 2. 上の条件を満たしたらcompositeと返す。
 3. 満たさなければprobably primeと返す。
 
@@ -673,6 +689,8 @@ $x_i = y_j$ となるとき $x = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j}
 1. 小さな素因数 $p_j$ を用いて $yg^k = \prod_{j = 1}^m p_j^{e_{j}} \pmod p$ と書けるような $k$ を見つける。
 2. $g^{k_i} = \prod_{j = 1}^m p_j^{e_{ij}} \pmod{p}$ と素因数分解できるような $k_i$ を $n$ 個以上見つける。
 
+すると次のように書ける。
+
 $$
 \begin{aligned}
   g^{k_i} & = \prod_{j = 1}^m p_j^{e_{ij}} & \pmod p \\
@@ -799,45 +817,57 @@ $$
 $$
 
 > **Thm. GSO ベクトルの基本性質**
-> 1. 任意の $1\leq i<j\leq n$ に対して $\langle\mathbf{b}_ i^* , \mathbf{b} _j^ *\rangle = 0$ が成り立つ。
-> 2. 任意の $1\leq i\leq n$ に対して $\|\mathbf{b}_ i^ * \|\leq\|\mathbf{b} _i\|$ が成り立つ。
-> 3. 任意の $1\leq i\leq n$ に対して $\langle\mathbf{b} _ 1^* ,\ldots,\mathbf{b} _ i^ *\rangle_{\mathbb{R}} = \langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}$ が成り立つ。
+> 1. 任意の $1\leq i<j\leq n$ に対して $\langle\mathbf{b}_i^*, \mathbf{b}_j^*\rangle = 0$ が成り立つ。
+> 2. 任意の $1\leq i\leq n$ に対して $\|\mathbf{b}_i^*\|\leq\|\mathbf{b}_i\|$ が成り立つ。
+> 3. 任意の $1\leq i\leq n$ に対して $\langle\mathbf{b}_1^* ,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}} = \langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}$ が成り立つ。
 > 4. $\mathrm{vol}(L) = \prod _ {i=1}^n\|\mathbf{b} _ i^*\|$ が成り立つ。
 
 **Proof.**
-まず 1 について $j$ に関する数学的帰納法により示す。 $j=1$ のときは証明すべきことはない。 $1,\ldots,j$ について成立していると仮定する。 $j+1$ のとき任意の $1\leq i<j+1$ に対して
+まず 1 について $j = 1$ のとき証明せずとも成り立ち、任意の $1\leq j\leq k$ に対して $\langle\mathbf{b}_i^*, \mathbf{b}_j^*\rangle = 0$ 成り立つと仮定する。 $j = k+1$ のとき
 
 $$
 \begin{aligned}
-\langle\mathbf{b} _ i^ * , \mathbf{b} _ {j+1}^ * \rangle &= \left\langle\mathbf{b} _ i^ * , \mathbf{b} _ {j+1} - \sum _ {k=1}^j\mu _ {j+1, k}\mathbf{b} _ {k}^ * \right\rangle \\
-&= \langle\mathbf{b} _ i^ * , \mathbf{b} _ {j+1}\rangle - \mu _ {j+1,i}\langle\mathbf{b} _ i^ * , \mathbf{b} _ {i}^ * \rangle \\
-&= \langle\mathbf{b} _ i^ * , \mathbf{b} _ {j+1}\rangle - \frac{\langle \mathbf{b} _ {j+1}, \mathbf{b} _ i^ * \rangle}{\| \mathbf{b} _ i^ * \|^2}\|\mathbf{b} _ i^ * \|^2 \\
-&= 0
+  \langle\mathbf{b}_i^*,\mathbf{b}_{k+1}^*\rangle &
+  = \left\langle\mathbf{b}_i^*,\mathbf{b}_{k+1} - \sum_{n=1}^k\mu_{k+1 n}\mathbf{b}_{n}^*\right\rangle \\
+  & = \langle\mathbf{b}_i^*,\mathbf{b}_{k+1}\rangle-\mu_{
+  k+1 i}\|\mathbf{b}_i^*\|^2\\
+  & = 0
 \end{aligned}
 $$
 
-が成り立つ。よって、数学的帰納法より任意の $1\leq i<j\leq n$ に対して $\langle\mathbf{b} _ i^ * , \mathbf{b} _ j^ * \rangle = 0$ が成り立つ。
-
-$i=1$ のとき $\mathbf{b} _ 1^* = \mathbf{b} _ 1$ より明らか。 $i\geq 2$ のとき
+が成り立つ。よって数学的帰納法より成り立つ。
+2 に関しては定義式にノルムを取ることで分かる。
 
 $$
-\|\mathbf{b}_ i\|^2 = \|\mathbf{b} _ i^ * \|^2 + \sum_{j=1}^{i-1}\mu _ {i,j}^2\|\mathbf{b}_j^ * \|^2\geq\|\mathbf{b} _ i^ * \|^2
+\begin{aligned}
+  \|\mathbf{b} _ 1^*\|^2 & = \|\mathbf{b}_1\|^2 \\
+  \|\mathbf{b}_ i\|^2 & = \|\mathbf{b} _ i^ * \|^2 + \sum_{j=1}^{i-1}\mu _ {i,j}^2\|\mathbf{b}_j^ * \|^2\geq\|\mathbf{b} _ i^ * \|^2
+\end{aligned}
 $$
 
-より成り立つ。
+3 については帰納法より任意の $1\leq k\leq i$ について成り立つとして
 
-1. 任意の $1\leq k\leq i$ に対し, $\mathbf{b} _ k = \mathbf{b} _ k^* + \sum _ {j=1}^{k-1} \mu _ {k, j}\mathbf{b} _ j^ *$ より, $\mathbf{b} _ k\in\langle\mathbf{b} _ 1^ * ,\ldots,\mathbf{b} _ i^ * \rangle _ {\mathbb{R}}$ がわかる。 よって $\langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}\subseteq\langle\mathbf{b} _ 1^ * ,\ldots,\mathbf{b} _ i^ * \rangle _ {\mathbb{R}}$ が成り立つ。 逆向きの包含関係は $i$ に関する数学的帰納法で示す。 $i = 1$ のとき $\mathbf{b} _ 1^ * = \mathbf{b} _ 1$ より明らか。 $i=k-1$ のとき成り立つと仮定すると $i=k$ のとき $\mathbf{b} _ k^ * = \mathbf{b} _ k - \sum _ {j=1}^{k-1} \mu _ {k, j}\mathbf{b} _ j^ *$ より $\mathbf{b} _ k^ * \in\langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}$ , よって任意の $i$ について示された。 よって $\langle\mathbf{b} _ 1^ * ,\ldots,\mathbf{b} _ i^ * \rangle _ {\mathbb{R}}=\langle\mathbf{b} _ 1,\ldots,\mathbf{b} _ i\rangle _ {\mathbb{R}}$ である。
+$$
+\begin{aligned}
+\mathbf{b}_k & = \mathbf{b}_k^* + \sum_{j=1}^{k-1} \mu_{kj}\mathbf{b}_j^* \in\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}} \\
+\mathbf{b}_k^* & = \mathbf{b}_k - \sum_{j=1}^{k-1} \mu_{kj}\mathbf{b}_j^* \in\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}
+\end{aligned}
+$$
 
-2. $B=UB^*$ と $\det(U) = 1$, GSOベクトルの直交性より
+より数学的帰納法から $\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}\subseteq\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}$ が成り立つ。よって $\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}=\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}$ となる。
+
+4 については $B=UB^*$ と $\det(U) = 1$、GSO ベクトルの直交性より
 
 $$
 \begin{aligned}
 \mathrm{vol}(L)^2 &= \det(BB^\top) \\
-&= \det(UB^ * (B^ * )^\top U^\top) \\
-&= \det(B^ * (B^ * )^\top) \\
-&= \prod _ {i=1}^n\|\mathbf{b} _ i^ * \|^2
+& = \det(UB^*(B^*)^\top U^\top) \\
+& = \det(B^*(B^*)^\top) \\
+& = \prod _ {i=1}^n\|\mathbf{b} _ i^ * \|^2
 \end{aligned}
 $$
+
+$\Box$
 
 GSO ベクトルの基本性質 2, 4 より次のことが分かる。
 > **Thm. Hadamardの不等式**
@@ -931,6 +961,9 @@ $$
 > 1. サイズ基底簡約
 > 2. Lovasz 条件に合うように基底ベクトルの交換
 
+```python
+```
+
 ## 多項式
 ここでは剰余上の方程式 $\mathbb{Z}/N\mathbb{Z}[x]$ の解を求める方法について解説します。
 
@@ -966,7 +999,7 @@ $$
 https://qiita.com/kusano_k/items/5509bff6e426e5043591
 
 :::message
-**練習問題**
+**演習**
 
 :::
 
