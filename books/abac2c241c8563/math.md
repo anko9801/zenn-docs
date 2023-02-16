@@ -15,9 +15,7 @@ title: "暗号技術を支える計算機代数"
 
 について解説します。楕円曲線は Fermat の最終定理を解く道具でもあったりする現代数学の要でもあるので暗号の解説ならまだしも攻撃となると流石に可換環論や代数幾何学を学んでいない読者は置いていくと思います。
 
-ここでは基本的なアイデアだけを示すので厳密な証明や実装が気になった人は参考文献の本や規格書、元論文などを読んで実装してみると良いと思います。何が厳密で何が厳密ではないかは明確に書くつもりなのでそこは安心してください。
-
-数学科2年前半までの数学を使います。曖昧な解説はしないつもりなので覚悟のある方だけきてください。予習必要かも、楕円曲線はここでは解説しきれない。出来る限り最短経路となるのでわかりにくいという部分が出てくると思います。質問が飛んできたら
+ここでは基本的なアイデアだけを示すので厳密な証明や実装が気になった人は参考文献の本や規格書、元論文などを読んで実装してみると良いと思います。非本質的な部分は曖昧にして本質的な部分は出来るだけ厳密に書きます。何が厳密で何が厳密ではないかは明確に書くつもりなのでそこは安心してください。
 
 ## 記号
 $\mathbb{N}$: 自然数の集合
@@ -384,22 +382,18 @@ $p = 13$ のとき $\mathbb{Z}/12\mathbb{Z} = \mathbb{Z}/3\mathbb{Z}\times\mathb
 > 与えられた数 $n$ が素数かどうかを計算時間 $O(k\log^3 n)$ で誤り率 $4^{-k}$ 以下で判定する確率的素数判定アルゴリズムです。
 
 
-$n$ が素数のとき、$n-1$ はそれを $2$ で割れるだけ割った数を $d$ として $n-1 = 2^sd$ と書けます。フェルマーの小定理より $a≠0 \pmod n$ のとき
+$n$ が素数のとき、$n-1$ はそれを $2$ で割れるだけ割った数を $d$ として $n-1 = 2^sd$ と書けます。フェルマーの小定理より $a\neq 0 \pmod n$ のとき
 
 $$
-\begin{aligned}
-a^{n-1} &= a^{2^sd} ≡ 1 \quad \pmod n \\
-a^{2^sd}-1 &= (a^d-1)(a^d+1)(a^{2d}+1)(a^{4d}+1)\cdots(a^{2^{s-1}d}+1)\\
-&≡ 0 \\
-\end{aligned}
+a^{n-1} - 1 = a^{2^sd} - 1 = (a^d-1)(a^d+1)(a^{2d}+1)(a^{4d}+1)\cdots(a^{2^{s-1}d}+1) = 0
 $$
 
 これより次の2式のどちらかが成り立ちます。
 
 $$
 \begin{cases}
-a^d ≡ 1 & \pmod n \\
-a^{2^rd} ≡ -1 & \pmod n \qquad (\exists r \in \mathbb{Z}, 0\leq r\leq s-1)
+a^d = 1 & \pmod n \\
+a^{2^rd} = -1 & \pmod n \qquad (\exists r \in \mathbb{Z}, 0\leq r\leq s-1)
 \end{cases}
 $$
 
@@ -776,18 +770,18 @@ $$
 
 ### Gram-Schmidt の直交化 (GSO; Gram-Schmidt Orthonormalization)
 
-Gram-Schmidt 直交化 (GSO; Gram-Schmidt Orthonormalization) とは実 $m$ 次元ベクトル空間 $\mathbb{R}^m$ の任意の $\mathbb{R}$ ベクトル空間としての基底を直交基底に変換する方法です。 $\mathbf{b} _ n$ の直交化は $\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n-1}$ すべてと直交するように元の高さのまま移動させます。 GSO の Wikipedia の gif がわかりやすいです。
+Gram-Schmidt 直交化 (GSO; Gram-Schmidt Orthonormalization) とは実 $m$ 次元ベクトル空間 $\mathbb{R}^m$ の任意の $\mathbb{R}$ ベクトル空間としての基底を直交基底に変換する方法です。 $\mathbf{b}_n$ の直交化は $\mathbf{b}_{1},\ldots, \mathbf{b}_{n-1}$ すべてと直交するように元の高さのまま移動させます。 GSO の Wikipedia の gif がわかりやすいです。
 
 > **Def. GSO ベクトル**
-> $n$ 次元格子 $L\subseteq \mathbb{R}^m$ の順序付き基底 $\{\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n}\}$ に対する GSO ベクトル $\mathbf{b} _ {1}^* ,\ldots, \mathbf{b} _ {n}^ *\in\mathbb{R}^m$ を GSO 係数 $\mu _ {i,j}$ を用いて次のように定義する。
+> $n$ 次元格子 $L\subseteq \mathbb{R}^m$ の順序付き基底 $\{\mathbf{b}_{1},\ldots, \mathbf{b}_{n}\}$ に対する GSO ベクトル $\mathbf{b}_{1}^* ,\ldots, \mathbf{b}_{n}^ *\in\mathbb{R}^m$ を GSO 係数 $\mu_{i,j}$ を用いて次のように定義する。
 >
 > $$
 \begin{aligned}
 &\begin{dcases}
-\mathbf{b} _ 1^* := \mathbf{b} _ 1 \\
-\mathbf{b} _ i^ * := \mathbf{b} _ i - \sum _ {j=1}^{i-1} \mu _ {ij} \mathbf{b} _ j^ * & (2\leq i\leq n) \\
+\mathbf{b}_1^* := \mathbf{b}_1 \\
+\mathbf{b}_i^ * := \mathbf{b}_i - \sum_{j=1}^{i-1} \mu_{ij} \mathbf{b}_j^* & (2\leq i\leq n) \\
 \end{dcases} \\
-&\quad\mu _ {ij} := \frac{\langle \mathbf{b} _ i, \mathbf{b}_j^ * \rangle}{\| \mathbf{b} _ j^ * \|^2} \qquad (1\leq j<i\leq n)
+&\quad \mu_{ij} := \frac{\langle \mathbf{b}_i, \mathbf{b}_j^* \rangle}{\| \mathbf{b}_j^*\|^2} \qquad (1\leq j<i\leq n)
 \end{aligned}
 $$
 
@@ -796,34 +790,48 @@ $$
 $$
 \begin{aligned}
 \begin{pmatrix}
-\mathbf{b} _ 1 \\
+\mathbf{b}_1 \\
 \vdots \\
-\mathbf{b} _ n \\
+\mathbf{b}_n \\
 \end{pmatrix}
 & =
 \begin{pmatrix}
 1 & 0 & 0 & & 0 \\
-\mu _ {21} & 1 & 0 & \cdots & 0 \\
-\mu _ {31} & \mu_{32} & 1 & & 0 \\
+\mu_{21} & 1 & 0 & \cdots & 0 \\
+\mu_{31} & \mu_{32} & 1 & & 0 \\
 & \vdots & & \ddots & \vdots \\
-\mu _ {n1} & \mu _ {n2} & \mu _ {n3} & \cdots & 1 \\
+\mu_{n1} & \mu_{n2} & \mu_{n3} & \cdots & 1 \\
 \end{pmatrix}
 \begin{pmatrix}
-\mathbf{b} _ 1^ * \\
+\mathbf{b}_1^ * \\
 \vdots \\
-\mathbf{b} _ n^ * \\
-\end{pmatrix}
+\mathbf{b}_n^ * \\
+\end{pmatrix} \\
+\\
+\mathbf{B} & = \mathbf{U}\mathbf{B}^*
 \end{aligned}
 $$
 
-> **Thm. GSO ベクトルの基本性質**
+この $\mathbf{B}$、$\mathbf{B}^*$、$\mathbf{U}$ をそれぞれ **基底行列**、**GSO ベクトル行列**、**GSO 係数行列** と呼ぶことにします。また GSO 係数について
+
+$$
+\mu_{ij} = \begin{dcases}
+  0 & (1\leq i<j\leq n)\\
+  1 & (1\leq i=j\leq n) \\
+  \frac{\langle \mathbf{b} _ i, \mathbf{b}_j^ * \rangle}{\| \mathbf{b}_j^*\|^2} & (1\leq j<i\leq n)
+\end{dcases}
+$$
+
+と定義を拡大して $\mathbf{U} = (\mu_{ij})$
+
+> **Prop. GSO ベクトルの基本性質**
 > 1. 任意の $1\leq i<j\leq n$ に対して $\langle\mathbf{b}_i^*, \mathbf{b}_j^*\rangle = 0$ が成り立つ。
 > 2. 任意の $1\leq i\leq n$ に対して $\|\mathbf{b}_i^*\|\leq\|\mathbf{b}_i\|$ が成り立つ。
 > 3. 任意の $1\leq i\leq n$ に対して $\langle\mathbf{b}_1^* ,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}} = \langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}$ が成り立つ。
-> 4. $\mathrm{vol}(L) = \prod _ {i=1}^n\|\mathbf{b} _ i^*\|$ が成り立つ。
+> 4. $\mathrm{vol}(L) = \prod_{i=1}^n\|\mathbf{b}_i^*\|$ が成り立つ。
 
 **Proof.**
-まず 1 について $j = 1$ のとき証明せずとも成り立ち、任意の $1\leq j\leq k$ に対して $\langle\mathbf{b}_i^*, \mathbf{b}_j^*\rangle = 0$ 成り立つと仮定する。 $j = k+1$ のとき
+まず 1 について $j = 1$ のとき証明せずとも成り立つ。$1\leq j\leq k$ のとき $\langle\mathbf{b}_i^*, \mathbf{b}_j^*\rangle = 0$ が成り立つと仮定して、$j = k+1$ のとき
 
 $$
 \begin{aligned}
@@ -845,18 +853,21 @@ $$
 \end{aligned}
 $$
 
-3 については帰納法より任意の $1\leq k\leq i$ について成り立つとして
+3 についてはまず $\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}\subseteq\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}$ について $i = 1$ は成り立ち、$1\leq i\leq k$ について成り立つとして以下より数学的帰納法から成り立つ。
 
 $$
-\begin{aligned}
-\mathbf{b}_k & = \mathbf{b}_k^* + \sum_{j=1}^{k-1} \mu_{kj}\mathbf{b}_j^* \in\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}} \\
-\mathbf{b}_k^* & = \mathbf{b}_k - \sum_{j=1}^{k-1} \mu_{kj}\mathbf{b}_j^* \in\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}
-\end{aligned}
+\mathbf{b}_k = \mathbf{b}_k^* + \sum_{j=1}^{k-1} \mu_{kj}\mathbf{b}_j^* \in\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}
 $$
 
-より数学的帰納法から $\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}\subseteq\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}$ が成り立つ。よって $\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}=\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}$ となる。
+同様に $\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}\supseteq\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}$ も数学的帰納法より成り立つ。
 
-4 については $B=UB^*$ と $\det(U) = 1$、GSO ベクトルの直交性より
+$$
+\mathbf{b}_k^* = \mathbf{b}_k - \sum_{j=1}^{k-1} \mu_{kj}\mathbf{b}_j^* \in\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}
+$$
+
+よって $\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}=\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}$ となる。
+
+4 については $\mathbf{B}=\mathbf{U}\mathbf{B}^*$ と $\det(\mathbf{U}) = 1$、GSO ベクトルの直交性より
 
 $$
 \begin{aligned}
@@ -1119,7 +1130,7 @@ Berlekamp-Zassenhause 法
 解きたい方程式の法の数の下限 $\beta$ と解が存在しうる上限 $X$ を決めて関数を与えると解が返ってきます。
 
 :::message
-**練習問題**
+**演習**
 
 :::
 
@@ -1130,29 +1141,27 @@ Berlekamp-Zassenhause 法
 まずは多項式 GCD です。
 例えば $x$ について同じ解を持つ次のような方程式を考えてみましょう。
 
-$$
-\begin{cases}
-f_1 = x^e - c_1 & \pmod{N} \\
-f_2 = (x + y)^e - c_2 & \pmod{N} \\
-\end{cases} \\
-$$
+> **Half GCD**
+> 2 つの多項式の最大公約式を $\mathcal{O}(N(\log{N})^2)$ で求められる。(N is 何)
 
-これは多項式 GCD を取ると解けます。その名の通り、ある 2 つの方程式に公約式があったとき、最も次数が大きい公約式を返します。 Half-GCD というアルゴリズムを用いると $O(N(\log{N})^2)$ で GCD が取れます。(N is 何)
+$a = qb + r$
 
 $$
-\begin{aligned}
-&\begin{cases}
-f_1 = x^e - c_1 & \pmod{N} \\
-f_2 = (x + y)^e - c_2 & \pmod{N} \\
-\end{cases} \\
-\iff
-&\begin{cases}
-f_1 = (x - m)g_1 & \pmod{N} \\
-f_2 = (x - m)g_2 & \pmod{N} \\
-\end{cases} \\
-&\gcd(f_1, f_2) = x - m
-\end{aligned}
+\begin{pmatrix}
+  0 & 1 \\
+  1 & -q
+\end{pmatrix}
+\begin{pmatrix}
+  a \\
+  b
+\end{pmatrix}
+= \begin{pmatrix}
+  b \\
+  a - qb
+\end{pmatrix}
 $$
+
+
 
 ### 終結式
 式増やしてgcd
