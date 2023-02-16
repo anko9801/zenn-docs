@@ -369,362 +369,6 @@ $p = 13$ のとき $\mathbb{Z}/12\mathbb{Z} = \mathbb{Z}/3\mathbb{Z}\times\mathb
 
 [Tonelli-Shanks のアルゴリズム - 37zigenのHP](https://37zigen.com/tonelli-shanks-algorithm/)
 
-## 素数生成
-
-暗号として機能する素数の大きさは $2^{512}$ や $2^{1024}$ 程度のオーダーとなっています。素数定理より、ある数 $n$ が素数である確率は約 $1/\log n$ です。例えば $n=2^{512}$ で2.8%、 $n=2^{1024}$ で1.4%となります。つまり、500回乱数を生成すれば99.65%で素数を見つけられるということです。
-素数判定のアルゴリズムは多くありますが、ここではMiller-Rabin素数判定法を紹介します。
-
-### Miller–Rabin 素数判定法
-
-素数判定法とはその名の通り、数を与えるとそれが素数かどうかが分かる判定法です。
-
-> **Miller-Rabin 素数判定法**
-> 与えられた数 $n$ が素数かどうかを計算時間 $O(k\log^3 n)$ で誤り率 $4^{-k}$ 以下で判定する確率的素数判定アルゴリズムです。
-
-
-$n$ が素数のとき、$n-1$ はそれを $2$ で割れるだけ割った数を $d$ として $n-1 = 2^sd$ と書けます。フェルマーの小定理より $a\neq 0 \pmod n$ のとき
-
-$$
-a^{n-1} - 1 = a^{2^sd} - 1 = (a^d-1)(a^d+1)(a^{2d}+1)(a^{4d}+1)\cdots(a^{2^{s-1}d}+1) = 0
-$$
-
-これより次の2式のどちらかが成り立ちます。
-
-$$
-\begin{cases}
-a^d = 1 & \pmod n \\
-a^{2^rd} = -1 & \pmod n \qquad (\exists r \in \mathbb{Z}, 0\leq r\leq s-1)
-\end{cases}
-$$
-
-この対偶をとると、「ある $a$ をとってきて次の2式をどちらも満たすとき
-
-$$
-\begin{cases}
-a^d \neq 1 & \pmod n\\
-a^{2^rd} \neq -1 & \pmod n \qquad (\forall r \in \mathbb{Z}, 0\leq r\leq s-1)
-\end{cases}
-$$
-
-$n$ は合成数である」と言えます。
-
-これを用い、次のステップを実行することで確率的な素数判定ができます。
-1. $1\leq a \leq n-1$ で $a$ の値をランダムにとってくる。
-2. 上の条件を満たしたらcompositeと返す。
-3. 満たさなければprobably primeと返す。
-
-これを繰り返すことで判定の精度が高まります。この処理をMiller–Rabin素数判定法といって、実行時間は $O(k\log^3 n)$ 、FFTベースの乗算で $Õ(k\log^2 n)$ となります。
-
-具体例を考えてみましょう。
-判定時にprobably primeを返す時 p、compositeを返す時 c として具体値を入れると次のようになります。
-$n = 25$ (合成数)のとき
-$n-1 = 24 = 2^3 \times 3$ より $s = 3, d = 3$
-
-| a | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 |
-|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| $a^3 \bmod 25$ | 1 | 8 | 2 | 14 | 0 | 16 | 18 | 12 | 4 | 0 | 6 | 3 | 22 | 19 | 0 | 21 | 13 | 7 | 9 | 0 | 11 | 23 | 17 | 24 |
-| $a^6 \bmod 25$ | 1 | 14 | 4 | 21 | 0 | 6 | 24 | 19 | 16 | 0 | 11 | 9 | 9 | 11 | 0 | 16 | 19 | 24 | 6 | 0 | 21 | 4 | 14 | 1 |
-| $a^{12} \bmod 25$ | 1 | 21 | 16 | 16 | 0 | 11 | 1 | 11 | 6 | 0 | 21 | 6 | 6 | 21 | 0 | 6 | 11 | 1 | 11 | 0 | 16 | 16 | 21 | 1 |
-| 判定 | p | c | c | c | c | c | p | c | c | c | c | c | c | c | c | c | c | p | c | c | c | c | c | p |
-
-$n = 17$ (素数)のとき
-$n-1 = 16 = 2^4 \times 1$ より $s = 4, d = 1$
-
-| a | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 |
-|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| $a \bmod 17$ | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 |
-| $a^2 \bmod 17$ | 1 | 4 | 9 | 16 | 8 | 2 | 15 | 13 | 13 | 15 | 2 | 8 | 16 | 9 | 4 | 1 |
-| $a^4 \bmod 17$ | 1 | 16 | 13 | 1 | 13 | 4 | 4 | 16 | 16 | 4 | 4 | 13 | 1 | 13 | 16 | 1 |
-| $a^8 \bmod 17$ | 1 | 1 | 16 | 1 | 16 | 16 | 16 | 1 | 1 | 16 | 16 | 16 | 1 | 16 | 1 | 1 |
-| 判定 | p | p | p | p | p | p | p | p | p | p | p | p | p | p | p | p |
-
-かなり正確に判定できていることがわかるでしょう。
-
-素数については必ず成功し、合成数のときは誤る可能性が $1/4$ 以下ということが示せるので、 $k$ 回試行すれば誤り率は $4^{-k}$ 以下となります。つまり、ある値に対して10回素数判定法を回せば99.9999046%成功するということです。
-
-## 素因数分解
-試し割り法を基本にして $\rho$ 法や楕円曲線法、数体ふるい法などがあります。まず試し割り法で小さな倍数は除いてから他の方法を選択すると速いです。
-
-```mermaid
-flowchart LR
-    id0(試し割り法) --> id1(ρ 法)
-    id0 --> id20(p-1 法)
-    id0 --> id21(p+1 法)
-    id0 --> id3(Fermat 法)
-    id20 --> id4(楕円曲線法)
-    id21 --> id4(楕円曲線法)
-    id3 --> id5(二次ふるい法) --> id6(一般数体ふるい法)
-```
-
-計算量はよく $L$ 記法を用いて表現されます。なぜかはわかりません。計算量解析苦手なので。
-
-$$
-L_n[\alpha, c] = \exp(c(\log n)^\alpha(\log\log n)^{1-\alpha})
-$$
-
-### 試し割り法
-
-愚直に素数を小さい順に割っていく方法です。大体の場合これで十分速いです。
-
-1. $N$ を $2$ 以上 $\sqrt{N}$ 以下の整数で下から順に割れるだけ割り続け、割った数 $p$ とその回数 $e$ を記録する。
-2. 最後に残った $N$ が $1$ ではないならば記録する。
-
-この計算量は $\mathcal{O}(\sqrt{N})$ となります。また $\sqrt{N}$ までの素数リストが既にあるならば素数定理によって計算量は $\mathcal{O}(\sqrt{N}/\log{\sqrt{N}})$ に落ちる。
-
-https://gist.github.com/anko9801/9a717f4737104a81b5cf90dd50b94dfd
-
-### Pollard の $p-1$ 法
-$p-1$ が Smooth number のとき有効な素因数分解法です。
-
-> **Prop.**
-> $N$ がある素因数 $p$ をもつとき $k$ が $p-1$ の倍数であれば $a^k - 1 \pmod N$ は $p$ の倍数となる。
-
-**Proof.**
-フェルマーの小定理より $a^k = 1 \pmod p$ であるから $a^k - 1 \pmod N$ は $p$ の倍数である。$\Box$
-
-もちろん $p$ の値は分からないので約数をたくさん持つような $M$ を用意します。$M$ を $B$-Smooth number として次のように構成します。
-
-$$
-\begin{aligned}
-  M = \prod_{\mathrm{primes}\ q\leq B} q^{\lfloor\log_q B\rfloor}
-\end{aligned}
-$$
-
-この $M$ が $N$ のどれかの大きな素因数 $p$ に対して $p-1$ の倍数となったとき $\gcd(a^k - 1, N)$ を計算することで $p$ を取り出せます。計算量は $\mathcal{O}(B\log B\log\log n)$ らしいです。
-
-果たしてそんなうまくいくのだろうか？これを初めて聞いたとき大きな数は大体大きな素因数持ってるだろうからほとんど上手くいかなそうと感じました。
-
-考えてみればすぐわかります。
-
-適当に数を取ってきてある素数 $p$ が含まれている確率というのは $1/p$ 、つまり素数が大きければ大きいほど入ってるのは稀です。
-
-https://gist.github.com/anko9801/8f53ff0e4af8d866d3fc93b4fbfefb68
-
-### Hugh Williams の $p+1$ 法
-$p + 1$ が Smooth number のとき有効な素因数分解法です。
-
-> **Prop.**
-> $k$ が $p+1$ の倍数であれば Lucas 数列 $u_i, v_i$ に対し、 $u_k$ は $p$ の倍数となる。ただし Lucas 数列は次のように定義される。
->
-> $$
-\begin{aligned}
-  u_0 & = 0, u_1 = 1, u_{n+1} = au_n - bu_{n-1} \\
-  v_0 & = 2, v_1 = a, v_{n+1} = av_n - bv_{n-1}
-\end{aligned}
-$$
-
-**Proof.**
-Lucas 数列について
-
-$$
-\begin{aligned}
-  \alpha,\beta & = \frac{a \pm \sqrt{a^2 - 4b}}{2} \\
-  y_n & = \frac{\alpha^n - \beta^n}{\alpha - \beta}
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-  2^{n-1}x_n & = \sum_k^n {}_nC_{2k}a^{n-2k}d^k \\
-  2^{n-1}y_n & = \sum_k^n {}_nC_{2k+1}a^{n-2k-1}d^k
-\end{aligned}
-$$
-
-$n = p$ と素数となるとき
-
-$$
-\begin{aligned}
-  x_p & = \sum_{k=0}^{(p-1)/2} {}_pC_{2k}a^{p-2k}d^k = a & \pmod p \\
-  y_p & = \sum_{k=0}^{(p-1)/2} {}_pC_{2k+1}a^{p-2k-1}d^k = d^{(p-1)/2} & \pmod p
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-  y_{p+1} & = ay_p + by_{p-1} = -a + (x_p - y_{p+1}) = -y_{p+1} & \implies y_{p+1} & = 0 & (d^{(p-1)/2} = -1) \pmod p \\
-  by_{p-1} & = y_{p+1} - ay_p = (x_p - by_{p-1}) - ay_p = -by_{p-1} & \implies y_{p-1} & = 0 & (d^{(p-1)/2} = 1) \pmod p
-\end{aligned}
-$$
-
-繰り返し二乗法っぽく $y_k$ を $\mathcal{O}(\log k)$ で計算できる。
-
-$$
-\begin{aligned}
-  y_{2n} & = 2y_ny_{n+1} - ay_n^2 \\
-  y_{2n+1} & = y_{n+1}^2 + by_n^2 \\
-  y_{2n+2} & = ay_{n+1}^2 + 2by_ny_{n+1}
-\end{aligned}
-$$
-
-約数の多い $k$ を用意して $\gcd(y_k, N)$ が出てくる。確率はどれくらい？
-
-### 楕円曲線法
-一般に有効な素因数分解法です。
-
-> **Prop.**
-> $k$ が $\#E/(\mathbb{Z}/N\mathbb{Z})$ の倍数であれば $kP = \mathcal{O}$ となる。このとき内部計算時に $x_1 - x_2$ が $p$ の倍数となる。
-
-$N$ が 2, 3 の倍数でないとします。楕円曲線 $y^2 = x^3 + ax + b \pmod N$ について $a, b$ に様々な値を与えて $kP$ を計算します。
-
-計算量は準指数時間 $\mathcal{O}(\exp((1 + c)(\log p)^{1/2}(\log\log p)^{1/2}))$ らしい。
-
-### 二次ふるい法 (QS; Quadratic Sieve)
-1. ある範囲 $\sqrt{N} - \epsilon < x_i < \sqrt{N} + \epsilon$ の中で $x_i^2 - N$ が $B$-smooth となるような数をいくつか取ってくる
-2. $x_i^2 - N$ を素因数分解し、いくつかの積 $(x_i^2 - N)\cdots(x_j^2 - N)$ がちょうど平方数となるように選択する
-3. その平方数を $y^2$ とすると $x^2 = y^2 \pmod N$ となり $x\pm y$ のどちらかは $p$ の倍数となる
-
-なんかしらんけど計算量は $\mathcal{O}(\exp((1 + c)(\log n)^{1/2}(\log\log n)^{1/2}))$ らしいです。
-
-### 一般数体ふるい法 (GNFS; General Number Field Sieve)
-計算量は $\mathcal{O}(\exp((1 + c)(\log n)^{1/3}(\log\log n)^{2/3}))$ になったらいいなと思っています。
-
-### Shor のアルゴリズム
-本質的には群の位数を見つけることで素因数分解します。
-
-> **位数発見問題**
-> $a$ の位数 $n$ つまり $a^n = 1 \pmod N$ となる最小の $n$ を量子計算機で見つけられる。
-
-**Proof.**
-
-$n$ が偶数のとき $a^{n/2}+1$ が未知の素因数の倍数となることがあります。
-
-## 離散対数問題
-離散対数問題 (DLP: Discrete Logarithm Problem) とは位数 $N$ の巡回群 $G$ について $g, y\in G$ が与えられるので $g^x = y$ となる最小の $x\in \mathbb{N}$ を求める問題です。
-
-- 有限体 $\mathbb{F}_p$ の DLP は FFDLP; Finite Field DLP と呼ばれる。巡回群 $\mathbb{F}_p$ の位数は $p-1$ となる。
-- 楕円曲線 $E$ 上での DLP は ECDLP; Elliptic Curve DLP と呼ばれる。巡回群 $E/\mathbb{F}_p$ の位数は Hasse の定理より $|\#E/\mathbb{F}_p - (p+1)|\leq 2\sqrt{p}$ に制限される。
-
-### Baby-step Giant-step
-
-半分全列挙を用いる方法。
-
-$m = \lceil\sqrt{N}\rceil$ とおく。DLP の解 $n$ を $m$ で割って $n = qm + r$ とおく。
-
-$$
-\begin{aligned}
-y & = g^{qm + r} & (q, r\in[0, m-1])
-\end{aligned}
-$$
-
-このとき $yg^{-r}$, $g^{qm}$ を全列挙し、どちらかのリストの要素をもう1つのリストで検索して $yg^{-r} = g^{qm}$ となる組を探索し、解を得る。この計算量は $O(\sqrt{N}\log N)$ となる。
-
-### Pollard's $\rho$ 法
-
-誕生日のパラドックスを用いる方法。
-
-> **Prop. 誕生日のパラドックス**
-> 誕生日が同じ 2 人を見つけたいときに確率 $P$ を超えるには人を何人集めればよいのかという問題です。鳩ノ巣原理から $366$ 人いれば必ず同じ誕生日の人が出てきます。$50\%$ を超えるには $23$ 人で十分です。
-
-若干曖昧ですが期待値の上界の証明です。
-
-**Proof.**
-$N$ 種類の元から $k$ 個の元を取ってきたとき $k-1$ 個までそれぞれ相違なり, $k$ 個目で同じとなる確率は $t \ll 1$ のときの近似 $1 - t\approx e^{-t}$ を行うことで次のようになる。
-
-$$
-P(A) = \frac{k}{N}\prod_{i = 0}^{k-1}\left(1-\frac{i}{N}\right) \leq \frac{k}{N}\prod_{i = 0}^{k-1}e^{-i/N} = \frac{k}{N}e^{-k(k-1)/2N} \leq \frac{k}{N}e^{-k^2/2N}
-$$
-
-試行回数 $k$ に対する期待値は $t = k/\sqrt{N}$ と変数変換し、ガウス積分することで求まる。
-
-$$
-E(A) \leq \sum_{k=1}^N k\cdot\frac{k}{N}e^{-k^2/2N} = \sum_{k=1}^N t^2e^{-t^2/2} \leq \sqrt{N}\int_0^\infty t^2e^{-t^2/2}dt = \sqrt{\frac{\pi N}{2}}
-$$
-
-よって期待値は大体 $\sqrt{\frac{\pi N}{2}}$ となる為、$N = 365$ を代入すると 50\% を超えるには 23.95 人が必要となる。$\Box$
-
-このように $N$ 種類のボールが入った袋から無作為に取ってきたら同じ種類のボールが 2 つ取れるような個数が $\mathcal{O}(\sqrt{N})$ であることを利用して計算量を落とすことを考えます。まず大枠としては次のようなアルゴリズムです。
-
-1. 疑似乱数関数 $f(a)$ を決めて数列 $a_0, a_{i+1} = f(a_i)$ を生成する。
-2. $a_i = a_j$ となる $i, j\ (0\leq i<j<N)$ を発見したとき以下の方法で DLP が求まる。
-
-まず、このアルゴリズムで使われる代表的な疑似乱数関数 $f(x)$ について紹介します。まず巡回群 $G$ を $G_1, G_2, G_3$ に振り分けて、次のように定義します。
-
-$$
-f(a)=
-\begin{cases}
-ya & (a \in G_1) \\
-a^2 & (a \in G_2) \\
-ga & (a \in G_3)
-\end{cases}
-$$
-
-このとき $a_0 = g$ とすると $a_i = g^{s_i}y^{t_i} = g^{s_i + xt_i}\ (s_i, t_i \in \mathbb{N})$ と書ける。$a_i = a_j$ のとき
-
-$$
-\begin{aligned}
-a_ia_j^{-1} & = g^{(s_i + xt_i) - (s_j + xt_j)} = 1 \\
-x &= \frac{s_i - s_j}{t_j - t_i} & \pmod N
-\end{aligned}
-$$
-
-となり $x$ が分かる。期待計算量は $\mathcal{O}(N^{1/4})$ です。
-
-Pollard-$\rho$ 法の $\rho$ は文字 $\rho$ の形が $a_i$ の由来となっています。
-
-### Pollard's Kangaroo 法 ($\lambda$ 法)
-$\rho$ 法は動く点が1つの値だったのに対し、 $\lambda$ 法は2つの値がランダムに動いていき、一方がもう一方の点に衝突したとき DLP が解ける。
-
-$$
-\begin{aligned}
-x_0 & = g^\alpha & y_0 & = y \\
-x_{i+1} & = x_ig^{f(x_i)} & y_{i+1} & = y_ia^{f(y_i)} \\
-\end{aligned}
-$$
-
-$x_i = y_j$ となるとき $x = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j} f(y_k)$ となる。
-見つからなければ $N$ や $f$ を取り替えて繰り返す。
-
-同じく期待計算量は $\mathcal{O}(N^{1/4})$ です。
-
-### Pohlig-Hellman
-
-> **Prop.**
-> 巡回群の位数が $|G| = \prod_{i = 1}^n p_i^{e_{i}}$ と素因数分解できるとき $G \cong \prod_{i = 1}^n \mathbb{Z}/p_i^{e_{i}}\mathbb{Z}$ となる。
-
-アーベルの構造定理により証明できる。詳細は群論を学んでほしい。
-これより中国剰余定理から $\mathcal{O}(\max{p_i^{e_i}})$ に落ちる。
-
-### 指数計算法 (Index Calculus Algorithm)
-有限体上の DLP でのみ有効な方法。楕円曲線でも研究はされていますが高速な方法はまだ見つかってないようです。
-
-1. 小さな素因数 $p_j$ を用いて $yg^k = \prod_{j = 1}^m p_j^{e_{j}} \pmod p$ と書けるような $k$ を見つける。
-2. $g^{k_i} = \prod_{j = 1}^m p_j^{e_{ij}} \pmod{p}$ と素因数分解できるような $k_i$ を $n$ 個以上見つける。
-
-すると次のように書ける。
-
-$$
-\begin{aligned}
-  g^{k_i} & = \prod_{j = 1}^m p_j^{e_{ij}} & \pmod p \\
-  k_i & = \sum_{j = 1}^m e_{ij}\log_g{p_j} & \pmod{p-1} \\
-\begin{pmatrix}
-  k_1 \\
-  \vdots \\
-  k_n \\
-\end{pmatrix} & =
-\begin{pmatrix}
-  e_{11} & \cdots & e_{m1} \\
-  \vdots & \ddots & \vdots \\
-  e_{1n} & \cdots & e_{mn}\\
-\end{pmatrix}
-\begin{pmatrix}
-  \log_g p_1 \\
-  \vdots \\
-  \log_g p_m \\
-\end{pmatrix} & \pmod{p-1}
-\end{aligned}
-$$
-
-これよりガウスの消去法から $\log_g p_1, \ldots, \log_g p_n$ が求まる。よって次の式より $x$ が求まる。
-
-$$
-x = \sum_{j = 1}^me_j\log_g{p_j} - k \pmod {p-1}
-$$
-
-計算量は $\exp((\sqrt{2}+c)(\log n)^{1/2}(\log\log n)^{1/2})$ となる。
-
-### 数体ふるい法
-- [General purpose integer factoring](https://eprint.iacr.org/2017/1087)
-
 ## 格子の基礎
 
 図でイメージ掴むのが速い
@@ -1348,6 +992,146 @@ $$
 $$
 
 の変換について不変
+
+## 離散対数問題
+計算機で解くことの難しい部類 NP 完全の問題です。
+
+> **離散対数問題 (DLP: Discrete Logarithm Problem)**
+> 位数 $N$ の巡回群 $G$ について $g, y\in G$ が与えられるので $g^x = y$ となる最小の $x\in \mathbb{N}$ を求める問題。
+
+- 有限体 $\mathbb{F}_p$ の DLP は FFDLP; Finite Field DLP と呼ばれる。巡回群 $\mathbb{F}_p$ の位数は $p-1$ となる。
+- 楕円曲線 $E$ 上での DLP は ECDLP; Elliptic Curve DLP と呼ばれる。巡回群 $E/\mathbb{F}_p$ の位数は Hasse の定理より $|\#E/\mathbb{F}_p - (p+1)|\leq 2\sqrt{p}$ に制限される。
+
+### Baby-step Giant-step
+
+半分全列挙を用いる方法。
+
+$m = \lceil\sqrt{N}\rceil$ とおく。DLP の解 $n$ を $m$ で割って $n = qm + r$ とおく。
+
+$$
+\begin{aligned}
+y & = g^{qm + r} & (q, r\in[0, m-1])
+\end{aligned}
+$$
+
+このとき $yg^{-r}$, $g^{qm}$ を全列挙し、どちらかのリストの要素をもう1つのリストで検索して $yg^{-r} = g^{qm}$ となる組を探索し、解を得る。この計算量は $O(\sqrt{N}\log N)$ となる。
+
+### Pollard's $\rho$ 法
+
+誕生日のパラドックスを用いる方法。
+
+> **Prop. 誕生日のパラドックス**
+> 誕生日が同じ 2 人を見つけたいときに確率 $P$ を超えるには人を何人集めればよいのかという問題です。鳩ノ巣原理から $366$ 人いれば必ず同じ誕生日の人が出てきます。$50\%$ を超えるには $23$ 人で十分です。
+
+若干曖昧ですが期待値の上界の証明です。
+
+**Proof.**
+$N$ 種類の元から $k$ 個の元を取ってきたとき $k-1$ 個までそれぞれ相違なり, $k$ 個目で同じとなる確率は $t \ll 1$ のときの近似 $1 - t\approx e^{-t}$ を行うことで次のようになる。
+
+$$
+P(A) = \frac{k}{N}\prod_{i = 0}^{k-1}\left(1-\frac{i}{N}\right) \leq \frac{k}{N}\prod_{i = 0}^{k-1}e^{-i/N} = \frac{k}{N}e^{-k(k-1)/2N} \leq \frac{k}{N}e^{-k^2/2N}
+$$
+
+試行回数 $k$ に対する期待値は $t = k/\sqrt{N}$ と変数変換し、ガウス積分することで求まる。
+
+$$
+E(A) \leq \sum_{k=1}^N k\cdot\frac{k}{N}e^{-k^2/2N} = \sum_{k=1}^N t^2e^{-t^2/2} \leq \sqrt{N}\int_0^\infty t^2e^{-t^2/2}dt = \sqrt{\frac{\pi N}{2}}
+$$
+
+よって期待値は大体 $\sqrt{\frac{\pi N}{2}}$ となる為、$N = 365$ を代入すると 50\% を超えるには 23.95 人が必要となる。$\Box$
+
+このように $N$ 種類のボールが入った袋から無作為に取ってきたら同じ種類のボールが 2 つ取れるような個数が $\mathcal{O}(\sqrt{N})$ であることを利用して計算量を落とすことを考えます。まず大枠としては次のようなアルゴリズムです。
+
+1. 疑似乱数関数 $f(a)$ を決めて数列 $a_0, a_{i+1} = f(a_i)$ を生成する。
+2. $a_i = a_j$ となる $i, j\ (0\leq i<j<N)$ を発見したとき以下の方法で DLP が求まる。
+
+まず、このアルゴリズムで使われる代表的な疑似乱数関数 $f(x)$ について紹介します。まず巡回群 $G$ を $G_1, G_2, G_3$ に振り分けて、次のように定義します。
+
+$$
+f(a)=
+\begin{cases}
+ya & (a \in G_1) \\
+a^2 & (a \in G_2) \\
+ga & (a \in G_3)
+\end{cases}
+$$
+
+このとき $a_0 = g$ とすると $a_i = g^{s_i}y^{t_i} = g^{s_i + xt_i}\ (s_i, t_i \in \mathbb{N})$ と書ける。$a_i = a_j$ のとき
+
+$$
+\begin{aligned}
+a_ia_j^{-1} & = g^{(s_i + xt_i) - (s_j + xt_j)} = 1 \\
+x &= \frac{s_i - s_j}{t_j - t_i} & \pmod N
+\end{aligned}
+$$
+
+となり $x$ が分かる。期待計算量は $\mathcal{O}(N^{1/4})$ です。
+
+Pollard-$\rho$ 法の $\rho$ は文字 $\rho$ の形が $a_i$ の由来となっています。
+
+### Pollard's Kangaroo 法 ($\lambda$ 法)
+$\rho$ 法は動く点が1つの値だったのに対し、 $\lambda$ 法は2つの値がランダムに動いていき、一方がもう一方の点に衝突したとき DLP が解ける。
+
+$$
+\begin{aligned}
+x_0 & = g^\alpha & y_0 & = y \\
+x_{i+1} & = x_ig^{f(x_i)} & y_{i+1} & = y_ia^{f(y_i)} \\
+\end{aligned}
+$$
+
+$x_i = y_j$ となるとき $x = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j} f(y_k)$ となる。
+見つからなければ $N$ や $f$ を取り替えて繰り返す。
+
+同じく期待計算量は $\mathcal{O}(N^{1/4})$ です。
+
+### Pohlig-Hellman
+
+> **Prop.**
+> 巡回群の位数が $|G| = \prod_{i = 1}^n p_i^{e_{i}}$ と素因数分解できるとき $G \cong \prod_{i = 1}^n \mathbb{Z}/p_i^{e_{i}}\mathbb{Z}$ となる。
+
+アーベルの構造定理により証明できる。詳細は群論を学んでほしい。
+これより中国剰余定理から $\mathcal{O}(\max{p_i^{e_i}})$ に落ちる。
+
+### 指数計算法 (Index Calculus Algorithm)
+有限体上の DLP でのみ有効な方法。楕円曲線でも研究はされていますが高速な方法はまだ見つかってないようです。
+
+1. 小さな素因数 $p_j$ を用いて $yg^k = \prod_{j = 1}^m p_j^{e_{j}} \pmod p$ と書けるような $k$ を見つける。
+2. $g^{k_i} = \prod_{j = 1}^m p_j^{e_{ij}} \pmod{p}$ と素因数分解できるような $k_i$ を $n$ 個以上見つける。
+
+すると次のように書ける。
+
+$$
+\begin{aligned}
+  g^{k_i} & = \prod_{j = 1}^m p_j^{e_{ij}} & \pmod p \\
+  k_i & = \sum_{j = 1}^m e_{ij}\log_g{p_j} & \pmod{p-1} \\
+\begin{pmatrix}
+  k_1 \\
+  \vdots \\
+  k_n \\
+\end{pmatrix} & =
+\begin{pmatrix}
+  e_{11} & \cdots & e_{m1} \\
+  \vdots & \ddots & \vdots \\
+  e_{1n} & \cdots & e_{mn}\\
+\end{pmatrix}
+\begin{pmatrix}
+  \log_g p_1 \\
+  \vdots \\
+  \log_g p_m \\
+\end{pmatrix} & \pmod{p-1}
+\end{aligned}
+$$
+
+これよりガウスの消去法から $\log_g p_1, \ldots, \log_g p_n$ が求まる。よって次の式より $x$ が求まる。
+
+$$
+x = \sum_{j = 1}^me_j\log_g{p_j} - k \pmod {p-1}
+$$
+
+計算量は $\exp((\sqrt{2}+c)(\log n)^{1/2}(\log\log n)^{1/2})$ となる。
+
+### 数体ふるい法
+- [General purpose integer factoring](https://eprint.iacr.org/2017/1087)
 
 ## 参考文献
 - [Finding a Small Root of a Univariate Modular Equation](https://static.aminer.org/pdf/PDF/000/192/854/finding_a_small_root_of_a_univariate_modular_equation.pdf)
