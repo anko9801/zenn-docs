@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/anko9801/zenn-docs#readme",
   "dependencies": {
+    "remark": "^14.0.2",
     "textlint": "^13.0.0",
     "textlint-rule-ja-no-space-between-full-width": "^2.2.0",
     "textlint-rule-no-dropping-the-ra": "^3.0.0",
