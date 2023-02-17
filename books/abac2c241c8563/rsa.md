@@ -119,6 +119,14 @@ $$
 
 では諦めて掛け算だけで解く、というだけではなく他に1つ方法があります。直接数に対応させなくても、ある数だけ累乗すると $1$ や $-1$ になるという情報を使うことである程度情報を引き出すことができます。いわゆる平方剰余と呼ばれるものなどです。
 
+それとわかりやすいように暗号化, 復号化関数 $Enc, Dec$ を定義しておきます。
+
+$$
+\begin{aligned}
+\mathcal{E}(m) &= m^e & \mathcal{D}_{sk}(c) &= c^d &\pmod N \\
+\end{aligned}
+$$
+
 ### RSA-CRT
 
 RSAの復号をする際に $c^d$ を計算しますが、 $d = e^{-1} \pmod {\phi (N)}$ は比較的大きいので処理が重くなります。これに対してRSA-CRTは中国剰余定理(CRT)を利用して高速化を図っています。
@@ -485,6 +493,25 @@ $n$ が偶数のとき $a^{n/2}+1$ が未知の素因数の倍数となること
 
 $O((\log⁡N)^2)$
 
+### アニーリング計算
+アニーリング計算は多変数多項式の HUBO QUBO
+
+素朴法 $f(x, y) = (N - xy)^2$ の最小化を目指す。
+
+$$
+\begin{aligned}
+xy & = \left(\sum_{i=0}^n 2^ix_i\right)\left(\sum_{i=0}^n 2^iy_i\right) = \sum_{i,j} 2^{i+j}x_iy_j
+\end{aligned}
+$$
+
+筆算法は $x, y$ を 2 進展開して筆算した形から方程式を組み立てる方法です。$i$ 桁目での $j$ 桁目への繰り上がり $z_{i,j}$ として次のように書けます。(繰り上がりの項数は雑な評価です)
+
+$$
+\begin{aligned}
+\sum_{i+j=k}x_iy_j + \sum_{n=1}^{\lceil\log\log N\rceil}z_{k+n,k} = N_k + \sum_{n=1}^{\lceil\log\log N\rceil}2^nz_{k,k+n}
+\end{aligned}
+$$
+
 ### 素因数分解データベース
 素因数分解の結果をデータベースとして保管しているサイトがあって実戦で便利です。
 http://www.factordb.com/
@@ -512,16 +539,6 @@ http://www.factordb.com/
 
 RSA暗号は素因数分解の困難性が安全性の根拠である。
 うまく実装しないと素因数分解を解かなくても攻撃が出来てしまう。
-
-
-それとわかりやすいように暗号化, 復号化関数 $Enc, Dec$ を定義しておきます。
-
-$$
-\begin{aligned}
-\mathcal{E}(m) &= m^e & \mathcal{D}_{sk}(c) &= c^d &\pmod N \\
-\end{aligned}
-$$
-
 
 ### $e$ が小さすぎてはいけない (Low Public Exponent Attack)
 
