@@ -346,30 +346,20 @@ $N$ が 2, 3 の倍数でないとします。楕円曲線 $y^2 = x^3 + ax + b \
 計算量は準指数時間 $\mathcal{O}(\exp((1 + c)(\log p)^{1/2}(\log\log p)^{1/2}))$ らしい。
 
 ### Fermat 法
-$p, q$ が近いと中心から順に調べることで素数の組を見つけられます。様々な探索の方法がありますが、以下のような方法がよく用いられています。
-
-$$
-\begin{aligned}
-N &= pq \\
-  &= (x + y)(x - y) \\
-  &= x^2 - y^2 \\
-y^2 &= x^2 - N \\
-\end{aligned}
-$$
-
-より初期値を $x = \lceil\sqrt N\rceil, y = 0$ として $x$ の値を1ずつ上げながら $y$ の値も上げていき、右辺と左辺の計算結果が一致したとき $p, q$ が求まるという仕掛けです。
-
-さらに、このままだと素数 $p, q$ が近い値のときしか対応できませんが、素数同士の近似比を与えればその付近で探索することが出来ます。素数 $p, q$ の近似比が $a : b$ と与えられれば次のように計算できます。
+$p, q$ の比率が大体わかっているとその周辺を調べることで素数の組を見つけられます。
 
 $$
 \begin{aligned}
 \frac{a}{b} &\approx \frac{p}{q} \\
 aq &\approx bp \\
-aq \times bp &= abN
+abN & = aq \times bp \\
+    & = (x + y)(x - y) \\
+    & = x^2 - y^2 \\
+y^2 &= x^2 - abN
 \end{aligned}
 $$
 
-これより $abN$ に対し Fermat's method を適用することで $p, q$ が求まります。
+初期値を $x = \lceil\sqrt{abN}\rceil, y = 0$ として $x$ の値を1ずつ上げながら $y$ の値も上げていき、右辺と左辺の計算結果が一致したとき $p, q$ が求まるという仕掛けです。
 
 また、$p, q$ についてより複雑な関係がある場合には Coppersmith method が適用できます。
 
@@ -388,17 +378,7 @@ def fermat(N):
     return (x - y, x + y)
 ```
 
-前の問題だと素数 $p, q$ が近い値のときしか対応できませんが、素数同士の近似比 $p:q \approx a:b$ が与えられる場合だったらどうでしょうか。([RSA暗号攻撃で他でも使える n のこと](https://project-euphoria.dev/blog/27-rsa-attacks/) より)
-
-$$
-\begin{aligned}
-\frac{a}{b} &\approx \frac{p}{q} \\
-aq &\approx bp \\
-aq \times bp &= abN
-\end{aligned}
-$$
-
-これより $abN$ に対し Fermat's method を適用することで $p, q$ が求まります。
+[RSA暗号攻撃で他でも使える n のこと](https://project-euphoria.dev/blog/27-rsa-attacks/) より
 
 ### 二次ふるい法 (QS; Quadratic Sieve)
 1. ある範囲 $\sqrt{N} - \epsilon < x_i < \sqrt{N} + \epsilon$ の中で $x_i^2 - N$ が $B$-smooth となるような数をいくつか取ってくる
@@ -431,7 +411,7 @@ xy & = \left(\sum_{i=0}^n 2^ix_i\right)\left(\sum_{i=0}^n 2^iy_i\right) = \sum_{
 \end{aligned}
 $$
 
-筆算法は $x, y$ を 2 進展開して筆算した形から方程式を組み立てる方法です。$i$ 桁目での $j$ 桁目への繰り上がり $z_{i,j}$ として次のように書けます。(繰り上がりの項数は雑な評価です)
+筆算法は $x, y$ を 2 進展開して筆算した形から方程式を組み立てる方法です。$i$ 桁目での $j$ 桁目への繰り上がり $z_{i,j}$ として $k$ 桁目における方程式は次のように書けます。(繰り上がりの項数は雑な評価です。)
 
 $$
 \begin{aligned}
@@ -439,18 +419,19 @@ $$
 \end{aligned}
 $$
 
+素朴法に比べ、変数が多くなりますが係数を小さくすることができます。また素数が奇数であることや 2 進数による条件などから変数を減らすことができます。
+
 ### 素因数分解データベース
 素因数分解の結果をデータベースとして保管しているサイトがあります。実戦ではこれが便利です。
 http://www.factordb.com/
 
 ## 攻撃
-
 実際のRSAではこのような攻撃が発見されてきました。
 
 | アンチケース                                                              | 攻撃名                                                           | 方法                                                   |
 | --------------------------------------                                    | ---------------------------------------------------------------- | -------------------------------------------------      |
 | 公開鍵 $e$ が小さすぎてはいけない                                            | Low Public Exponent Attack                                       | 整数上の $e$ 乗根に落とし込む                        |
-| 秘密鍵 $d$ が小さくてはいけない            | Wiener's Attack, Boneh-Durfee Attack                             | 近似分数から見積もる, Coppersmith Method               |
+| 秘密鍵 $d$ が小さすぎてはいけない            | Wiener's Attack, Boneh-Durfee Attack                             | 近似分数から見積もる, Coppersmith Method               |
 | 同一の平文を同一の $N$ 異なる $e$ で暗号化した暗号文を与えてはいけない               | Common Modulus Attack                                            | $e$ について拡張ユークリッドの互除法                   |
 | 同一の平文を異なる $N$ で暗号化した暗号文を与えてはいけない               | Håstad's Broadcast Attack                                        | 中国剰余定理                                           |
 | 同一の平文を同一の $d$ 異なる $e, N$ で暗号化した暗号文を与えてはいけない | Small Common Private Exponent Attack                             | Coppersmith Method                                     |
