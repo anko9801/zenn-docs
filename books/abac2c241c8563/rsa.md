@@ -17,7 +17,7 @@ title: "RSA暗号への攻撃"
 これで剰余上の演算は一通りできるようになりました。さてコンピューターはこれらをどのようにして計算するのでしょうか。代表的なアルゴリズムで組んだ場合だと以下の表のようになります。(簡単の為、基本的な演算の計算量はビット数に依らないとする)
 
 | 演算                   | 方法                          | 計算量                      |
-| :--------------------  | :---------------------------- | :-------------------------: |
+| :--------------------  | :---------------------------- | :-------------------------- |
 | 足し算   $a + b$       | 足してN以上になったらN引く    | $O(1)$            |
 | 引き算   $a - b$       | 引いて0未満になったらN足す    | $O(1)$            |
 | 掛け算   $a \times b$  | 掛けてNで割った余り           | $O(1)$            |
@@ -101,32 +101,6 @@ print(plaintext)
 | `long_to_bytes(n)`             | 数をASCIIとしてエンコードしバイト文字列に変換 |
 :::
 
-RSA暗号はこれを使えば簡単に解けます。
-RSAは $c = m^e \pmod {N}$ という式について $e, c$ が分かっているので累乗根を求める問題なのですが、原始根 $a$ で対数を取るとカーマイケルの定理より
-
-$$
-\begin{aligned}
-c &= m^e & \pmod {N} \\
-m &= c^{1/e} & \pmod {N} \\
-\end{aligned}
-$$
-
-と累乗根を計算できます。
-
-ここまでは数学の話でしたが、ここから計算機科学に移ります。
-
-確かに、掛け算を足し算に変換することで簡単な問題になります。しかし、それ以前にコンピュータが剰余上の対数を計算する事は結構難しく、離散対数問題 (DLP: Discrete Logarithm Problem) と呼ばれ、現在見つかっている最も速いアルゴリズムでも完全指数時間も掛かります。
-
-では諦めて掛け算だけで解く、というだけではなく他に1つ方法があります。直接数に対応させなくても、ある数だけ累乗すると $1$ や $-1$ になるという情報を使うことである程度情報を引き出すことができます。いわゆる平方剰余と呼ばれるものなどです。
-
-それとわかりやすいように暗号化, 復号化関数 $Enc, Dec$ を定義しておきます。
-
-$$
-\begin{aligned}
-\mathcal{E}(m) &= m^e & \mathcal{D}_{sk}(c) &= c^d &\pmod N \\
-\end{aligned}
-$$
-
 ### RSA-CRT
 
 RSAの復号をする際に $c^d$ を計算しますが、 $d = e^{-1} \pmod {\phi (N)}$ は比較的大きいので処理が重くなります。これに対してRSA-CRTは中国剰余定理(CRT)を利用して高速化を図っています。
@@ -160,6 +134,34 @@ RFC 8017: PKCS #1 V2.2(RSA Cryptography Specifications Version 2.2)
 - PSS; Probabilistic Signature Scheme
 
 このようなパディングを用いたRSAをRSA-[パディング名]などと呼んだりします。
+
+### 安全性
+RSA暗号はこれを使えば簡単に解けます。
+RSAは $c = m^e \pmod {N}$ という式について $e, c$ が分かっているので累乗根を求める問題なのですが、原始根 $a$ で対数を取るとカーマイケルの定理より
+
+$$
+\begin{aligned}
+c &= m^e & \pmod {N} \\
+m &= c^{1/e} & \pmod {N} \\
+\end{aligned}
+$$
+
+と累乗根を計算できます。
+
+ここまでは数学の話でしたが、ここから計算機科学に移ります。
+
+確かに、掛け算を足し算に変換することで簡単な問題になります。しかし、それ以前にコンピュータが剰余上の対数を計算する事は結構難しく、離散対数問題 (DLP: Discrete Logarithm Problem) と呼ばれ、現在見つかっている最も速いアルゴリズムでも完全指数時間も掛かります。
+
+では諦めて掛け算だけで解く、というだけではなく他に1つ方法があります。直接数に対応させなくても、ある数だけ累乗すると $1$ や $-1$ になるという情報を使うことである程度情報を引き出すことができます。いわゆる平方剰余と呼ばれるものなどです。
+
+それとわかりやすいように暗号化, 復号化関数 $\mathcal{E}_{pk}, \mathcal{D}_{sk}$ を定義しておきます。
+
+$$
+\begin{aligned}
+\mathcal{E}_{pk}(m) &= m^e & \mathcal{D}_{sk}(c) &= c^d &\pmod N \\
+\end{aligned}
+$$
+
 
 ## 素因数分解
 計算機で解くことの難しい部類 NP 完全の問題です。素因数分解したい数 $N$ **のビット数** に対して多項式時間 $\mathcal{O}((\log N)^k)$ で解くアルゴリズムは量子計算機を除いて見つかっていません。
@@ -378,8 +380,6 @@ def fermat(N):
     return (x - y, x + y)
 ```
 
-[RSA暗号攻撃で他でも使える n のこと](https://project-euphoria.dev/blog/27-rsa-attacks/) より
-
 ### 二次ふるい法 (QS; Quadratic Sieve)
 1. ある範囲 $\sqrt{N} - \epsilon < x_i < \sqrt{N} + \epsilon$ の中で $x_i^2 - N$ が $B$-smooth となるような数をいくつか取ってくる
 2. $x_i^2 - N$ を素因数分解し、いくつかの積 $(x_i^2 - N)\cdots(x_j^2 - N)$ がちょうど平方数となるように選択する
@@ -419,7 +419,7 @@ $$
 \end{aligned}
 $$
 
-素朴法に比べ、変数が多くなりますが係数を小さくすることができます。また素数が奇数であることや 2 進数による条件などから変数を減らすことができます。
+素朴法に比べ、変数は多くなりますが係数を小さくすることができます。また素数が奇数であることや 2 進数による条件などから変数を減らすことができます。
 
 ### 素因数分解データベース
 素因数分解の結果をデータベースとして保管しているサイトがあります。実戦ではこれが便利です。
@@ -441,8 +441,6 @@ http://www.factordb.com/
 | 平文を部分的にでも知られてはならない                            | LSB Decryption Oracle Attack など                                    | 二分探索                                               |
 | 秘密鍵を部分的にでも知られてはならない                                    | Partial Key Exposure Attack                                      | Coppersmith Method                                     |
 | 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない          | Franklin-Reiter Related Message Attack                           | 最大公約式                                             |
-
-(参考: [RSA暗号運用でやってはいけない n のこと](https://www.slideshare.net/sonickun/rsa-n-ssmjp))
 
 これらの攻撃手法はCrypto問を解く上で基本的なアイデアとなります。解き方やソースコードなど詳しいことは実践編で取り扱いますが、ここではそれぞれのアイデアの中で特に重要な性質をここで紹介します。
 
@@ -611,41 +609,13 @@ me = crt(c, N)
 m = gmpy2.iroot(me, e)[0]
 ```
 
-### Smooth な ElGamal暗号
-
-累乗を求めることは簡単でもDLPが難しいという非対称性を用いた暗号が ElGamal暗号 です。通常は素数を法としますが、多くの小さな素数で割り切れるようなsmoothな数を法とした場合はどうなるのか考えてみます。
-
-$$
-c = a^{m} \pmod{p_1p_2\ldots p_n}
-$$
-
-まずは素因数分解をします。今回はそれぞれの素数が小さいので Pollard-$\rho$ 法を用いて素因数分解できます。そして暗号文をそれぞれの素因数について剰余を取ります。
+:::message
+**演習 (Smooth な ElGamal暗号)**
 
 $$
-\begin{aligned}
-c_1 &= a^{m_1} \pmod{p_1} \\
-c_2 &= a^{m_2} \pmod{p_2} \\
-\vdots \\
-c_n &= a^{m_n} \pmod{p_n} \\
-\end{aligned}
+c = g^{m} \pmod{p_1p_2\ldots p_n}
 $$
-
-それぞれの式の法の数が小さいので DLP が解けます。
-
-$$
-\begin{aligned}
-m_1& \pmod{p_1 - 1} \\
-m_2& \pmod{p_2 - 1} \\
-\vdots \\
-m_n& \pmod{p_n - 1} \\
-\end{aligned}
-$$
-
-それらを持ち上げることで平文を求めることができます。
-
-$$
-m = \mathrm{CRT}(m_1, m_2, \ldots, m_n)
-$$
+:::
 
 ### 同一の平文を異なるeで暗号化した暗号文を与えてはいけない (Common Modulus Attack)
 
@@ -1022,7 +992,9 @@ $O(e^n)$
 あなたもCTFに出て暗号の世界を堪能してみませんか。
 
 ## 参考文献
-[RSA暗号攻撃で他でも使える n のこと](https://project-euphoria.dev/blog/27-rsa-attacks/)
-[CTF crypto 逆引き](https://furutsuki.hatenablog.com/entry/2021/03/16/095021)
-[Recovering cryptographic keys from partial information, by example](https://eprint.iacr.org/2020/1506.pdf)
-[Twenty Years of Attacks on the RSA Cryptosystem](https://crypto.stanford.edu/~dabo/pubs/papers/RSA-survey.pdf)
+- [RSA暗号運用でやってはいけない n のこと](https://www.slideshare.net/sonickun/rsa-n-ssmjp)
+- [RSA暗号攻撃で他でも使える n のこと](https://project-euphoria.dev/blog/27-rsa-attacks/)
+- [CTF crypto 逆引き](https://furutsuki.hatenablog.com/entry/2021/03/16/095021)
+- [Recovering cryptographic keys from partial information, by example](https://eprint.iacr.org/2020/1506.pdf)
+- [Twenty Years of Attacks on the RSA Cryptosystem](https://crypto.stanford.edu/~dabo/pubs/papers/RSA-survey.pdf)
+
