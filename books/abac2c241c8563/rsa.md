@@ -151,7 +151,7 @@ q_{inv} &= q^{-1} \bmod p \\
 $$
 
 ### padding
-メッセージが改ざんされずに届けられていることを確認するのにパディングは用いられる。RSAでは主に次の3つのパディングが使われる。
+メッセージが改ざんされずに届けられていることを確認するのにパディングは用いられます。RSAでは主に次の3つのパディングが使われます。
 
 RFC 8017: PKCS #1 V2.2(RSA Cryptography Specifications Version 2.2)
 
@@ -159,7 +159,7 @@ RFC 8017: PKCS #1 V2.2(RSA Cryptography Specifications Version 2.2)
 - OAEP; Optimal Asymmetric Encryption Padding
 - PSS; Probabilistic Signature Scheme
 
-このようなパディングを用いたRSAをRSA-[パディング名]などと呼んだりする。
+このようなパディングを用いたRSAをRSA-[パディング名]などと呼んだりします。
 
 ## 素因数分解
 計算機で解くことの難しい部類 NP 完全の問題です。素因数分解したい数 $N$ **のビット数** に対して多項式時間 $\mathcal{O}((\log N)^k)$ で解くアルゴリズムは量子計算機を除いて見つかっていません。
@@ -171,6 +171,12 @@ RFC 8017: PKCS #1 V2.2(RSA Cryptography Specifications Version 2.2)
 上の方法だと完全指数時間掛かりますがそれより速い準指数時間のアルゴリズム、Index calculus や数体ふるい法などがあります。
 整数をランダムに選んできたとき、それは小さい素数、たとえば 2, 3, 5, 7 などのべき乗を掛け合わせたもの、言い換えると、これらの小さい素数だけで生成されるものになる確率は高いことが知られています。これらの小さな素数を「ファクターベース」これらの数が暗号に使われている数に比べて大変小さく、たとえばその準指数関数のサイズ
 
+計算量はよく $L$ 記法を用いて表現されます。なぜかはわかりません。計算量解析苦手なので。
+
+$$
+L_n[\alpha, c] = \exp(c(\log n)^\alpha(\log\log n)^{1-\alpha})
+$$
+
 ```mermaid
 flowchart LR
     id0(試し割り法) --> id1(ρ 法)
@@ -180,16 +186,10 @@ flowchart LR
     id20 --> id4(楕円曲線法)
     id21 --> id4(楕円曲線法)
     id3 --> id5(二次ふるい法) --> id6(一般数体ふるい法)
-    id7(位数発見問題) --> id8(Shor のアルゴリズム)
-    id9(アニーリング計算) --> id10(素朴法)
+    id12(量子アルゴリズム) --> id7(位数発見問題) --> id8(Shor のアルゴリズム)
+    id12 --> id9(アニーリング計算) --> id10(素朴法)
     id9 --> id11(筆算法)
 ```
-
-計算量はよく $L$ 記法を用いて表現されます。なぜかはわかりません。計算量解析苦手なので。
-
-$$
-L_n[\alpha, c] = \exp(c(\log n)^\alpha(\log\log n)^{1-\alpha})
-$$
 
 ### 試し割り法
 
@@ -440,7 +440,7 @@ $$
 $$
 
 ### 素因数分解データベース
-素因数分解の結果をデータベースとして保管しているサイトがあって実戦で便利です。
+素因数分解の結果をデータベースとして保管しているサイトがあります。実戦ではこれが便利です。
 http://www.factordb.com/
 
 ## 攻撃
@@ -450,15 +450,16 @@ http://www.factordb.com/
 | アンチケース                                                              | 攻撃名                                                           | 方法                                                   |
 | --------------------------------------                                    | ---------------------------------------------------------------- | -------------------------------------------------      |
 | 公開鍵 $e$ が小さすぎてはいけない                                            | Low Public Exponent Attack                                       | 整数上の $e$ 乗根に落とし込む                        |
-| 秘密鍵 $d$ が小さくてはいけない(公開鍵 $e$ が大きすぎてはいけない)             | Wiener's Attack, Boneh-Durfee Attack                             | 近似分数から見積もる, Coppersmith Method               |
-| 同一の平文を異なる $e$ で暗号化した暗号文を与えてはいけない               | Common Modulus Attack                                            | $e$ について拡張ユークリッドの互除法                   |
+| 秘密鍵 $d$ が小さくてはいけない            | Wiener's Attack, Boneh-Durfee Attack                             | 近似分数から見積もる, Coppersmith Method               |
+| 同一の平文を同一の $N$ 異なる $e$ で暗号化した暗号文を与えてはいけない               | Common Modulus Attack                                            | $e$ について拡張ユークリッドの互除法                   |
 | 同一の平文を異なる $N$ で暗号化した暗号文を与えてはいけない               | Håstad's Broadcast Attack                                        | 中国剰余定理                                           |
-| RSA-CRTにバグがあってはならない                                               | RSA-CRT Fault Attack                                             | 秘密鍵が書き換えれると平文の差分が $p, q$ の倍数となる |
-| 任意の暗号文を復号した結果を知られてはいけない                            | 適応的選択暗号文攻撃                                             | $a^ec$ を復号すると $am$ となる                        |
-| 暗号文を復号した結果の偶奇を知られてはいけない                            | LSB Decryption Oracle Attack                                     | 二分探索                                               |
 | 同一の平文を同一の $d$ 異なる $e, N$ で暗号化した暗号文を与えてはいけない | Small Common Private Exponent Attack                             | Coppersmith Method                                     |
+| RSA-CRT にメモリ書き換えのバグがあってはならない                                               | RSA-CRT Fault Attack                                             | 秘密鍵が書き換えれると平文の差分が $p, q$ の倍数となる |
+| 任意の暗号文を復号した結果を知られてはならない                            | 適応的選択暗号文攻撃                                             | $a^ec$ を復号すると $am$ となる                        |
+| エラーの内容を知られてはならない                            | Bleichenbacher's Attack                                     | 二分探索など                                               |
+| 複数の平文を部分的にでも知られてはならない                            | LSB Decryption Oracle Attack など                                    | 二分探索                                               |
+| 秘密鍵を部分的にでも知られてはならない                                    | Partial Key Exposure Attack                                      | Coppersmith Method                                     |
 | 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない          | Franklin-Reiter Related Message Attack                           | 最大公約式                                             |
-| 秘密鍵が部分的にでも知られてはならない                                    | Partial Key Exposure Attack                                      | Coppersmith Method                                     |
 
 (参考: [RSA暗号運用でやってはいけない n のこと](https://www.slideshare.net/sonickun/rsa-n-ssmjp))
 
@@ -486,7 +487,7 @@ $$
 f(x) &= x^e - c \\
 0 &= f'(x_n)(x_n - x_{n+1}) + f(x_n) \\
 x_{n+1} &= x_n - \frac{f(x_n)}{f'(x_n)} \\
-x_{n+1} &= x_n - \frac{x_n}{e} + \frac{c}{ex_n^{e-1}}
+x_{n+1} &= \left(1-\frac{1}{e}\right)x_n + \frac{c}{e}\frac{1}{x_n^{e-1}}
 \end{aligned}
 $$
 
@@ -713,9 +714,10 @@ $$
 
 https://inaz2.hatenablog.com/entry/2016/01/26/222303
 
-### パディングによるエラー内容を返してはいけない (Bleichenbacher's Attack)
+### パディングによるエラー内容を知られてはいけない (Bleichenbacher's Attack)
+これは平文の一部がしられてはいけない
 
-### 暗号文を復号した結果の偶奇を知られてはいけない (LSB Decryption Oracle Attack)
+暗号文を復号した結果の偶奇を知られてはいけない (LSB Decryption Oracle Attack)
 
 全てが分かっていなくとも偶奇さえ分かれば任意の暗号文を復号できる。
 ある暗号文 $c$ に対し、$2^e$ をx回掛けた値を復号した下位1bitを得て平文を求めます。得られる下位1bitは次の関数 $f(x)$ を用いて $f(x) \bmod 2$ と表せられます。decは復号化関数です。
