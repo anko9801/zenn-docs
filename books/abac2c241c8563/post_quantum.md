@@ -1,6 +1,27 @@
 ---
-title: "格子暗号と準同型暗号"
+title: "耐量子暗号"
 ---
+
+## 耐量子暗号
+様々な暗号があります。
+ラウンド 4
+
+- 符号暗号 (code-based)
+- 格子暗号 (lattice-based-)
+- 同種写像暗号
+- 多変数多項式暗号
+- 共通鍵暗号ベース署名
+- ハッシュ関数署名
+
+## 符号暗号
+
+## 同種写像暗号
+CSIDH
+超特異同種写像ディフィー・ヘルマン鍵共有 (SIDH or SIKE)
+
+## 参考文献
+- Post-Quantum Cryptography
+- 耐量子計算機暗号
 
 
 ### BKZ (Block Korkine-Zolotareff) 基底簡約

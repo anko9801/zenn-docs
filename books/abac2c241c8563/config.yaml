@@ -6,11 +6,12 @@ price: 0 # 有料の場合200〜5000
 # 本に含めるチャプターを順番に並べましょう
 chapters:
   - introduction
-  - common_key
+  - symmetric
   - math
   - rsa
   - ecc
-  - lattice
+  - post_quantum
+  - homomorphic
   - hash
   - computability
   - protocol
