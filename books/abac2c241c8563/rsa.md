@@ -455,9 +455,9 @@ http://www.factordb.com/
 | 同一の平文を異なる $N$ で暗号化した暗号文を与えてはいけない               | Håstad's Broadcast Attack                                        | 中国剰余定理                                           |
 | 同一の平文を同一の $d$ 異なる $e, N$ で暗号化した暗号文を与えてはいけない | Small Common Private Exponent Attack                             | Coppersmith Method                                     |
 | RSA-CRT にメモリ書き換えのバグがあってはならない                                               | RSA-CRT Fault Attack                                             | 秘密鍵が書き換えれると平文の差分が $p, q$ の倍数となる |
-| 任意の暗号文を復号した結果を知られてはならない                            | 適応的選択暗号文攻撃                                             | $a^ec$ を復号すると $am$ となる                        |
+| 特定の暗号以外の暗号文を復号した結果を知られてはならない                            | 適応的選択暗号文攻撃                                             | $a^ec$ を復号すると $am$ となる                        |
 | エラーの内容を知られてはならない                            | Bleichenbacher's Attack                                     | 二分探索など                                               |
-| 複数の平文を部分的にでも知られてはならない                            | LSB Decryption Oracle Attack など                                    | 二分探索                                               |
+| 平文を部分的にでも知られてはならない                            | LSB Decryption Oracle Attack など                                    | 二分探索                                               |
 | 秘密鍵を部分的にでも知られてはならない                                    | Partial Key Exposure Attack                                      | Coppersmith Method                                     |
 | 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない          | Franklin-Reiter Related Message Attack                           | 最大公約式                                             |
 
