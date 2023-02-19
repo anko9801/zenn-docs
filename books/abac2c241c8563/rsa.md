@@ -38,7 +38,7 @@ title: "RSA暗号への攻撃"
 RSA暗号とは剰余上での累乗は簡単でも累乗根は難しいという非対称性を使った暗号です。
 
 事前に大きな素数 $p, q$ と自然数 $e$ を生成し、$N = pq$ を公開します。(素数生成の方法はコラムへ)
-そして平文 $m$ に対して暗号文を $m^e \bmod N$ とします。そして復号化については逆に $e^{-1}$ 乗します。具体的にはカーマイケルの定理から $(\mathbb{Z}/pq\mathbb{Z})^×≅\mathbb{Z}/\mathrm{lcm}((p−1), (q-1))\mathbb{Z}$ より $\phi(N) = (p - 1)(q - 1)$ として $d = e^{-1} \pmod{\phi(N)}$ 乗すれば $m$ を復号できます。
+そして平文 $m$ に対して暗号文を $m^e \bmod N$ とします。そして復号化については逆に $e^{-1}$ 乗します。具体的にはカーマイケルの定理から $(\mathbb{Z}/pq\mathbb{Z})^×≅\mathbb{Z}/\mathrm{lcm}(p−1, q-1)\mathbb{Z}$ より $\phi(N) = (p - 1)(q - 1)$ として $d = e^{-1} \pmod{\phi(N)}$ 乗すれば $m$ を復号できます。
 
 $$
 \begin{aligned}
@@ -51,10 +51,10 @@ $$
 
 具体的には次の手順で暗号化された通信します。
 
-1. AliceがBobに公開鍵 $N, e$ を渡す
-2. Bobは公開鍵を用いて平文を暗号化
-3. BobからAliceへ暗号文を送る
-4. Aliceは秘密鍵 $p, q$ を用いて復号化し、平文を得る
+1. Alice が Bob に公開鍵 $N, e$ を渡す
+2. Bob は公開鍵を用いて平文を暗号化
+3. Bob から Alice へ暗号文を送る
+4. Alice は秘密鍵 $p, q$ を用いて復号化し、平文を得る
 
 ここに図
 
@@ -124,7 +124,7 @@ q_{inv} &= q^{-1} \bmod p \\
 \end{aligned}
 $$
 
-### padding
+### パディング
 メッセージが改ざんされずに届けられていることを確認するのにパディングは用いられます。RSAでは主に次の3つのパディングが使われます。
 
 RFC 8017: PKCS #1 V2.2(RSA Cryptography Specifications Version 2.2)
@@ -132,27 +132,28 @@ RFC 8017: PKCS #1 V2.2(RSA Cryptography Specifications Version 2.2)
 - PKCS#1 v1.5; Public-Key Cryptography Standards#1 v1.5
 - OAEP; Optimal Asymmetric Encryption Padding
 - PSS; Probabilistic Signature Scheme
+  - 署名でよく使われる
 
 このようなパディングを用いたRSAをRSA-[パディング名]などと呼んだりします。
 
 ### 安全性
-RSA暗号はこれを使えば簡単に解けます。
-RSAは $c = m^e \pmod {N}$ という式について $e, c$ が分かっているので累乗根を求める問題なのですが、原始根 $a$ で対数を取るとカーマイケルの定理より
+> **Prop.**
+> 素因数分解が解けるならば RSA 暗号が解ける。
+
+**Proof.**
+素因数分解が解けるから $N = pq$ となる $p, q$ がわかる。これより $\phi(N) = (p-1)(q-1)$, $d = e^{-1} \pmod{\phi(N)}$, $c^d = m \pmod{N}$ は計算可能である。 $\Box$
+
+> **Prop.**
+> 離散対数問題が解けるならば素因数分解が解ける。
+
+累乗根を求める
+原始根 $g$ を底として対数を取る
 
 $$
 \begin{aligned}
-c &= m^e & \pmod {N} \\
-m &= c^{1/e} & \pmod {N} \\
+\log_g a
 \end{aligned}
 $$
-
-と累乗根を計算できます。
-
-ここまでは数学の話でしたが、ここから計算機科学に移ります。
-
-確かに、掛け算を足し算に変換することで簡単な問題になります。しかし、それ以前にコンピュータが剰余上の対数を計算する事は結構難しく、離散対数問題 (DLP: Discrete Logarithm Problem) と呼ばれ、現在見つかっている最も速いアルゴリズムでも完全指数時間も掛かります。
-
-では諦めて掛け算だけで解く、というだけではなく他に1つ方法があります。直接数に対応させなくても、ある数だけ累乗すると $1$ や $-1$ になるという情報を使うことである程度情報を引き出すことができます。いわゆる平方剰余と呼ばれるものなどです。
 
 それとわかりやすいように暗号化, 復号化関数 $\mathcal{E}_{pk}, \mathcal{D}_{sk}$ を定義しておきます。
 
@@ -242,7 +243,7 @@ $$
 ```python
 import math
 
-def pollard_rho(N):
+def pollard_rho(N: int) -> int:
     f = lambda x: (x*x + 1) % N
     x = y = 2
     d = 1
@@ -250,7 +251,7 @@ def pollard_rho(N):
         x = f(x)
         y = f(f(y))
         d = math.gcd(abs(x - y), N)
-    return d if d < N else -1
+    return d
 ```
 
 ### Pollard の $p-1$ 法
