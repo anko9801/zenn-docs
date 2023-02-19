@@ -127,7 +127,7 @@ $$
 ### パディング
 メッセージが改ざんされずに届けられていることを確認するのにパディングは用いられます。RSAでは主に次の3つのパディングが使われます。
 
-RFC 8017: PKCS #1 V2.2(RSA Cryptography Specifications Version 2.2)
+RFC 8017: PKCS #1 V2.2 (RSA Cryptography Specifications Version 2.2)
 
 - PKCS#1 v1.5; Public-Key Cryptography Standards#1 v1.5
 - OAEP; Optimal Asymmetric Encryption Padding
@@ -141,7 +141,7 @@ RFC 8017: PKCS #1 V2.2(RSA Cryptography Specifications Version 2.2)
 > 素因数分解が解けるならば RSA 暗号が解ける。
 
 **Proof.**
-素因数分解が解けるから $N = pq$ となる $p, q$ がわかる。これより $\phi(N) = (p-1)(q-1)$, $d = e^{-1} \pmod{\phi(N)}$, $c^d = m \pmod{N}$ は計算可能である。 $\Box$
+素因数分解が解けるから $N = pq$ となる $p, q$ がわかる。これより $\phi(N) = (p-1)(q-1)$, $d = e^{-1} \pmod{\phi(N)}$, $m = c^d \pmod{N}$ は計算可能である。 $\Box$
 
 > **Prop.**
 > 離散対数問題が解けるならば素因数分解が解ける。
@@ -241,7 +241,7 @@ $$
 計算量は $O(\sqrt{p})$ で $N \approx 10^{20}$ くらいまでなら現実的な時間で素因数分解できます。$c = 1$ とし、初期値は $x_0 = 2$ を用いることが多いらしいです。
 
 ```python
-import math
+from math import gcd
 
 def pollard_rho(N: int) -> int:
     f = lambda x: (x*x + 1) % N
@@ -250,7 +250,7 @@ def pollard_rho(N: int) -> int:
     while d == 1 or d == N:
         x = f(x)
         y = f(f(y))
-        d = math.gcd(abs(x - y), N)
+        d = gcd(abs(x - y), N)
     return d
 ```
 
@@ -280,15 +280,15 @@ $$
 適当に数を取ってきてある素数 $p$ が含まれている確率というのは $1/p$ 、つまり素数が大きければ大きいほど入ってるのは稀です。
 
 ```python
-import math
+from math import gcd, log
 
 def p_1(N: int) -> int:
     B = 1000000
     primes = eratosthenes(B)
     M = 3
     for p in primes:
-        M *= pow(M, p ** int(math.log(B, p)), N)
-    return math.gcd(M - 1, N)
+        M *= pow(M, p ** int(log(B, p)), N)
+    return gcd(M - 1, N)
 ```
 
 ### Hugh Williams の $p+1$ 法
@@ -378,11 +378,11 @@ $$
 また、$p, q$ についてより複雑な関係がある場合には Coppersmith method が適用できます。
 
 ```python
-import math
+from math import floor, sqrt
 
 def fermat(N: int) -> tuple[int, int]:
-    x = math.floor(math.sqrt(N)) + 1
-    y = math.floor(math.sqrt(x * x - N))
+    x = floor(sqrt(N)) + 1
+    y = floor(sqrt(x * x - N))
     while True:
         w = x * x - N - y * y
         if w == 0:
