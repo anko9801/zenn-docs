@@ -281,7 +281,41 @@ $$
 
 適当に数を取ってきてある素数 $p$ が含まれている確率というのは $1/p$ 、つまり素数が大きければ大きいほど入ってるのは稀です。
 
-https://gist.github.com/anko9801/8f53ff0e4af8d866d3fc93b4fbfefb68
+```python
+import math
+
+
+def eratosthenes(N: int) -> list[int]:
+    isprime = [True] * (N + 1)
+    isprime[0], isprime[1] = False, False
+
+    res: list[int] = []
+    for p in range(2, N + 1):
+        if not isprime[p]:
+            continue
+        res.append(p)
+        q = 2 * p
+        while q <= N:
+            isprime[q] = False
+            q += p
+    return res
+
+
+def p_1(N: int) -> int:
+    B = 1000000
+    primes = eratosthenes(B)
+    M = 3
+    for p in primes:
+        M *= pow(M, p ** int(math.log(B, p)), N)
+    return gcd(M - 1, N)
+
+
+N = 10**61 - 1
+print(N)
+m = p_1(N)
+print(m)
+print(factor(lift(m)))
+```
 
 ### Hugh Williams の $p+1$ 法
 $p + 1$ が Smooth number のとき有効な素因数分解法です。
