@@ -217,19 +217,14 @@ def trial_division(N: int) -> list[tuple[int, int]]:
         res.append((p, e))
     res.append((N, 1))
     return res
-
-
-print(trial_division(460))
 ```
 
 ### Pollard-$\rho$ 法
 
-誕生日のパラドックス
-
 > **Prop. 誕生日のパラドックス**
 > 誕生日が同じ 2 人を見つけたいときに必要な人数の期待値は約 $\sqrt{365\pi/2}$ である。
 
-$\mathbb{Z}/N\mathbb{Z}$ の数を同値類 $\mathbb{Z}/p\mathbb{Z}$ で種類分けして同じ数を見つけるのは誕生日のパラドックスから $\sqrt{\pi p/2} = 1.18\sqrt{p}$ であることがわかっています。そうして見つけた数の差は $p$ の倍数となっているため、これと $N$ で最大公約数を取って素因数 $p$ を求めることができます。
+$\mathbb{Z}/N\mathbb{Z}$ の数をその素因数 $p$ を用いて同値類 $\mathbb{Z}/p\mathbb{Z}$ で種類分けして同じ種類の数を見つける期待値は誕生日のパラドックスから約 $\sqrt{\pi p/2} = 1.18\sqrt{p}$ です。そうして見つけた数の差は $p$ の倍数となっているため、これと $N$ で最大公約数を取って $p$ を求めることができます。
 
 コンピュータ上ではランダムな数を集める為に擬似的な乱数を生成する関数 $f$ を用いて最大公約数が $p$ になるまで回し続けます。
 
@@ -245,6 +240,8 @@ $$
 計算量は $O(\sqrt{p})$ で $N \approx 10^{20}$ くらいまでなら現実的な時間で素因数分解できます。$c = 1$ とし、初期値は $x_0 = 2$ を用いることが多いらしいです。
 
 ```python
+import math
+
 def pollard_rho(N):
     f = lambda x: (x*x + 1) % N
     x = y = 2
@@ -252,7 +249,7 @@ def pollard_rho(N):
     while d == 1 or d == N:
         x = f(x)
         y = f(f(y))
-        d = gcd(abs(x - y), N)
+        d = math.gcd(abs(x - y), N)
     return d if d < N else -1
 ```
 
@@ -284,37 +281,13 @@ $$
 ```python
 import math
 
-
-def eratosthenes(N: int) -> list[int]:
-    isprime = [True] * (N + 1)
-    isprime[0], isprime[1] = False, False
-
-    res: list[int] = []
-    for p in range(2, N + 1):
-        if not isprime[p]:
-            continue
-        res.append(p)
-        q = 2 * p
-        while q <= N:
-            isprime[q] = False
-            q += p
-    return res
-
-
 def p_1(N: int) -> int:
     B = 1000000
     primes = eratosthenes(B)
     M = 3
     for p in primes:
         M *= pow(M, p ** int(math.log(B, p)), N)
-    return gcd(M - 1, N)
-
-
-N = 10**61 - 1
-print(N)
-m = p_1(N)
-print(m)
-print(factor(lift(m)))
+    return math.gcd(M - 1, N)
 ```
 
 ### Hugh Williams の $p+1$ 法
@@ -404,9 +377,11 @@ $$
 また、$p, q$ についてより複雑な関係がある場合には Coppersmith method が適用できます。
 
 ```python
-def fermat(N):
-    x = floor(sqrt(N)) + 1
-    y = floor(sqrt(x * x - N))
+import math
+
+def fermat(N: int) -> tuple[int, int]:
+    x = math.floor(math.sqrt(N)) + 1
+    y = math.floor(math.sqrt(x * x - N))
     while True:
         w = x * x - N - y * y
         if w == 0:
