@@ -202,7 +202,25 @@ flowchart LR
 
 この計算量は $\mathcal{O}(\sqrt{N})$ となります。また $\sqrt{N}$ までの素数リストが既にあるならば素数定理によって計算量は $\mathcal{O}(\sqrt{N}/\log{\sqrt{N}})$ に落ちます。
 
-https://gist.github.com/anko9801/9a717f4737104a81b5cf90dd50b94dfd
+```python
+def trial_division(N: int) -> list[tuple[int, int]]:
+    res: list[tuple[int, int]] = []
+    for p in range(2, N):
+        if p * p > N:
+            break
+        if N % p != 0:
+            continue
+        e = 0
+        while N % p == 0:
+            e += 1
+            N //= p
+        res.append((p, e))
+    res.append((N, 1))
+    return res
+
+
+print(trial_division(460))
+```
 
 ### Pollard-$\rho$ 法
 
@@ -217,26 +235,21 @@ $\mathbb{Z}/N\mathbb{Z}$ の数を同値類 $\mathbb{Z}/p\mathbb{Z}$ で種類�
 
 $$
 \begin{aligned}
-f(x) &= x^2 + c \pmod N \\
-x_{i+1} &= f(x_i) \\
-y_{i+1} &= f(f(y_i)) \\
-p &= \gcd(N, |x_i - y_i|) \\
+f(x) & = x^2 + c \pmod N \\
+x_{i+1} & = f(x_i) \\
+y_{i+1} & = f(f(y_i)) \\
+p & = \gcd(|x_i - y_i|, N) \\
 \end{aligned}
 $$
 
 計算量は $O(\sqrt{p})$ で $N \approx 10^{20}$ くらいまでなら現実的な時間で素因数分解できます。$c = 1$ とし、初期値は $x_0 = 2$ を用いることが多いらしいです。
 
 ```python
-def gcd(m, n):
-    while n:
-        m, n = n, m % n
-    return m
-
 def pollard_rho(N):
     f = lambda x: (x*x + 1) % N
     x = y = 2
     d = 1
-    while d == 1:
+    while d == 1 or d == N:
         x = f(x)
         y = f(f(y))
         d = gcd(abs(x - y), N)
