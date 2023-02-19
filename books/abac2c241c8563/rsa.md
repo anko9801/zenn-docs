@@ -364,35 +364,43 @@ $p, q$ の比率が大体わかっているとその周辺を調べることで�
 
 $$
 \begin{aligned}
-\frac{a}{b} &\approx \frac{p}{q} \\
-aq &\approx bp \\
+\frac{p}{q} & \approx \frac{a}{b} \\
+aq & \approx bp \\
 abN & = aq \times bp \\
     & = (x + y)(x - y) \\
     & = x^2 - y^2 \\
-y^2 &= x^2 - abN
 \end{aligned}
 $$
 
 初期値を $x = \lceil\sqrt{abN}\rceil, y = 0$ として $x$ の値を1ずつ上げながら $y$ の値も上げていき、右辺と左辺の計算結果が一致したとき $p, q$ が求まるという仕掛けです。
 
-また、$p, q$ についてより複雑な関係がある場合には Coppersmith method が適用できます。
-
 ```python
 from math import floor, sqrt
 
-def fermat(N: int) -> tuple[int, int]:
-    x = floor(sqrt(N)) + 1
-    y = floor(sqrt(x * x - N))
+def fermat(N: int, a: int = 1, b: int = 1) -> tuple[int, int]:
+    abN = a * b * N
+    x = floor(sqrt(abN - 1)) + 1
+    y = floor(sqrt(x * x - abN))
     while True:
-        w = x * x - N - y * y
+        w = x * x - abN - y * y
         if w == 0:
             break
         elif w > 0:
             y += 1
         else:
             x += 1
-    return (x - y, x + y)
+
+    if (x + y) % a == 0:
+        assert (x + y) % a == 0
+        assert (x - y) % b == 0
+        return ((x - y) // b, (x + y) // a)
+    else:
+        assert (x + y) % b == 0
+        assert (x - y) % a == 0
+        return ((x - y) // a, (x + y) // b)
 ```
+
+また、$p, q$ についてより複雑な関係がある場合には Coppersmith method も有効です。
 
 ### 二次ふるい法 (QS; Quadratic Sieve)
 1. ある範囲 $\sqrt{N} - \epsilon < x_i < \sqrt{N} + \epsilon$ の中で $x_i^2 - N$ が $B$-smooth となるような数をいくつか取ってくる
