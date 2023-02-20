@@ -6,9 +6,9 @@ title: "耐量子暗号"
 様々な暗号があります。
 ラウンド 4
 
-- 符号暗号 (code-based)
-- 格子暗号 (lattice-based-)
-- 同種写像暗号
+- 符号暗号 (Code Based Cryptography)
+- 格子暗号 (Lattice Based Cryptography)
+- 同種写像暗号 (Isogeny Based Cryptography)
 - 多変数多項式暗号
 - 共通鍵暗号ベース署名
 - ハッシュ関数署名
