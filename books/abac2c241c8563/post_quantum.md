@@ -19,11 +19,7 @@ title: "耐量子暗号"
 CSIDH
 超特異同種写像ディフィー・ヘルマン鍵共有 (SIDH or SIKE)
 
-## 参考文献
-- Post-Quantum Cryptography
-- 耐量子計算機暗号
-
-
+## 格子暗号
 ### BKZ (Block Korkine-Zolotareff) 基底簡約
 
 ### HKZ (Hermite-Korkine-Zolotareff) 基底簡約
@@ -64,3 +60,7 @@ $$
 
 機械学習理論から派生した求解困難な問題で、有限体 $\mathbb{F}_q$ 上の秘密ベクトル $\mathbf{s} \in \mathbb{F}_q^n$ に関するランダムな連立線形「近似」方程式が与えられたとき、その秘密ベクトルを復元する問題である。
 
+
+## 参考文献
+- Post-Quantum Cryptography
+- 耐量子計算機暗号
