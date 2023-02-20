@@ -7,6 +7,7 @@ title: "ハッシュとSMT"
 - 原像計算困難性 与えられた $h$ に対して $H(m) = h$ となる $m$ を見つけることが困難である．
 - 第二原像計算困難性 $m_1$ が与えられたときに $H(m_1) = H(m_2)$ となる $m_2\neq m_1$ を求めるのが困難である．
 - 衝突困難性 相異なる $m_1$ と $m_2$ で，$H(m_1) = H(m_2)$ となるメッセージを見つけることが困難である．
+![](/images/hash.png)
 
 HMAC (Hash-based MAC)
 
@@ -53,6 +54,7 @@ CDCL (Constrait-Driven Clause Learning) アルゴリズム
 | 4   | $x_4$       | 2     | $\lbrace x_1,x_3,x_4\rbrace$                 |
 | 5   | $x_6$       | 2     | $\lbrace x_1,\lnot x_2,\lnot x_4,x_6\rbrace$ |
 | 6   | $\lnot x_6$ | 2     | $\lbrace x_3,\lnot x_4,x_5,\lnot x_6\rbrace$ |
+
 ミュンヘン工科大学の資料より
 
 ここで $t$ が 0 から 3 までの条件 $\lnot x_1\land x_2\land\lnot x_5\land\lnot x_3$ のときコンフリクトすることが分かる. するとその否定 $x_1\lor\lnot x_2\lor x_5\lor x_3 = \lbrace x_1,\lnot x_2,x_5,x_3\rbrace$ は必ず成立しなければならない為, 新たに条件として入れることができる.

@@ -241,16 +241,17 @@ $$
 計算量は $O(\sqrt{p})$ で $N \approx 10^{20}$ くらいまでなら現実的な時間で素因数分解できます。$c = 1$ とし、初期値は $x_0 = 2$ を用いることが多いらしいです。
 
 ```python
-from math import gcd
+from collections.abc import Callable
+import math
 
 def pollard_rho(N: int) -> int:
-    f = lambda x: (x*x + 1) % N
+    f: Callable[[int], int] = lambda x: (x * x + 1) % N
     x = y = 2
     d = 1
     while d == 1 or d == N:
         x = f(x)
         y = f(f(y))
-        d = gcd(abs(x - y), N)
+        d = math.gcd(abs(x - y), N)
     return d
 ```
 
