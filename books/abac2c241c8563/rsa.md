@@ -655,27 +655,27 @@ c_2 &≡ m^{e_2} \pmod N \\
 \end{aligned}
 $$
 
-$e_1, e_2$ について $\gcd(e_1, e_2) = g$ のとき、拡張ユークリッドの互除法を用いることで次を満たす $s_1, s_2$ を求められます。
+$e_1, e_2$ について拡張ユークリッドの互除法を用いて $g = \gcd(e_1, e_2)$ となる。
 
 $$
 \begin{aligned}
-s_1e_1 + s_2e_2 &= g \\
-c_1^{s_1} c_2^{s_2} = m^{s_1e_1 + s_2e_2} &= m^g \pmod N \\
+g & = \gcd(e_1, e_2) = s_1e_1 + s_2e_2 \\
+m^g & = m^{s_1e_1 + s_2e_2} = c_1^{s_1} c_2^{s_2} \pmod N \\
 \end{aligned}
 $$
 
-これによって $e_1, e_2$ が互いに素のとき、または $g$ が小さいならばLow Public Exponent Attackを用いて $m$ を求められます。
+これによって $e_1, e_2$ が互いに素のとき、または $g$ が小さいならば Low Public Exponent Attack を用いて $m$ を求められます。
 
 
 ### 任意の暗号文を復号した結果を知られてはいけない (適応的選択暗号文攻撃)
 
 任意の暗号を復号した結果を知っているとき、ある暗号文の復号結果を防がれていたとしても他の暗号を送ることで解読できます。
-$2^e$ を暗号文に掛けて復号した結果を $2$ で割ればその平文がわかります。
+
+> **Prop.**
+> $k^ec$ を復号した結果は $km$ となる。また上位ビットが固定されたパディングは不等式で表現できる。
 
 $$
-\begin{aligned}
-Dec(2^ec) = 2m \pmod N
-\end{aligned}
+\mathcal{D}(k^ec) = km \pmod N
 $$
 
 これに対する防御方法として平文にパディングを施し、復号化した際にパディング形式が違うときは相手に渡さないようにするという方法があります。これによって正当な暗号文しか受け入れず、適応的選択暗号文攻撃を防げます。
@@ -684,9 +684,9 @@ $$
 
 `0002<random>00<hashprefix><message>`
 
-これについてパディングが合っているかどうかを相手に送ってしまうとPadding Oracle Attackで攻撃でき、PKCS #1 v1.5では200万程度送ると平文が読めてしまいます。
+これについてパディングが合っているかどうかを相手に送ってしまうと Padding Oracle Attack で攻撃でき、PKCS #1 v1.5では200万程度送ると平文が読めてしまいます。
 
-対してPadding Oracle Attackで破られないようなパディング形式はInD-CCA2と呼びます。
+対して Padding Oracle Attack で破られないようなパディング形式はInD-CCA2と呼びます。
 
 その1つであるOAEP(Optimal Asymmetric Encryption Padding)については次の記事を読むとよいです。
 
@@ -698,11 +698,11 @@ https://inaz2.hatenablog.com/entry/2016/01/26/222303
 暗号文を復号した結果の偶奇を知られてはいけない (LSB Decryption Oracle Attack)
 
 全てが分かっていなくとも偶奇さえ分かれば任意の暗号文を復号できる。
-ある暗号文 $c$ に対し、$2^e$ をx回掛けた値を復号した下位1bitを得て平文を求めます。得られる下位1bitは次の関数 $f(x)$ を用いて $f(x) \bmod 2$ と表せられます。decは復号化関数です。
+ある暗号文 $c$ に対し、$2^e$ をx回掛けた値を復号した下位1bitを得て平文を求めます。得られる下位1bitは次の関数 $f(x)$ を用いて $f(x) \bmod 2$ と表せられます。
 
 $$
 \begin{aligned}
-f(x) &= Dec(2^{ex}c \bmod N) = 2^xm \bmod N \\
+f(x) &= \mathcal{D}(2^{ex}c \bmod N) = 2^xm \bmod N \\
 \end{aligned}
 $$
 
