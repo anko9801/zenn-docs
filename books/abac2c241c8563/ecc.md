@@ -2,28 +2,54 @@
 title: "楕円曲線暗号への攻撃"
 ---
 
-
 ## 楕円曲線
-楕円曲線というのは次の関数からなる曲線のことです。
+
+$K$ を任意の体、 $f(x) \in K[x]$ を3次方程式とする。ただし $f(x)$ の3解は相異なる。ここで次の方程式を考える。
+
+$$
+y^2 = f(x)
+$$
+
+$x, y$ 線形変換によって2次の項は消すことができ、
 
 $$
 y^2 = x^3 + ax + b
 $$
 
-ここにグラフ
 
-射影平面で定義する理由
+$C: F(x, y) = 0$ について
+$C$ が点 $(x_0, y_0)$ で非特異であるとは2つの偏微分 $\partial F/\partial x, \partial F/\partial y$ のうちの1つが $(x_0, y_0)$ で $0$ でないということである。$K'$ が実数体 $\mathbb{R}$ であるとき $C$ がその点で接線を持つための条件と一致する。 $F(x, y) = y^2 - f(x)$ の場合、偏微分は $- f'(x_0)$ と $2y_0$ である。2つの微分が同時に $0$ であるためには、 $y_0 = 0$ かつ $x_0$ は $f(x)$ の重解であることが必要十分である。この理由の為に楕円曲線の定義において、$f(x)$ が相違なる根を持つということを仮定したのである。つまり楕円曲線はすべての点において非特異である。
 
-- 無限遠点を数学的に定義できる
-- 実装時に割り算の遅延ができ高速化できる
+楕円曲線上の点全体に加えてその曲線上に存在すると考えたいきわめて重要な無限遠点と呼ばれるものがある。これは複素関数論において、複素平面に無限遠点を添加してリーマン球面を形成することと同じようなものである。このことを正確に扱う為に今、射影座標を導入する。
 
-楕円曲線上の点 $P, Q$ に対し、直線 $PQ$ と曲線との交点の $y$ 座標を符号反転した点を $P + Q$ とします。
-
-ここに図
-
-この定義を踏まえて、具体的に式を立てて計算すると $P(x_1, y_1), Q(x_2, y_2)$ として $R(x_3, y_3) = P + Q$ は次のように計算できます。ただし、$P = Q$ のときの直線 $PQ$ は曲線に対する点 $P$ の接線と考えます。
+単項式 $x^iy^j$ の全次数(total degree) とは $i + j$ を意味する。多項式 $F(x,y)$ の全次数とは、 $0$ でない係数を持って出てくる単項式の全次数の最大値を意味する。$F(x,y)$ の全次数が $n$ のとき、対応する $3$ 変数の同次多項式 $\widetilde{F}(x,y,z)$ を $F(x,y)$ における各多項式 $x^iy^j$ に、 $x, y, z$ に関する全次数が $n$ になるように $z^{n-i-j}$ を掛けて得られる多項式と定義する。言い換えると
 
 $$
+\widetilde{F}(x,y,z) = z^nF\left(\frac{x}{z}, \frac{y}{z}\right)
+$$
+
+となる。例えば楕円曲線の1つ $F(x, y) = y^2 - (x^3 + ax + b)$
+
+$$
+\begin{aligned}
+\widetilde{F}(x,y,z) &= y^2z - x^3 - axz^2 - bz^3 \\
+\end{aligned}
+$$
+
+$\widetilde{F}(x, y, 1) = F(x, y)$ とか $\widetilde{F}(\lambda x,\lambda y,\lambda z) = \lambda^n\widetilde{F}(x, y, z)$ みたいな性質がある。
+
+無限遠点の解説
+自明な3つ組 $(0,0,0)$ を除いた射影平面 $\mathbb{P}_K^2$ を非自明な3つ組の同値類を体のなす集合として定義する。
+射影平面を同値類で考えることが好きな正常な人間などいるわけないが、ありがたいことにこれを幾何学的に考えることができる。
+$(x,y,z)$ の同値類
+$\{(x,1,0)\ |\ x \in K\}$ は $y = 1$ の直線と無限遠点 $(1,0,0)$ の和として視覚化できる。
+
+群構造をなす証明
+
+> **Def. 楕円曲線上の和**
+> $P(x_1, y_1)$、$Q(x_2, y_2)$ として $R(x_3, y_3) = P + Q$ は次のように計算できます。
+>
+> $$
 \begin{aligned}
 x_3 &= \lambda^2 - x_1 - x_2 \\
 y_3 &= \lambda(x_1 - x_3) - y_1 \\
@@ -35,38 +61,88 @@ y_3 &= \lambda(x_1 - x_3) - y_1 \\
 \end{aligned}
 $$
 
-ここに具体例
+楕円曲線上の点 $P, Q$ に対し、直線 $PQ$ と曲線との交点の $y$ 座標を符号反転した点が $P + Q$ となります。ただし、$P = Q$ のときの直線 $PQ$ は曲線に対する点 $P$ の接線と考えます。
 
-また加法について群となることが証明でき結合法則 $P + (Q + R) = (P + Q) + R$ が成り立つことが証明でき、$nP = \underbrace{P + P + \ldots + P}_n$ と書けます。これを楕円曲線上のスカラー積と呼びます。
+> **Thm. Hasse の定理**
+> $p$ を素数, $E/\mathbb{F}_p$ を楕円曲線とする。
+>
+> $$
+|\#E/\mathbb{F}_p - (p+1)|\leq 2\sqrt{p}
+$$
+> ただし、$\#E/\mathbb{F}_p$ で群位数を表す。
 
-ここに具体例
-
-$8P$
-
-ここに実装
-
-### 楕円曲線の位数
 > **Schoof のアルゴリズム**
-> 楕円曲線 $E/\mathbb{F}_p$ の位数を求められる。
-
-Hasse-Weil 定理より
-
-$$
-q+1-2\sqrt{q}\leq|E(\mathbb{F}_q)|\leq q+1+2\sqrt{q}
-$$
-
-$|E(\mathbb{F}_q)|=q+1+t$ とおける。$\mathbb{F}_q$ のフロベニウス写像 $\sigma$ のトレース $t$ を計算できれば位数が求まる。しかし $t$ は $2\sqrt{q}$ のオーダーであるため、直接計算できない。そこで素数 $l$ を剰余にとってそれぞれの $t$ の値を求め、中国剰余定理によって $t$ を求める。
-
-具体的には特性多項式の $t$ に $0,\ldots,\frac{l-1}{2}$ の値を代入して確かめる。
+> 位数を計算できる。
+### 2重周期関数
+複素平面内の格子 $L$ とは、与えられた2つの複素数 $\omega_1, \omega_2$ の整数係数の1次結合全体のなす集合を意味する。ただし、$\omega_1$ と $\omega_2$ は原点を通る同一の直線状に無いものとする。
+例えば $\omega_1 = 1, \omega_2 = i$ の場合、ガウス整数全体のなす格子 $\{m + ni\ |\ m, n \in \mathbb{Z}\}$ を得る。
+基本平行四辺形
 
 $$
 \begin{aligned}
-\sigma_q^2-t\sigma_q+q &= 0 \\
-\pm[t_l]\circ\sigma_q &= \sigma_q^2+[q_l]
+L &= \{m\omega_1 + n\omega_2\ |\ m, n \in \mathbb{Z}\} \\
+\Pi &= \{a\omega_1 + b\omega_2\ |\ 0 \leq a \leq 1, 0 \leq b \leq 1\} \\
 \end{aligned}
 $$
 
-1つの $l$ 等分点 $P$ に対して成り立てばすべての $l$ 等分点に対して成り立つ。
+与えられた格子 $L$ に対し、 $\mathbb{C}$ 上の有理型関数 $f$ はすべての $\lambda \in L$ について $f(z + \lambda) = f(z)$ になるとき、 $L$ に関する楕円関数と言われる。 $\lambda = \omega_1$ と $\lambda = \omega_2$ についてこの性質を確認すれば十分であることを注意しておく。
+
+2重周期関数
+複素多様体 トーラス
+実多様体 円
+
+楕円関数の重要な例となるものを定義する。この関数はワイエルシュトラスの $\wp$ -関数(ペー関数)と呼ばれる。
+
+$$
+\wp(z) = \wp(z; L) = \frac{1}{z^2} + \sum_{\lambda \in L, \lambda \neq 0} \left(\frac{1}{(z-\lambda)^2} - \frac{1}{\lambda^2} \right)
+$$
+
+
+
+$$
+\begin{aligned}
+\wp(z) &= \frac{1}{z^2} + \sum_{\lambda \in L, \lambda \neq 0} \left(\frac{1}{(z-\lambda)^2} - \frac{1}{\lambda^2} \right) \\
+&= \frac{1}{z^2} + \sum_{\lambda \in L, \lambda \neq 0} \frac{1}{\lambda^2}\left(\frac{1}{(1-z/\lambda)^2} - 1\right) \\
+&= \frac{1}{z^2} + \sum_{\lambda \in L, \lambda \neq 0} \frac{1}{\lambda^2}\sum_{k=1}^{\infty}(k+1)\left(-\frac{z}{\lambda}\right)^k \\
+&= \frac{1}{z^2} + \sum_{k=1}^{\infty}(k+1)(-1)^k\sum_{\lambda \in L, \lambda \neq 0} \frac{1}{\lambda^{k+2}}z^k \\
+&= \frac{1}{z^2} + \frac{g_2}{20}z^2 + \frac{g_3}{28}z^4 + \mathcal{O}(z^6) \\
+g_2 &:= 60\sum_{\lambda \in L}\frac{1}{\lambda^4}, \quad
+g_3 := 140\sum_{\lambda \in L}\frac{1}{\lambda^6} \\
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\wp'(z) &= -2\sum_{\lambda \in L} \frac{1}{(z-\lambda)^3} \\
+&= - \frac{2}{z^3} + 2\sum_{\lambda \in L,\lambda\neq0} \frac{1}{\lambda^3}\sum_{k=0}^{\infty}(2k+1)\left(\frac{z}{\lambda}\right)^k \\
+&= 2\sum_{k=0}^{\infty} (2k+1)\sum_{\lambda \in L,\lambda\neq0}\frac{1}{\lambda^{k+3}}z^k
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\wp(z) &= \frac{1}{z^2} + \frac{g_2}{20}z^2 + \frac{g_3}{28}z^4 + \mathcal{O}(z^6) \\
+\wp'(z) &= -\frac{2}{z^3} + \frac{g_2}{10}z + \frac{g_3}{7}z^3 + \mathcal{O}(z^5) \\
+\wp^3(z) &= \frac{1}{z^6} + \frac{3g_2}{20}\frac{1}{z^2} + \frac{3g_3}{28} + \mathcal{O}(z^2) \\
+\wp'^2(z) &= \frac{4}{z^6} - \frac{2g_2}{5}\frac{1}{z^2} - \frac{4g_3}{7} + \mathcal{O}(z^2) \\
+\end{aligned}
+$$
+
+楕円関数体
+楕円曲線
+
+### 超楕円曲線
+超楕円曲線
+ヤコビ多様体
+
+### 保型形式
+上半平面 $\mathbb{H}$
+
+$$
+\gamma(x) = \frac{ax + b}{cx + d}
+$$
+
+の変換について不変
 
 ## 楕円曲線暗号
 
