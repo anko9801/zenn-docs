@@ -184,6 +184,9 @@ ECDDH
 E/P E/Q -> E/PQ
 
 ### SIDH/SIKE
+$p = w_A^{e_A}w_b^{e_B}f \pm 1$
+$\mathbb{F}_{p^2}$ 上の超特異楕円曲線 $E$
+位数 $w_A^{e_A}$ である点 $P_A, Q_A$ と位数 $w_B^{e_B}$ である点 $P_B, Q_B$
 
 ### CSIDH
 

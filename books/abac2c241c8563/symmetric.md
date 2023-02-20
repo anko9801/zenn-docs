@@ -95,9 +95,6 @@ $E_K$
 [CryptoHack の SYMMETRIC CIPHERS](https://cryptohack.org/challenges/aes/) で HOW AES WORKS の章を解いてください。
 :::
 
-## AES の暗号利用モード
-https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89
-
 ### パディング
 AES は **16 バイトごとでしか** 暗号化できません。平文の始めから 16 バイトずつ切り出して暗号化していくと最後に余るデータがあります。当然それも暗号化して送りたいので 16 バイトになるように適当なデータをくっつけて暗号化します。この操作をパディングと呼び、AES では PKCS #7 パディングという規格でパディングを行います。
 
@@ -117,6 +114,10 @@ a\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f
 パディングした平文を $P$ として次のように複数のブロックに分割し、暗号化の際、それぞれのブロックで暗号化します。暗黙のうちに16バイトごと
 
 $P = P_1\|\cdots\|P_n$
+
+特に CTF では暗号利用モード ECB, CBC, OFB, GCM が使われます。
+
+https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89
 
 ### AES-ECB (Electronic CodeBlock)
 最も簡単なモードです。
@@ -228,5 +229,4 @@ Grover's algorithm: $2^{K}\to 2^{K/2}$
 鍵長を倍の長さにすることで同じセキュリティを担保できる。
 
 ## 参考文献
-- [暗号利用モード](https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89)
 - [Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC](https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38d.pdf)
