@@ -306,5 +306,28 @@ Python での高速な実装 fastecdsa
 ## 超楕円曲線
 
 $$
-y^2 = f(x)
+y^2 + h(x)y = f(x)
+$$
+
+$\deg f = 2g + 1$ と書けるなら虚超楕円曲線と呼び、$g$ を種数
+
+
+### 加算アルゴリズム
+まず $d = \gcd(u_1, u_2, v_1 + v_2 + h) = s_1u_1 + s_2u_2 + s_3(v_1 + v_2 + h)$ を計算する。
+
+$$
+\begin{aligned}
+u & = \frac{u_1u_2}{d^2} \\
+v & = \frac{s_1u_1v_2 + s_2u_2v_1 + s_3(v_1v_2 + f)}{d} & \pmod u
+\end{aligned}
+$$
+
+### 還元アルゴリズム
+$\deg u > g$ なら次のように計算して $u$ をモニックとする。
+
+$$
+\begin{aligned}
+u' & = \frac{f - vh - v^2}{u} \\
+v' & = - h - v & \pmod{u'}
+\end{aligned}
 $$
