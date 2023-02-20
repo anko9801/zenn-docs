@@ -331,3 +331,6 @@ u' & = \frac{f - vh - v^2}{u} \\
 v' & = - h - v & \pmod{u'}
 \end{aligned}
 $$
+
+## 参考文献
+- [Imaginary hyperelliptic curve - Wikipedia](https://en.wikipedia.org/wiki/Imaginary_hyperelliptic_curve)
