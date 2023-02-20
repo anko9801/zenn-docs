@@ -220,7 +220,7 @@ def trial_division(N: int) -> list[tuple[int, int]]:
     return res
 ```
 
-### Pollard-$\rho$ 法
+### Pollard-$ρ$ 法
 
 > **Prop. 誕生日のパラドックス**
 > 誕生日が同じ 2 人を見つけたいときに必要な人数の期待値は約 $\sqrt{365\pi/2}$ である。

@@ -23,7 +23,9 @@ HMAC (Hash-based MAC)
 充足可能性問題 (SAT; SATisfiability Problem)
 SAT を解くには指数時間掛かると信じられている。指数時間の中でも高速化していく技術を学ぶ。
 
-$((a\land\lnot b\land\lnot c)\lor(b\land c\land\lnot d))\land(\lnot b\lor\lnot c)$
+$$
+((a\land\lnot b\land\lnot c)\lor(b\land c\land\lnot d))\land(\lnot b\lor\lnot c)
+$$
 
 $(a,b,c,d)=(\top,\bot,\bot,\top)$
 
@@ -122,7 +124,28 @@ EUF (Equality Logic With Uninterpreted Functions)
 FOL (First-Order Logic)
 HOL (Higher-Order Logic)
 
-### Bit Vectors
+### BitVector
+| 構文 | 式 |
+|:--:|:--|
+| $a\land b$ | |
+| $\lnot a$ | |
+| $a < b$ | |
+| $a = b$ | |
+| $a[i]$ | |
+| $\sim a$ | |
+| $a\mathop{\|}b$ | |
+| $a\mathop{\&}b$ | |
+| $a \oplus b$ | |
+| $a \ll b$ | |
+| $a \gg b$ | |
+| $a + b$ | |
+| $a - b$ | |
+| $a \times b$ | |
+| $a / b$ | |
+| $\mathrm{ext}(a)$ | |
+| $a\circ b$ | |
+| $a[b:c]$ | |
+| $c?a:b$ | |
 
 ### DPLL(T)
 
