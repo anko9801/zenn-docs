@@ -14,51 +14,52 @@ $H(m_1) = H(m_2)$ となる $m_1, m_2$ が見つけにくい
 
 HMAC (Hash-based MAC)
 
-伸長攻撃
 ### Merkle-Damgård construction
+## 攻撃
+### 伸長攻撃
+### Differenctial Cryptoanalysis
 
 ## SAT
-SAT (SATisfiability Problem)
-SATを解くには指数時間掛かると信じられている. 指数時間の中でも高速化していく技術を学ぶ.
+充足可能性問題 (SAT; SATisfiability Problem)
+SAT を解くには指数時間掛かると信じられている。指数時間の中でも高速化していく技術を学ぶ。
 
-$((a\land\lnot b\land\lnot c)\lor(b\land c\land\lnot d))\land(\lnot b\lor\lnot c) \to (a,b,c,d)=(t,f,f,t)$
+$((a\land\lnot b\land\lnot c)\lor(b\land c\land\lnot d))\land(\lnot b\lor\lnot c)$
 
-### 単純な探索
-まずは SAT に関する全探索を考える. 以下の方法は DPLL (Davis Putnam Logemann Loveland) アルゴリズムと呼ばれている。
-リテラルが1つしかない節を単位節と呼ぶ。
+$(a,b,c,d)=(\top,\bot,\bot,\top)$
 
-1. 単位節があればその変数の値は確定する.
-2. それがなければ変数のどれか1つを深さ優先探索する.
-3. コンフリクトしたなら失敗, コンフリクトなしに変数を全て割り当てられたら成功とする.
+### DPLL アルゴリズム
+まずは単純に全探索を考える。リテラルが 1 つしかない節を単位節と呼ぶとして次の操作を繰り返す。
+
+1. 単位節があればその変数の値は確定する
+2. 単位節がなければ変数のどれか1つを深さ優先探索する
+3. コンフリクトしたなら失敗、コンフリクトなしに変数を全て割り当てられたら成功とする
+
+これは DPLL (Davis Putnam Logemann Loveland) アルゴリズムと呼ばれている。
 
 このとき深さ優先探索での深さが $d$ のときをレベル $d$ と呼ぶ.
 
 $$
 \begin{aligned}
-\phi &= (a ∨ ¬b ∨ d) ∧ (a ∨ ¬b ∨ e) \\
-&∧ (¬b ∨ ¬d ∨ ¬e) \\
-&∧ (a ∨ b ∨ c ∨ d) ∧ (a ∨ b ∨ c ∨ ¬d) \\
-&∧ (a ∨ b ∨ ¬c ∨ e) ∧ (a ∨ b ∨ ¬c ∨ ¬e)
+\phi &= (a \lor \lnot b \lor d) \land (a \lor \lnot b \lor e) \\
+& \land (\lnot b \lor \lnot d \lor \lnot e) \\
+& \land (a \lor b \lor c \lor d) \land (a \lor b \lor c \lor \lnot d) \\
+& \land (a \lor b \lor \lnot c \lor e) \land (a \lor b \lor \lnot c \lor \lnot e)
 \end{aligned}
 $$
-ミュンヘン工科大学の資料より
 
 ### 節学習
 
-DPLL に加え, コンフリクトしたときにその探索状態だと失敗することを条件に入れる.
-CDCL (Constrait-Driven Clause Learning) アルゴリズム
+DPLL に加え、コンフリクトしたときにその探索状態だと失敗することを条件に入れる。これを節学習と呼び、このアルゴリズムは CDCL (Constrait-Driven Clause Learning) アルゴリズムと呼ばれる。
 
-| $t$ | $L_t$       | level | reason                                       |
+| $t$ | $L_t$       | 深さ  | reason                                       |
 | --- | ----------- | ----- | -------------------------------------------- |
 | 0   | $\lnot x_1$ | 0     | $\lbrace\lnot x_1\rbrace$                    |
-| 1   | $x_2$       | 1     | $\Lambda$                                    |
+| 1   | $x_2$       | 1     | $\lbrace\rbrace$                             |
 | 2   | $\lnot x_5$ | 1     | $\lbrace \lnot x_2,\lnot x_5\rbrace$         |
-| 3   | $\lnot x_3$ | 2     | $\Lambda$                                    |
+| 3   | $\lnot x_3$ | 2     | $\lbrace\rbrace$                             |
 | 4   | $x_4$       | 2     | $\lbrace x_1,x_3,x_4\rbrace$                 |
 | 5   | $x_6$       | 2     | $\lbrace x_1,\lnot x_2,\lnot x_4,x_6\rbrace$ |
 | 6   | $\lnot x_6$ | 2     | $\lbrace x_3,\lnot x_4,x_5,\lnot x_6\rbrace$ |
-
-ミュンヘン工科大学の資料より
 
 ここで $t$ が 0 から 3 までの条件 $\lnot x_1\land x_2\land\lnot x_5\land\lnot x_3$ のときコンフリクトすることが分かる. するとその否定 $x_1\lor\lnot x_2\lor x_5\lor x_3 = \lbrace x_1,\lnot x_2,x_5,x_3\rbrace$ は必ず成立しなければならない為, 新たに条件として入れることができる.
 
