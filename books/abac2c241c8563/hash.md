@@ -3,16 +3,19 @@ title: "ハッシュとSMT"
 ---
 
 ## ハッシュ
+ハッシュとは
+ハッシュはデータを識別したいときに便利です。何か
+暗号的に使われるハッシュ
 
-- 原像計算困難性 与えられた $h$ に対して $H(m) = h$ となる $m$ を見つけることが困難である．
-- 第二原像計算困難性 $m_1$ が与えられたときに $H(m_1) = H(m_2)$ となる $m_2\neq m_1$ を求めるのが困難である．
-- 衝突困難性 相異なる $m_1$ と $m_2$ で，$H(m_1) = H(m_2)$ となるメッセージを見つけることが困難である．
+- 衝突困難性
+$H(m_1) = H(m_2)$ となる $m_1, m_2$ が見つけにくい
+
 ![](/images/hash.png)
 
 HMAC (Hash-based MAC)
 
 伸長攻撃
-- Merkle-Damgård construction
+### Merkle-Damgård construction
 
 ## SAT
 SAT (SATisfiability Problem)
@@ -21,8 +24,8 @@ SATを解くには指数時間掛かると信じられている. 指数時間の
 $((a\land\lnot b\land\lnot c)\lor(b\land c\land\lnot d))\land(\lnot b\lor\lnot c) \to (a,b,c,d)=(t,f,f,t)$
 
 ### 単純な探索
-まずは SAT に関する全探索を考える. 以下の方法は DPLL (Davis Putnam Logemann Loveland) アルゴリズムと呼ばれている.
-リテラルが1つしかない節を単位節と呼ぶ.
+まずは SAT に関する全探索を考える. 以下の方法は DPLL (Davis Putnam Logemann Loveland) アルゴリズムと呼ばれている。
+リテラルが1つしかない節を単位節と呼ぶ。
 
 1. 単位節があればその変数の値は確定する.
 2. それがなければ変数のどれか1つを深さ優先探索する.
