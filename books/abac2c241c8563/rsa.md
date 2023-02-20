@@ -622,35 +622,19 @@ def boneh_durfee(N, e):
 
 ### 同一の平文を異なるnで暗号化した暗号文を与えてはいけない (Håstad's Broadcast Attack)
 
-同一の平文を異なる $e$ 個の $N$ で暗号化した暗号文を与えられたとします。
+同一の平文を異なる $e$ 個の $N_i$ で暗号化した暗号文を与えられたとします。
 
 $$
-\begin{cases}
-c_1 = m^e \pmod{N_1} \\
-c_2 = m^e \pmod{N_2} \\
-\qquad \vdots \\
-c_e = m^e \pmod{N_e} \\
-\end{cases}
+c_i = m^e \pmod{N_i}
 $$
 
-これらの暗号文を中国剰余定理によって整数上の $m^e$ を作り $e$ 乗根して平文 $m$ を得られます。
+これらの暗号文を中国剰余定理によって持ち上げます。
 
 $$
-\begin{aligned}
-m^e &= \mathrm{CRT}(c_1, c_2, \ldots, c_e) \pmod{N_1N_2\ldots N_e} \\
-&= \mathrm{CRT}(c_1, c_2, \ldots, c_e) \quad (\mathrm{over} \ \mathbb{Z}) \\
-\end{aligned}
+m^e = \mathrm{CRT}(c_1, c_2, \ldots, c_e) \pmod{N_1N_2\cdots N_e}
 $$
 
-```python
-import gmpy2
-
-e = 3
-c = [c1, c2, c3]
-N = [N1, N2, N3]
-me = crt(c, N)
-m = gmpy2.iroot(me, e)[0]
-```
+持ち上げた先で $m^e < N_1\cdots N_e$ となるので $e$ 乗根して平文 $m$ を得られます。
 
 :::message
 **演習 (Smooth な ElGamal暗号)**
