@@ -625,7 +625,7 @@ $$
 
 $$
 \begin{aligned}
-\mathrm{vol}(L)^2 &= \det(\boldsymbol{B}\boldsymbol{B}^\top) \\
+\mathrm{vol}(\mathcal{L})^2 &= \det(\boldsymbol{B}\boldsymbol{B}^\top) \\
 & = \det(\boldsymbol{U}\boldsymbol{B}^*(\boldsymbol{B}^*)^\top \boldsymbol{U}^\top) \\
 & = \det(\boldsymbol{B}^*(\boldsymbol{B}^*)^\top) \\
 & = \prod_{i=1}^n\|\boldsymbol{b}_i^*\|^2
@@ -736,8 +736,8 @@ $$
 
 $$
 \begin{aligned}
-A\mathbf{x} &= \mathbf{b} & \pmod N \\
-\mathbf{x} &= A^{-1}\mathbf{b} & \pmod N
+A\boldsymbol{x} &= \boldsymbol{b} & \pmod N \\
+\boldsymbol{x} &= A^{-1}\boldsymbol{b} & \pmod N
 \end{aligned}
 $$
 
