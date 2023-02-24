@@ -71,10 +71,36 @@ $(xy)z$ の $z$ を前に持ってきて $z(xy)$ などとすることは一般�
 
 **Proof.**
 
+> **Def. 同値関係**
+> 集合 $S$ 上の関係 $\sim$ が次の条件を満たすとき $\sim$ を同値関係という。
+> 1. 反射律 $a\sim a$
+> 2. 対称律 $a\sim b\implies b\sim a$
+> 3. 推移律 $a\sim b, b\sim c\implies a\sim c$
+>
+> 同値関係 $\sim$ について $x\in S$ に対し
+>
+> $$
+C(x) = \lbrace y\in S\mid y\sim x\rbrace
+$$
+>
+> を同値類といい、同値類全体の集合を同値関係による商 $S/\sim$ と呼ぶ。
+
+> **Def. 剰余類**
+> $G_2$ を群 $G_1$ の部分群とする。$x\sim y$ を $x^{-1}y\in G_2$ と定義したとき、同値関係 $\sim$ による $x\in G_2$ の同値類を左剰余類といい $xH$ と書く。またその同値関係による商を $G/H$ と書く。
+> 同様に $x\sim y$ を $yx^{-1}\in G_2$ と定義したとき、同値類を右剰余類といい $Hx$ と書き、同値関係による商を $H\backslash G$ と書く。
+
+> **Prop.**
+> $G_2$ が群 $G_1$ の部分群とおく。このとき次が成り立つ。
+> 1. $|G/H| = |H\backslash G|$
+> 2. $\forall g\in G\ |gH| = |Hg| = |H|$
+
+**Proof.**
+写像 $\alpha: G/H\to H\backslash G$ を $\alpha(gH) = Hg^{-1}$ と定義する。
+
 > **Thm. ラグランジュの定理**
 >
 > $$
-|G| = |G:H||H|
+|G| = (G:H)|H|
 $$
 
 > **Def.**
@@ -452,18 +478,18 @@ $n-1 = 16 = 2^4 \times 1$ より $s = 4, d = 1$
 冗長になりがちなので厳密性を落とします。
 
 > **Def. 格子**
->  $n$ 個の線形独立なベクトル $\mathbf{b}_1,\ldots,\mathbf{b}_n\in\mathbb{R}^m$ について整数係数の線形結合によって生成されるベクトルの集合を格子 $\mathcal{L}$ と定義します。
+>  $n$ 個の線形独立なベクトル $\boldsymbol{b}_1,\ldots,\boldsymbol{b}_n\in\mathbb{R}^m$ について整数係数の線形結合によって生成されるベクトルの集合を格子 $\mathcal{L}$ と定義します。
 >
 > $$
-\mathcal{L}(\mathbf{b}_1,\ldots, \mathbf{b}_n) := \left\{ \sum_{i=1}^{n} a_i\mathbf{b}_i\in\mathbb{R}^m\ \middle|\ a_i \in \mathbb{Z} \right\}
+\mathcal{L}(\boldsymbol{b}_1,\ldots, \boldsymbol{b}_n) := \left\{ \sum_{i=1}^{n} a_i\boldsymbol{b}_i\in\mathbb{R}^m\ \middle|\ a_i \in \mathbb{Z} \right\}
 $$
 
 
 $$
-\mathbf{B} = \begin{pmatrix}
-  \mathbf{b}_1 \\
+\boldsymbol{B} = \begin{pmatrix}
+  \boldsymbol{b}_1 \\
   \vdots \\
-  \mathbf{b}_n \\
+  \boldsymbol{b}_n \\
 \end{pmatrix} = \begin{pmatrix}
   b_{11} & \cdots & b_{1m} \\
   \vdots & \ddots & \vdots \\
@@ -479,37 +505,37 @@ $$
 ### SVP; Shortest Vector Problem
 
 一般の次元の格子上の非零なベクトルの中で最もノルムが小さなベクトルを見つけ出す問題です。
-そのベクトルを $\mathbf{v}$ とおくと次のように表せられます。
+そのベクトルを $\boldsymbol{v}$ とおくと次のように表せられます。
 
 $$
-\mathbf{v} = v_1\mathbf{b}_1 + \ldots + v_n\mathbf{b}_n \qquad (\exists v_1, \ldots , v_n \in \mathbb{Z}) \\
+\boldsymbol{v} = v_1\boldsymbol{b}_1 + \ldots + v_n\boldsymbol{b}_n \qquad (v_1, \ldots , v_n \in \mathbb{Z}) \\
 $$
 
 この問題はNP困難
 
 > **Def. 逐次最小**
-> $n$ 次元格子 $L$ に対して、一次独立な格子ベクトル $\mathbf{b}_1,\ldots,\mathbf{b}_i\in L$ を用いて各 $1\leq i\leq n$ における逐次最小を次のように定義する。
+> $n$ 次元格子 $L$ に対して、一次独立な格子ベクトル $\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\in L$ を用いて各 $1\leq i\leq n$ における逐次最小を次のように定義する。
 >
 > $$
-\lambda_i(L) := \min_{\mathbf{b}_1,\ldots,\mathbf{b}_i\in L}\max\lbrace\|\mathbf{b}_1\|,\ldots,\|\mathbf{b}_i\|\rbrace
+\lambda_i(L) := \min_{\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\in L}\max\lbrace\|\boldsymbol{b}_1\|,\ldots,\|\boldsymbol{b}_i\|\rbrace
 $$
 >
-> 特に任意の $1\leq i\leq n$ について $\|\mathbf{b}_i\| = \lambda_i(L)$ を満たすとき逐次最小ベクトルと呼び、それらが基底となっているとき逐次最小基底と呼ぶ。
+> 特に任意の $1\leq i\leq n$ について $\|\boldsymbol{b}_i\| = \lambda_i(L)$ を満たすとき逐次最小ベクトルと呼び、それらが基底となっているとき逐次最小基底と呼ぶ。
 
 ### Gram-Schmidt の直交化 (GSO; Gram-Schmidt Orthonormalization)
 
-Gram-Schmidt 直交化 (GSO; Gram-Schmidt Orthonormalization) とは実 $m$ 次元ベクトル空間 $\mathbb{R}^m$ の任意の $\mathbb{R}$ ベクトル空間としての基底を直交基底に変換する方法です。 $\mathbf{b}_n$ の直交化は $\mathbf{b}_{1},\ldots, \mathbf{b}_{n-1}$ すべてと直交するように元の高さのまま移動させます。 GSO の Wikipedia の gif がわかりやすいです。
+Gram-Schmidt 直交化 (GSO; Gram-Schmidt Orthonormalization) とは実 $m$ 次元ベクトル空間 $\mathbb{R}^m$ の任意の $\mathbb{R}$ ベクトル空間としての基底を直交基底に変換する方法です。 $\boldsymbol{b}_n$ の直交化は $\boldsymbol{b}_{1},\ldots, \boldsymbol{b}_{n-1}$ すべてと直交するように元の高さのまま移動させます。 GSO の Wikipedia の gif がわかりやすいです。
 
 > **Def. GSO ベクトル**
-> $n$ 次元格子 $L\subseteq \mathbb{R}^m$ の順序付き基底 $\{\mathbf{b}_{1},\ldots, \mathbf{b}_{n}\}$ に対する GSO ベクトル $\mathbf{b}_{1}^* ,\ldots, \mathbf{b}_{n}^ *\in\mathbb{R}^m$ を GSO 係数 $\mu_{i,j}$ を用いて次のように定義する。
+> $n$ 次元格子 $L\subseteq \mathbb{R}^m$ の順序付き基底 $\{\boldsymbol{b}_{1},\ldots, \boldsymbol{b}_{n}\}$ に対する GSO ベクトル $\boldsymbol{b}_{1}^* ,\ldots, \boldsymbol{b}_{n}^ *\in\mathbb{R}^m$ を GSO 係数 $\mu_{i,j}$ を用いて次のように定義する。
 >
 > $$
 \begin{aligned}
 &\begin{dcases}
-\mathbf{b}_1^* := \mathbf{b}_1 \\
-\mathbf{b}_i^ * := \mathbf{b}_i - \sum_{j=1}^{i-1} \mu_{ij} \mathbf{b}_j^* & (2\leq i\leq n) \\
+\boldsymbol{b}_1^* := \boldsymbol{b}_1 \\
+\boldsymbol{b}_i^ * := \boldsymbol{b}_i - \sum_{j=1}^{i-1} \mu_{ij} \boldsymbol{b}_j^* & (2\leq i\leq n) \\
 \end{dcases} \\
-&\quad \mu_{ij} := \frac{\langle \mathbf{b}_i, \mathbf{b}_j^* \rangle}{\| \mathbf{b}_j^*\|^2} \qquad (1\leq j<i\leq n)
+&\quad \mu_{ij} := \frac{\langle \boldsymbol{b}_i, \boldsymbol{b}_j^* \rangle}{\| \boldsymbol{b}_j^*\|^2} \qquad (1\leq j<i\leq n)
 \end{aligned}
 $$
 
@@ -518,9 +544,9 @@ $$
 $$
 \begin{aligned}
 \begin{pmatrix}
-\mathbf{b}_1 \\
+\boldsymbol{b}_1 \\
 \vdots \\
-\mathbf{b}_n \\
+\boldsymbol{b}_n \\
 \end{pmatrix}
 & =
 \begin{pmatrix}
@@ -531,42 +557,42 @@ $$
 \mu_{n1} & \mu_{n2} & \mu_{n3} & \cdots & 1 \\
 \end{pmatrix}
 \begin{pmatrix}
-\mathbf{b}_1^ * \\
+\boldsymbol{b}_1^ * \\
 \vdots \\
-\mathbf{b}_n^ * \\
+\boldsymbol{b}_n^ * \\
 \end{pmatrix} \\
 \\
-\mathbf{B} & = \mathbf{U}\mathbf{B}^*
+\boldsymbol{B} & = \boldsymbol{U}\boldsymbol{B}^*
 \end{aligned}
 $$
 
-この $\mathbf{B}$、$\mathbf{B}^*$、$\mathbf{U}$ をそれぞれ **基底行列**、**GSO ベクトル行列**、**GSO 係数行列** と呼ぶことにします。また GSO 係数について
+この $\boldsymbol{B}$、$\boldsymbol{B}^*$、$\boldsymbol{U}$ をそれぞれ **基底行列**、**GSO ベクトル行列**、**GSO 係数行列** と呼ぶことにします。また GSO 係数について
 
 $$
 \mu_{ij} = \begin{dcases}
   0 & (1\leq i<j\leq n)\\
   1 & (1\leq i=j\leq n) \\
-  \frac{\langle \mathbf{b} _ i, \mathbf{b}_j^ * \rangle}{\| \mathbf{b}_j^*\|^2} & (1\leq j<i\leq n)
+  \frac{\langle \boldsymbol{b} _ i, \boldsymbol{b}_j^ * \rangle}{\| \boldsymbol{b}_j^*\|^2} & (1\leq j<i\leq n)
 \end{dcases}
 $$
 
-と定義を拡大して $\mathbf{U} = (\mu_{ij})$
+と定義を拡大して $\boldsymbol{U} = (\mu_{ij})$
 
 > **Prop. GSO ベクトルの基本性質**
-> 1. 任意の $1\leq i<j\leq n$ に対して $\langle\mathbf{b}_i^*, \mathbf{b}_j^*\rangle = 0$ が成り立つ。
-> 2. 任意の $1\leq i\leq n$ に対して $\|\mathbf{b}_i^*\|\leq\|\mathbf{b}_i\|$ が成り立つ。
-> 3. 任意の $1\leq i\leq n$ に対して $\langle\mathbf{b}_1^* ,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}} = \langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}$ が成り立つ。
-> 4. $\mathrm{vol}(L) = \prod_{i=1}^n\|\mathbf{b}_i^*\|$ が成り立つ。
+> 1. 任意の $1\leq i<j\leq n$ に対して $\langle\boldsymbol{b}_i^*, \boldsymbol{b}_j^*\rangle = 0$ が成り立つ。
+> 2. 任意の $1\leq i\leq n$ に対して $\|\boldsymbol{b}_i^*\|\leq\|\boldsymbol{b}_i\|$ が成り立つ。
+> 3. 任意の $1\leq i\leq n$ に対して $\langle\boldsymbol{b}_1^* ,\ldots,\boldsymbol{b}_i^*\rangle_{\mathbb{R}} = \langle\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\rangle_{\mathbb{R}}$ が成り立つ。
+> 4. $\mathrm{vol}(L) = \prod_{i=1}^n\|\boldsymbol{b}_i^*\|$ が成り立つ。
 
 **Proof.**
-まず 1 について $j = 1$ のとき証明せずとも成り立つ。$1\leq j\leq k$ のとき $\langle\mathbf{b}_i^*, \mathbf{b}_j^*\rangle = 0$ が成り立つと仮定して、$j = k+1$ のとき
+まず 1 について $j = 1$ のとき証明せずとも成り立つ。$1\leq j\leq k$ のとき $\langle\boldsymbol{b}_i^*, \boldsymbol{b}_j^*\rangle = 0$ が成り立つと仮定して、$j = k+1$ のとき
 
 $$
 \begin{aligned}
-  \langle\mathbf{b}_i^*,\mathbf{b}_{k+1}^*\rangle &
-  = \left\langle\mathbf{b}_i^*,\mathbf{b}_{k+1} - \sum_{n=1}^k\mu_{k+1 n}\mathbf{b}_{n}^*\right\rangle \\
-  & = \langle\mathbf{b}_i^*,\mathbf{b}_{k+1}\rangle-\mu_{
-  k+1 i}\|\mathbf{b}_i^*\|^2\\
+  \langle\boldsymbol{b}_i^*,\boldsymbol{b}_{k+1}^*\rangle &
+  = \left\langle\boldsymbol{b}_i^*,\boldsymbol{b}_{k+1} - \sum_{n=1}^k\mu_{k+1 n}\boldsymbol{b}_{n}^*\right\rangle \\
+  & = \langle\boldsymbol{b}_i^*,\boldsymbol{b}_{k+1}\rangle-\mu_{
+  k+1 i}\|\boldsymbol{b}_i^*\|^2\\
   & = 0
 \end{aligned}
 $$
@@ -576,33 +602,33 @@ $$
 
 $$
 \begin{aligned}
-  \|\mathbf{b} _ 1^*\|^2 & = \|\mathbf{b}_1\|^2 \\
-  \|\mathbf{b}_ i\|^2 & = \|\mathbf{b} _ i^ * \|^2 + \sum_{j=1}^{i-1}\mu _ {i,j}^2\|\mathbf{b}_j^ * \|^2\geq\|\mathbf{b} _ i^ * \|^2
+  \|\boldsymbol{b} _ 1^*\|^2 & = \|\boldsymbol{b}_1\|^2 \\
+  \|\boldsymbol{b}_ i\|^2 & = \|\boldsymbol{b} _ i^ * \|^2 + \sum_{j=1}^{i-1}\mu _ {i,j}^2\|\boldsymbol{b}_j^ * \|^2\geq\|\boldsymbol{b} _ i^ * \|^2
 \end{aligned}
 $$
 
-3 についてはまず $\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}\subseteq\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}$ について $i = 1$ は成り立ち、$1\leq i\leq k$ について成り立つとして以下より数学的帰納法から成り立つ。
+3 についてはまず $\langle\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\rangle_{\mathbb{R}}\subseteq\langle\boldsymbol{b}_1^*,\ldots,\boldsymbol{b}_i^*\rangle_{\mathbb{R}}$ について $i = 1$ は成り立ち、$1\leq i\leq k$ について成り立つとして以下より数学的帰納法から成り立つ。
 
 $$
-\mathbf{b}_k = \mathbf{b}_k^* + \sum_{j=1}^{k-1} \mu_{kj}\mathbf{b}_j^* \in\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}
+\boldsymbol{b}_k = \boldsymbol{b}_k^* + \sum_{j=1}^{k-1} \mu_{kj}\boldsymbol{b}_j^* \in\langle\boldsymbol{b}_1^*,\ldots,\boldsymbol{b}_i^*\rangle_{\mathbb{R}}
 $$
 
-同様に $\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}\supseteq\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}$ も数学的帰納法より成り立つ。
+同様に $\langle\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\rangle_{\mathbb{R}}\supseteq\langle\boldsymbol{b}_1^*,\ldots,\boldsymbol{b}_i^*\rangle_{\mathbb{R}}$ も数学的帰納法より成り立つ。
 
 $$
-\mathbf{b}_k^* = \mathbf{b}_k - \sum_{j=1}^{k-1} \mu_{kj}\mathbf{b}_j^* \in\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}
+\boldsymbol{b}_k^* = \boldsymbol{b}_k - \sum_{j=1}^{k-1} \mu_{kj}\boldsymbol{b}_j^* \in\langle\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\rangle_{\mathbb{R}}
 $$
 
-よって $\langle\mathbf{b}_1^*,\ldots,\mathbf{b}_i^*\rangle_{\mathbb{R}}=\langle\mathbf{b}_1,\ldots,\mathbf{b}_i\rangle_{\mathbb{R}}$ となる。
+よって $\langle\boldsymbol{b}_1^*,\ldots,\boldsymbol{b}_i^*\rangle_{\mathbb{R}}=\langle\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\rangle_{\mathbb{R}}$ となる。
 
-4 については $\mathbf{B}=\mathbf{U}\mathbf{B}^*$ と $\det(\mathbf{U}) = 1$、GSO ベクトルの直交性より
+4 については $\boldsymbol{B}=\boldsymbol{U}\boldsymbol{B}^*$ と $\det(\boldsymbol{U}) = 1$、GSO ベクトルの直交性より
 
 $$
 \begin{aligned}
-\mathrm{vol}(L)^2 &= \det(BB^\top) \\
-& = \det(UB^*(B^*)^\top U^\top) \\
-& = \det(B^*(B^*)^\top) \\
-& = \prod _ {i=1}^n\|\mathbf{b} _ i^ * \|^2
+\mathrm{vol}(L)^2 &= \det(\boldsymbol{B}\boldsymbol{B}^\top) \\
+& = \det(\boldsymbol{U}\boldsymbol{B}^*(\boldsymbol{B}^*)^\top \boldsymbol{U}^\top) \\
+& = \det(\boldsymbol{B}^*(\boldsymbol{B}^*)^\top) \\
+& = \prod_{i=1}^n\|\boldsymbol{b}_i^*\|^2
 \end{aligned}
 $$
 
@@ -612,59 +638,59 @@ GSO ベクトルの基本性質 2, 4 より次のことが分かる。
 > **Thm. Hadamardの不等式**
 >
 > $$
-\mathrm{vol}(L)\leq\prod _ {i=1}^n\|\mathbf{b} _ i\|
+\mathrm{vol}(L)\leq\prod _ {i=1}^n\|\boldsymbol{b} _ i\|
 $$
 >
-> 特に $\{\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n}\}$ が直交基底$\iff\mathrm{vol}(L)=\prod _ {i=1}^n\|\mathbf{b} _ i\|$ である。
+> 特に $\{\boldsymbol{b} _ {1},\ldots, \boldsymbol{b} _ {n}\}$ が直交基底$\iff\mathrm{vol}(L)=\prod _ {i=1}^n\|\boldsymbol{b} _ i\|$ である。
 
 > **Def. 射影格子**
-> $n$ 次元格子 $L\subseteq\mathbb{R}^m$ の基底 $\{\mathbf{b} _ {1},\ldots, \mathbf{b} _ {n}\}$ に対し, 各 $1\leq l\leq n$ に対して $\langle\mathbf{b} _ {1},\ldots, \mathbf{b} _ {l-1}\rangle _ \mathbb{R}$ の直交補空間への直交射影を $\pi _ l:\mathbb{R}^m\to\langle\mathbf{b} _ {1},\ldots, \mathbf{b} _ {l-1}\rangle _ \mathbb{R}^\bot$ とする。 定理 2 の 1,3 より
+> $n$ 次元格子 $L\subseteq\mathbb{R}^m$ の基底 $\{\boldsymbol{b} _ {1},\ldots, \boldsymbol{b} _ {n}\}$ に対し, 各 $1\leq l\leq n$ に対して $\langle\boldsymbol{b} _ {1},\ldots, \boldsymbol{b} _ {l-1}\rangle _ \mathbb{R}$ の直交補空間への直交射影を $\pi _ l:\mathbb{R}^m\to\langle\boldsymbol{b} _ {1},\ldots, \boldsymbol{b} _ {l-1}\rangle _ \mathbb{R}^\bot$ とする。 定理 2 の 1,3 より
 >
 > $$
 \begin{aligned}
-\langle\mathbf{b} _ {1},\ldots, \mathbf{b} _ {l-1}\rangle _ \mathbb{R}^\bot &= \langle\mathbf{b} _ {1}^ * ,\ldots, \mathbf{b} _ {l-1}^ * \rangle _ \mathbb{R}^\bot = \langle\mathbf{b} _ {l}^ * ,\ldots, \mathbf{b} _ {n}^ * \rangle _ \mathbb{R} \\
-\pi _ l(\mathbf{b}_i) &= \sum _ {j=l}^i\mu _ {i,j}\mathbf{b} _ j^ * \\
+\langle\boldsymbol{b} _ {1},\ldots, \boldsymbol{b} _ {l-1}\rangle _ \mathbb{R}^\bot &= \langle\boldsymbol{b} _ {1}^ * ,\ldots, \boldsymbol{b} _ {l-1}^ * \rangle _ \mathbb{R}^\bot = \langle\boldsymbol{b} _ {l}^ * ,\ldots, \boldsymbol{b} _ {n}^ * \rangle _ \mathbb{R} \\
+\pi _ l(\boldsymbol{b}_i) &= \sum _ {j=l}^i\mu _ {i,j}\boldsymbol{b} _ j^ * \\
 \end{aligned}
 $$
 >
-> となる。 すると集合 $\pi _ l(L)$ は $\{\pi _ l(\mathbf{b} _ {l}),\ldots,\pi _ l(\mathbf{b} _ {n})\}$ を基底に持つ $n-l+1$ 次元の格子であり, $\pi _ l(L)$ を射影格子 (projected lattice) と呼ぶ。
+> となる。 すると集合 $\pi _ l(L)$ は $\{\pi _ l(\boldsymbol{b} _ {l}),\ldots,\pi _ l(\boldsymbol{b} _ {n})\}$ を基底に持つ $n-l+1$ 次元の格子であり, $\pi _ l(L)$ を射影格子 (projected lattice) と呼ぶ。
 
 ### 最短ベクトルの数え上げ
 
 まずは全探索してみます。
 考えてみると帰納的に求めるのでは正確な最短ベクトルは求められないでしょう。
-考えてみるとある基底 $\mathbf{b}_i$ に対し、それ以下の基底 $\mathbf{b}_1, \ldots \mathbf{b}_{i-1}$ で組み立てられたベクトル $\mathbf{v}$ に対し、$\mathbf{b}_i$ を用いて短くする
+考えてみるとある基底 $\boldsymbol{b}_i$ に対し、それ以下の基底 $\boldsymbol{b}_1, \ldots \boldsymbol{b}_{i-1}$ で組み立てられたベクトル $\boldsymbol{v}$ に対し、$\boldsymbol{b}_i$ を用いて短くする
 
 効率的に数え上げる為には基底簡約すると良いということが知られています。
 
 ### Lagrange 基底簡約 (Gaussian Reduction)
 2 次元格子の厳密解については古くから知られている。ユークリッドの互除法を用いることで最も簡約された基底を得られる。
 
-$\|\mathbf{v}_1\| < \|\mathbf{v}_2\|$ となるように交換して
+$\|\boldsymbol{v}_1\| < \|\boldsymbol{v}_2\|$ となるように交換して
 
 $$
 \begin{aligned}
-  m & = \left\lfloor\frac{\mathbf{v}_1\cdot \mathbf{v}_2}{\|\mathbf{v}_1\|^2}\right\rceil \\
-  \mathbf{v}_2 & \leftarrow \mathbf{v}_2 - m\mathbf{v}_1
+  m & = \left\lfloor\frac{\boldsymbol{v}_1\cdot \boldsymbol{v}_2}{\|\boldsymbol{v}_1\|^2}\right\rceil \\
+  \boldsymbol{v}_2 & \leftarrow \boldsymbol{v}_2 - m\boldsymbol{v}_1
 \end{aligned}
 $$
 
-を繰り返し $m = 0$ となるとき $\mathbf{v}_1$, $\mathbf{v}_2$ は最も簡約された基底となる。
+を繰り返し $m = 0$ となるとき $\boldsymbol{v}_1$, $\boldsymbol{v}_2$ は最も簡約された基底となる。
 
 最も簡約化されているかを証明する。
 
 ### サイズ基底簡約
 
 > **サイズ基底簡約**
-> $n$ 次元格子 $L$ の基底 $\\{\mathbf{b_1},\ldots,\mathbf{b_n}\\}$ を GSO 係数 $\mu_{i,j}$ が
+> $n$ 次元格子 $L$ の基底 $\\{\boldsymbol{b_1},\ldots,\boldsymbol{b_n}\\}$ を GSO 係数 $\mu_{i,j}$ が
 >
 > $$
 |\mu_{i,j}| \leq \frac{1}{2} \quad (1 \leq \forall j < \forall i \leq n)
 $$
 >
-> を満たすとき、基底 $\\{\mathbf{b_1},\ldots,\mathbf{b_n}\\}$ はサイズ簡約されているという。
+> を満たすとき、基底 $\\{\boldsymbol{b_1},\ldots,\boldsymbol{b_n}\\}$ はサイズ簡約されているという。
 > GSO ベクトルを簡約 -> 基底ベクトルを簡約
-> 1. $q = \lfloor\mu_{ij}\rceil$ として $\mathbf{b}_i\leftarrow\mathbf{b}_i - q\mathbf{b}_j$ と更新する。
+> 1. $q = \lfloor\mu_{ij}\rceil$ として $\boldsymbol{b}_i\leftarrow\boldsymbol{b}_i - q\boldsymbol{b}_j$ と更新する。
 > 2. GSO 係数について $\mu_{il}\leftarrow \mu_{il} - q\mu_{jl}$ と更新する。
 
 ```python
@@ -693,7 +719,7 @@ print(size_reduction(B))
 > Lovasz 条件を $1/4 < \delta < 1$ としたときに次を満たすこととする。
 >
 > $$
-\forall 2\leq k\leq n\quad \delta \|\mathbf{b}_{k-1}^*\|^2 \leq \|\pi_{k-1}(\mathbf{b}_k)\|^2
+\forall 2\leq k\leq n\quad \delta \|\boldsymbol{b}_{k-1}^*\|^2 \leq \|\pi_{k-1}(\boldsymbol{b}_k)\|^2
 $$
 >
 > このとき次の 2 ステップを行えるまで繰り返す。
