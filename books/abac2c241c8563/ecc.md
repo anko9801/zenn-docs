@@ -188,6 +188,16 @@ $p = w_A^{e_A}w_b^{e_B}f \pm 1$
 $\mathbb{F}_{p^2}$ 上の超特異楕円曲線 $E$
 位数 $w_A^{e_A}$ である点 $P_A, Q_A$ と位数 $w_B^{e_B}$ である点 $P_B, Q_B$
 
+```python
+a = 110
+b = 67
+p = 2^a*3^b - 1
+Fp2<I> = GF(p, 2)
+assert I^2 eq -1
+R<x> = PolynomialRing(Fp2)
+E = EllipticCurve(x^3 + 6*x^2 + x)
+```
+
 ### CSIDH
 
 
