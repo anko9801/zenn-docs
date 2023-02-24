@@ -533,7 +533,7 @@ Gram-Schmidt 直交化 (GSO; Gram-Schmidt Orthonormalization) とは実 $m$ 次�
 \begin{aligned}
 &\begin{dcases}
 \boldsymbol{b}_1^* := \boldsymbol{b}_1 \\
-\boldsymbol{b}_i^ * := \boldsymbol{b}_i - \sum_{j=1}^{i-1} \mu_{ij} \boldsymbol{b}_j^* & (2\leq i\leq n) \\
+\boldsymbol{b}_i^* := \boldsymbol{b}_i - \sum_{j=1}^{i-1} \mu_{ij} \boldsymbol{b}_j^* & (2\leq i\leq n) \\
 \end{dcases} \\
 &\quad \mu_{ij} := \frac{\langle \boldsymbol{b}_i, \boldsymbol{b}_j^* \rangle}{\| \boldsymbol{b}_j^*\|^2} \qquad (1\leq j<i\leq n)
 \end{aligned}
