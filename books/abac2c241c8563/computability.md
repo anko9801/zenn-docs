@@ -87,25 +87,25 @@ DRBG に対する全ての攻撃は内部状態をいかに復元するかが鍵
 ### メルセンヌ・ツイスタ
 統計的に十分に分散していて長い周期を持つ高速な疑似乱数生成器の一種です。周期の長さは $2^{19937}-1$ とメルセンヌ数であり名前の由来になっています。実は日本人が作っています。
 
-中身では 32 ビットのビットベクタで計算されていて初期状態 $\mathbf{x}_i$ $(i = 0,\cdots,n)$ を入力して漸化式から $\mathbf{x}_k$ を生成し、それぞれの $\mathbf{x}$ について後処理をした $\mathbf{y}$ を出力とします。
+中身では 32 ビットのビットベクタで計算されていて初期状態 $\boldsymbol{x}_i$ $(i = 0,\cdots,n)$ を入力して漸化式から $\boldsymbol{x}_k$ を生成し、それぞれの $\boldsymbol{x}$ について後処理をした $\boldsymbol{y}$ を出力とします。
 
 $$
 \begin{aligned}
-  \mathbf{x}_{k+n} & = \mathbf{x}_{k+m}\hspace{-10px}&& \oplus((\mathbf{x}_k\mid\mathbf{x}_{k+1})\gg 1)\oplus(\mathrm{LSB}(\mathbf{x}_{k+1})\mathop{\mathrm{AND}}\mathbf{a}) \\
-  \mathbf{y} & \leftarrow \mathbf{x} && \oplus\ \,(\mathbf{x}\gg 11) \\
-  \mathbf{y} & \leftarrow \mathbf{y} && \oplus((\mathbf{y}\ll\ \ 7) \mathop{\mathrm{AND}} \mathbf{b}) \\
-  \mathbf{y} & \leftarrow \mathbf{y} && \oplus((\mathbf{y}\ll 15) \mathop{\mathrm{AND}} \mathbf{c}) \\
-  \mathbf{y} & \leftarrow \mathbf{y} &&\oplus\ \,(\mathbf{y}\gg 18) \\
+  \boldsymbol{x}_{k+n} & = \boldsymbol{x}_{k+m}\hspace{-10px}&& \oplus((\boldsymbol{x}_k\mid\boldsymbol{x}_{k+1})\gg 1)\oplus(\mathrm{LSB}(\boldsymbol{x}_{k+1})\mathop{\mathrm{AND}}\boldsymbol{a}) \\
+  \boldsymbolmbol{y} & \leftarrow \boldsymbol{x} && \oplus\ \,(\boldsymbol{x}\gg 11) \\
+  \boldsymbol{y} & \leftarrow \boldsymbol{y} && \oplus((\boldsymbol{y}\ll\ \ 7) \mathop{\mathrm{AND}} \boldsymbol{b}) \\
+  \boldsymbol{y} & \leftarrow \boldsymbol{y} && \oplus((\boldsymbol{y}\ll 15) \mathop{\mathrm{AND}} \boldsymbol{c}) \\
+  \boldsymbol{y} & \leftarrow \boldsymbol{y} &&\oplus\ \,(\boldsymbol{y}\gg 18) \\
 \end{aligned}
 $$
 
-ただし、$\mathbf{x}_k\mid\mathbf{x}_{k+1}$ は $\mathbf{x}_k$ の最上位ビットと $\mathbf{x}_{k+1}$ の下位 31 ビットを結合する演算、$\mathrm{LSB}(\mathbf{x}_{k+1})$ は $\mathbf{x}_{k+1}$ の最下位ビットを 32 ビットに展開する演算です。
-初期シード $\mathbf{x}_0$ を元に初期状態とパラメータは次のようにします。
+ただし、$\boldsymbol{x}_k\mid\boldsymbol{x}_{k+1}$ は $\boldsymbol{x}_k$ の最上位ビットと $\boldsymbol{x}_{k+1}$ の下位 31 ビットを結合する演算、$\mathrm{LSB}(\boldsymbol{x}_{k+1})$ は $\boldsymbol{x}_{k+1}$ の最下位ビットを 32 ビットに展開する演算です。
+初期シード $\boldsymbol{x}_0$ を元に初期状態とパラメータは次のようにします。
 
 $$
 \begin{aligned}
   n & = 624 \quad m = 397 \\
-  \mathbf{a} & = \mathrm{0x9908B0DF} \quad \mathbf{b} = \mathrm{0x9D2C5680} \quad \mathbf{c} = \mathrm{0xEFC60000} \\
+  \boldsymbol{a} & = \mathrm{0x9908B0DF} \quad \boldsymbol{b} = \mathrm{0x9D2C5680} \quad \boldsymbol{c} = \mathrm{0xEFC60000} \\
   x_i & = (x_{i-1} \oplus (x_{i-1}\gg 30))\times 1812433253 + i \pmod{2^{32}}
 \end{aligned}
 $$

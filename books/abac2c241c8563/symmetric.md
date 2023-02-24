@@ -228,5 +228,8 @@ Padding Oracle Attackでは最後の1文字総当り時に全く同じとき例�
 Grover's algorithm: $2^{K}\to 2^{K/2}$
 鍵長を倍の長さにすることで同じセキュリティを担保できる。
 
+## Stream cipher
+### ChaCha20-Poly1305
+
 ## 参考文献
 - [Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC](https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38d.pdf)

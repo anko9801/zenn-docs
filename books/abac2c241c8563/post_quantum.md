@@ -28,20 +28,17 @@ title: "耐量子暗号"
 - CVP
 - near CVP
 
-
-### Kannan’s embedding method
-
 > **Kannan's embedding method**
 > CVP の目標ベクトル $w$ と解ベクトル $v$ の差 $e = w - v$ のノルムについて $\|e\| < \lambda_1/2$ が成り立つとき SVP を解くことで求まる。
 
 $$
 \begin{pmatrix}
-  B & \mathbf{0} \\
+  B & \boldsymbol{0} \\
   w & M
 \end{pmatrix}
 $$
 
-### Babai’s Algorithm
+> **Babai’s Algorithm**
 
 $$
 \begin{aligned}
@@ -52,7 +49,7 @@ $$
 
 ### LWE格子暗号
 
-機械学習理論から派生した求解困難な問題で、有限体 $\mathbb{F}_q$ 上の秘密ベクトル $\mathbf{s} \in \mathbb{F}_q^n$ に関するランダムな連立線形「近似」方程式が与えられたとき、その秘密ベクトルを復元する問題である。
+機械学習理論から派生した求解困難な問題で、有限体 $\mathbb{F}_q$ 上の秘密ベクトル $\boldsymbol{s} \in \mathbb{F}_q^n$ に関するランダムな連立線形「近似」方程式が与えられたとき、その秘密ベクトルを復元する問題である。
 
 ## 符号暗号
 
