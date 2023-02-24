@@ -242,7 +242,7 @@ $$
 
 ```python
 from collections.abc import Callable
-import math
+from math import gcd
 
 def pollard_rho(N: int) -> int:
     f: Callable[[int], int] = lambda x: (x * x + 1) % N
@@ -251,7 +251,7 @@ def pollard_rho(N: int) -> int:
     while d == 1 or d == N:
         x = f(x)
         y = f(f(y))
-        d = math.gcd(abs(x - y), N)
+        d = gcd(abs(x - y), N)
     return d
 ```
 
@@ -522,28 +522,38 @@ m = gmpy2.iroot(c, e)[0]
 
 ### $d$ が小さすぎてはいけない (Wiener's Attack)
 
-$e$ が大きいとき $(e \approx N)$ 、秘密鍵 $d = e^{-1}$ が小さくなり $d$ を求められます。
+$e$ が大きいとき $(e \approx N)$ 、秘密鍵 $d = e^{-1}$ が小さくなり、近似分数を用いた近似で $d$ を求められます。
 
-次のように $e/N$ に対してユークリッドの互除法を用いて連分数展開し、適当な場所で打ち切って再構成することで近似分数を作ることが出来ます。そしてこの近似分数が $k/d$ と一致するとき秘密鍵 $d$ が求まります。
+ある分数についてユークリッドの互除法を用いて連分数展開し、適当な場所で打ち切って再構成することで近似分数を作ることが出来ます。
 
+> **連分数による近似分数の生成**
+>
+> $$
+\frac{a}{b} \approx q_0 + \cfrac{1}{q_1 + \cfrac{1}{q_2 + \cfrac{1}{\ddots \cfrac{}{q_{m-1} + \cfrac{1}{q_m}}}}} = \frac{\alpha_m}{\beta_m} \\
 $$
+>
+> $q_i, \alpha_i, \beta_i$ については次の漸化式を用いて計算できます。形式的に数列の $-1, -2$ 番目も定義することで分かりやすく計算できます。
+>
+> $$
 \begin{aligned}
-ed &≡ 1 \pmod{\phi(N)} \\
-ed &= k\phi(N) + 1 = k(N - p - q + 1) + 1 \\
-\frac{e}{N} &= \frac{k}{d}(1-\delta) &\delta = \frac{p + q - 1 - \frac{1}{k}}{N} \approx \frac{1}{2^{512}} \\
-\frac{e}{N} &\approx q_0 + \cfrac{1}{q_1 + \cfrac{1}{q_2 + \cfrac{1}{\ddots \cfrac{}{q_{m-1} + \cfrac{1}{q_m}}}}} = \frac{k_m}{d_m} \\
+r_{-2} &= a & \alpha_{-2} &= 0 &\beta_{-2} &= 1 \\
+r_{-1} &= b & \alpha_{-1} &= 1 &\beta_{-1} &= 0 \\
+r_{i-2} \div r_{i-1} &= q_{i} \cdots r_{i} & \alpha_i &= q_i \alpha_{i−1} + \alpha_{i−2} &\beta_i &= q_i \beta_{i−1}+\beta_{i−2} \\
 \end{aligned}
 $$
 
-$q_i, k_i, d_i$ については次の漸化式を用いて計算できます。形式的に数列の $-1, -2$ 番目も定義することで分かりやすく計算できます。
+まず次のように変形します。
 
 $$
 \begin{aligned}
-r_{-2} &= e & k_{-2} &= 0 &d_{-2} &= 1 \\
-r_{-1} &= N & k_{-1} &= 1 &d_{-1} &= 0 \\
-r_{i-2} \div r_{i-1} &= q_{i} \cdots r_{i} & k_i &= q_i k_{i−1} + k_{i−2} &d_i &= q_i d_{i−1}+d_{i−2} \\
+ed & = 1 \qquad \pmod{\phi(N)} \\
+ed & = k\phi(N) + 1 \\
+& = k(N - p - q + 1) + 1 \\
+\frac{e}{N} & = \frac{k}{d}(1-\delta) \approx \frac{k}{d} & \left(\delta = \frac{p + q - 1 - \frac{1}{k}}{N} \approx \frac{1}{\sqrt{N}}\right)
 \end{aligned}
 $$
+
+そして $e/N$ の近似分数が $k/d$ と一致するとき秘密鍵 $d$ が求まります。
 
 $q_i, k_i, d_i$ の計算をどこで打ち切るかは2次方程式 $x^2 - (p + q)x + pq = 0$ の判別式を用いて判定します。判別式が正となるとき解 $p, q$ のが存在し、 $p+q$ が整数ならば $p, q$ も整数となるという方法です。
 
@@ -595,6 +605,10 @@ def WienersAttack(n, e):
 ```
 
 さらにWiener's Attackより強い攻撃としてBoneh-Durfee Attackがあります。まず以下のように変形します。
+
+> **Boneh-Durfee Attack**
+>
+> $d < N^{0.292}$ のとき Coppersmith Method を用いて解ける。
 
 $$
 \begin{aligned}

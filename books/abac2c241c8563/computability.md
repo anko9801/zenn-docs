@@ -2,6 +2,7 @@
 title: "乱数と計算可能性"
 ---
 
+## 計算可能性
 今までの暗号がこんなに攻撃できそうなのになぜ安全だと言えるのか？それは計算可能性に基づいているからです。
 
 - 停止性問題
@@ -92,7 +93,7 @@ DRBG に対する全ての攻撃は内部状態をいかに復元するかが鍵
 $$
 \begin{aligned}
   \boldsymbol{x}_{k+n} & = \boldsymbol{x}_{k+m}\hspace{-10px}&& \oplus((\boldsymbol{x}_k\mid\boldsymbol{x}_{k+1})\gg 1)\oplus(\mathrm{LSB}(\boldsymbol{x}_{k+1})\mathop{\mathrm{AND}}\boldsymbol{a}) \\
-  \boldsymbolmbol{y} & \leftarrow \boldsymbol{x} && \oplus\ \,(\boldsymbol{x}\gg 11) \\
+  \boldsymbol{y} & \leftarrow \boldsymbol{x} && \oplus\ \,(\boldsymbol{x}\gg 11) \\
   \boldsymbol{y} & \leftarrow \boldsymbol{y} && \oplus((\boldsymbol{y}\ll\ \ 7) \mathop{\mathrm{AND}} \boldsymbol{b}) \\
   \boldsymbol{y} & \leftarrow \boldsymbol{y} && \oplus((\boldsymbol{y}\ll 15) \mathop{\mathrm{AND}} \boldsymbol{c}) \\
   \boldsymbol{y} & \leftarrow \boldsymbol{y} &&\oplus\ \,(\boldsymbol{y}\gg 18) \\
@@ -189,7 +190,7 @@ $r_i$ は剰余未満の数であり、その上位 2 バイト程を削除し�
 #### コラム
 RTA
 
-### 参考文献
+## 参考文献
 
 - [メルセンヌ・ツイスタをわかった気になる](https://6715.jp/posts/5/)
 - [Mersenne Twisterの出力を推測してみる](https://inaz2.hatenablog.com/entry/2016/03/07/194147)
