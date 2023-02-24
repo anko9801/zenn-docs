@@ -21,6 +21,13 @@ HMAC (Hash-based MAC)
 
 ## SAT
 充足可能性問題 (SAT; SATisfiability Problem)
+
+- 論理式に帰着できるすべての問題のソルバ
+- Differential Cryptoanalysis
+- モデル検査
+- 自動定理証明支援系
+- シンボリック実行エンジン
+
 SAT を解くには指数時間掛かると信じられている。指数時間の中でも高速化していく技術を学ぶ。
 
 $$
@@ -100,13 +107,6 @@ $$
 CNFの入力形式 DIMACS
 
 ## SMT
-SMT ソルバ全般
-- [SAT/SMTソルバの仕組み](https://www.slideshare.net/sakai/satsmt)
-- [ミュンヘン工科大学の夏学期の自動推論に関する授業](https://www21.in.tum.de/teaching/sar/SS20/)
-
-SAT/SMTソルバのサーベイ論文
-- [SATソルバ・SMTソルバの技術と応用](https://www.jstage.jst.go.jp/article/jssst/27/3/27_3_3_24/_pdf)
-- [A Survey of Satisfiability Modulo Theory](https://arxiv.org/abs/1606.04786)
 形式手法
 - モデル検査
 - 定理証明支援系
@@ -139,22 +139,10 @@ SAT/SMTソルバのサーベイ論文
 
 ### 実装
 SMTソルバの入力形式 SMT-LIBv2
-- [The SMT-LIBv2 Language and Tools: A Tutorial](http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf)
-p20. SMT-LIBv2 の token が表になって並んでおり、どのような正規表現でマッチさせられるか掲載している
-- [SMT-LIB The Satisfiability Modulo Theories Library](http://smtlib.cs.uiowa.edu/)
-SMT ソルバに与える入力の形式 SMT-LIB v2 についてまとまっている Web サイト
-- [SMT-LIB-benchmarks / QF_UF · GitLab (uiowa.edu)](https://clc-gitlab.cs.uiowa.edu:2443/SMT-LIB-benchmarks/QF_UF)
-QF_UF のベンチマーク用入力が大量に用意されている
+
 
 ## Z3
-Python, Rust
-
-使い道
-- Differential Cryptoanalysis
-- 自動定理証明支援系
-- モデル検査
-- シンボリック実行エンジン
-- 任意のソルバ
+私が知っている Z3 を使える言語は Python, Rust です。ラッパを書けば
 
 使えるデータ
 - bool, int, float, float32, double, real, string
@@ -178,3 +166,19 @@ print(solver.check())
 print(solver.model())
 ```
 
+## 参考文献
+SMT ソルバ全般
+- [SAT/SMTソルバの仕組み](https://www.slideshare.net/sakai/satsmt)
+- [ミュンヘン工科大学の夏学期の自動推論に関する授業](https://www21.in.tum.de/teaching/sar/SS20/)
+
+SAT/SMTソルバのサーベイ論文
+- [SATソルバ・SMTソルバの技術と応用](https://www.jstage.jst.go.jp/article/jssst/27/3/27_3_3_24/_pdf)
+- [A Survey of Satisfiability Modulo Theory](https://arxiv.org/abs/1606.04786)
+
+SMT-LIBv2
+- [The SMT-LIBv2 Language and Tools: A Tutorial](http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf)
+p20. SMT-LIBv2 の token が表になって並んでおり、どのような正規表現でマッチさせられるか掲載している
+- [SMT-LIB The Satisfiability Modulo Theories Library](http://smtlib.cs.uiowa.edu/)
+SMT ソルバに与える入力の形式 SMT-LIB v2 についてまとまっている Web サイト
+- [SMT-LIB-benchmarks / QF_UF · GitLab (uiowa.edu)](https://clc-gitlab.cs.uiowa.edu:2443/SMT-LIB-benchmarks/QF_UF)
+QF_UF のベンチマーク用入力が大量に用意されている
