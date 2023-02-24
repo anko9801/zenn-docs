@@ -47,10 +47,13 @@ $(a,b,c,d)=(\top,\bot,\bot,\top)$
 
 $$
 \begin{aligned}
-\phi &= (a \lor \lnot b \lor d) \land (a \lor \lnot b \lor e) \\
+\phi &= (a \lor \lnot b \lor d) \\
+& \land (a \lor \lnot b \lor e) \\
 & \land (\lnot b \lor \lnot d \lor \lnot e) \\
-& \land (a \lor b \lor c \lor d) \land (a \lor b \lor c \lor \lnot d) \\
-& \land (a \lor b \lor \lnot c \lor e) \land (a \lor b \lor \lnot c \lor \lnot e)
+& \land (a \lor b \lor c \lor d) \\
+& \land (a \lor b \lor c \lor \lnot d) \\
+& \land (a \lor b \lor \lnot c \lor e) \\
+& \land (a \lor b \lor \lnot c \lor \lnot e)
 \end{aligned}
 $$
 
@@ -68,15 +71,13 @@ DPLL に加え、コンフリクトしたときにその探索状態だと失敗
 | 5   | $x_6$       | 2     | $\lbrace x_1,\lnot x_2,\lnot x_4,x_6\rbrace$ |
 | 6   | $\lnot x_6$ | 2     | $\lbrace x_3,\lnot x_4,x_5,\lnot x_6\rbrace$ |
 
-ここで $t$ が 0 から 3 までの条件 $\lnot x_1\land x_2\land\lnot x_5\land\lnot x_3$ のときコンフリクトすることが分かる. するとその否定 $x_1\lor\lnot x_2\lor x_5\lor x_3 = \lbrace x_1,\lnot x_2,x_5,x_3\rbrace$ は必ず成立しなければならない為, 新たに条件として入れることができる.
+ここで $t$ が 0 から 3 までの条件 $\lnot x_1\land x_2\land\lnot x_5\land\lnot x_3$ のときコンフリクトすることが分かる。するとその否定 $x_1\lor\lnot x_2\lor x_5\lor x_3 = \lbrace x_1,\lnot x_2,x_5,x_3\rbrace$ は必ず成立しなければならない為、新たに条件として入れることができる。
 
-[疑問] このときなぜ $\lnot x_4$ を入れてはいけないのかよくわからない. 資料には $x_6$ に依存しているからと書かれているが $\lbrace x_1,x_3,x_4\rbrace$ は $x_1, x_3$ によって決定されるので関係なさそう(入れた方が条件が弱くなるのは確かにそうだけれども, もし全てのリテラルがfalseでも $\lbrace x_1,x_3,x_4\rbrace$ とコンフリクトするので大丈夫そう). たぶん節内のリテラルを出来る限り少なくして探索時に有用に扱いたいんだと思う.
+[疑問] このときなぜ $\lnot x_4$ を入れてはいけないのかよくわからない. 資料には $x_6$ に依存しているからと書かれているが $\lbrace x_1,x_3,x_4\rbrace$ は $x_1, x_3$ によって決定されるので関係なさそう(入れた方が条件が弱くなるのは確かにそうだけれども, もし全てのリテラルがfalseでも $\lbrace x_1,x_3,x_4\rbrace$ とコンフリクトするので大丈夫そう)。たぶん節内のリテラルを出来る限り少なくして探索時に有用に扱いたいんだと思う。
 
-そして条件が多くなればなるほど探索をしなくて済むので高速化出来る.
+そして条件が多くなればなるほど探索をしなくて済むので高速化出来る。
 
-その他最適化するアルゴリズムの基本的なアイデアとその名前を挙げるので興味ある方は調べてみるのも良さです。
-1. 命題論理・述語論理の推論規則を用いて恒真命題か矛盾命題かを証明する。(Tableaux algorithm)
-2. $A\lor L$ と $B\lor\lnot L$ があるなら $A\lor B$ を推論できる。特に $A = B$ のとき項数が少なくなる。(Resolution)
+その他ヒューリスティックなアルゴリズムの基本的なアイデアとして、命題論理・述語論理の推論規則を用いて恒真命題か矛盾命題かを証明すること (Tableaux algorithm) や $A\lor L$ と $B\lor\lnot L$ があるなら $A\lor B$ を推論でき、特に $A = B$ のとき項数が少なくなること (Resolution) などがあります。
 
 ### 実装
 効率的な CDCL の実装方法を学ぶ。
