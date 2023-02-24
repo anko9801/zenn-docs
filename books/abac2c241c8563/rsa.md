@@ -987,8 +987,9 @@ https://xagawa.hatenablog.com/entry/2021/12/20/232133
 CryptoのWriteupをまとめてる人
 https://mystiz.hk
 
-### RSALib
-主要な暗号ハードウェアメーカで使われているライブラリ RSALib の鍵生成アルゴリズムの欠陥。
+### ROCA (The Return of Coppersmith's Attack)
+鍵生成アルゴリズムのバグ
+主要な暗号ハードウェアメーカで使われているライブラリ RSALib では次のように素数を生成していた。
 
 $$
 \begin{aligned}

@@ -175,10 +175,20 @@ Python, Rust
 - array, set, enumeration, bitvector
 
 ```python
-x = Int('x')
-y = Int('y')
 BitVec()
 IntVector()
 Real()
+from z3 import Solver, Context, RecFunction, RecAddDefinition, IntSort, Int, If, simplify
+
+ctx = Context()
+f = RecFunction("f", IntSort(ctx), IntSort(ctx))
+x = Int("x", ctx)
+RecAddDefinition(f, x, If(x <= 2, 1, f(x-1) + f(x-2)))
+
+solver = Solver(ctx=ctx)
+solver.add(f(x) == 10946)
+
+print(solver.check())
+print(solver.model())
 ```
 
