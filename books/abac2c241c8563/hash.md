@@ -38,8 +38,6 @@ $(a,b,c,d)=(\top,\bot,\bot,\top)$
 
 これは DPLL (Davis Putnam Logemann Loveland) アルゴリズムと呼ばれている。
 
-このとき深さ優先探索での深さが $d$ のときをレベル $d$ と呼ぶ.
-
 $$
 \begin{aligned}
 \phi &= (a \lor \lnot b \lor d) \land (a \lor \lnot b \lor e) \\
@@ -51,10 +49,10 @@ $$
 
 ### 節学習
 
-DPLL に加え、コンフリクトしたときにその探索状態だと失敗することを条件に入れる。これを節学習と呼び、このアルゴリズムは CDCL (Constrait-Driven Clause Learning) アルゴリズムと呼ばれる。
+DPLL に加え、コンフリクトしたときにその探索状態だと失敗することを条件に入れる。この操作を節学習と呼び、DPLL に節学習を加えたアルゴリズムは CDCL (Constrait-Driven Clause Learning) アルゴリズムと呼ばれる。
 
 | $t$ | $L_t$       | 深さ  | reason                                       |
-| --- | ----------- | ----- | -------------------------------------------- |
+| :-: | :---------: | :---: | :------------------------------------------- |
 | 0   | $\lnot x_1$ | 0     | $\lbrace\lnot x_1\rbrace$                    |
 | 1   | $x_2$       | 1     | $\lbrace\rbrace$                             |
 | 2   | $\lnot x_5$ | 1     | $\lbrace \lnot x_2,\lnot x_5\rbrace$         |
@@ -69,19 +67,21 @@ DPLL に加え、コンフリクトしたときにその探索状態だと失敗
 
 そして条件が多くなればなるほど探索をしなくて済むので高速化出来る.
 
-### 実装
-効率的なCDCLの実装方法を学ぶ.
+その他最適化するアルゴリズムの基本的なアイデアとその名前を挙げるので興味ある方は調べてみるのも良さです。
+1. 命題論理・述語論理の推論規則を用いて恒真命題か矛盾命題かを証明する。(Tableaux algorithm)
+2. $A\lor L$ と $B\lor\lnot L$ があるなら $A\lor B$ を推論できる。特に $A = B$ のとき項数が少なくなる。(Resolution)
 
-節は $x_k$ と $\lnot x_k$ は $2k$, $2k+1$ と表す. 合計で $2n$ ビット必要になる.
+### 実装
+効率的な CDCL の実装方法を学ぶ。
+
+節は $x_k$ と $\lnot x_k$ は $2k$, $2k+1$ と表す。合計で $2n$ ビット必要になる。
 各節はリテラルのポインタを格納するリンクリストを持つ
 次に探索する変数の優先順位を表すアクティビティスコアを持つ
-アクティビティスコアはコンフリクト時に各変数のそれに足されるものである. i回目のコンフリクト時には $\rho^{-i}$ 足される. (ex. $\rho=0.95$) 後の方になればなるほど増加するスピードが速くなり, 古いコンフリクトは無視されるようになる.
+アクティビティスコアはコンフリクト時に各変数のそれに足されるものである。i回目のコンフリクト時には $\rho^{-i}$ 足される。(ex. $\rho=0.95$) 後の方になればなるほど増加するスピードが速くなり、古いコンフリクトは無視されるようになる。
 
-殆どのSATソルバは連言標準形(CNF)を入力として受け取る.
-任意の命題論理式をCNFに変換する為のアルゴリズム(Tseitin Encoding)
-CNFの入力形式 DIMACS
+殆どのSATソルバは連言標準形(CNF)を入力として受け取る。
+任意の命題論理式をCNFに変換する為のアルゴリズムが存在する。(Tseitin Encoding)
 
-### Tseitin Encoding
 $$
 \begin{aligned}
 \phi&\coloneqq((p\lor q)\land r)\to(\lnot s) \\
@@ -97,15 +97,7 @@ x_2\leftrightarrow p\lor q &= (x_2\to(p\lor q))\land((p\lor q)\to x_2) \\
 \end{aligned}
 $$
 
-### Tableaux
-SAT において恒真命題, 矛盾命題について考える
-1955年に Evert William Beth によって提案, Raymond Smullyan が analytic tableau へ発展させた。
-**Tableauxの基礎**
-**Propositional Tableaux**
-**First-Order Tableaux**
-
-### Resolution
-定理
+CNFの入力形式 DIMACS
 
 ## SMT
 SMT ソルバ全般
@@ -118,13 +110,11 @@ SAT/SMTソルバのサーベイ論文
 形式手法
 - モデル検査
 - 定理証明支援系
-SMT (Satisfiability Modulo Theories)
-EUF (Equality Logic With Uninterpreted Functions)
 
-FOL (First-Order Logic)
-HOL (Higher-Order Logic)
+今回は BitVector しか使わないのでそれだけ解説する。他にも EUF (Equality logic with Uninterpreted Functions) に関するアルゴリズムや blahblah など色々あるので興味ある方は参考文献などを参照されて頂きたい。
 
 ### BitVector
+
 | 構文 | 式 |
 |:--:|:--|
 | $a\land b$ | |
@@ -138,7 +128,7 @@ HOL (Higher-Order Logic)
 | $a \oplus b$ | |
 | $a \ll b$ | |
 | $a \gg b$ | |
-| $a + b$ | |
+| $a + b$ | 全加算器 |
 | $a - b$ | |
 | $a \times b$ | |
 | $a / b$ | |
@@ -147,11 +137,7 @@ HOL (Higher-Order Logic)
 | $a[b:c]$ | |
 | $c?a:b$ | |
 
-### DPLL(T)
-
 ### 実装
-
-
 SMTソルバの入力形式 SMT-LIBv2
 - [The SMT-LIBv2 Language and Tools: A Tutorial](http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf)
 p20. SMT-LIBv2 の token が表になって並んでおり、どのような正規表現でマッチさせられるか掲載している
