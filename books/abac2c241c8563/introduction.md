@@ -93,9 +93,17 @@ SSL は TLS の前身で現在は使用されていない。
   - 現代で最も使われている
 
 ## あそんでみよう
+https://quipqiup.com/
 [CyberChef](https://gchq.github.io/CyberChef/) で遊ぶ
 
 - RSA 暗号
 - Base64
 - 署名
 - 鍵共有
+
+実際の CTF ではよくわからない暗号やエンコーディング、古典暗号を調べて解くみたいなことが多いのでググったり CyberChef に投げればよい。
+
+:::message
+演習
+:::
+

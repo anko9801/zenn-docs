@@ -15,9 +15,14 @@ $H(m_1) = H(m_2)$ となる $m_1, m_2$ が見つけにくい
 HMAC (Hash-based MAC)
 
 ### Merkle-Damgård construction
-## 攻撃
-### 伸長攻撃
+4ブロックごとに処理する
+![](/images/length_extension.png)
+
+### 伸長攻撃 (Length Extension Attack)
+$H(m_1)$ $H(m_1\|m_2)$ を求める
+
 ### Differenctial Cryptoanalysis
+暗号を解析しながら SMT を用いて解く
 
 ## SAT
 充足可能性問題 (SAT; SATisfiability Problem)
@@ -28,13 +33,16 @@ HMAC (Hash-based MAC)
 - 自動定理証明支援系
 - シンボリック実行エンジン
 
-SAT を解くには指数時間掛かると信じられている。指数時間の中でも高速化していく技術を学ぶ。
+SAT を解くには指数時間掛かると信じられている。
 
 $$
 ((a\land\lnot b\land\lnot c)\lor(b\land c\land\lnot d))\land(\lnot b\lor\lnot c)
 $$
 
 $(a,b,c,d)=(\top,\bot,\bot,\top)$
+
+ブラックボックスでもいいが、やっぱり使い方だけ教えるのはしっくりこないので簡単に仕組みを紹介します。とはいいつつ全てのアルゴリズムは解説しきれないほどあるので一般的手法のみを紹介し、特殊な状況や
+指数時間の中でも高速化していく技術を学ぶ。
 
 ### DPLL アルゴリズム
 まずは単純に全探索を考える。リテラルが 1 つしかない節を単位節と呼ぶとして次の操作を繰り返す。
@@ -168,6 +176,8 @@ print(solver.model())
 ```
 
 ## 参考文献
+- [Length Extension Attackの原理と実装](https://ptr-yudai.hatenablog.com/entry/2018/08/28/205129)
+
 SMT ソルバ全般
 - [SAT/SMTソルバの仕組み](https://www.slideshare.net/sakai/satsmt)
 - [ミュンヘン工科大学の夏学期の自動推論に関する授業](https://www21.in.tum.de/teaching/sar/SS20/)

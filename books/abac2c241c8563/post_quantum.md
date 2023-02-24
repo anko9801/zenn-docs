@@ -14,12 +14,14 @@ title: "耐量子暗号"
 - ハッシュ関数署名
 
 ## 格子暗号
-### BKZ (Block Korkine-Zolotareff) 基底簡約
 
-### HKZ (Hermite-Korkine-Zolotareff) 基底簡約
+> **HKZ (Hermite-Korkine-Zolotareff) 基底簡約**
+> 1. サイズ基底簡約
+> 2. すべての $1\leq i\leq n$ に対して $\|\boldsymbol{b}_i^*\| = \lambda_1(\pi_i(L))$ となるように基底ベクトルの交換
 
-1. サイズ基底簡約
-2. 条件に合うように基底ベクトルの交換
+> **BKZ (Block Korkine-Zolotareff) 基底簡約**
+> 1. サイズ基底簡約
+> 2. すべての $1\leq k\leq n-\beta+1$ に対して $\beta$ 次元の格子 $L_{[k,k+\beta-1]} = \lbrace\pi_k(\boldsymbol{b}_k), \pi_k(\boldsymbol{b}_{k+1}), \ldots, \pi_k(\boldsymbol{b}_{k+\beta-1})\rbrace$ の基底が HKZ 基底簡約
 
 ### CVP; Closest Vector Problem
 

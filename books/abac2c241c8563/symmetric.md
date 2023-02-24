@@ -83,6 +83,12 @@ const uint8_t inv_sbox[] = {
 ### Permutation
 シフトやスワップなどを用いてブロック内の転置を行います。
 
+:::message
+演習
+nullcon HackIM 2019 2FUN
+中間一致攻撃
+:::
+
 ## AES
 - 共通鍵暗号の標準的な暗号
 - AES-NI
