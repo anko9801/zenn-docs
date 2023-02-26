@@ -96,6 +96,42 @@ x_k & = \boldsymbol{c}\cdot\boldsymbol{a}_k^{n} = \sum_{i=0}^{n-1} c_ia_{k+i}
 \end{aligned}
 $$
 
+```python
+class LFSR():
+  def __init__(self, n):
+    self.state = [getRandBit(1) for _ in range(n)]
+    self.taps = [getRandBit(1) for _ in range(n)]
+  def next(self):
+    output = reduce(xor, [bit&tap for bit,tap in zip(self.state, self.taps)])
+    self.state = self.state[1:] + [output]
+    return output
+
+class lfsr():
+  def __init__(self, init, mask, length):
+    self.init = init
+    self.mask = mask
+    self.lengthmask = 2**(length+1)-1
+
+  def next(self):
+    nextdata = (self.init << 1) & self.lengthmask
+    i = self.init & self.mask & self.lengthmask
+    output = 0
+    while i != 0:
+      output ^= (i & 1)
+      i = i >> 1
+    nextdata ^= output
+    self.init = nextdata
+    return output
+
+def generate_bit_sequence(initial_state):
+  state = initial_state
+  while True:
+    last_bit = state & 1
+    yield last_bit
+    middle_bit = state >> 3 & 1
+    state = (state >> 1) | ((last_bit ^ middle_bit) << 4)
+```
+
 :::message
 zer0lfsr, zer0lfsr+, zer0lfsr++ を解こう
 :::

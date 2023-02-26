@@ -1002,7 +1002,7 @@ $P_n = 2\cdot 3\cdot\ldots\cdot p_n$
 1024bit RSA $M = P_{71}$
 2048bit RSA $M = P_{126}$
 
-### 乗法群の位数が $\phi(N) = se^n$ と表されるとき $e$ の逆元が取れない.
+### 乗法群の位数が $\phi(N) = se^n$ と表されるとき $e$ の逆元が取れない
 
 このとき位数 $se^n$ から $e^n$ 乗することで位数 $s$ の乗法群に落とし, そこでなら逆元を取れるので, 位数 $se^n$ の元を $e^n$ 回掛けて全探索すると平文が見つかる.
 
@@ -1010,7 +1010,23 @@ $O(e^n)$
 
 ## 素因数分解ベースの暗号
 ### Paillier 暗号
+$r$ の位数の倍数 $\lambda$ を秘密鍵
+
+$$
+\begin{aligned}
+c & = (1 + kn)^mr^n & \pmod{n^2} \\
+c^\lambda & = ((1 + kn)^mr^n)^\lambda = (1 + kn)^{m\lambda} = 1 + knm\lambda & \pmod{n^2}
+\end{aligned}
+$$
+
 ### Rabin 暗号
+
+$$
+\begin{aligned}
+& c = m(m + B) & \pmod{n} \\
+& x^2 + Bx - c = 0 & \pmod{n}
+\end{aligned}
+$$
 
 ## まとめ
 
