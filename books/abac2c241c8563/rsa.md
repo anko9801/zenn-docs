@@ -14,22 +14,6 @@ title: "RSA暗号への攻撃"
 
 ここでは実際にスクリプトを書いて攻撃していきます！攻撃したことない人はコードを書きながら勉強でき、CTFerにはライブラリ保管庫として使ってほしいと思って書いてます。
 
-これで剰余上の演算は一通りできるようになりました。さてコンピューターはこれらをどのようにして計算するのでしょうか。代表的なアルゴリズムで組んだ場合だと以下の表のようになります。(簡単の為、基本的な演算の計算量はビット数に依らないとする)
-
-| 演算                   | 方法                          | 計算量                      |
-| :--------------------  | :---------------------------- | :-------------------------- |
-| 足し算   $a + b$       | 足してN以上になったらN引く    | $O(1)$            |
-| 引き算   $a - b$       | 引いて0未満になったらN足す    | $O(1)$            |
-| 掛け算   $a \times b$  | 掛けてNで割った余り           | $O(1)$            |
-| 割り算   $a \div b$    | 拡張ユークリッドの互除法      | $O(\log^2 N)$   |
-| 累乗     $a ^ e$       | 繰り返し二乗法                | $O(\log N)$       |
-| 平方根   $\sqrt{a}$    | Tonelli Shanksのアルゴリズム  | $O(\log^2 N)$   |
-| 累乗根   $\sqrt[e]{a}$ | Tonelli Shanksのアルゴリズム     | $O(\min(N^{1/4},\sqrt{e})\log{e}\log^2{N})$     |
-| 対数     $\log_e{a}$   | 離散対数問題            | $O(\sqrt{N})$     |
-
-(参考: [整数論テクニック集のpdf](https://kirika-comp.hatenablog.com/entry/2018/03/12/210446) など)
-
-それぞれのアルゴリズムは参考などの資料を見てください。累乗は多項式時間しか掛かりませんが、累乗根や対数は指数時間掛かるということを頭の隅に置いておいてください。
 
 それと剰余と合わせて、普段よく使っている整数 $\mathbb{Z}$ 上での演算は $\bmod N$ と対比して $\mathrm{over}\ \mathbb{Z}$ と書くことにします。
 
@@ -1024,7 +1008,9 @@ $P_n = 2\cdot 3\cdot\ldots\cdot p_n$
 
 $O(e^n)$
 
-[p - 1 ≡ 0 (mod e) のときの RSA 復号方法](https://blog.y011d4.com/20201026-not-coprime-e-phi)
+## 素因数分解ベースの暗号
+### Paillier 暗号
+### Rabin 暗号
 
 ## まとめ
 
@@ -1038,4 +1024,4 @@ $O(e^n)$
 - [CTF crypto 逆引き](https://furutsuki.hatenablog.com/entry/2021/03/16/095021)
 - [Recovering cryptographic keys from partial information, by example](https://eprint.iacr.org/2020/1506.pdf)
 - [Twenty Years of Attacks on the RSA Cryptosystem](https://crypto.stanford.edu/~dabo/pubs/papers/RSA-survey.pdf)
-
+- [p - 1 ≡ 0 (mod e) のときの RSA 復号方法](https://blog.y011d4.com/20201026-not-coprime-e-phi)

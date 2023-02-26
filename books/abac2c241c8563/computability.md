@@ -61,7 +61,7 @@ title: "乱数と計算可能性"
 
 ### 決定論的乱数生成器 (DRBG)
 TRNG だと乱数を生成するのに熱が揺らいでいるのを取らないといけないので時間がかかります。高速化するにはアルゴリズムで疑似的に乱数を生成することが必要です。これを決定論的乱数生成器 (DRBG; Deterministic Random Bit Generator) と呼びます。
-ex.) XorShift、線形合同法、メルセンヌ・ツイスタ
+ex.) XorShift、線形合同法、メルセンヌ・ツイスタ、LFSR
 
 メリット
 - 高速に生成できる
@@ -85,7 +85,35 @@ https://www.youtube.com/watch?v=WaAErTq7hWA
 
 DRBG に対する全ての攻撃は内部状態をいかに復元するかが鍵となっています。
 
-### メルセンヌ・ツイスタ
+### LFSR (Linear Feedback Shift Register)
+
+$\boldsymbol{a}_k^n = (a_k, a_{k+1}, \ldots, a_{k+n-1})\in\mathbb{F}_2^n$
+
+$$
+\begin{aligned}
+a_{k+n} & = \boldsymbol{s}\cdot\boldsymbol{a}_k^{n} = \sum_{i=0}^{n-1} s_ia_{k+i} \\
+x_k & = \boldsymbol{c}\cdot\boldsymbol{a}_k^{n} = \sum_{i=0}^{n-1} c_ia_{k+i}
+\end{aligned}
+$$
+
+:::message
+zer0lfsr, zer0lfsr+, zer0lfsr++ を解こう
+:::
+
+#### NLSR
+非線形化を施すと行列形式で書くことができないので逆変換が難しくなる。
+
+
+
+
+攻撃手法
+1. 高次項は無視や線形近似をする (Walsh-Hadamard 変換)
+2. 低次項は状態として定義する
+3. annihilator
+4. Correlation Attack
+5. Z3
+
+### メルセンヌ・ツイスタ (MT19937)
 統計的に十分に分散していて長い周期を持つ高速な疑似乱数生成器の一種です。周期の長さは $2^{19937}-1$ とメルセンヌ数であり名前の由来になっています。実は日本人が作っています。
 
 中身では 32 ビットのビットベクタで計算されていて初期状態 $\boldsymbol{x}_i$ $(i = 0,\cdots,n)$ を入力して漸化式から $\boldsymbol{x}_k$ を生成し、それぞれの $\boldsymbol{x}$ について後処理をした $\boldsymbol{y}$ を出力とします。

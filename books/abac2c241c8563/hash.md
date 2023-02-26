@@ -14,6 +14,8 @@ $H(m_1) = H(m_2)$ となる $m_1, m_2$ が見つけにくい
 
 HMAC (Hash-based MAC)
 
+CRC
+
 ### Merkle-Damgård construction
 4ブロックごとに処理する
 ![](/images/length_extension.png)

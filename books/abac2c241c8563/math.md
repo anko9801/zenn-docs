@@ -721,6 +721,16 @@ $$
 
 0.99
 
+### ナップサック暗号 (Markle-Hellman Knapsack encryption)
+一般の数列 $\beta_i$ に対して $c = \sum_i m_i\beta_i$ となる $c$ から $m_i$ を求めるのは難しいが $\beta_i$ が超増加列という性質を持つとき簡単になることを利用した暗号。
+
+> **Def. 超増加列**
+> 次の性質を満たす数列 $\lbrace w_i\rbrace$ を超増加列と呼ぶ。
+>
+> $$
+\sum_{i=1}^n w_i < w_{n+1}
+$$
+
 ## 多項式
 ここでは剰余上の方程式 $\mathbb{Z}/N\mathbb{Z}[x]$ の解を求める方法について解説します。
 
@@ -757,7 +767,13 @@ https://qiita.com/kusano_k/items/5509bff6e426e5043591
 
 :::message
 **演習**
+$|x|, |y|\leq\sqrt{n}$
 
+$$
+ax = b \pmod n
+$$
+
+Approximate GCD Problem
 :::
 
 更に $n$ 次方程式を格子問題に帰着する方法を考えます。
@@ -1153,6 +1169,23 @@ $$
 ### 数体ふるい法
 - [General purpose integer factoring](https://eprint.iacr.org/2017/1087)
 
+## まとめ
+
+これで剰余上の演算は一通りできるようになりました。さてコンピューターはこれらをどのようにして計算するのでしょうか。代表的なアルゴリズムで組んだ場合だと以下の表のようになります。(簡単の為、基本的な演算の計算量はビット数に依らないとする)
+
+| 演算                   | 方法                          | 計算量                      |
+| :--------------------  | :---------------------------- | :-------------------------- |
+| 足し算   $a + b$       | 足して $N$ 以上になったら $N$ 引く | $O(1)$            |
+| 引き算   $a - b$       | 引いて $0$ 未満になったら $N$ 足す | $O(1)$            |
+| 掛け算   $a \times b$  | 掛けて $N$ で割った余り           | $O(1)$            |
+| 割り算   $a \div b$    | 拡張ユークリッドの互除法      | $O(\log^2 N)$   |
+| 累乗     $a ^ e$       | 繰り返し二乗法                | $O(\log N)$       |
+| 平方根   $\sqrt{a}$    | Tonelli Shanksのアルゴリズム  | $O(\log^2 N)$   |
+| 累乗根   $\sqrt[e]{a}$ | Tonelli Shanksのアルゴリズム     | $O(\min(N^{1/4},\sqrt{e})\log{e}\log^2{N})$     |
+| 対数     $\log_e{a}$   | 離散対数問題            | $O(\sqrt{N})$     |
+
+累乗は多項式時間しか掛かりませんが、累乗根や対数は指数時間掛かるということを頭の隅に置いておいてください。
+
 ## 参考文献
 - [Finding a Small Root of a Univariate Modular Equation](https://static.aminer.org/pdf/PDF/000/192/854/finding_a_small_root_of_a_univariate_modular_equation.pdf)
 - [katagaitai workshop 2018 winter](http://elliptic-shiho.github.io/slide/katagaitai_winter_2018.pdf)
@@ -1161,3 +1194,4 @@ $$
 - The Arithmetic of Elliptic Curves
 - Introduction to Cryptography Buchmann
 - クラウドを支えるこれからの暗号技術
+- [整数論テクニック集のpdf](https://kirika-comp.hatenablog.com/entry/2018/03/12/210446)
