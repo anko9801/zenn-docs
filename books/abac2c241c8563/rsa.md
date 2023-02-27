@@ -345,19 +345,19 @@ $N$ が 2, 3 の倍数でないとします。楕円曲線 $y^2 = x^3 + ax + b \
 計算量は準指数時間 $\mathcal{O}(\exp((1 + c)(\log p)^{1/2}(\log\log p)^{1/2}))$ らしい。
 
 ### Fermat 法
-$p, q$ の比率が大体わかっているとその周辺を調べることで素数の組を見つけられます。
+$p, q$ の比率が大体わかっているとその周辺を調べることで素数の組を見つけられます。まず $p \approx q$ のとき
 
 $$
 \begin{aligned}
-\frac{p}{q} & \approx \frac{a}{b} \\
-aq & \approx bp \\
-abN & = aq \times bp \\
-    & = (x + y)(x - y) \\
-    & = x^2 - y^2 \\
+N & = p \times q \\
+  & = (x + y)(x - y) \\
+  & = x^2 - y^2 \\
 \end{aligned}
 $$
 
-初期値を $x = \lceil\sqrt{abN}\rceil, y = 0$ として $x$ の値を1ずつ上げながら $y$ の値も上げていき、右辺と左辺の計算結果が一致したとき $p, q$ が求まるという仕掛けです。
+初期値を $x = \lceil\sqrt{N}\rceil, y = 0$ として $x$ の値を1ずつ上げながら $y$ の値も上げていき、右辺と左辺の計算結果が一致したとき $p, q$ が求まるという仕掛けです。
+
+他の比率のときは $p:q \approx a:b$ より $aq \approx bp$ となるから $abN$ に対して同様に行えばよい。
 
 ```python
 from math import floor, sqrt
@@ -451,19 +451,19 @@ http://www.factordb.com/
 RSA 暗号は素因数分解の困難性が安全性の根拠ですが、うまく実装しないと素因数分解を解かなくても攻撃が出来てしまいます。
 RSA 暗号ではこのような攻撃が発見されてきました。
 
-| アンチケース                                                              | 攻撃名                                                           | 方法                                                   |
-| --------------------------------------                                    | ---------------------------------------------------------------- | -------------------------------------------------      |
-| 公開鍵 $e$ が小さすぎてはいけない                                            | Low Public Exponent Attack                                       | 整数上の $e$ 乗根に落とし込む                        |
-| 秘密鍵 $d$ が小さすぎてはいけない            | Wiener's Attack, Boneh-Durfee Attack                             | 近似分数から見積もる, Coppersmith Method               |
-| 同一の平文を同一の $N$ 異なる $e$ で暗号化した暗号文を与えてはいけない               | Common Modulus Attack                                            | $e$ について拡張ユークリッドの互除法                   |
-| 同一の平文を異なる $N$ で暗号化した暗号文を与えてはいけない               | Håstad's Broadcast Attack                                        | 中国剰余定理                                           |
-| 同一の平文を同一の $d$ 異なる $e, N$ で暗号化した暗号文を与えてはいけない | Small Common Private Exponent Attack                             | Coppersmith Method                                     |
-| RSA-CRT にメモリ書き換えのバグがあってはならない                                               | RSA-CRT Fault Attack                                             | 秘密鍵が書き換えれると平文の差分が $p, q$ の倍数となる |
-| 特定の暗号以外の暗号文を復号した結果を知られてはならない                            | 適応的選択暗号文攻撃                                             | $a^ec$ を復号すると $am$ となる                        |
-| エラーの内容を知られてはならない                            | Bleichenbacher's Attack                                     | 二分探索など                                               |
-| 平文を部分的にでも知られてはならない                            | LSB Decryption Oracle Attack など                                    | 二分探索                                               |
-| 秘密鍵を部分的にでも知られてはならない                                    | Partial Key Exposure Attack                                      | Coppersmith Method                                     |
-| 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない          | Franklin-Reiter Related Message Attack                           | 最大公約式                                             |
+| アンチケース                                                              | 攻撃名                                 | 方法                                                   |
+| ------------------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------ |
+| 公開鍵 $e$ が小さすぎてはいけない                                         | Low Public Exponent Attack             | 整数上の $e$ 乗根に落とし込む                          |
+| 秘密鍵 $d$ が小さすぎてはいけない                                         | Wiener's Attack, Boneh-Durfee Attack   | 近似分数から見積もる, Coppersmith Method               |
+| 同一の平文を同一の $N$ 異なる $e$ で暗号化した暗号文を与えてはいけない    | Common Modulus Attack                  | $e$ について拡張ユークリッドの互除法                   |
+| 同一の平文を異なる $N$ で暗号化した暗号文を与えてはいけない               | Håstad's Broadcast Attack              | 中国剰余定理                                           |
+| 同一の平文を同一の $d$ 異なる $e, N$ で暗号化した暗号文を与えてはいけない | Small Common Private Exponent Attack   | Coppersmith Method                                     |
+| RSA-CRT にメモリ書き換えのバグがあってはならない                          | RSA-CRT Fault Attack                   | 秘密鍵が書き換えれると平文の差分が $p, q$ の倍数となる |
+| 特定の暗号以外の暗号文を復号した結果を知られてはならない                  | 適応的選択暗号文攻撃                   | $a^ec$ を復号すると $am$ となる                        |
+| エラーの内容を知られてはならない                                          | Bleichenbacher's Attack                | 二分探索など                                           |
+| 平文を部分的にでも知られてはならない                                      | LSB Decryption Oracle Attack など      | 二分探索                                               |
+| 秘密鍵を部分的にでも知られてはならない                                    | Partial Key Exposure Attack            | Coppersmith Method                                     |
+| 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない          | Franklin-Reiter Related Message Attack | 最大公約式                                             |
 
 ### $e$ が小さすぎてはいけない (Low Public Exponent Attack)
 
