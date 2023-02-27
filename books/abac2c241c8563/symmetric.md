@@ -12,10 +12,9 @@ ex.) DES, AES, ChaCha20
 
 共通鍵暗号を考えてみましょう。条件は次のようになります。
 
-1. 復号可能性 $\implies$ 全単射
+1. 復号可能 $\iff$ 暗号化する関数が全単射である
 2. 暗号文の規則性が(事実上)ない
 
-逆変換できるけれども他の人に推察されないようにシャッフルする必要があります。
 そのような方法があるのでしょうか？
 
 ### ワンタイムパッド
@@ -98,13 +97,13 @@ $E_K$
 
 :::message
 **練習問題**
-[CryptoHack の SYMMETRIC CIPHERS](https://cryptohack.org/challenges/aes/) で HOW AES WORKS の章を解いてください。
+AES を作ってみましょう。[CryptoHack](https://cryptohack.org/challenges/aes/) を見るとよさそう。
 :::
 
 ### パディング
 AES は **16 バイトごとでしか** 暗号化できません。平文の始めから 16 バイトずつ切り出して暗号化していくと最後に余るデータがあります。当然それも暗号化して送りたいので 16 バイトになるように適当なデータをくっつけて暗号化します。この操作をパディングと呼び、AES では PKCS #7 パディングという規格でパディングを行います。
 
-PKCS #7 Padding は見た方が速くて次のように余った数をそのままバイトとして余った数だけ繋げるようにします。
+PKCS #7 Padding は次のように余った数をそのままバイトに変換して余った数だけ繋げるようにします。
 
 ```
 \x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10
@@ -121,7 +120,7 @@ Sound! Euphonium\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10
 
 $P = P_1\|\cdots\|P_n$
 
-特に CTF では暗号利用モード ECB, CBC, OFB, GCM が使われます。
+特に CTF では暗号利用モード ECB, CBC, GCM が使われます。その他の暗号利用モードは Wikipedia を参照すると良いです。
 
 https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89
 
@@ -138,8 +137,8 @@ $$
 この攻撃方法としては復号することはできなくとも新しい
 
 ### AES-CBC (Cipher Block Chaining)
-最も一般的に使われるモードです。
-これ以降では鍵以外に初期ベクトル IV (Initialization Vector) を用いて暗号化します。
+Padding Oracle Attack で大きな衝撃を与えたモードです。
+ここでは鍵以外に初期ベクトル IV (Initialization Vector) を用いて暗号化します。
 
 $$
 \begin{aligned}
@@ -151,17 +150,8 @@ P_i & = E_K(C_i)\oplus C_{i-1}
 \end{aligned}
 $$
 
-### AES-OFB (Output Feedback)
-AES-ECB と同じく脆弱な例としてよく出題されます。
-
-$$
-\begin{aligned}
-  C_i & = P_i\oplus E_K^i(IV) \\
-  P_i & = C_i\oplus E_K^i(IV)
-\end{aligned}
-$$
-
 ### AES-GCM (Galois/Counter Mode)
+TLS 1.3 で使われる唯一のモードです。
 ガロア体 (有限体) 上でカウンターを回すモードです。比較的よく使われるので CTF でも頻出です。ちょっとわかりにくいですが
 
 認証という機能もあります。

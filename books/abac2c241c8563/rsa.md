@@ -405,7 +405,7 @@ def fermat(N: int, a: int = 1, b: int = 1) -> tuple[int, int]:
 
 $n$ が偶数のとき $a^{n/2}+1$ が未知の素因数の倍数となることがあります。
 
-$O((\log⁡N)^2)$
+$O((\log⁡N)^2\log\log N\log\log\log N)$
 
 ### アニーリング計算
 アニーリング計算は多変数多項式の HUBO QUBO
@@ -431,6 +431,17 @@ $$
 ### 素因数分解データベース
 素因数分解の結果をデータベースとして保管しているサイトがあります。実戦ではこれが便利です。
 http://www.factordb.com/
+
+### 共通の素因数を持つ数と $\gcd$
+何かしらの情報から脆弱性を突き、共通の素因数を取得できたら $\gcd$ すれば求まる。
+
+ここまで話したけれども実践的に CTF で使われるのは「素因数分解 DB」か「共通の素因数を持つ数と $\gcd$」くらいしかない。他の人が素因数分解すればいいし、そうでなければ脆弱な部分を突いてあげればいいからね。でもたまに他のアイデアを元に解けることもあるので網羅的に紹介しました。
+
+:::message
+練習問題
+zer0pts CTF 2022/Anti-Fermat より
+
+:::
 
 ## 攻撃
 RSA 暗号は素因数分解の困難性が安全性の根拠ですが、うまく実装しないと素因数分解を解かなくても攻撃が出来てしまいます。
@@ -955,12 +966,22 @@ Half GCD
 ### Coppersmith's Short Pad Attack
 
 二つの暗号文について平文の上位bitがnのbit数の (1-1/e2) 程度共通する場合、これらからそれぞれの平文を求めることができる。 具体的には、次のような手順となる。
+$y$ の値を代入した
 
-1.  `g1 = x^e - c1`と`g2 = (x+y)^e - c2`の[終結式（resultant）](https://ja.wikipedia.org/wiki/%E7%B5%82%E7%B5%90%E5%BC%8F)を求め、その根としてyの値を得る
-2.  yの値を代入した上でg1(x)とg2(x)の最大公約式を求め、その根としてm1を得る
-3.  `m2 = m1 + y`よりm2を得る
+$$
+\begin{aligned}
+g_1(x) & = x^e - c_1 \\
+g_2(x, y) & = (x+y)^e - c_2 \\
+\mathrm{Res}(g_1, g_2) & = \\
+\gcd(g_1(x), g_2(x)) & =
+\end{aligned}
+$$
+
+[終結式 (resultant)](https://ja.wikipedia.org/wiki/%E7%B5%82%E7%B5%90%E5%BC%8F)を求め、その根としてyの値を得る
+2. その根としてm1を得る
+3. $m_2 = m_1 + y$ より $m_2$ を得る
 多項式GCD $O(n\log^2n)$ を使う
-Franklin-Reiter Related Message Attack
+### Franklin-Reiter Related Message Attack
 
 $$
 \begin{aligned}
@@ -976,6 +997,22 @@ f_2(x) &= (x + pad_2 - pad_1)^e - c_2 \\
 x - m_1 &= \gcd(f_1, f_2) \\
 \end{aligned}
 $$
+
+```python
+def short_pad_attack(c1, c2, e, n):
+    PRxy.<x,y> = PolynomialRing(Zmod(n))
+    PRx.<xn> = PolynomialRing(Zmod(n))
+    g1 = x^e - c1
+    g2 = (x+y)^e - c2
+    h = q2.resultant(q1)
+    h = h.univariate_polynomial()
+    h = h.change_ring(PRx).subs(y=xn)
+    h = h.monic()
+    kbits = n.nbits()//(2*e*e)
+    diff = h.small_roots(X=2^kbits, beta=0.5)[0]
+```
+
+
 
 https://inaz2.hatenablog.com/entry/2016/01/20/022936
 

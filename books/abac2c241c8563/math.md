@@ -519,7 +519,7 @@ $$
 
 ### Gram-Schmidt の直交化 (GSO; Gram-Schmidt Orthonormalization)
 
-Gram-Schmidt 直交化 (GSO; Gram-Schmidt Orthonormalization) とは実 $m$ 次元ベクトル空間 $\mathbb{R}^m$ の任意の $\mathbb{R}$ ベクトル空間としての基底を直交基底に変換する方法です。 $\boldsymbol{b}_n$ の直交化は $\boldsymbol{b}_{1},\ldots, \boldsymbol{b}_{n-1}$ すべてと直交するように元の高さのまま移動させます。 GSO の Wikipedia の gif がわかりやすいです。
+Gram-Schmidt 直交化 (GSO; Gram-Schmidt Orthonormalization) とはベクトル空間 $\mathbb{R}^m$ の基底を直交基底に変換する方法です。 $\boldsymbol{b}_n$ の直交化は $\boldsymbol{b}_{1},\ldots, \boldsymbol{b}_{n-1}$ すべてと直交するように元の高さのまま移動させます。 GSO の Wikipedia の gif がわかりやすいです。
 
 > **Def. GSO ベクトル**
 > $n$ 次元格子 $L\subseteq \mathbb{R}^m$ の順序付き基底 $\{\boldsymbol{b}_{1},\ldots, \boldsymbol{b}_{n}\}$ に対する GSO ベクトル $\boldsymbol{b}_{1}^* ,\ldots, \boldsymbol{b}_{n}^ *\in\mathbb{R}^m$ を GSO 係数 $\mu_{i,j}$ を用いて次のように定義する。
@@ -673,6 +673,11 @@ $$
 
 最も簡約化されているかを証明する。
 
+:::message
+**練習問題**
+CryptoHack
+:::
+
 > **サイズ基底簡約**
 > $n$ 次元格子 $L$ の基底 $\\{\boldsymbol{b_1},\ldots,\boldsymbol{b_n}\\}$ を GSO 係数 $\mu_{i,j}$ が
 >
@@ -703,11 +708,24 @@ B = [vector([5, -3, -7]), vector([2, -7, -7]), vector([3, -10, 0])]
 print(size_reduction(B))
 ```
 
+$$
+\begin{pmatrix}
+5 & -3 & -7 \\
+2 & -7 & -7 \\
+3 & -10 & 0
+\end{pmatrix}\to
+\begin{pmatrix}
+5 & -3 & -7 \\
+2 & -7 & -7 \\
+3 & -10 & 0
+\end{pmatrix}
+$$
+
 > **LLL (Lenstra-Lenstra-Lovasz) 基底簡約**
-> Lovasz 条件を $1/4 < \delta < 1$ としたときに次を満たすこととする。
+> Lovasz 条件を $1/4 < \delta < 1$ としたときに任意の $2\leq k\leq n$ に対して次を満たすこととする。
 >
 > $$
-\forall 2\leq k\leq n\quad \delta \|\boldsymbol{b}_{k-1}^*\|^2 \leq \|\pi_{k-1}(\boldsymbol{b}_k)\|^2
+\delta \|\boldsymbol{b}_{k-1}^*\|^2 \leq \|\pi_{k-1}(\boldsymbol{b}_k)\|^2
 $$
 >
 > このとき次の 2 ステップを行えるまで繰り返す。
@@ -774,6 +792,12 @@ ax = b \pmod n
 $$
 
 Approximate GCD Problem
+$r_i \approx 2^\lambda$, $p \approx 2^{\lambda + \log\lambda}$, $q \approx 2^{\lambda\log\lambda}$
+
+$$
+x_i = q_ip + r_i
+$$
+
 :::
 
 更に $n$ 次方程式を格子問題に帰着する方法を考えます。
@@ -927,6 +951,8 @@ $$
 
 ### 終結式
 式増やしてgcd
+合成数 mod でも使える
+グレブナー基底は mod p のみ
 
 ### Gröbner 基底
 

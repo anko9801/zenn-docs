@@ -164,8 +164,7 @@ $$
 \end{aligned}
 $$
 
-ただし、$\boldsymbol{x}_k\mid\boldsymbol{x}_{k+1}$ は $\boldsymbol{x}_k$ の最上位ビットと $\boldsymbol{x}_{k+1}$ の下位 31 ビットを結合する演算、$\mathrm{LSB}(\boldsymbol{x}_{k+1})$ は $\boldsymbol{x}_{k+1}$ の最下位ビットを 32 ビットに展開する演算です。
-初期シード $\boldsymbol{x}_0$ を元に初期状態とパラメータは次のようにします。
+ただし、$\boldsymbol{x}_k\mid\boldsymbol{x}_{k+1}$ は $\boldsymbol{x}_k$ の最上位ビットと $\boldsymbol{x}_{k+1}$ の下位 31 ビットを結合する演算、$\mathrm{LSB}(\boldsymbol{x}_{k+1})$ は $\boldsymbol{x}_{k+1}$ の最下位ビットを 32 ビットに展開する演算です。パラメータと初期シード $x_0$ を元に初期状態を生成する漸化式は次のようにします。
 
 $$
 \begin{aligned}
@@ -184,9 +183,9 @@ https://www.ambionics.io/blog/php-mt-rand-prediction
 これでは乱数を予測されてしまうので暗号には使えません。暗号で使えるような DRBG はあるのでしょうか？それらを次節で紹介します。
 
 :::message
-演習
+練習問題
+CPCTF22/the luck 2 より
 Python の `random` モジュールを予測してみよう
-ヒント
 :::
 
 ### CSPRNG
