@@ -408,16 +408,21 @@ $n$ が偶数のとき $a^{n/2}+1$ が未知の素因数の倍数となること
 $O((\log⁡N)^2\log\log N\log\log\log N)$
 
 ### アニーリング計算
-アニーリング計算は多変数多項式の HUBO QUBO
+アニーリング計算は多変数多項式を最小にするような解を与えるような量子アルゴリズムである。素因数分解するアニーリング計算は素朴法と筆算法などがあり、それを紹介する。
 
-素朴法 $f(x, y) = (N - xy)^2$ の最小化を目指す。
+#### 素朴法
+多変数関数 $f(x, y) = (N - xy)^2$ の最小化を計算させる。これは次のように 2 進展開できる。
 
 $$
 \begin{aligned}
-xy & = \left(\sum_{i=0}^n 2^ix_i\right)\left(\sum_{i=0}^n 2^iy_i\right) = \sum_{i,j} 2^{i+j}x_iy_j
+xy & = \left(\sum_{i=0}^n 2^ix_i\right)\left(\sum_{i=0}^n 2^iy_i\right) = \sum_{i,j} 2^{i+j}x_iy_j \\
+(N - xy)^2 & = \sum_{i,j}2^{i+j}N_iN_j + \sum_{i,j,k} 2^{i+j+k}N_kx_iy_j + \sum_{i,j,k,l} 2^{i+j+k+l}x_iy_jx_ky_l
 \end{aligned}
 $$
 
+項数は比較的少ないが係数が大きくなりがちな方法である。
+
+#### 筆算法
 筆算法は $x, y$ を 2 進展開して筆算した形から方程式を組み立てる方法です。$i$ 桁目での $j$ 桁目への繰り上がり $z_{i,j}$ として $k$ 桁目における方程式は次のように書けます。(繰り上がりの項数は雑な評価です。)
 
 $$
@@ -438,9 +443,8 @@ http://www.factordb.com/
 ここまで話したけれども実践的に CTF で使われるのは「素因数分解 DB」か「共通の素因数を持つ数と $\gcd$」くらいしかない。他の人が素因数分解すればいいし、そうでなければ脆弱な部分を突いてあげればいいからね。でもたまに他のアイデアを元に解けることもあるので網羅的に紹介しました。
 
 :::message
-練習問題
-zer0pts CTF 2022/Anti-Fermat より
-
+**練習問題**
+- [zer0pts CTF 2022/Anti-Fermat](https://github.com/zer0pts/zer0pts-CTF-2022-Public/tree/master/crypto/anti_fermat) を解こう
 :::
 
 ## 攻撃
