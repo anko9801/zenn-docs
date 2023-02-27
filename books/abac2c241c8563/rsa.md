@@ -114,7 +114,10 @@ $$
 RFC 8017: PKCS #1 V2.2 (RSA Cryptography Specifications Version 2.2)
 
 - PKCS#1 v1.5; Public-Key Cryptography Standards#1 v1.5
+  - `0002<random>00<hashprefix><message>`
 - OAEP; Optimal Asymmetric Encryption Padding
+  - Padding Oracle Attack で破られないようなパディング形式 InD-CCA2
+  - https://inaz2.hatenablog.com/entry/2016/01/26/222303
 - PSS; Probabilistic Signature Scheme
   - 署名でよく使われる
 
@@ -282,7 +285,8 @@ $p + 1$ が Smooth number のとき有効な素因数分解法です。
 > **Prop.**
 > $k$ が $p+1$ の倍数であれば Lucas 数列 $u_i, v_i$ に対し、 $u_k$ は $p$ の倍数となる。ただし Lucas 数列は次のように定義される。
 >
-> $$
+
+$$
 \begin{aligned}
   u_0 & = 0, u_1 = 1, u_{n+1} = au_n - bu_{n-1} \\
   v_0 & = 2, v_1 = a, v_{n+1} = av_n - bv_{n-1}
@@ -692,73 +696,30 @@ $$
 
 これに対する防御方法として平文にパディングを施し、復号化した際にパディング形式が違うときは相手に渡さないようにするという方法があります。これによって正当な暗号文しか受け入れず、適応的選択暗号文攻撃を防げます。
 
-パディング形式の1つにPKCS #1 v1.5があります。
-
-`0002<random>00<hashprefix><message>`
-
-これについてパディングが合っているかどうかを相手に送ってしまうと Padding Oracle Attack で攻撃でき、PKCS #1 v1.5では200万程度送ると平文が読めてしまいます。
-
-対して Padding Oracle Attack で破られないようなパディング形式はInD-CCA2と呼びます。
-
-その1つであるOAEP(Optimal Asymmetric Encryption Padding)については次の記事を読むとよいです。
-
-https://inaz2.hatenablog.com/entry/2016/01/26/222303
-
 ### パディングによるエラー内容を知られてはいけない (Bleichenbacher's Attack)
 これは平文の一部がしられてはいけない
 
-暗号文を復号した結果の偶奇を知られてはいけない (LSB Decryption Oracle Attack)
+これについてパディングが合っているかどうかを相手に送ってしまうと Padding Oracle Attack で攻撃でき、PKCS #1 v1.5では200万程度送ると平文が読めてしまいます。
 
-全てが分かっていなくとも偶奇さえ分かれば任意の暗号文を復号できる。
-ある暗号文 $c$ に対し、$2^e$ をx回掛けた値を復号した下位1bitを得て平文を求めます。得られる下位1bitは次の関数 $f(x)$ を用いて $f(x) \bmod 2$ と表せられます。
+### 暗号文を復号した結果の偶奇を知られてはいけない (LSB Decryption Oracle Attack)
 
-$$
-\begin{aligned}
-f(x) &= \mathcal{D}(2^{ex}c \bmod N) = 2^xm \bmod N \\
-\end{aligned}
-$$
+全てが分かっていなくとも偶奇さえ分かれば任意の暗号文を復号できるという攻撃です。
 
-$x = 1$ のとき
-まず $0 \leq m < N$ であるから $f(1)$ は $2m \bmod N = 2m, 2m - N$ のどちらかとなる。また $2m$ は偶数、$N$ は奇数であるから $f(1)$ が偶数か奇数かで $2m, 2m - N$ のどちらかが分かります。すると $m$ が存在する区間が分かります。
+まず平文 $m$ に関してある範囲 $k/2^s\leq m<(k+1)/2^s$ にあるとき
 
 $$
 \begin{aligned}
-&f(1) = 2m \bmod N \\
-&
-\begin{cases}
-    f(1) \bmod 2 = 1 \Leftrightarrow f(1) = 2m - N & \Leftrightarrow \frac{N}{2} \leq m < N \\
-    f(1) \bmod 2 = 0 \Leftrightarrow f(1) = 2m & \Leftrightarrow 0 \leq m < \frac{N}{2} \\
-\end{cases}
+\mathcal{D}(2^{(s+1)e}c) & = 2^{s+1}m \bmod N \\
+& = \begin{dcases}
+2^{s+1}m - 2kN & \left(\frac{2k}{2^{s+1}}\leq m < \frac{2k+1}{2^{s+1}}\right) \\
+2^{s+1}m - (2k+1)N & \left(\frac{2k+1}{2^{s+1}}\leq m < \frac{2k+2}{2^{s+1}}\right)
+\end{dcases}
 \end{aligned}
 $$
 
-つまり $m$ は $[0, N)$ の範囲に対して最下位ビットが1のとき区間の右半分、0のとき区間の左半分だと言えます。
+となります。この上下を判別出来れば平文となり得る範囲を半分にすることができます。ここで最下位ビットについてよく見ると値の偶奇から上のとき $0$、下のとき $1$ となることがわかり、成功します。
 
-$x = 2$ のとき
-前の結果を用いて場合分けして考えると同様の考え方で次のように導けます。
-
-$$
-\begin{aligned}
-f(2) &= 2(2m \bmod N) \bmod N \\
-f(1) &= 2m - N \Rightarrow f(2) = 4m - 2N \bmod N \\
-&
-\begin{cases}
-    f(2) \bmod 2 = 1 \Leftrightarrow f(2) = 4m - 3N & \Leftrightarrow \frac{3N}{4} \leq m < N \\
-    f(2) \bmod 2 = 0 \Leftrightarrow f(2) = 4m - 2N & \Leftrightarrow \frac{N}{2} \leq m < \frac{3N}{4} \\
-\end{cases}
-\\
-f(1) &= 2m \Rightarrow f(2) = 4m \bmod N \\
-&
-\begin{cases}
-    f(2) \bmod 2 = 1 \Leftrightarrow f(2) = 4m - N & \Leftrightarrow \frac{N}{4} \leq m < \frac{N}{2} \\
-    f(2) \bmod 2 = 0 \Leftrightarrow f(2) = 4m & \Leftrightarrow 0 \leq m < \frac{N}{4} \\
-\end{cases}
-\end{aligned}
-$$
-
-つまり $m$ は $[0, N/2)$ 、 $[N/2, N)$ のそれぞれの範囲に対して最下位ビットが1のとき区間の右半分、0のとき区間の左半分だと言えます。
-
-$x \geq 3$ のときも同様に行って $m$ の値を求めることができます。
+これを $s = 0$ から始めることで平文を探し出すことができます。
 
 ### RSA-CRT にバグがあってはならない (RSA-CRT Fault Attack)
 

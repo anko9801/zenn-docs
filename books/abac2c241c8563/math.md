@@ -790,14 +790,25 @@ $$
 ax = b \pmod n
 $$
 
-Approximate GCD Problem
-$r_i \approx 2^\lambda$, $p \approx 2^{\lambda + \log\lambda}$, $q \approx 2^{\lambda\log\lambda}$
+:::
 
-$$
+> **Approximate GCD Problem**
+> $r_i \approx 2^\lambda$, $p \approx 2^{\lambda + \log\lambda}$, $q \approx 2^{\lambda\log\lambda}$
+>
+> $$
 x_i = q_ip + r_i
 $$
 
-:::
+$$
+\begin{pmatrix}
+2^{\rho+1} & x_1 & x_2 & x_3 & x_4 \\
+& -x_0 &&& \\
+&& -x_0 && \\
+&&& -x_0 & \\
+&&&& -x_0  \\
+\end{pmatrix}
+$$
+
 
 更に $n$ 次方程式を格子問題に帰着する方法を考えます。
 
