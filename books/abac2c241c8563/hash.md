@@ -126,33 +126,16 @@ CNFの入力形式 DIMACS
 
 ### BitVector
 
-| 構文 | 式 |
-|:--:|:--|
-| $a\land b$ | |
-| $\lnot a$ | |
-| $a < b$ | |
-| $a = b$ | |
-| $a[i]$ | |
-| $\sim a$ | |
-| $a\mathop{\|}b$ | |
-| $a\mathop{\&}b$ | |
-| $a \oplus b$ | |
-| $a \ll b$ | |
-| $a \gg b$ | |
-| $a + b$ | 全加算器 |
-| $a - b$ | |
-| $a \times b$ | |
-| $a / b$ | |
-| $\mathrm{ext}(a)$ | |
-| $a\circ b$ | |
-| $a[b:c]$ | |
-| $c?a:b$ | |
+それぞれの n bit 演算を論理式に落とし、 SAT に投げることで解く。
+使われる演算としては $a\land b$, $\lnot a$, $a < b$, $a = b$, $a[i]$, $\sim a$, $a\mathop{\|}b$, $a\mathop{\&}b$, $a \oplus b$, $a \ll b$, $a \gg b$, $a + b$, $a - b$, $a \times b$, $a / b$, $\mathrm{ext}(a)$, $a\circ b$, $a[b:c]$, $c?a:b$ があるので、これらを論理式に落とせることは CPU を自作したことがある人ならわかると思う。
+例えば $a + b$ なら全加算器を論理式に落とせばよい。
 
 ### 実装
-SMTソルバの入力形式 SMT-LIBv2
-
+まだ実装できてないです。
+SMTソルバの入力形式 SMT-LIBv2 を用いて
 
 ## Z3
+デファクトスタンダードな SMT ソルバです。
 私が知っている Z3 を使える言語は Python, Rust です。ラッパを書けば
 
 使えるデータ

@@ -792,13 +792,15 @@ def partial_p_lower(p_lower: int, k: int, N: int) -> int:
     roots = f.small_roots(X=2^(N.nbits()//2-k), beta=0.3)
     for x0 in roots:
         return gcd(2^k*x0 + p_lower, N)
+    return 1
 
 def partial_p_upper(p_upper: int, k: int, N: int) -> int:
     PR.<x> = PolynomialRing(Zmod(N))
     f = x + p_upper
-    beta = 0.5
-    x0 = f.small_roots(X=2^(floor(n.nbits() * (beta^2 - beta^2/7))), beta=0.3)[0]
-    return x0 + p_upper
+    roots = f.small_roots(X=2^(floor((n.nbits() / 4) * 6/7)), beta=0.3)
+    for x0 in roots:
+        return x0 + p_upper
+    return 1
 ```
 
 #### $d$ を $n/4$ ビット程度知っているとき
