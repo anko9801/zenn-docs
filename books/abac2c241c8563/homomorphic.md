@@ -97,3 +97,17 @@ $$
 
 ### TFHE
 現状で最も高速な部類に入る完全準同型暗号です。
+
+
+
+LWE をトーラス $\mathbb{T} = \mathbb{R}/\mathbb{Z}$ 上で行う TLWE
+
+LWE は次のようなものだった。
+> **LWE**
+> 体 $K$ に対して $K$ のベクトル空間
+
+$$
+b - \boldsymbol{a}\cdot\boldsymbol{s} = m + e
+$$
+
+$\mathbb{T}[X]/(X^{1024} + 1)$

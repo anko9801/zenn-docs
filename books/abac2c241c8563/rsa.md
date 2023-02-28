@@ -402,6 +402,7 @@ def fermat(N: int, a: int = 1, b: int = 1) -> tuple[int, int]:
 計算量は $\mathcal{O}(\exp((1 + c)(\log n)^{1/3}(\log\log n)^{2/3}))$ になったらいいなと思っています。
 
 ### Shor のアルゴリズム
+量子アルゴリズムについてはちょっとだけ齧っているだけなので詳しい解説は他の良い資料に任せます。
 本質的には群の位数を見つけることで素因数分解します。
 
 > **位数発見問題**
@@ -862,67 +863,6 @@ Coppersmith method を使ったより様々な攻撃を知りたければ次の�
 
 https://eprint.iacr.org/2020/1506.pdf
 
-```python
-def find_p(d0, kbits, e, n):
-    X = var('X')
-
-	# edx - kx(n-x+1) + kn = x mod 2^k
-	# (ed - 1)x - kx(n-x+1) + kn = 0 mod 2^k
-    for k in xrange(1, e+1):
-        results = solve_mod([e*d0*X - k*X*(n-X+1) + k*n == X], 2^kbits)
-        for x in results:
-            p0 = ZZ(x[0])
-            p = partial_p(p0, kbits, n)
-            if p:
-                return p
-
-
-if __name__ == '__main__':
-    n = 0x00bef498e6eb2cffe71312da47ab89d2c47db7438ea2cfa992ddddbc2a01978001fc51e286e6ebf028396cdb8b3323c60e6b9d50cd84187cf7f48e3875a2f0890f70b02333ad89db2923863ce146562286f63fb0a1d0198e3a6862ba5ac12e85a5c6d0d27cb1c81bdf69cc5bc95b8001a2f744517f9437b4ddd5a076fc0e9a5de1a7a268c40f31aa29e8dc27c0b3a182299ca7a9335b4bd4585452f6107c238e486c98dd73a5f9862e9e80b152f53381c72f897107551c281259ac3ee32c4b4f46cc03127d1bf699acd0266f3c6729253c70da0c69b1560fa172735709866b375b6eba294e1ce8b46fba798ba380080b4bf9603998cac199d9cd46e30ae8da9e7f
-    e = 3
-    d = 0x7f4dbb449cc8aa9a0cb73c2fc7b1372da924d7b46c8a710c93e9281c010faaabfd8bec59ef47f5702648925cccc284099d138b33ad65a8a54db425a3c1f5b0b4f5cac22273b13cc617aed340d98ec1af4ed5206be011097c459726e72b7459192f35e1a8768567ea46883d30e7aaabc1fa2d8baa62cfcde93915a4a809bc3e9547bb07e1ecca16e51078312e89f0561e31b55db8b0ea5bc87a6ca7464a3d7c28a68c60e2ba88fe6a7d2b300d723e549910a987da89fc0a1c0de197a3d62c501b1f0e819891b1c32a0d6c233f2a285df87bb9e5c6c72d983ff3e706696bba639f573f9c3646968f02f3a615a438e20bb7c38d53621079f2899547a95350f3abeb
-
-    beta = 0.5
-    epsilon = beta^2/7
-
-    nbits = n.nbits()
-    kbits = floor(nbits*(beta^2+epsilon))
-    d0 = d & (2^kbits-1)
-    print "lower %d bits (of %d bits) is given" % (kbits, nbits)
-
-    p = find_p(d0, kbits, e, n)
-    print "found p: %d" % p
-    q = n//p
-    print d
-    print inverse_mod(e, (p-1)*(q-1))
-```
-
-```python
-from Crypto.Util.number import *
-
-p = getPrime(512)
-q = getPrime(512)
-n = p * q
-e = 3
-
-beta = 0.5
-epsilon = beta^2/7
-
-pbits = p.nbits()
-kbits = floor(n.nbits() * (beta^2 - epsilon))
-# p upper
-pbar = p & (2^pbits - 2^kbits)
-
-print(f"upper {pbits - kbits} bits (of {pbits} bits) is given")
-
-PR.<x> = PolynomialRing(Zmod(n))
-f = x + pbar
-
-print(p)
-x0 = f.small_roots(X=2^kbits, beta=0.3)[0]
-print(x0 + pbar)
-```
-
 ### 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない (Franklin-Reiter Related Message Attack)
 
 $f(m_1) = m_2$
@@ -952,10 +892,24 @@ g_2(x, y) & = (x+y)^e - c_2 \\
 \end{aligned}
 $$
 
-[終結式 (resultant)](https://ja.wikipedia.org/wiki/%E7%B5%82%E7%B5%90%E5%BC%8F)を求め、その根としてyの値を得る
+1. [終結式 (resultant)](https://ja.wikipedia.org/wiki/%E7%B5%82%E7%B5%90%E5%BC%8F)を求め、その根としてyの値を得る
 2. その根としてm1を得る
 3. $m_2 = m_1 + y$ より $m_2$ を得る
 多項式GCD $O(n\log^2n)$ を使う
+
+```python
+def short_pad_attack(c1, c2, e, n):
+    PRxy.<x,y> = PolynomialRing(Zmod(n))
+    PRx.<xn> = PolynomialRing(Zmod(n))
+    g1 = x^e - c1
+    g2 = (x+y)^e - c2
+    h = q2.resultant(q1)
+    h = h.univariate_polynomial()
+    h = h.change_ring(PRx).subs(y=xn)
+    h = h.monic()
+    kbits = n.nbits()//(2*e*e)
+    diff = h.small_roots(X=2^kbits, beta=0.5)[0]
+```
 ### Franklin-Reiter Related Message Attack
 
 $$
@@ -972,20 +926,6 @@ f_2(x) &= (x + pad_2 - pad_1)^e - c_2 \\
 x - m_1 &= \gcd(f_1, f_2) \\
 \end{aligned}
 $$
-
-```python
-def short_pad_attack(c1, c2, e, n):
-    PRxy.<x,y> = PolynomialRing(Zmod(n))
-    PRx.<xn> = PolynomialRing(Zmod(n))
-    g1 = x^e - c1
-    g2 = (x+y)^e - c2
-    h = q2.resultant(q1)
-    h = h.univariate_polynomial()
-    h = h.change_ring(PRx).subs(y=xn)
-    h = h.monic()
-    kbits = n.nbits()//(2*e*e)
-    diff = h.small_roots(X=2^kbits, beta=0.5)[0]
-```
 
 
 
