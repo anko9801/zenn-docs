@@ -39,13 +39,21 @@ LLL 基底簡約は
 BKZ を応用したさらなる基底簡約アルゴリズムは BKZ2.0, RSR, G6K などがあります。参考に元論文を置いておきます。
 
 ### 最近ベクトル問題 (Closest Vector Problem)
-SVP は原点に最も近い格子点を求める問題でしたが CVP は任意の点に対して最も近い格子点を求める問題となります。
+SVP は原点に最も近い格子点を求める問題でしたが CVP はある点に最も近い格子点を求める問題です。
 
 > **Def. CVP; Closest Vector Problem**
+> CVP とは目標ベクトル $\boldsymbol{w}$ (格子点である必要はない) に対して格子上の最近ベクトル $\boldsymbol{v}$ を求める問題である。
+
+これを解く代表的な方法に Babai’s nearest plane algorithm があります。
+
+> **Babai’s nearest plane algorithm**
 >
 
-- (near) SVP
-- (near) CVP
+$$
+\begin{aligned}
+  w = \sum a_ib_i
+\end{aligned}
+$$
 
 > **Kannan's embedding method**
 > CVP の目標ベクトル $w$ と解ベクトル $v$ の差 $e = w - v$ のノルムについて $\|e\| < \lambda_1/2$ が成り立つとき SVP を解くことで求まる。
@@ -57,14 +65,7 @@ $$
 \end{pmatrix}
 $$
 
-> **Babai’s Algorithm**
-
-$$
-\begin{aligned}
-  w = \sum a_ib_i
-\end{aligned}
-$$
-
+このような格子の分野において求解困難な問題はたくさんあり、これを用いた暗号はたくさんあります。その中で CVP を用いる暗号を LWE (Learning With Error) 暗号と言ったりします。
 
 ### LWE格子暗号
 
@@ -73,11 +74,25 @@ $$
 > **LWE 問題**
 >
 
+多項式環の剰余環 $R = \mathbb{Z}[x]/(x^n+1)$、$R_p = \mathbb{F}_p[x]/(x^n+1)$ とおきます。
+
+
 ### CRYSTALS-KYBER
+
+鍵生成
+1. 乱数 $\rho, \sigma$ を生成する
+2. $\boldsymbol{A}\sim R_q^{k\times k} = Sam(\rho)$
+3. $(\boldsymbol{s}, \boldsymbol{e}) \sim \beta_\eta^k\times\beta_\eta^k = Sam(\sigma)$
+4. $\boldsymbol{t} = Compress_q(\boldsymbol{A}\boldsymbol{s} + \boldsymbol{e}, d_t)$
+5. $\boldsymbol{t}, \rho$ を公開鍵、$\boldsymbol{s}$ を秘密鍵とする
+
+暗号化
+1. 乱数 $r$ を生成する
+2. $\boldsymbol{t}$
 
 ### NTRU
 CRYSTALS と引き合いとして出されるのが NTT が開発した NTRU 暗号です。
-簡略化の為、多項式環の剰余環 $R = \mathbb{Z}[x]/(x^n-1)$、$R_p = \mathbb{F}_p[x]/(x^n-1)$ とおきます。
+簡略化の為、
 
 > **Def. Ternary Polynomials**
 > 係数が $\pm 1$ の多項式の集合である。具体的には $\mathcal{T}(d_{+1}, d_{-1})$ を $d_{+1}$ 個の $+1$ 係数と $d_{-1}$ 個の $-1$ 係数のある多項式の集合とする。
