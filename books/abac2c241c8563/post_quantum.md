@@ -124,14 +124,15 @@ $$
 
 暗号化
 平文 $m$ を用いて
-1. $\boldsymbol{t} = \mathrm{Decompress}_q(\boldsymbol{t}, d_t), \boldsymbol{A}, \boldsymbol{r}, \boldsymbol{e}_1, e_2$ を生成する
-2. $\boldsymbol{u} = \mathrm{Compress}_q(\boldsymbol{A}^T\boldsymbol{r} + \boldsymbol{e}_1, d_u)$
-3. $v = \mathrm{Compress}_q(\boldsymbol{t}^T\boldsymbol{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m, d_v)$
-4. $c = (\boldsymbol{u}, v)$ を暗号文として返す
+1. $\boldsymbol{A}, \boldsymbol{r}, \boldsymbol{e}_1, e_2$ を生成する
+2. $\boldsymbol{t} = \mathrm{Decompress}_q(\boldsymbol{t}, d_t)$
+3. $\boldsymbol{u} = \mathrm{Compress}_q(\boldsymbol{A}^T\boldsymbol{r} + \boldsymbol{e}_1, d_u)$
+4. $v = \mathrm{Compress}_q(\boldsymbol{t}^T\boldsymbol{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m, d_v)$
+5. $c = (\boldsymbol{u}, v)$ を暗号文として返す
 
 復号
 1. $\boldsymbol{u} = \mathrm{Decompress}_q(\boldsymbol{u}, d_u)$
-2. $v = \mathrm{Decompress}_q(v, d_u)$
+2. $v = \mathrm{Decompress}_q(v, d_v)$
 3. $\mathrm{Compress}_q(v - \boldsymbol{s}^T\boldsymbol{u}, 1)$ を平文として返す
 
 
