@@ -24,6 +24,8 @@ https://csrc.nist.gov/Projects/post-quantum-cryptography/post-quantum-cryptograp
 
 ## 格子暗号
 
+耐量子暗号の中では有力ですが耐量子性は明解ではないです。
+
 第三章で基底簡約することにより SVP が解き易くなるということで LLL 基底簡約アルゴリズムまでやりましたが、暗号で使われる問題である CVP を解く為にはより強い基底簡約が必要です。まずはそれらを紹介し CVP の解き方、LWE 格子暗号とその派生について学びます。
 
 ### LLL 基底簡約のその先へ
@@ -209,10 +211,25 @@ E = EllipticCurve(x^3 + 6*x^2 + x)
 ```
 
 ## 多変数多項式暗号 (Multivariate polynomial cryptography)
+とても短いが安全性は格子暗号に比べて低め
 
 
 ## ハッシュ関数署名 (Hash-based signature)
-SPHINCS+
+ハッシュ値を用いるだけの退屈な署名です。1979 年の Lamport 署名について
+
+### Lamport 署名
+Constructing Digital Signatures from a One Way Function
+1 ビットごとに署名します
+
+1. 秘密鍵 $s_0, s_1$ を生成し、公開鍵 $p_i = H(s_i)$ を計算します
+2. 1 ビットのメッセージ $m$ を用いて $s_m$ を署名として公開します
+3. $p_m = H(s_m)$ となることを確認して検証します
+
+非常にシンプルですが署名として使えるものであることはわかると思います。しかしこれだとあまりに大量のメモリを使わないといけません。これを短い公開鍵で大量のメッセージを署名できるように改良するには Merkle が提案した二分木の一種 Merkle 木を使います。
+
+### SPHINCS+
+randomized tree-based stateless signature
+
 
 ## 参考文献
 - Post-Quantum Cryptography
