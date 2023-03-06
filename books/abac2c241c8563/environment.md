@@ -46,14 +46,17 @@ sudo apt-get install sagemath
 load('coppersmith.sage')
 
 # 整数環, 剰余環, 有限体
-ZZ, Zmod(N), GF(q)
+ZZ
+QQ
+Zmod(N)
+GF(q)
 
 R = GF(2^m)
 R.fetch_int(12)
 # 多項式
 R = Zmod(N)
-P. < x, y > = PolynomialRing(R)
-f = x ^ 2 + 3*x + 3
+P.<x, y> = PolynomialRing(R)
+f = x^2 + 3*x + 3
 f.small_roots()
 p /= p.leading_coefficient()  # 最高次項 モニック化
 p = p.monic()
@@ -63,11 +66,14 @@ crt(remain_list, modulo_list)
 b.nth_root(3)
 
 # 行列
-M = matrix(QQ, [[1, 2], [3, 4]])
+M = matrix(QQ, [
+    [1, 2],
+    [3, 4]
+])
 M.LLL()
 
 A = matrix(Zn, [
-    [_a, _b, _c, _d, _e],
+    [a, b, c, d, e],
     [1, 0, 0, 0, 0],
     [0, 1, 0, 0, 0],
     [0, 0, 1, 0, 0],
