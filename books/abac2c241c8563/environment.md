@@ -2,52 +2,44 @@
 title: "環境構築"
 ---
 
-Python
-asdf でバージョン管理
+## Python
+まずはバージョン管理マネージャー asdf を入れます。以下のリンクを読んで asdf のインストールをしてください。
 
+https://asdf-vm.com/guide/getting-started.html
+
+それでは Python
 
 ```shell
 asdf plugin-add python
-```
-
-```shell
-export ASDF_PYTHON_PATCH_URL="https://github.com/python/cpython/commit/8ea6353.patch?full_index=1"
-asdf install python 3.6.12
-```
-
-```shell
-asdf global python 3.6.2 2.7.13
-```
-
-```shell
-python -V
-Python 3.6.2
-
-python3 -V
-Python 3.6.2
-
-python2 -V
-Python 2.7.13
-```
-
-```shell
+asdf list-all python
+asdf install python 3.11.2
+asdf install python 2.7.18
+asdf global python 3.11.2 2.7.18
 asdf reshim
 ```
 
-pylance
-Ruff
-
-- `ruff`
-- `PyCryptodome`
-- `gmpy2`
-- `pwntools`
-- `z3`
-
+```shell
+$ python -V
+Python 3.11.2
+$ python3 -V
+Python 3.11.2
+$ python2 -V
+Python 2.7.18
 ```
+
+linter などは
+- Pylance
+- Ruff
+
+```shell
 pip install pycryptodome gmpy2 pwntools z3
 ```
 
 ## SageMath
+
+```shell
+sudo apt-get install sagemath
+```
 
 ```python
 # import
