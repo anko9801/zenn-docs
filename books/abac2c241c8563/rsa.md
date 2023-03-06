@@ -865,6 +865,8 @@ https://eprint.iacr.org/2020/1506.pdf
 
 ### 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない (Franklin-Reiter Related Message Attack)
 
+Approximate GCD Problem を用いて
+
 $f(m_1) = m_2$
 $m_1 = pad_1 + m, m_2 = pad_2 + m, m_2 = m_1 + (pad_2 - pad_1)$
 

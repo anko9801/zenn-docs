@@ -104,7 +104,7 @@ LWE をトーラス $\mathbb{T} = \mathbb{R}/\mathbb{Z}$ 上で行う TLWE
 
 LWE は次のようなものだった。
 > **LWE**
-> 体 $K$ に対して $K$ のベクトル空間
+> 環 $R$ に対して $GL_n(R)$ のベクトル空間
 
 $$
 b - \boldsymbol{a}\cdot\boldsymbol{s} = m + e

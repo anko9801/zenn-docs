@@ -83,6 +83,8 @@ $$
 A\boldsymbol{s} + \boldsymbol{e} = \boldsymbol{b}
 $$
 
+LWE 問題にはさまざまな派生があります。その中で最も有名な3つが次です。
+
 ```mermaid
 flowchart LR
     id0(LWE 問題) --> id1(Ring-LWE 問題) --> id2(Module-LWE 問題)
@@ -115,8 +117,28 @@ $$
 
 多項式同士の積で畳み込みを計算するので数論変換 NTT; Number Theoretic Transform を用いると $\mathcal{O}(n\log n)$ と高速に計算できる。
 
-### CRYSTALS-KYBER
+また LWE ではデータ圧縮をよく行う。$d < \lceil\log_2(q)\rceil$ として $\mathbb{Z}/q\mathbb{Z}\to\lbrace 0,\ldots,2^d-1\rbrace$ と圧縮し、次のような性質を満たす。
 
+$$
+\begin{aligned}
+& x' = \mathrm{Decompress}_q(\mathrm{Compress}_q(x, d), d) \\
+& |x' - x\bmod q|\leq\lceil q/2^{d+1}\rfloor
+\end{aligned}
+$$
+
+つまり圧縮解凍をしたときの誤差が小さければ LWE の誤差に乗せることができるという意味です。
+次のように定義すると上記性質を満たす。
+
+$$
+\begin{aligned}
+\mathrm{Compress}_q(x, d) & = \lceil(2^d/q)x\rfloor \bmod q \\
+\mathrm{Decompress}_q(x, d) & = \lceil(q/2^d)x\rfloor
+\end{aligned}
+$$
+
+また $R_q$ であれば各要素に対して圧縮を行う。
+
+### CRYSTALS-KYBER
 
 鍵生成
 1. 256 ビットの乱数を用いて $\boldsymbol{A}, \boldsymbol{s}, \boldsymbol{e}$ を生成し、$\boldsymbol{t} = \mathrm{Compress}_q(\boldsymbol{A}\boldsymbol{s} + \boldsymbol{e}, d_t)$ を計算する
@@ -135,8 +157,6 @@ $$
 2. $v = \mathrm{Decompress}_q(v, d_v)$
 3. $\mathrm{Compress}_q(v - \boldsymbol{s}^T\boldsymbol{u}, 1)$ を平文として返す
 
-
-
 ### NTRU
 CRYSTALS と引き合いとして出されるのが NTT が開発した NTRU 暗号です。
 簡略化の為、$R = \mathbb{Z}[x]/(x^n+1)$
@@ -147,25 +167,22 @@ CRYSTALS と引き合いとして出されるのが NTT が開発した NTRU 暗
 $$
 \begin{aligned}
 f(x) & = 1+3x+4x^2+5x^3+2x^5 \in R_p \\
-Lift(f) & = 1+3x−3x^2−2x^3+2x^5 \in R
+\mathrm{Lift}(f) & = 1+3x−3x^2−2x^3+2x^5 \in R
 \end{aligned}
 $$
 
-
 鍵生成
 1. $f\in\mathcal{T}(d+1, d)$, $g\in\mathcal{T}(d, d)$
-2. $F_p = f^{-1}\in R_p, F_q = f^{-1}\in R_q$
-3. $h = F_q\circ g$
+3. $h = (f^{-1} \bmod q)g$
 
 暗号化
 1. $m \in R_p$ を Center lift する
-2. 乱数 $r\in\mathcal{T}(d, d)$
-3. $e = pr\circ h + m \pmod q$
-4. $e$ を送る
+2. $r\in\mathcal{T}(d, d)$
+3. $e = prh + m \pmod q$ を返す
 
 復号
-1. $a = f\circ e\pmod q$ の Center lift をする
-2. $m = F_p\circ a\pmod p$
+1. $a = fe\pmod q$ の Center lift をする
+2. $m = a(f^{-1}\bmod p)\pmod p$
 
 環とイデアルで割った部分環について何らかの方法で持ち上げることができるとき暗号を構成できる
 
