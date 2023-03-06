@@ -95,7 +95,7 @@ A = matrix(Zn, [
 b11, b12, b13, b14, b15 = map(int, (A ^ e)[4])
 
 D, P = m.eigenmatrix_left()
-P ^ (-1)*D*P == m
+P^(-1)*D*P == m
 
 Q = diagonal_matrix(weights)
 
