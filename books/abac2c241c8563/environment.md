@@ -45,20 +45,21 @@ sudo apt-get install sagemath
 # import
 load('coppersmith.sage')
 
-# 整数環, 剰余環, 有限体
-# FiniteField Galois Field
+# 環
 ZZ
-QQ
 Zmod(N)
+QQ
+RR
+
+# 有限体 FiniteField Galois Field
 GF(q)
 GF(p).primitive_element()
 F = GF(13)
 F(9) * 200 == 9
-
 R = GF(2^m)
 R.fetch_int(12)
 
-# 多項式 PolynomialRing
+# 多項式 Polynomial Ring
 R = Zmod(N)
 P.<x, y> = PolynomialRing(R)
 f = x^2 + 3*x + 3
@@ -67,7 +68,7 @@ p /= p.leading_coefficient()  # 最高次項 モニック化
 p = p.monic()
 ideal(f).groebner_basis()
 
-# 剰余環 (QuotientRing)
+# 剰余環 Quotient Ring
 PR.<x> = PolynomialRing(GF(2))
 QR.<x> = PR.quotient(x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8 + x^7 + x^5 + x^4 + x^2 + x^ + 1)
 
@@ -108,7 +109,7 @@ set(factor(n))
 EllipticCurve()
 ```
 
-整数変数連立方程式を解く時はsageよりもこっちのほうが早く出来たりする（なぜかSageは`assume(x, 'integer')`を無視するんだよね
+整数変数連立方程式を解く時はsageよりもsympyのほうが早く出来たりする（なぜかSageは`assume(x, 'integer')`を無視するんだよね
 
 ```python
 from sympy.solvers import solve
