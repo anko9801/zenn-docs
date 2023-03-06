@@ -46,10 +46,11 @@ sudo apt-get install sagemath
 load('coppersmith.sage')
 
 # 環
-ZZ
-Zmod(N)
-QQ
-RR
+ZZ # 整数環 Z
+Zmod(N) # 剰余環 Z/NZ
+QQ # 有理数体 Q
+RR # 実数体 R
+CC # 複素数体 C
 
 # 有限体 FiniteField Galois Field
 GF(q)
