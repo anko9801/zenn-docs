@@ -2,31 +2,41 @@
 title: "耐量子暗号"
 ---
 
-NIST による選考
+量子コンピュータにより DLP や素因数分解問題は Shor のアルゴリズムを用いて多項式時間で計算出来ることがわかりました。これにより従来多く用いられてきた公開鍵暗号である RSA 暗号や楕円曲線暗号は量子コンピュータによって解かれてしまいます。その為量子コンピュータに解かれないような暗号: 耐量子暗号を開発する必要が出てきました。
+
+耐量子暗号の仕組みや攻撃について紹介します。ただなぜ量子コンピュータで解かれないのかについてはよく分かっていないのでお答え出来ません。ここらへんについて詳しい方がいたらご教授頂きたいです。
+
+## Post-Quantum Cryptography Standardization
+耐量子暗号は英語で Post-Quantum Cryptography 略して PQC といいます。
+
+NIST は全世界から PQC 標準化候補の方式を募集し、選考、標準規格の作成を行っています。
 
 https://csrc.nist.gov/Projects/post-quantum-cryptography/post-quantum-cryptography-standardization
+
+応募された方式は大きく 5 種類の暗号に分類できます。
 
 - 格子暗号 (Lattice-based cryptography)
 - 符号暗号 (Code-based cryptography)
 - 同種写像暗号 (Isogeny-based cryptography)
 - 多変数多項式暗号 (Multivariate polynomial cryptography)
+  - 鍵自体やアルゴリズムはとても短いですが安全性は格子暗号に比べて低いらしく選考に外されたようです。これを紹介するか迷ってます。
 - ハッシュ関数署名 (Hash-based signature)
 
-現在 (2023/3/5) は NIST PQC 第 3 ラウンドが終了し、最終第 4 ラウンドの候補として次が挙げられています。
+現在 (2023/3/8) は NIST PQC Standarization の第 3 ラウンドが終了し、最終第 4 ラウンドの候補として次が挙げられています。
 
 | 公開鍵暗号/鍵共有 | 署名 |
 | :---- | :--- |
 | CRYSTALS-KYBER (格子暗号) <br> BIKE (符号暗号) <br> Classic McElience (符号暗号) <br> HQC (符号暗号) <br> SIKE (同種写像暗号) | CRYSTALS-Dilithium (格子暗号) <br> FALCON (格子暗号) <br> SPHINCS+ (ハッシュ関数署名) |
 
-私もすべて理解している訳ではないので知っていることだけを紹介します。
-
-> なんでもは知らないわよ。知っていることだけ。
+今回はこれらの紹介をしていきたいと思います。
 
 ## 格子暗号
 
 耐量子暗号の中では有力ですが耐量子性は明解ではないです。
 
-第三章で基底簡約することにより SVP が解き易くなるということで LLL 基底簡約アルゴリズムまでやりましたが、暗号で使われる問題である CVP を解く為にはより強い基底簡約が必要です。まずはそれらを紹介し CVP の解き方、LWE 格子暗号とその派生について学びます。
+SVP, CVP, SIS 問題, LWE 問題, LWR 問題など実にさまざまな計算困難な問題があり、それに対応する暗号がありますが、今回は耐量子暗号や完全準同型暗号でよく使われる LWE 問題に絞って紹介します。
+
+第三章で基底簡約することにより SVP が解き易くなるということで LLL 基底簡約アルゴリズムまでやりましたが、LWE 問題の基礎である CVP を解く為にはより強い基底簡約が必要です。まずはそれらを紹介し CVP の解き方、LWE 格子暗号とその派生について学びます。
 
 ### LLL 基底簡約のその先へ
 
@@ -189,18 +199,30 @@ $$
 環とイデアルで割った部分環について何らかの方法で持ち上げることができるとき暗号を構成できる
 
 ## 符号暗号
-### BIKE
+現段階では符号の SDP; Syndrome Decoding Problem の計算困難性を利用した暗号が主要なようです。
+
+> **SDP; Syndrome Decoding Problem**
+> 正数 $n, k\leq n, w\leq n$ とし、パリティチェック行列 $\boldsymbol{H}\in\mathbb{F}_2^{(n-k)\times n}$ と Syndrome ベクトル $\boldsymbol{s}\in\mathbb{F}_2^{n-k}$ に対して $\boldsymbol{He}^T = \boldsymbol{s}^T$ となるハミング重みが $w$ 以下のベクトル $\boldsymbol{e}\in\mathbb{F}_2^n$ を見つける。
+
+それぞれの暗号は使う符号が異なります。逆に言えばそれぞれの暗号の違いはほぼそれくらいです。
+
+| 暗号 | 符号 | 安全性 | 開発組織 |
+| :-- | :-- | :-- | :-- |
+| BIKE | QC-MDPC 符号 | IND-CPA | Intel |
+| Classic McElience | Goppa 符号 | IND-CCA | TU Eindhoven |
+| HQC | Quasi-Cyclic 符号 | IND-CCA | University of Limoges |
 
 ## 同種写像暗号
 超特異同種写像ディフィー・ヘルマン鍵共有 (SIDH / SIKE)
 CSIDH
+現在 SIKE しかありませんが攻撃が見つかっている為選考に残るのは難しいです。
 
 ### SIKE
 $p = w_A^{e_A}w_b^{e_B}f \pm 1$
 $\mathbb{F}_{p^2}$ 上の超特異楕円曲線 $E$
 位数 $w_A^{e_A}$ である点 $P_A, Q_A$ と位数 $w_B^{e_B}$ である点 $P_B, Q_B$
 
-$p = 2^{e_2}3^{e_3} - 1$ ｔ $2^{e_2}\approx 3^{e_3}$ $\#E = (p + 1)^2$
+$p = 2^{e_2}3^{e_3} - 1$ $2^{e_2}\approx 3^{e_3}$ $\#E = (p + 1)^2$
 $2^{e_2}$-ねじれ群 $E_0[2^{e_2}]$ $E_0[3^{e_3}]$
 
 $$
@@ -225,9 +247,6 @@ E = EllipticCurve(x^3 + 6*x^2 + x)
 ### SIKE への攻撃
 
 https://eprint.iacr.org/2022/975
-
-## 多変数多項式暗号 (Multivariate polynomial cryptography)
-とても短いが安全性は格子暗号に比べて低め
 
 
 ## ハッシュ関数署名 (Hash-based signature)
