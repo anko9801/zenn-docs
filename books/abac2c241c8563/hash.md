@@ -16,6 +16,10 @@ HMAC (Hash-based MAC)
 
 CRC
 
+耐量子性
+Grover's algorithm: $2^{K}\to 2^{K/2}$
+鍵長を倍の長さにすることで同じセキュリティを担保できる。
+
 ### Merkle-Damgård construction
 4ブロックごとに処理する
 ![](/images/length_extension.png)

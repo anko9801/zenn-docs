@@ -200,15 +200,31 @@ $p = w_A^{e_A}w_b^{e_B}f \pm 1$
 $\mathbb{F}_{p^2}$ 上の超特異楕円曲線 $E$
 位数 $w_A^{e_A}$ である点 $P_A, Q_A$ と位数 $w_B^{e_B}$ である点 $P_B, Q_B$
 
+$p = 2^{e_2}3^{e_3} - 1$ ｔ $2^{e_2}\approx 3^{e_3}$ $\#E = (p + 1)^2$
+$2^{e_2}$-ねじれ群 $E_0[2^{e_2}]$ $E_0[3^{e_3}]$
+
+$$
+y^2 = x^3 + x
+y^2 = x^3 + 6x^2 + x
+$$
+
 ```python
-a = 110
-b = 67
-p = 2^a*3^b - 1
+# SIKEp377
+p = 2^191 * 3^117 - 1
+# SIKEp546
+p = 2^273 * 3^172 - 1
+# SIKEp697
+p = 2^356 * 3^215 - 1
+
 Fp2<I> = GF(p, 2)
-assert I^2 eq -1
+assert I^2 == -1
 R<x> = PolynomialRing(Fp2)
 E = EllipticCurve(x^3 + 6*x^2 + x)
 ```
+
+### SIKE への攻撃
+
+https://eprint.iacr.org/2022/975
 
 ## 多変数多項式暗号 (Multivariate polynomial cryptography)
 とても短いが安全性は格子暗号に比べて低め

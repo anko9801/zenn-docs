@@ -2,6 +2,10 @@
 title: "暗号プロトコル"
 ---
 
+## 性質
+耐量子性
+準同型性
+
 - 選択平文攻撃 (Chosen-plaintext attack; CPA)
 - 適応的選択平文攻撃 (Adaptive chosen-plaintext attack; CPA2)
 - 選択暗号文攻撃 (Chosen-ciphertext attack; CCA1)
@@ -130,6 +134,7 @@ SoloKey, Nitrokey
 
 
 ## サービス
+マイナンバーカード
 コンテナイメージの署名 Sigstore
 
 ## 参考文献

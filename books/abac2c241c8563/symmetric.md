@@ -219,11 +219,11 @@ Padding Oracle Attackでは最後の1文字総当り時に全く同じとき例�
 
 ### Integral Cryptanalysis
 ### Differencial cryptanalysis
-これはハッシュ関数の実装に踏み込む手法である. スケッチとしては何かしらのパラメータが同じなどの特殊な場合のとき, 簡約化ができ, 単純な算術演算による条件式をいくつか生成できる. これを SMT で解くらしい.
+これはハッシュ関数の実装に踏み込む手法です。条件式を立てて SMT で解きます。詳細は「ハッシュとSMT」で紹介します。
 
+耐量子性
 Grover's algorithm: $2^{K}\to 2^{K/2}$
 鍵長を倍の長さにすることで同じセキュリティを担保できる。
-
 ## Stream cipher
 ### ChaCha20-Poly1305
 
