@@ -199,10 +199,15 @@ $$
 環とイデアルで割った部分環について何らかの方法で持ち上げることができるとき暗号を構成できる
 
 ## 符号暗号
-現段階では符号の SDP; Syndrome Decoding Problem の計算困難性を利用した暗号が主要なようです。
+符号理論にも様々な計算困難な問題がありますが、候補は Syndrome Decoding Problem の計算困難性を利用した暗号が主要です。
 
 > **SDP; Syndrome Decoding Problem**
-> 符号長 $n$ と次元 $k$ をパリティチェック行列 $\boldsymbol{H}\in\mathbb{F}_2^{(n-k)\times n}$ と Syndrome ベクトル $\boldsymbol{s}\in\mathbb{F}_2^{n-k}$ に対して $\boldsymbol{He}^T = \boldsymbol{s}^T$ となるハミング重みが $w$ 以下のベクトル $\boldsymbol{e}\in\mathbb{F}_2^n$ を見つける。
+> SDP とは符号長 $n$ として次元 $k$ をパリティ検査行列 $\boldsymbol{H}\in\mathbb{F}_2^{(n-k)\times n}$ とシンドローム $\boldsymbol{s}\in\mathbb{F}_2^{n-k}$ に対して $\boldsymbol{eH}^T = \boldsymbol{s}$ となるハミング重みが $w$ の $\boldsymbol{e}\in\mathbb{F}_2^n$ を求める問題である。
+
+つまり $1$ が $w$ 個、$0$ が $n-w$ 個ある符号でパリティチェックすると $\boldsymbol{s}$ となるような $\boldsymbol{e}$ を求める問題です。
+
+TODO:
+これがなぜ暗号となるのか？
 
 それぞれの暗号は使う符号が異なります。逆に言えばそれぞれの暗号の違いはほぼそれくらいです。
 
@@ -226,8 +231,9 @@ $p = 2^{e_2}3^{e_3} - 1$ $2^{e_2}\approx 3^{e_3}$ $\#E = (p + 1)^2$
 $2^{e_2}$-ねじれ群 $E_0[2^{e_2}]$ $E_0[3^{e_3}]$
 
 $$
-y^2 = x^3 + x
-y^2 = x^3 + 6x^2 + x
+\begin{aligned}
+y^2 & = x^3 + x & y^2 & = x^3 + 6x^2 + x
+\end{aligned}
 $$
 
 ```python
