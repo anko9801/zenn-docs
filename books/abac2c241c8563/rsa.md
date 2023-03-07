@@ -722,6 +722,13 @@ $$
 
 この判別を $s = 0$ から始めることで平文を探し出すことができます。
 
+:::message
+**演習問題**
+1. 異なる $N$ について平文の最下位ビットがわかるときはどうすればよいか (InCTF waRSAw より)
+https://github.com/ashutosh1206/Crypton/tree/master/RSA-encryption/Attack-LSBit-Oracle-variant
+2. 平文の $\bmod 3$ がわかるときはどうすればよいか (BambooFox 2019 Oracle より)
+:::
+
 ### RSA-CRT にバグがあってはならない (RSA-CRT Fault Attack)
 
 RSAの復号をする際に $c^d$ を計算しますが、 $d = e^{-1} \pmod {\phi (N)}$ は比較的大きいので処理が重くなります。これに対してRSA-CRTは中国剰余定理(CRT)を利用して高速化を図っています。
@@ -767,9 +774,11 @@ $$
 秘密鍵を部分的に知っていさえいれば、Coppersmith Method を用いて解けてしまう。
 $n$ を $N$ のビット数とする。
 
+```
 small_roots(X, beta)
 X: 解の最大値
 beta: factor >= n^beta
+```
 
 #### $p, q$ のどちらかを $n/4$ ビット程度知っているとき
 
@@ -882,7 +891,7 @@ Half GCD
 
 ### Coppersmith's Short Pad Attack
 
-二つの暗号文について平文の上位bitがnのbit数の (1-1/e2) 程度共通する場合、これらからそれぞれの平文を求めることができる。 具体的には、次のような手順となる。
+二つの暗号文について平文の上位bitが $n$ のbit数の $1-1/e^2$ 程度共通する場合、これらからそれぞれの平文を求めることができる。 具体的には、次のような手順となる。
 $y$ の値を代入した
 
 $$
@@ -894,8 +903,8 @@ g_2(x, y) & = (x+y)^e - c_2 \\
 \end{aligned}
 $$
 
-1. [終結式 (resultant)](https://ja.wikipedia.org/wiki/%E7%B5%82%E7%B5%90%E5%BC%8F)を求め、その根としてyの値を得る
-2. その根としてm1を得る
+1. [終結式 (resultant)](https://ja.wikipedia.org/wiki/%E7%B5%82%E7%B5%90%E5%BC%8F)を求め、その根として $y$ の値を得る
+2. その根として $m_1$ を得る
 3. $m_2 = m_1 + y$ より $m_2$ を得る
 多項式GCD $O(n\log^2n)$ を使う
 
@@ -929,32 +938,25 @@ x - m_1 &= \gcd(f_1, f_2) \\
 \end{aligned}
 $$
 
-
-
-https://inaz2.hatenablog.com/entry/2016/01/20/022936
-
-RTACTF
-https://xagawa.hatenablog.com/entry/2021/12/20/232133
-CryptoのWriteupをまとめてる人
-https://mystiz.hk
-
-### ROCA (The Return of Coppersmith's Attack)
-鍵生成アルゴリズムのバグ
-主要な暗号ハードウェアメーカで使われているライブラリ RSALib では次のように素数を生成していた。
+### The Return of Coppersmith's Attack
+鍵生成アルゴリズムが仕様に沿わないと暗号学的に脆弱となる可能性がある。
+主要な暗号ハードウェアメーカで使われているライブラリ RSALib では Smooth number $M$ を用いて次のように素数を生成していました。
 
 $$
 \begin{aligned}
 p &= kM + (e^a \bmod M) \\
 q &= lM + (e^b \bmod M) \\
-N &= pq = e^{a + b} \pmod M
+pq &= e^{a + b} \bmod M
 \end{aligned}
 $$
 
-M の素因数分解して中国剰余定理からのDLPを適用
-$P_n = 2\cdot 3\cdot\ldots\cdot p_n$
-512bit RSA $M = P_{39}$, $k$ 37bit, $a$ 62bit
-1024bit RSA $M = P_{71}$
-2048bit RSA $M = P_{126}$
+これは $M$ の素因数分解をして中国剰余定理から DLP を適用することで RSA が解けてしまう。$P_n$ を小さい順に $n$ 個目までの素数の積として $M$ は次のような値です。
+
+| RSA | $M$ |
+| :-: | :-: |
+| 512bit RSA | $M = P_{39}$ , $k$ 37bit, $a$ 62bit |
+| 1024bit RSA | $M = P_{71}$ |
+| 2048bit RSA | $M = P_{126}$ |
 
 ### 乗法群の位数が $\phi(N) = se^n$ と表されるとき $e$ の逆元が取れない
 
@@ -995,3 +997,6 @@ $$
 - [Recovering cryptographic keys from partial information, by example](https://eprint.iacr.org/2020/1506.pdf)
 - [Twenty Years of Attacks on the RSA Cryptosystem](https://crypto.stanford.edu/~dabo/pubs/papers/RSA-survey.pdf)
 - [p - 1 ≡ 0 (mod e) のときの RSA 復号方法](https://blog.y011d4.com/20201026-not-coprime-e-phi)
+- [SageMathを使ってCoppersmith's Attackをやってみる](https://inaz2.hatenablog.com/entry/2016/01/20/022936)
+- [RTACTF](https://xagawa.hatenablog.com/entry/2021/12/20/232133)
+- [Crypto Challenge](https://mystiz.hk)
