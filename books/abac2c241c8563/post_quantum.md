@@ -178,14 +178,14 @@ CRYSTALS と引き合いとして出されるのが NTT が開発した NTRU 暗
 
 $$
 \begin{aligned}
-f(x) & = 1+3x+4x^2+5x^3+2x^5 \in R_p \\
-\mathrm{Lift}(f) & = 1+3x−3x^2−2x^3+2x^5 \in R
+f & = 1+3x+4x^2+5x^3+2x^5 \in R_p \\
+\phi(f) & = 1+3x−3x^2−2x^3+2x^5 \in R
 \end{aligned}
 $$
 
 鍵生成
 1. $f\in\mathcal{T}(d+1, d)$, $g\in\mathcal{T}(d, d)$
-3. $h = (f^{-1} \bmod q)g$
+2. $h = (f^{-1} \bmod q)g$
 
 暗号化
 1. $m \in R_p$ を Center lift する
@@ -202,7 +202,7 @@ $$
 現段階では符号の SDP; Syndrome Decoding Problem の計算困難性を利用した暗号が主要なようです。
 
 > **SDP; Syndrome Decoding Problem**
-> 正数 $n, k\leq n, w\leq n$ とし、パリティチェック行列 $\boldsymbol{H}\in\mathbb{F}_2^{(n-k)\times n}$ と Syndrome ベクトル $\boldsymbol{s}\in\mathbb{F}_2^{n-k}$ に対して $\boldsymbol{He}^T = \boldsymbol{s}^T$ となるハミング重みが $w$ 以下のベクトル $\boldsymbol{e}\in\mathbb{F}_2^n$ を見つける。
+> 符号長 $n$ と次元 $k$ をパリティチェック行列 $\boldsymbol{H}\in\mathbb{F}_2^{(n-k)\times n}$ と Syndrome ベクトル $\boldsymbol{s}\in\mathbb{F}_2^{n-k}$ に対して $\boldsymbol{He}^T = \boldsymbol{s}^T$ となるハミング重みが $w$ 以下のベクトル $\boldsymbol{e}\in\mathbb{F}_2^n$ を見つける。
 
 それぞれの暗号は使う符号が異なります。逆に言えばそれぞれの暗号の違いはほぼそれくらいです。
 
