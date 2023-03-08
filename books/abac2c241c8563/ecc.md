@@ -204,7 +204,7 @@ $$
 \frac{\#E}{p_i}Q = z_0\left(\frac{\#E}{p_i}P\right)
 $$
 
-この $z_0$ は ECDLP を用いて $\mathcal{O}(\sqrt{p_i})$ で求まります。次に $z_0,\ldots,z_{j-1}$ を知っているときに $z_j$ を計算する為に次のように変形する。
+この $z_0$ は ECDLP を用いて $\mathcal{O}(\sqrt{p_i})$ で求まります。次に $z_0,\ldots,z_{j-1}$ を知っているときに $z_j$ を計算する為に次のように変形します。
 
 $$
 \begin{aligned}
@@ -213,7 +213,7 @@ $$
 \end{aligned}
 $$
 
-これより ECDLP を解くことで $z_j$ が求まる。
+これより ECDLP を解くことで $z_j$ が求まります。
 
 ```python
 fact = factor(G.order())
