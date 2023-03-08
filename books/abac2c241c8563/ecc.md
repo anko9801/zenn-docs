@@ -32,9 +32,7 @@ $$
 となる。例えば楕円曲線の1つ $F(x, y) = y^2 - (x^3 + ax + b)$
 
 $$
-\begin{aligned}
-\widetilde{F}(x,y,z) &= y^2z - x^3 - axz^2 - bz^3 \\
-\end{aligned}
+\widetilde{F}(x,y,z) = y^2z - x^3 - axz^2 - bz^3
 $$
 
 $\widetilde{F}(x, y, 1) = F(x, y)$ とか $\widetilde{F}(\lambda x,\lambda y,\lambda z) = \lambda^n\widetilde{F}(x, y, z)$ みたいな性質がある。
@@ -145,6 +143,8 @@ $$
 
 の変換について不変
 
+Mumford 表現
+
 ## 楕円曲線暗号
 
 楕円曲線暗号 (ECC) はRSA暗号と同時期に開発された暗号で1985年頃に Victor S. Miller と Neal Koblitz が同時期かつ独立に発明しました(ちなみにMiller-Rabin素数判定法のMillerはGary L. Millerで別人です)。特徴としては RSA 暗号よりも純粋に強い暗号であることや鍵長が短いことなどが挙げられます。
@@ -192,32 +192,31 @@ DLP で書いた手法を用いることで解くことができます。有限�
 
 中国剰余定理を用いて大きな群を複数の小さな群の直積に分けます。楕円曲線暗号の楕円曲線の位数は細かく素因数分解できることが多いので有効な手法になります。
 
-楕円曲線の位数 $\#E = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ と素因数分解して $Q = dP$ となるとき次のように $d_i$ を置く。
+楕円曲線の位数 $\#E = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ と素因数分解して $Q = dP$ となるとき次のように $d_i$ をおく。
 
 $$
 \begin{aligned}
-d_1 &= d \pmod{p_1^{e_1}} \\
-d_2 &= d \pmod{p_2^{e_2}} \\
-&\vdots \\
-d_k &= d \pmod{p_k^{e_k}} \\
+d_i &= d & \pmod{p_i^{e_i}} \\
+& = z_0+z_1p_i+z_2p_i^2+\ldots+z_{e_i−1}p_i^{e_i−1} & \pmod{p_i^{e_i}} \\
 \end{aligned}
 $$
 
-それぞれの $d_i$ について次のように書ける。
+これより次の関係式が成り立つ。
 
 $$
-d_i=z_0+z_1p_i+z_2p_i^2+\ldots+z_{e_i−1}p_i^{e_i−1} \pmod{p_i^{e_i}} \quad (∀k:z_k \in [0,p_i))
+\frac{\#E}{p_i}Q = z_0\left(\frac{\#E}{p_i}P\right)
 $$
 
-ここで $P_{i,j}=\frac{\#E}{p_i^j}P, Q_i=\frac{\#E}{p_i^j}Q$ とおくと
+この $z_0$ は ECDLP を用いて $\mathcal{O}(\sqrt{p_i})$ で求まります。次に $z_0,\ldots,z_{j-1}$ を知っているときに $z_j$ を計算する為に次のように変形する。
 
 $$
-Q_{i,1} = d_{i,1}P_{i,1} = (z_0+z_1p_i+z_2p_i^2+\ldots+z_{e_i−1}p_i^{e_i−1})P_{i,1} = z_0P_i
+\begin{aligned}
+\frac{\#E}{p_i^{j+1}}Q & = (z_0+\cdots+z_{j}p_i^{j})\left(\frac{\#E}{p_i^{j+1}}P\right) \\
+\frac{\#E}{p_i^{j+1}}Q & - (z_0+\cdots+z_{j−1}p_i^{j−1})\left(\frac{\#E}{p_i^{j+1}}P\right) = z_{j}\left(\frac{\#E}{p_i}P\right) \\
+\end{aligned}
 $$
 
-となり, $z_0 < p_i$ である $Q_i = z_0P_i$ についてDLPを解けば良い。
-
-他については $Q_i' = (Q_i - z_0P_i) / p_i$ とおいて同様に解けると思っていたけど除算は ECC の DDH 問題から不可能っぽいので $p_i^{e_i}$ 全探索するしかないかも。
+これより ECDLP を解くことで $z_j$ が求まる。
 
 ```python
 fact = factor(G.order())
@@ -261,9 +260,9 @@ $$
 
 $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 
-Mumford 表現
 
-### GHS-Weil descent
+
+### GHS-Weil descent 攻撃
 
 ## 攻撃手法
 
