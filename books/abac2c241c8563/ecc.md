@@ -192,13 +192,10 @@ DLP で書いた手法を用いることで解くことができます。有限�
 
 中国剰余定理を用いて大きな群を複数の小さな群の直積に分けます。楕円曲線暗号の楕円曲線の位数は細かく素因数分解できることが多いので有効な手法になります。
 
-楕円曲線の位数 $\#E = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ と素因数分解して $Q = dP$ となるとき次のように $d_i$ をおく。
+楕円曲線の位数 $\#E = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ と素因数分解して $Q = dP$ となるとき次のように $z_i$ を定義する。
 
 $$
-\begin{aligned}
-d_i &= d & \pmod{p_i^{e_i}} \\
-& = z_0+z_1p_i+z_2p_i^2+\ldots+z_{e_i−1}p_i^{e_i−1} & \pmod{p_i^{e_i}} \\
-\end{aligned}
+d = z_0+z_1p_i+z_2p_i^2+\ldots+z_{e_i−1}p_i^{e_i−1} \quad \pmod{p_i^{e_i}} \\
 $$
 
 これより次の関係式が成り立つ。
@@ -212,7 +209,7 @@ $$
 $$
 \begin{aligned}
 \frac{\#E}{p_i^{j+1}}Q & = (z_0+\cdots+z_{j}p_i^{j})\left(\frac{\#E}{p_i^{j+1}}P\right) \\
-\frac{\#E}{p_i^{j+1}}Q & - (z_0+\cdots+z_{j−1}p_i^{j−1})\left(\frac{\#E}{p_i^{j+1}}P\right) = z_{j}\left(\frac{\#E}{p_i}P\right) \\
+\frac{\#E}{p_i^{j+1}}Q & - (z_0+\cdots+z_{j−1}p_i^{j−1})\left(\frac{\#E}{p_i^{j+1}}P\right) = z_{j}\left(\frac{\#E}{p_i}P\right)
 \end{aligned}
 $$
 
