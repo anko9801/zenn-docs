@@ -145,6 +145,36 @@ $$
 
 Mumford 表現
 
+## 超楕円曲線
+
+$$
+y^2 + h(x)y = f(x)
+$$
+
+$\deg f = 2g + 1$ と書けるなら虚超楕円曲線と呼び、$g$ を種数
+
+
+### 加算アルゴリズム
+まず $d = \gcd(u_1, u_2, v_1 + v_2 + h) = s_1u_1 + s_2u_2 + s_3(v_1 + v_2 + h)$ を計算し、次のように加算を行う。
+
+$$
+\begin{aligned}
+u & = \frac{u_1u_2}{d^2} \\
+v & = \frac{s_1u_1v_2 + s_2u_2v_1 + s_3(v_1v_2 + f)}{d} & \pmod u
+\end{aligned}
+$$
+
+### 還元アルゴリズム
+$\deg u > g$ なら次のように計算して $u$ をモニックとする。
+
+$$
+\begin{aligned}
+u' & = \frac{f - vh - v^2}{u} \\
+v' & = - h - v & \pmod{u'}
+\end{aligned}
+$$
+
+
 ## 楕円曲線暗号
 
 楕円曲線暗号 (ECC) はRSA暗号と同時期に開発された暗号で1985年頃に Victor S. Miller と Neal Koblitz が同時期かつ独立に発明しました(ちなみにMiller-Rabin素数判定法のMillerはGary L. Millerで別人です)。特徴としては RSA 暗号よりも純粋に強い暗号であることや鍵長が短いことなどが挙げられます。
@@ -319,40 +349,7 @@ $$
 ### Invalid Curve Attack
 
 
-### Weil decsent
-
-https://blog.z.cash/new-snark-curve/ :  BLS12-381: New zk-SNARK Elliptic Curve Construction
-
-Python での高速な実装 fastecdsa
-
-## 超楕円曲線
-
-$$
-y^2 + h(x)y = f(x)
-$$
-
-$\deg f = 2g + 1$ と書けるなら虚超楕円曲線と呼び、$g$ を種数
-
-
-### 加算アルゴリズム
-まず $d = \gcd(u_1, u_2, v_1 + v_2 + h) = s_1u_1 + s_2u_2 + s_3(v_1 + v_2 + h)$ を計算し、次のように加算を行う。
-
-$$
-\begin{aligned}
-u & = \frac{u_1u_2}{d^2} \\
-v & = \frac{s_1u_1v_2 + s_2u_2v_1 + s_3(v_1v_2 + f)}{d} & \pmod u
-\end{aligned}
-$$
-
-### 還元アルゴリズム
-$\deg u > g$ なら次のように計算して $u$ をモニックとする。
-
-$$
-\begin{aligned}
-u' & = \frac{f - vh - v^2}{u} \\
-v' & = - h - v & \pmod{u'}
-\end{aligned}
-$$
-
 ## 参考文献
 - [Imaginary hyperelliptic curve - Wikipedia](https://en.wikipedia.org/wiki/Imaginary_hyperelliptic_curve)
+- https://blog.z.cash/new-snark-curve/ : BLS12-381: New zk-SNARK Elliptic Curve Construction
+- Python での高速な実装 fastecdsa
