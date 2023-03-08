@@ -158,7 +158,7 @@ Mumford 表現
 
 実はこの問題はとても難しく、これを解く効率的なアルゴリズムは現在見つかっていません。この ECDLP を利用して暗号の形にしたものが楕円曲線暗号です。
 
-### ECDH (Elliptic curve Diffie–Hellman key exchange)
+### ECDH (Elliptic Curve Diffie–Hellman key exchange)
 
 暗号通信をする為に使われる暗号プロトコルです。
 
@@ -178,11 +178,6 @@ Alice と Bob は AES などの共通鍵暗号を用いて暗号通信しよう�
 
 暗号標準を定める国際機関によって楕円曲線が
 https://neuromancer.sk/std/
-
-Diffie Hellman
-E/P/Q = E/Q/P
-ECDDH
-E/P E/Q -> E/PQ
 
 ## ECDLP
 
@@ -260,6 +255,8 @@ $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 
 
 ### GHS-Weil descent 攻撃
+
+楕円曲線の $\mathbb{F}_{p^k}$ 有理点群 $E(\mathbb{F}_{p^k})$ を種数 $g\geq k$ の代数曲線 $C$ の Jacobian の有理点群 $\mathcal{J}_C(\mathbb{F}_p)$ に埋め込み、 $\mathcal{J}_C(\mathbb{F}_p)$ 上で Gaudry アルゴリズムで解く
 
 ## 攻撃手法
 
