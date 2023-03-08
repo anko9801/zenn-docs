@@ -10,9 +10,9 @@ title: "準同型暗号"
 - レベル n 準同型暗号
 - 完全準同型暗号
 
-## 乗法準同型暗号
+### 乗法準同型暗号
 最もよくある準同型暗号
-### Unpadded RSA
+#### Unpadded RSA
 
 $$
 \begin{aligned}
@@ -22,7 +22,7 @@ $$
 \end{aligned}
 $$
 
-### ElGamal暗号
+#### ElGamal暗号
 
 $$
 \begin{aligned}
@@ -32,9 +32,9 @@ $$
 \end{aligned}
 $$
 
-## 加法準同型暗号
+### 加法準同型暗号
 あまり見かけない準同型暗号です。
-### Paillier暗号
+#### Paillier暗号
 加法準同型
 
 $$
@@ -45,13 +45,13 @@ $$
 \end{aligned}
 $$
 
-## レベルn準同型暗号
+### レベルn準同型暗号
 レベルn準同型 = 加法準同型 + n回の乗算準同型
 - 乗算回数に制約がある完全準同型
 - レベルnはn次方程式を計算できる
 - レベル2準同型なら乗算が1度だけ可能
 
-### Lifted-ElGamal暗号
+#### Lifted-ElGamal暗号
 レベル2準同型暗号
 位数 $p$ の楕円曲線 $E$, と生成元 $P\in E$
 秘密鍵 $s\in\mathbb{F}_p$ と公開鍵 $sP$

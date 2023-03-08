@@ -199,7 +199,7 @@ $$
 環とイデアルで割った部分環について何らかの方法で持ち上げることができるとき暗号を構成できる
 
 ## 符号暗号
-符号理論にも様々な計算困難な問題がありますが、候補は Syndrome Decoding Problem の計算困難性を利用した暗号が主要です。
+符号理論にも様々な計算困難な問題がありますが、候補は誤り訂正符号の復号問題の計算困難性を利用した暗号が主要です。計算問題として SDP や DSDP の困難性を仮定しています。
 
 > **SDP; Syndrome Decoding Problem**
 > SDP とは符号長 $n$ として次元 $k$ をパリティ検査行列 $\boldsymbol{H}\in\mathbb{F}_2^{(n-k)\times n}$ とシンドローム $\boldsymbol{s}\in\mathbb{F}_2^{n-k}$ に対して $\boldsymbol{eH}^T = \boldsymbol{s}$ となるハミング重みが $w$ の $\boldsymbol{e}\in\mathbb{F}_2^n$ を求める問題である。
@@ -260,7 +260,7 @@ https://eprint.iacr.org/2022/975
 
 ### Lamport 署名
 Constructing Digital Signatures from a One Way Function
-1 ビットごとに署名します
+1 ビットごとに署名します。
 
 1. 秘密鍵 $s_0, s_1$ を生成し、公開鍵 $p_i = H(s_i)$ を計算します
 2. 1 ビットのメッセージ $m$ を用いて $s_m$ を署名として公開します
@@ -280,3 +280,6 @@ randomized tree-based stateless signature
 ## 参考文献
 - Post-Quantum Cryptography
 - 耐量子計算機暗号
+- [量子コンピュータに耐性のある暗号技術の
+標準化動向：米国政府標準暗号について](https://www.imes.boj.or.jp/research/papers/japanese/19-J-04.pdf)
+- [An efficient key recovery attack on SIDH](https://eprint.iacr.org/2022/975)

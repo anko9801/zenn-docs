@@ -253,9 +253,9 @@ print(crt(dlogs, primes))
 ```
 
 ### Index Calculus Algorithm
-超楕円曲線上の ECDLP では Index Calculus Algorithm が有効です。次の Gaudry アルゴリズム
+超楕円曲線上の ECDLP では Index Calculus Algorithm を応用することができます。次の Gaudry アルゴリズム
 
-因子基底 $B = \lbrace P_j\in C(\mathbb{F}_p)\setminus P_\infty\mid X(P_j)\neq X(P_i) for i \neq j\rbrace$
+$B$ 以下の素数に代えて、次数 $s$ 以下の多項式の因子基底を用意して Mumford 表現に現れる多項式 $U$ が因子基底の要素に分解される場合に対して $B = \lbrace P_j\in C(\mathbb{F}_p)\setminus P_\infty\mid X(P_j)\neq X(P_i) for i \neq j\rbrace$
 
 $$
 \begin{aligned}
@@ -282,10 +282,7 @@ $$
 
 $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 
-
-
 ### GHS-Weil descent 攻撃
-
 楕円曲線の $\mathbb{F}_{p^k}$ 有理点群 $E(\mathbb{F}_{p^k})$ を種数 $g\geq k$ の代数曲線 $C$ の Jacobian の有理点群 $\mathcal{J}_C(\mathbb{F}_p)$ に埋め込み、 $\mathcal{J}_C(\mathbb{F}_p)$ 上で Gaudry アルゴリズムで解く
 
 ## 攻撃手法
