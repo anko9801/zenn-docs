@@ -2,10 +2,8 @@
 title: "楕円曲線暗号への攻撃"
 ---
 
-楕円曲線は Fermat の最終定理を解く道具でもあったりする現代数学の要でもあるので暗号の解説ならまだしも攻撃となると可換環論や代数幾何学を学んでいないと難しい側面があるので
-
-
 ## 楕円曲線
+TODO: かなり書き直す
 
 $K$ を任意の体、 $f(x) \in K[x]$ を3次方程式とする。ただし $f(x)$ の3解は相異なる。ここで次の方程式を考える。
 
@@ -188,7 +186,7 @@ E/P E/Q -> E/PQ
 
 ## ECDLP
 
-DLP で書いた手法を用いることで解くことができます。有限体のみの手法である Index Calculus Algorithm や数体ふるい法を除いて同じ手法で解けます。よく使う Pohlig-Hellman だけ解説しておきます。
+DLP で書いた手法を用いることで解くことができます。有限体のみの手法である数体ふるい法を除いて同じ手法で解けます。よく使う Pohlig-Hellman だけ解説しておきます。
 
 ### Pohlig-Hellman
 
@@ -233,6 +231,39 @@ for p, e in fact:
 print(crt(dlogs, primes))
 ```
 
+### Index Calculus Algorithm
+超楕円曲線上の ECDLP では Index Calculus Algorithm が有効です。次の Gaudry アルゴリズム
+
+因子基底 $B = \lbrace P_j\in C(\mathbb{F}_p)\setminus P_\infty\mid X(P_j)\neq X(P_i) for i \neq j\rbrace$
+
+$$
+\begin{aligned}
+r_i\mathcal{D}_b & = \sum_{j=1}^n e_{ij}P_j^{e_{ij}} - mP_\infty \\
+\begin{pmatrix}
+r_i\mathcal{D}_b \\
+\vdots \\
+r_i\mathcal{D}_b
+\end{pmatrix}
+& = \begin{pmatrix}
+e_{11} & \cdots & e_{m1} \\
+\vdots & \ddots & \vdots \\
+e_{1n} & \cdots & e_{mn}
+\end{pmatrix}
+\begin{pmatrix}
+\log_{\mathcal{D}_b} P_i \\
+\vdots \\
+\log_{\mathcal{D}_b} P_i
+\end{pmatrix} \\
+\mathcal{D}_a + r\mathcal{D}_b & = \prod_{j=1}^n s_jP_j - mP_\infty \\
+x = \log_{\mathcal{D}_b}\mathcal{D}_a & = \sum_{j=1}^ns_j\log_{\mathcal{D}_b}P_j - r \bmod N
+\end{aligned}
+$$
+
+$\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
+
+Mumford 表現
+
+### GHS-Weil descent
 
 ## 攻撃手法
 
