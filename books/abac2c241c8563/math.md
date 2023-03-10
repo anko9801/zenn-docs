@@ -742,13 +742,72 @@ $$
 0.99
 
 ### ナップサック暗号 (Markle-Hellman Knapsack encryption)
-一般の数列 $\beta_i$ に対して $c = \sum_i m_i\beta_i$ となる $c$ から $m_i$ を求めるのは難しいが $\beta_i$ が超増加列という性質を持つとき簡単になることを利用した暗号。
+一般の数列 $b_i$ に対して $c = \sum_i m_ib_i$ となる $c$ から $m_i$ を求めるのは難しいが $b_i$ が超増加列という性質を持つとき簡単になることを利用した暗号。
 
 > **Def. 超増加列**
 > 次の性質を満たす数列 $\lbrace w_i\rbrace$ を超増加列と呼ぶ。
 >
 > $$
 \sum_{i=1}^n w_i < w_{n+1}
+$$
+
+鍵生成
+1. 超増加列 $\lbrace w_i\rbrace$ を生成する。
+2. 整数 $q, r$ について $q > \sum_i w_i$, $\gcd(r, q) = 1$ なるように生成する。
+3. $b_i = rw_i \pmod q$ を計算し、$\lbrace b_i\rbrace, q$ を公開鍵、$\lbrace w_i\rbrace, r$ を秘密鍵とする。
+
+暗号化
+平文 $m_i\in\lbrace 0, 1\rbrace$ を用いて次のように暗号文 $c$ を得る。
+
+$$
+c = \sum_i m_ib_i \pmod q
+$$
+
+復号
+暗号文 $c$ に対して秘密鍵 $r$ を用いて $c' = cr^{-1} \bmod q = \sum_i m_iw_i$ を計算する。$i$ を降順に次のアルゴリズムを実行する。
+
+$$
+\begin{aligned}
+m_i & \leftarrow \begin{cases}
+0 & (c' \leq w_i) \\
+1 & (c' > w_i)
+\end{cases} \\
+c' & \leftarrow c' - w_i
+\end{aligned}
+$$
+
+これが低密度のとき LLL を用いて攻撃する方法があります。LO 法 (Lagarias-Odlyzko Algorithm) と CLOS 法 (Coster LaMacchia Odlyzko Schnorr) と呼ばれています。
+
+LO 法は次の行列を LLL 簡約して左端が $0$, それ以外が $0, 1$ のみである行があれば、それは復号結果の候補となる。
+
+$$
+\begin{pmatrix}
+\boldsymbol{b} & I \\
+-c & \boldsymbol{0}
+\end{pmatrix} =
+\begin{pmatrix}
+b_0 & 1 &&& \\
+b_1 && 1 && \\
+\vdots &&& \ddots & \\
+b_{n-1} &&&& 1 \\
+-c &&&& \\
+\end{pmatrix}
+$$
+
+CLOS 法は基底行列をちょっと変更して精度を向上させた方法です。まず $0, 1$ はノルムに非対称性があるので $-1, 1$ に変更し、左端を優先的に $0$ にするよう伝える為適当な大きな定数 $K$ を掛ける。
+
+$$
+\begin{pmatrix}
+K\boldsymbol{b} & 2I \\
+-Kc & -\boldsymbol{1}
+\end{pmatrix} =
+\begin{pmatrix}
+Kb_0 & 2 &&& \\
+Kb_1 && 2 && \\
+\vdots &&& \ddots & \\
+Kb_{n-1} &&&& 2 \\
+-Kc & -1 & -1 & \cdots & -1 \\
+\end{pmatrix}
 $$
 
 ## 多項式
@@ -1206,7 +1265,6 @@ $$
 計算量は $\exp((\sqrt{2}+c)(\log n)^{1/2}(\log\log n)^{1/2})$ となる。
 
 ### 数体ふるい法
-- [General purpose integer factoring](https://eprint.iacr.org/2017/1087)
 
 ## まとめ
 
@@ -1234,3 +1292,5 @@ $$
 - Introduction to Cryptography Buchmann
 - クラウドを支えるこれからの暗号技術
 - [整数論テクニック集のpdf](https://kirika-comp.hatenablog.com/entry/2018/03/12/210446)
+- [General purpose integer factoring](https://eprint.iacr.org/2017/1087)
+- https://www.slideshare.net/trmr105/katagaitai-workshop-7-crypto
