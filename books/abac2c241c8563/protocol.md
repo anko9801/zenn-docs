@@ -2,39 +2,6 @@
 title: "暗号プロトコル"
 ---
 
-## 性質
-耐量子性
-準同型性
-
-- 選択平文攻撃 (Chosen-plaintext attack; CPA)
-- 適応的選択平文攻撃 (Adaptive chosen-plaintext attack; CPA2)
-- 選択暗号文攻撃 (Chosen-ciphertext attack; CCA1)
-- 適応的選択暗号文攻撃 (Adaptive Chosen-ciphertext attack; CCA2)
-- Side-channel attack
-
-↓ めちゃくちゃわかりにくい、といってわかりやすさが上がる方法とは？定理証明だと思う.
-
-- 一方向性 (Onewayness; OW)
-	- 暗号文から平文を求めるのが困難
-- 強秘匿性 (Semantic Security; SS)
-	- 暗号文から平文のどんな部分情報も漏れない
-- 識別不可能性 (Indistinguishability; IND)
-	- 暗号文が平文AとBのどちらのものかを区別できない
-- 頑強性 (Non-Malleability; NM)
-	- 暗号文が与えられた時、ある関係性を持った別の暗号文の生成が不可
-	- stream cipher
-	- RSA暗号 $Enc(m)\cdot t^e \bmod n = Enc(mt)$ padding(OAEP, PKCS 1)
-
-
-## DH
-共有鍵を作る為の操作である。共有鍵を作ることができれば共有鍵暗号を用いて通信できる。
-
-1. AliceとBobが巡回群 $G$ とその生成元 $g$ を共有する。
-2. AliceとBobはそれぞれ秘密鍵 $x_a, x_b$ を生成し、公開鍵 $y_a = g^{x_a}, y_b = g^{x_b}$ を公開する。
-3. AliceとBobは自分の秘密鍵と相手の公開鍵を掛けると $s = g^{x_ax_b} = y_b^{x_a} = y_a^{x_b}$ となり、$s$ はAliceとBobのみが知る共有鍵となる。
-
-ECDH だと $s$ の $x$ 座標をハッシュ化したものを共有鍵として使う。
-
 ## ゼロ知識証明
 ゼロ知識証明の性質
 - 完全性（Completeness）
@@ -62,6 +29,8 @@ zk-SNARKs
 [ZenGo-X/zk-paillier: A collection of Paillier cryptosystem zero knowledge proofs (github.com)](https://github.com/ZenGo-X/zk-paillier)
 
 [zk-SNARKsの理論 (zenn.dev)](https://zenn.dev/kyosuke/articles/a1854b9be26c01df13eb)
+
+## 署名
 ### Fiat-Shamir 変換
 
 Fiat-Shamir変換は、証明システムを非対話型にするために使用される有名なスキームで、検証者がランダムに選択するチャレンジの値を（ランダムオラクルモデルとして）暗号学的ハッシュ関数を使って決定論的に導出することで、証明システムのプロトコルを非対話型にする。
@@ -112,6 +81,15 @@ $$
 
 ここで $e = e'$ となれば署名が有効であると検証されたことになる。
 
+## 秘密分散
+ある秘密情報を $n$ 個に分割して $t$ 個わかれば復元できる。
+
+### Shamir's secret sharing
+$t-1$ 次多項式 $f(x) = \sum_i a_ix^i \in \mathbb{F}_p[x]$ を用いて多項式上の $n$ 点 $(x_i, f(x_i))$ を生成する。
+
+### Blakley's secret sharing
+
+
 ## SSH
 
 OpenSSH 9.0 ポスト量子暗号化時代への対応として、格子暗号系の「Streamlined NTRU Prime」と、楕円曲線暗号系の「x25519」からなるハイブリッド手法がデフォルトとなっている。
@@ -136,6 +114,39 @@ SoloKey, Nitrokey
 ## サービス
 マイナンバーカード
 コンテナイメージの署名 Sigstore
+
+## 暗号の性質
+耐量子性
+準同型性
+
+- 選択平文攻撃 (Chosen-plaintext attack; CPA)
+- 適応的選択平文攻撃 (Adaptive chosen-plaintext attack; CPA2)
+- 選択暗号文攻撃 (Chosen-ciphertext attack; CCA1)
+- 適応的選択暗号文攻撃 (Adaptive Chosen-ciphertext attack; CCA2)
+- Side-channel attack
+
+↓ めちゃくちゃわかりにくい、といってわかりやすさが上がる方法とは？定理証明だと思う.
+
+- 一方向性 (Onewayness; OW)
+	- 暗号文から平文を求めるのが困難
+- 強秘匿性 (Semantic Security; SS)
+	- 暗号文から平文のどんな部分情報も漏れない
+- 識別不可能性 (Indistinguishability; IND)
+	- 暗号文が平文AとBのどちらのものかを区別できない
+- 頑強性 (Non-Malleability; NM)
+	- 暗号文が与えられた時、ある関係性を持った別の暗号文の生成が不可
+	- stream cipher
+	- RSA暗号 $Enc(m)\cdot t^e \bmod n = Enc(mt)$ padding(OAEP, PKCS 1)
+
+
+## DH
+共有鍵を作る為の操作である。共有鍵を作ることができれば共有鍵暗号を用いて通信できる。
+
+1. AliceとBobが巡回群 $G$ とその生成元 $g$ を共有する。
+2. AliceとBobはそれぞれ秘密鍵 $x_a, x_b$ を生成し、公開鍵 $y_a = g^{x_a}, y_b = g^{x_b}$ を公開する。
+3. AliceとBobは自分の秘密鍵と相手の公開鍵を掛けると $s = g^{x_ax_b} = y_b^{x_a} = y_a^{x_b}$ となり、$s$ はAliceとBobのみが知る共有鍵となる。
+
+ECDH だと $s$ の $x$ 座標をハッシュ化したものを共有鍵として使う。
 
 ## 参考文献
 
