@@ -34,7 +34,7 @@ https://csrc.nist.gov/Projects/post-quantum-cryptography/post-quantum-cryptograp
 
 耐量子暗号の中では有力ですが耐量子性は明解ではないです。
 
-SVP, CVP, SIS 問題, LWE 問題, LWR 問題など実にさまざまな計算困難な問題があり、それに対応する暗号がありますが、今回は耐量子暗号や完全準同型暗号でよく使われる LWE 問題に絞って紹介します。
+SVP, GapSVP, SIVP, CVP, SIS, LWE, LWR, Approx-GCD, BGV, GSW などなど実にさまざまな計算困難な問題があり、それに対応する暗号がありますが、今回は耐量子暗号や完全準同型暗号でよく使われる LWE 問題に絞って紹介します。
 
 ### LLL 基底簡約のその先へ
 
@@ -87,49 +87,32 @@ $$
 ### LWE格子暗号
 
 機械学習理論から派生した求解困難な問題で
-
-> **LWE (Learning With Error) 問題**
-> 環 $\mathbb{Z}/q\mathbb{Z}$ 上において行列 $A$ とベクトル $\boldsymbol{s}$ を掛けて誤差ベクトル $\boldsymbol{e}$ を与えた $\boldsymbol{b}$ に対し $(A, \boldsymbol{b})$ が与えられたときに $\boldsymbol{s}$ を求める問題を LWE 問題と呼ぶ。
->
-> $$
-A\boldsymbol{s} + \boldsymbol{e} = \boldsymbol{b}
-$$
-
-LWE 問題にはさまざまな派生があります。その中で最も有名な3つが次です。
-
-```mermaid
-flowchart LR
-    id0(LWE 問題) --> id1(Ring-LWE 問題) --> id2(Module-LWE 問題)
-```
-
-多項式環の剰余環 $\mathbb{Z}/q\mathbb{Z}[x]/(x^n+1)$ とベクトル空間 $(\mathbb{Z}/q\mathbb{Z})^n$ は全単射 $\phi: a_0 + a_1x + \cdots + a_{n-1}x^{n-1} \to (a_0, a_1, \ldots, a_{n-1})$ を用いて同一視できる。これを用いて LWE 問題を構成したものが Ring-LWE 問題という。
-
-> **Ring-LWE 問題**
-> 環 $\mathbb{Z}/q\mathbb{Z}[x]/(x^n+1)$ 上において、元 $s$ とベクトル $\boldsymbol{a}, \boldsymbol{e}$ を用いて次のように計算した $(\boldsymbol{a}, \boldsymbol{b})$ が与えられたときに $s$ を求める問題を Ring-LWE 問題と呼ぶ。
->
-> $$
-\boldsymbol{a}s + \boldsymbol{e} = \boldsymbol{b}
-$$
-
-Ring-LWE 問題の一般化として Module-LWE 問題があります。
-
-> **Module-LWE 問題**
-> 環 $\mathbb{Z}/q\mathbb{Z}[x]/(x^n+1)$ 上において、行列 $A$ とベクトル $\boldsymbol{s}$ を掛けて誤差ベクトル $\boldsymbol{e}$ を与えたベクトル $\boldsymbol{b}$ に対し $(A, \boldsymbol{b})$ が与えられたときに $\boldsymbol{s}$ を求める問題を Module-LWE 問題と呼ぶ。
->
-> $$
-A\boldsymbol{s} + \boldsymbol{e} = \boldsymbol{b}
-$$
-
-簡単の為に多項式環の剰余環 $R_q = \mathbb{Z}/q\mathbb{Z}[x]/(x^n+1)$ とおきます。
-
-使われる乱数に用いる分布について秘密情報については二項分布であることなど細かいところは元論文を当たって欲しい。
-
-円分体の整数環
+簡単の為に一般の LWE 問題 (自己流) を紹介しその他派生を表現する。
 これが $B \geq 2\sqrt{n}$ のとき計算困難な問題であることが知られている
 
-多項式同士の積で畳み込みを計算するので数論変換 NTT; Number Theoretic Transform を用いると $\mathcal{O}(n\log n)$ と高速に計算できる。
+> **LWE 問題**
+> $K$ を体とする。$\boldsymbol{A}\in M_{m,n}(K), \boldsymbol{s}\in K^m$ を掛けて誤差ベクトル $\boldsymbol{e}\in K^n$ を与えた $\boldsymbol{b}\in K^n$ に対し $(\boldsymbol{A}, \boldsymbol{b})$ が与えられたときに $\boldsymbol{s}$ を求める問題を LWE 問題と呼ぶ。
+>
+> $$
+\boldsymbol{A}\boldsymbol{s} + \boldsymbol{e} = \boldsymbol{b}
+$$
 
-また LWE ではデータ圧縮をよく行う。$d < \lceil\log_2(q)\rceil$ として $\mathbb{Z}/q\mathbb{Z}\to\lbrace 0,\ldots,2^d-1\rbrace$ と圧縮し、次のような性質を満たす。
+$q$ を素数として
+$K = \mathbb{F}_q$ のとき LWE 問題
+$K = \mathbb{F}_q[x]/(x^n + 1)$ かつ $m = 1$ のとき Ring-LWE 問題
+$K = \mathbb{F}_q[x]/(x^n + 1)$ のとき Module-LWE 問題
+注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体です。
+
+
+
+簡単の為に $R_q = \mathbb{F}_q[x]/(x^n+1)$ とおきます。
+
+乱数分布
+使われる乱数に用いる分布について秘密情報については二項分布であることなど細かいところは元論文を当たって欲しい。
+
+多項式同士の積で畳み込みを計算するので数論変換 NTT; Number Theoretic Transform を用いると次数 $n$ として $\mathcal{O}(n\log n)$ と高速に計算できる。
+
+また LWE ではデータ圧縮をよく行う。$d < \lceil\log_2(q)\rceil$ として $\mathbb{F}_q\to\lbrace 0,\ldots,2^d-1\rbrace$ と圧縮し、次のような性質を満たす。
 
 $$
 \begin{aligned}
