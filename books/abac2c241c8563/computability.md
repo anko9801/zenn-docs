@@ -152,12 +152,13 @@ zer0lfsr, zer0lfsr+, zer0lfsr++ を解こう
 ### メルセンヌ・ツイスタ (MT19937)
 統計的に十分に分散していて長い周期を持つ高速な疑似乱数生成器の一種です。周期の長さは $2^{19937}-1$ とメルセンヌ数であり名前の由来になっています。実は日本人が作っています。
 
-中身では 32 ビットのビットベクタで計算されていて初期状態 $\boldsymbol{x}_i$ $(i = 0,\cdots,n)$ を入力して漸化式から $\boldsymbol{x}_k$ を生成し、それぞれの $\boldsymbol{x}$ について後処理をした $\boldsymbol{y}$ を出力とします。
+中身では 32 ビットのビットベクタで計算されていて初期状態 $\boldsymbol{x}_i$ $(i = 0,\cdots,n)$ を入力して漸化式から $\boldsymbol{x}_k$ を生成し、それぞれの $\boldsymbol{x}_k$ について後処理をした $\boldsymbol{y}$ を出力とします。
 
 $$
 \begin{aligned}
   \boldsymbol{x}_{k+n} & = \boldsymbol{x}_{k+m}\hspace{-10px}&& \oplus((\boldsymbol{x}_k\mid\boldsymbol{x}_{k+1})\gg 1)\oplus(\mathrm{LSB}(\boldsymbol{x}_{k+1})\mathop{\mathrm{AND}}\boldsymbol{a}) \\
-  \boldsymbol{y} & \leftarrow \boldsymbol{x} && \oplus\ \,(\boldsymbol{x}\gg 11) \\
+  \boldsymbol{y} & \leftarrow \boldsymbol{x}_k \\
+  \boldsymbol{y} & \leftarrow \boldsymbol{y} && \oplus\ \,(\boldsymbol{y}\gg 11) \\
   \boldsymbol{y} & \leftarrow \boldsymbol{y} && \oplus((\boldsymbol{y}\ll\ \ 7) \mathop{\mathrm{AND}} \boldsymbol{b}) \\
   \boldsymbol{y} & \leftarrow \boldsymbol{y} && \oplus((\boldsymbol{y}\ll 15) \mathop{\mathrm{AND}} \boldsymbol{c}) \\
   \boldsymbol{y} & \leftarrow \boldsymbol{y} &&\oplus\ \,(\boldsymbol{y}\gg 18) \\
