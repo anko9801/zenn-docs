@@ -130,11 +130,7 @@ $$
 楕円関数体
 楕円曲線
 
-### 超楕円曲線
-超楕円曲線
-ヤコビ多様体
-
-### 保型形式
+#### 保型形式
 上半平面 $\mathbb{H}$
 
 $$
@@ -143,9 +139,16 @@ $$
 
 の変換について不変
 
-Mumford 表現
+## ペアリング
+
+Weil-pairing
+Tate-pairing
+構成
 
 ## 超楕円曲線
+超楕円曲線
+ヤコビ多様体
+Mumford 表現
 
 $$
 y^2 + h(x)y = f(x)
@@ -211,7 +214,7 @@ https://neuromancer.sk/std/
 
 ## ECDLP
 
-DLP で書いた手法を用いることで解くことができます。有限体のみの手法である数体ふるい法を除いて同じ手法で解けます。よく使う Pohlig-Hellman だけ解説しておきます。
+DLP で書いた手法を用いることで解くことができます。Pollard-rho 法や GSBS 法は簡単に応用が効くので飛ばします。あとよく分かってないですけど数体ふるい法は ECDLP 上では有効ではないらしいので Pohlig-Hellman と Index Calculus Algorithm を紹介します。詳しい方教えてください。
 
 ### Pohlig-Hellman
 
@@ -253,7 +256,7 @@ print(crt(dlogs, primes))
 ```
 
 ### Index Calculus Algorithm
-超楕円曲線上の ECDLP では Index Calculus Algorithm を応用することができます。次の Gaudry アルゴリズム
+種数が大きい超楕円曲線上の ECDLP では Index Calculus Algorithm を応用することができます。次の Gaudry アルゴリズム
 
 $B$ 以下の素数に代えて、次数 $s$ 以下の多項式の因子基底を用意して Mumford 表現に現れる多項式 $U$ が因子基底の要素に分解される場合に対して $B = \lbrace P_j\in C(\mathbb{F}_p)\setminus P_\infty\mid X(P_j)\neq X(P_i) for i \neq j\rbrace$
 

@@ -98,9 +98,15 @@ $$
 ### TFHE
 現状で最も高速な部類に入る完全準同型暗号です。
 
+$\mathbb{T} := \mathbb{R}/\mathbb{Z}$ は環ではないです。
+群 $+:\mathbb{T}\times\mathbb{T}\to\mathbb{T}$
+作用 $\times:\mathbb{T}\times\mathbb{Z}\to\mathbb{T}$
+$\mathbb{Z}_N[X] := \mathbb{Z}[X]/(X^N + 1)$
+$\mathbb{T}_N[X] := \mathbb{R}[X]/(X^N + 1)\bmod 1$
 
-
-LWE をトーラス $\mathbb{T} = \mathbb{R}/\mathbb{Z}$ 上で行う TLWE
+> **Gadget Decomposition function**
+> $\|d - \boldsymbol{v}\cdot H\|$ を最小化する $\boldsymbol{v}$ を求めるアルゴリズム
+approximate decomposition
 
 LWE は次のようなものだった。
 > **LWE**
@@ -109,5 +115,3 @@ LWE は次のようなものだった。
 $$
 b - \boldsymbol{a}\cdot\boldsymbol{s} = m + e
 $$
-
-$\mathbb{T}[X]/(X^{1024} + 1)$

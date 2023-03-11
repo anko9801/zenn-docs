@@ -7,18 +7,15 @@ title: "環境構築"
 
 https://asdf-vm.com/guide/getting-started.html
 
-それでは Python
+asdf を入れたら Python を入れます。
 
 ```shell
-asdf plugin-add python
-asdf list-all python
-asdf install python 3.11.2
-asdf install python 2.7.18
-asdf global python 3.11.2 2.7.18
-asdf reshim
-```
-
-```shell
+$ asdf plugin-add python
+$ asdf list-all python
+$ asdf install python 3.11.2
+$ asdf install python 2.7.18
+$ asdf global python 3.11.2 2.7.18
+$ asdf reshim
 $ python -V
 Python 3.11.2
 $ python3 -V
@@ -27,19 +24,25 @@ $ python2 -V
 Python 2.7.18
 ```
 
-linter などは
-- Pylance
-- Ruff
+これで Python が入りました。:tada:
+私が入れてるエコシステムはこれくらいです。
+- Pylance (language support)
+- Ruff (linter)
+
+今回使うパッケージはこんな感じです。
 
 ```shell
-pip install pycryptodome gmpy2 pwntools z3
+$ pip install pycryptodome gmpy2 pwntools z3
 ```
 
 ## SageMath
+SageMath とは
 
 ```shell
-sudo apt-get install sagemath
+$ sudo apt-get install sagemath
 ```
+
+チートシート
 
 ```python
 # import

@@ -18,6 +18,7 @@ title: "暗号技術を支える計算機代数"
 資料の厳密さはその情報の信頼度を表していると思っています。しかし全てを厳密に書いてしまうと文章が記事では収まらなくなってしまいますので非本質的な部分は曖昧にしたり省きます。何が厳密で何が厳密ではないかは明確に書くつもりなのでそこは安心してください。厳密な証明や実装が気になった人は参考文献の本や規格書、元論文などを読んでみると良いと思います。
 
 ## 記号
+$\mathbb{B} = \lbrace 0, 1\rbrace$: バイナリの値の集合
 $\mathbb{N}$: 自然数の集合
 $\mathbb{Z}$: 整数の集合
 $\mathbb{Q}$: 有理数の集合
@@ -468,7 +469,7 @@ $n-1 = 16 = 2^4 \times 1$ より $s = 4, d = 1$
 ベクトル空間
 
 ## 有限体
-ここで強く断っておくのですが $\mathbb{F}_p^n \neq \mathbb{F}_{p^n}$ です。そりゃ有限体は零因子を持たないので $\alpha^n = 0$ とならないから、そうなるはずがありません。けれども暗号やってる人でこれがわかってない人がとんでもない人数います。間違えないでください。
+$\mathbb{F}_p^n \neq \mathbb{F}_{p^n}$ です。
 
 ## 格子の基礎
 
@@ -675,6 +676,24 @@ $$
 
 最も簡約化されているかを証明する。
 
+```python
+def gaussian_reduction(v1, v2):
+    while True:
+        if v2.norm() < v1.norm():
+            v1, v2 = v2, v1
+        m = floor(v1.dot_product(v2) / v1.dot_product(v1))
+        if m == 0:
+            break
+        v2 = v2 - m*v1
+    return v1, v2
+
+
+v1 = vector([846835985, 9834798552])
+v2 = vector([87502093, 123094980])
+```
+
+
+
 :::message
 **練習問題**
 CryptoHack
@@ -786,10 +805,10 @@ $$
 -c & \boldsymbol{0}
 \end{pmatrix} =
 \begin{pmatrix}
-b_0 & 1 &&& \\
-b_1 && 1 && \\
+b_1 & 1 &&& \\
+b_2 && 1 && \\
 \vdots &&& \ddots & \\
-b_{n-1} &&&& 1 \\
+b_n &&&& 1 \\
 -c &&&& \\
 \end{pmatrix}
 $$
@@ -802,14 +821,30 @@ K\boldsymbol{b} & 2I \\
 -Kc & -\boldsymbol{1}
 \end{pmatrix} =
 \begin{pmatrix}
-Kb_0 & 2 &&& \\
-Kb_1 && 2 && \\
+Kb_1 & 2 &&& \\
+Kb_2 && 2 && \\
 \vdots &&& \ddots & \\
-Kb_{n-1} &&&& 2 \\
+Kb_n &&&& 2 \\
 -Kc & -1 & -1 & \cdots & -1 \\
 \end{pmatrix}
 $$
 
+### Approximate GCD Problem
+$r_i \approx 2^\lambda$, $p \approx 2^{\lambda + \log\lambda}$, $q \approx 2^{\lambda\log\lambda}$
+
+$$
+x_i = q_ip + r_i
+$$
+
+$$
+\begin{pmatrix}
+2^{\rho+1} & x_1 & x_2 & x_3 & x_4 \\
+& -x_0 &&& \\
+&& -x_0 && \\
+&&& -x_0 & \\
+&&&& -x_0  \\
+\end{pmatrix}
+$$
 ## 多項式
 ここでは剰余上の方程式 $\mathbb{Z}/N\mathbb{Z}[x]$ の解を求める方法について解説します。
 
@@ -853,24 +888,6 @@ ax = b \pmod n
 $$
 
 :::
-
-> **Approximate GCD Problem**
-> $r_i \approx 2^\lambda$, $p \approx 2^{\lambda + \log\lambda}$, $q \approx 2^{\lambda\log\lambda}$
->
-> $$
-x_i = q_ip + r_i
-$$
-
-$$
-\begin{pmatrix}
-2^{\rho+1} & x_1 & x_2 & x_3 & x_4 \\
-& -x_0 &&& \\
-&& -x_0 && \\
-&&& -x_0 & \\
-&&&& -x_0  \\
-\end{pmatrix}
-$$
-
 
 更に $n$ 次方程式を格子問題に帰着する方法を考えます。
 
@@ -1293,4 +1310,4 @@ $$
 - クラウドを支えるこれからの暗号技術
 - [整数論テクニック集のpdf](https://kirika-comp.hatenablog.com/entry/2018/03/12/210446)
 - [General purpose integer factoring](https://eprint.iacr.org/2017/1087)
-- https://www.slideshare.net/trmr105/katagaitai-workshop-7-crypto
+- [katagaitai workshop #7 crypto ナップサック暗号と低密度攻撃](https://www.slideshare.net/trmr105/katagaitai-workshop-7-crypto)
