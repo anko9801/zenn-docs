@@ -81,13 +81,16 @@ $$
 
 ここで $e = e'$ となれば署名が有効であると検証されたことになる。
 
-## 秘密分散
+## 秘密分散 (Secret Sharing)
 ある秘密情報を $n$ 個に分割して $t$ 個わかれば復元できる。
 
 ### Shamir's secret sharing
 $t-1$ 次多項式 $f(x) = \sum_i a_ix^i \in \mathbb{F}_p[x]$ を用いて多項式上の $n$ 点 $(x_i, f(x_i))$ を生成する。
 
 ### Blakley's secret sharing
+
+## 紛失通信 (Oblivious Transfer)
+Goldwasser–Micali cryptosystem
 
 
 ## SSH
