@@ -83,6 +83,7 @@ $$
 
 ## 秘密分散 (Secret Sharing)
 ある秘密情報を $n$ 個に分割して $t$ 個わかれば復元できる。
+BLS署名
 
 ### Shamir's secret sharing
 $t-1$ 次多項式 $f(x) = \sum_i a_ix^i \in \mathbb{F}_p[x]$ を用いて多項式上の $n$ 点 $(x_i, f(x_i))$ を生成する。
@@ -117,6 +118,7 @@ SoloKey, Nitrokey
 ## サービス
 マイナンバーカード
 コンテナイメージの署名 Sigstore
+FIDO認証
 
 ## 暗号の性質
 耐量子性
