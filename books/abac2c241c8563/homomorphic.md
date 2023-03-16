@@ -5,14 +5,22 @@ title: "準同型暗号"
 ## 準同型暗号
 準同型暗号には次のような種類がある。
 
-- 乗法準同型暗号
-- 加法準同型暗号
-- レベル n 準同型暗号
-- 完全準同型暗号
+| 暗号 | 説明 |
+| :--: | :-- |
+| 加法準同型暗号 | 暗号化関数 $\mathcal{E}$ が加法準同型 $\mathcal{E}(x + y) = \mathcal{E}(x)\mathcal{E}(y)$ を満たす |
+| 乗法準同型暗号 | 暗号化関数 $\mathcal{E}$ が乗法準同型 $\mathcal{E}(xy) = \mathcal{E}(x)\mathcal{E}(y)$ を満たす |
+| レベル $n$ 準同型暗号 | 加法準同型かつ $n$ 回までの乗法準同型演算が成り立つ暗号 |
+| 完全準同型暗号 | 加法準同型かつ乗法準同型な暗号 |
 
-### 乗法準同型暗号
-最もよくある準同型暗号
-#### Unpadded RSA
+レベル $n$ 準同型暗号は $n$ 次方程式を計算できる
+
+準同型暗号ができることによって何ができるか
+
+### 具体例
+加法/乗法準同型暗号の具体例を並べる。
+
+乗法準同型暗号
+- Unpadded RSA
 
 $$
 \begin{aligned}
@@ -22,7 +30,7 @@ $$
 \end{aligned}
 $$
 
-#### ElGamal暗号
+- ElGamal暗号
 
 $$
 \begin{aligned}
@@ -32,10 +40,8 @@ $$
 \end{aligned}
 $$
 
-### 加法準同型暗号
-あまり見かけない準同型暗号です。
-#### Paillier暗号
-加法準同型
+加法準同型暗号
+- Paillier暗号
 
 $$
 \begin{aligned}
@@ -45,14 +51,9 @@ $$
 \end{aligned}
 $$
 
-### レベルn準同型暗号
-レベルn準同型 = 加法準同型 + n回の乗算準同型
-- 乗算回数に制約がある完全準同型
-- レベルnはn次方程式を計算できる
-- レベル2準同型なら乗算が1度だけ可能
-
-#### Lifted-ElGamal暗号
-レベル2準同型暗号
+## レベル $n$ 準同型暗号
+Lifted-ElGamal暗号
+レベル $2$ 準同型暗号
 位数 $p$ の楕円曲線 $E$, と生成元 $P\in E$
 秘密鍵 $s\in\mathbb{F}_p$ と公開鍵 $sP$
 平文 $m$ に対して乱数 $r$ をとり $c=(mP+rsP, rP)$
@@ -69,7 +70,10 @@ $$
 $$
 
 乗法準同型性
-$\mathcal{E}(m_1)\times\mathcal{E}(m_2) := (e(S_1, S_2), e(S_1, T_2), e(T_1, S_2), e(T_1, T_2))$
+
+$$
+\mathcal{E}(m_1)\times\mathcal{E}(m_2) := (e(S_1, S_2), e(S_1, T_2), e(T_1, S_2), e(T_1, T_2))
+$$
 
 $$
 \begin{aligned}
@@ -80,7 +84,6 @@ $$
 $$
 
 
-[ペアリングベースの効率的なレベル2準同型暗号（SCIS2018） (slideshare.net)](https://www.slideshare.net/herumi/2scis2018?next_slideshow=86572957)
 
 
 ## 完全準同型暗号
@@ -117,3 +120,7 @@ b - \boldsymbol{a}\cdot\boldsymbol{s} = m + e
 $$
 
 これで準同型暗号に興味を持った方は Zama プロジェクトを調べてみると楽しいと思います。誰にも知られずに人工知能の推論や
+
+## 参考文献
+
+- [ペアリングベースの効率的なレベル2準同型暗号（SCIS2018） (slideshare.net)](https://www.slideshare.net/herumi/2scis2018)
