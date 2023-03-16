@@ -2,10 +2,12 @@
 title: "楕円曲線暗号への攻撃"
 ---
 
+楕円曲線の理論は群環体、ガロア理論、可換環論、代数幾何学と理解した先になるので付け焼き刃程度しか書けないです。ちゃんと理解するには1つ1つ自分で理論を構築できるようになるまで理解する必要があります。
+
 ## 楕円曲線
 TODO: かなり書き直す
 
-$K$ を任意の体、 $f(x) \in K[x]$ を3次方程式とする。ただし $f(x)$ の3解は相異なる。ここで次の方程式を考える。
+$K$ を体、 $f(x) \in K[x]$ を3次方程式とする。ただし $f(x)$ の3解は相異なる。ここで次の方程式を考える。
 
 $$
 y^2 = f(x)
@@ -70,8 +72,13 @@ $$
 $$
 > ただし、$\#E/\mathbb{F}_p$ で群位数を表す。
 
+**Proof.**
+
 > **Schoof のアルゴリズム**
-> 位数を計算できる。
+>
+
+Schoof のアルゴリズムはモジュラー多項式によって $O(\log^8p)$ から $O(\log^6p)$ へ高速化できるのですが、本筋とズレるので気になる方は楕円曲線について学習された上、論文などを参照してください。
+
 ### 2重周期関数
 複素平面内の格子 $L$ とは、与えられた2つの複素数 $\omega_1, \omega_2$ の整数係数の1次結合全体のなす集合を意味する。ただし、$\omega_1$ と $\omega_2$ は原点を通る同一の直線状に無いものとする。
 例えば $\omega_1 = 1, \omega_2 = i$ の場合、ガウス整数全体のなす格子 $\{m + ni\ |\ m, n \in \mathbb{Z}\}$ を得る。
@@ -127,23 +134,13 @@ $$
 \end{aligned}
 $$
 
-楕円関数体
-楕円曲線
-
-#### 保型形式
-上半平面 $\mathbb{H}$
-
-$$
-\gamma(x) = \frac{ax + b}{cx + d}
-$$
-
-の変換について不変
 
 ## ペアリング
 
 Weil-pairing
+Weil pairing $e_n: E[n]\times E[n]\to \mu_n\subseteq \mathbb{F}_{p^k}^*$
 Tate-pairing
-構成
+Bilinear-paring
 
 ## 超楕円曲線
 超楕円曲線
@@ -214,7 +211,7 @@ https://neuromancer.sk/std/
 
 ## ECDLP
 
-DLP で書いた手法を用いることで解くことができます。Pollard-rho 法や GSBS 法は簡単に応用が効くので飛ばします。あとよく分かってないですけど数体ふるい法は ECDLP 上では有効ではないらしいので Pohlig-Hellman と Index Calculus Algorithm を紹介します。詳しい方教えてください。
+DLP で書いた手法を用いることで解くことができます。Pollard-rho 法や GSBS 法は簡単に応用が効くので飛ばします。あとよく分かってないですけど数体ふるい法は ECDLP 上では有効ではないらしいので Pohlig-Hellman と Index Calculus Algorithm とその派生を紹介します。詳しい方ここらへん教えてください。
 
 ### Pohlig-Hellman
 
@@ -294,7 +291,7 @@ $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 
 | アンチケース | 攻撃名   | 方法 |
 | ---- | --- | ---- |
-| なし | ECDLP | ECDLP を解く $O(\sqrt{\#E/\mathbb{F}_p})$ となる |
+| なし | ECDLP | 単純に ECDLP を解く |
 | 位数が Smooth number $\#E/\mathbb{F}_p = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ | Pohlig Hellman Attack | 位数 $p_i$ の小さな ECDLP に分解できる |
 | Anomalous な曲線 $\#E/\mathbb{F}_p = p$ | MOV/FR Reduction | $\mathbb{F}_p^+$ 上の DLP に帰着できる |
 | Supersingular な曲線 $\#E/\mathbb{F}_p = p+1$ | SSSA Attack | 埋め込み次数 $k$ を用いて $\mathbb{F}_{p^k}^\times$ 上の DLP に帰着できる |
@@ -303,15 +300,12 @@ $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 
 
 ### MOV/FR Reduction
+楕円曲線が Anomalous という性質を持つとき、ペアリングを用いて有限体上の DLP に帰着できるという方法です。
+
 MOV Reduction (Menezes-Okamoto-Vanstone Reduction)
 Weil-pairing
 FR Reduction (Frey-Rück Reduction)
 Tate-pairing
-
-Tate-pairing, Bilinear-pairingのいい資料がみつからない
-$R=dP$ となるECDLPを解く
-
-Weil pairing $e_n: E[n]\times E[n]\to \mu_n\subseteq \mathbb{F}_{p^k}^*$
 
 1. $E[n]\subseteq E(\mathbb{F}_{p^k})$ となる最小の $k$ を持ってくる
 2. 位数 $n$ の $\alpha=e_n(P, Q)$ となるように $Q \in E[n]$ を取ってくる
@@ -321,15 +315,12 @@ Weil pairing $e_n: E[n]\times E[n]\to \mu_n\subseteq \mathbb{F}_{p^k}^*$
 $k$ は多くとも6まで
 $E(\mathbb{F}_{p^k}^*)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
 
-
-
 ### Supersingular な曲線を用いてはいけない
 SSSA Attack
 $E/\mathbb{F}_q, \gcd(t, q) > 1$ 埋め込み次数 $k\leq6$ 全埋込み次数は既知
 $E[p]  \mathbb{Z}/p\mathbb{Z}$
 $\pi:\mathbb{P}^2(\mathbb{Q}_p) \to \mathbb{P}^2(\mathbb{F}_p)$
 $\phi:\ker\pi \to \mathcal{E}(p\mathbb{Z}_p)$
-
 
 ### Singular な曲線を用いてはいけない
 
