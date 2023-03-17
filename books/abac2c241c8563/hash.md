@@ -12,14 +12,16 @@ title: "ハッシュとSMT"
 これを満たしたハッシュというのは実際にあります。MD5 や SHA1, SHA-256 などなど、まぁそれぞれのハッシュの実装は結構荒っぽく作られてるので詳細は省きます。ただし攻撃するときの重要な性質として Merkle-Damgård construction というものがあるのでそれだけ知っておきましょう。
 
 ### Merkle-Damgård construction
-4ブロックごとに処理する
+ハッシュ関数は任意長のメッセージを固定長の出力に変換しないといけません。その為に入力を固定長のブロックに分割し、1つずつ内部状態に適用させます。
 ![](/images/length_extension.png)
 
-### 誕生日攻撃 (Birthday Attack)
-$H(m_1) = H(m_2)$ となる $m_1, m_2$ を見つける
+MD5 や SHA-1 などよく使われるハッシュ関数はこれです。このときに成立する攻撃というのが伸長攻撃です。伸長攻撃から慎重につってね！フゥーワッ！
 
 ### 伸長攻撃 (Length Extension Attack)
 $H(m_1)$ $H(m_1\|m_2)$ を求める
+
+### 誕生日攻撃 (Birthday Attack)
+$H(m_1) = H(m_2)$ となる $m_1, m_2$ を見つける
 
 ### Differenctial Cryptoanalysis
 暗号を解析しながら SMT を用いて解く
