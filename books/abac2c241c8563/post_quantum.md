@@ -29,6 +29,7 @@ https://csrc.nist.gov/Projects/post-quantum-cryptography/post-quantum-cryptograp
 | CRYSTALS-KYBER (格子暗号) <br> BIKE (符号暗号) <br> Classic McElience (符号暗号) <br> HQC (符号暗号) <br> SIKE (同種写像暗号) | CRYSTALS-Dilithium (格子暗号) <br> FALCON (格子暗号) <br> SPHINCS+ (ハッシュ関数署名) |
 
 今回はこれらの紹介をしていきたいと思います。
+また量子の性質を用いて鍵配送問題を解決する量子暗号プロトコルがあります。これは誰かに見られたかを判定します。他の資料におまかせします。
 
 ## 格子暗号
 
