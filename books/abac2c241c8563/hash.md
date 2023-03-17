@@ -2,32 +2,43 @@
 title: "ハッシュとSMT"
 ---
 
-## ハッシュ
-ハッシュとは
+## ハッシュ関数
+ハッシュ関数とは
 
-暗号では署名などに使われていたりします。ただ暗号で使うためには攻撃者がハッシュに対する元の入力を思いつかせないようにしないといけません。
-
-これを原像計算困難性といいます。
+暗号ではパスワードの保存や HMAC, 署名などに使われていたりします。ただ暗号で使うためには攻撃者がハッシュ値に対する元の入力を思いつかせないようにしないといけません。これを原像計算困難性といいます。
 
 ![](/images/hash.png)
 
-詳細は省きますがこれを
-
-
-HMAC (Hash-based MAC)
-
-### 誕生日攻撃 (Birthday Attack)
-$H(m_1) = H(m_2)$ となる $m_1, m_2$ を見つける
+これを満たしたハッシュというのは実際にあります。MD5 や SHA1, SHA-256 などなど、まぁそれぞれのハッシュの実装は結構荒っぽく作られてるので詳細は省きます。ただし攻撃するときの重要な性質として Merkle-Damgård construction というものがあるのでそれだけ知っておきましょう。
 
 ### Merkle-Damgård construction
 4ブロックごとに処理する
 ![](/images/length_extension.png)
+
+### 誕生日攻撃 (Birthday Attack)
+$H(m_1) = H(m_2)$ となる $m_1, m_2$ を見つける
 
 ### 伸長攻撃 (Length Extension Attack)
 $H(m_1)$ $H(m_1\|m_2)$ を求める
 
 ### Differenctial Cryptoanalysis
 暗号を解析しながら SMT を用いて解く
+
+### HMAC (Hash-based MAC)
+信頼できないソースの正当性を証明するものというのは世界中で必要とされています。これを秘密鍵を用いて検査するコードのことをメッセージ認証コード (message authentication codes; MAC) と言います。その中でハッシュを用いる MAC を HMAC と呼びます。
+- ハッシュ関数 `H`
+- `H` のハッシュ値のバイト長 `B`
+- 秘密鍵 `K`
+- `outer_pad = the byte 0x5C repeated B times`
+- `inner_pad = the byte 0x36 repeated B times`
+
+として HMAC の値は
+
+```cpp
+H(K XOR outer_pad, H(K XOR inner_pad, data))
+```
+
+と計算します。
 
 ## CRC
 ビット列を $\mathbb{F}_2[x]/(f(x))$ に変換して誤り検出する方法です。$f(x)$ を生成多項式と呼び、CRC-32 では次の生成多項式を用います。
