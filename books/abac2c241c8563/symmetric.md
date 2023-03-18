@@ -197,7 +197,7 @@ C & = \mathrm{GCTR}_K(J_0 + 1, P)
 \end{aligned}
 $$
 
-また暗号文とは別に認証タグを生成します。これは復号するときにこのタグと一緒に入力することで暗号文が改ざんされたかどうかを検知することができる代物です。暗号文とオプショナルの認証データ (AAD; Additional Authenticated Data) を用意して投げると出てきます。
+また暗号文とは別に認証タグを生成します。これは復号するときにこのタグと一緒に入力することで暗号文が改ざんされたかどうかを検知することができる代物です。暗号文 $C$ とオプショナルの認証データ (AAD; Additional Authenticated Data) $A$ を用意して投げると出てきます。
 
 $$
 T = \mathrm{GCTR}_K(J_0, \mathrm{GHASH}_H(Z_{b, 128}(A)\|Z_{b, 128}(C)\|Z_{f, 64}(\mathrm{len}(A))\|Z_{f, 64}(\mathrm{len}(C))))
