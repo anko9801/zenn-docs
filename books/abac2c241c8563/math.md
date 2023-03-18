@@ -80,9 +80,7 @@ $(xy)z$ の $z$ を前に持ってきて $z(xy)$ などとすることは一般�
 >
 > 同値関係 $\sim$ について $x\in S$ に対し
 >
-> $$
-C(x) = \lbrace y\in S\mid y\sim x\rbrace
-$$
+> $$C(x) = \lbrace y\in S\mid y\sim x\rbrace$$
 >
 > を同値類といい、同値類全体の集合を同値関係による商 $S/\sim$ と呼ぶ。
 
@@ -100,9 +98,9 @@ $$
 
 > **Thm. ラグランジュの定理**
 >
-> $$
-|G| = (G:H)|H|
-$$
+> $$|G| = (G:H)|H|$$
+
+> **Def. 正規部分群**
 
 > **Def.**
 > 準同型とは取れる
@@ -111,9 +109,7 @@ $$
 > **Thm. 準同型定理**
 > 群 $G_1, G_2$ とその間に準同型 $\phi: G_1 \to G_2$ があるとするとき次が成り立つ。
 >
-> $$
-G_1/\mathrm{Ker}(\phi) \cong \mathrm{Im}(\phi)
-$$
+> $$G_1/\mathrm{Ker}(\phi) \cong \mathrm{Im}(\phi)$$
 
 ### 中国剰余定理
 
@@ -143,9 +139,7 @@ $$
 > **Prop.**
 > $n = p_1^{e_1}\cdots p_k^{e_k}$ と素因数分解出来るとき、次が成り立つ。
 >
-> $$
-\mathbb{Z}/n\mathbb{Z} \cong \mathbb{Z}/p_1^{e_1}\mathbb{Z}\times\cdots\times\mathbb{Z}/p_k^{e_k}\mathbb{Z}
-$$
+> $$\mathbb{Z}/n\mathbb{Z} \cong \mathbb{Z}/p_1^{e_1}\mathbb{Z}\times\cdots\times\mathbb{Z}/p_k^{e_k}\mathbb{Z}$$
 
 例えば $\mathbb{Z}/15\mathbb{Z} \cong \mathbb{Z}/3\mathbb{Z}\times\mathbb{Z}/5\mathbb{Z}$ となるので法が15の数と法が3, 5の数のペアは1対1に対応させることができます。
 
