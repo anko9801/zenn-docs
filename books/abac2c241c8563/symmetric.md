@@ -137,6 +137,8 @@ https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%8
 ### AES-ECB (Electronic CodeBlock)
 最も単純なモードです。平文をそのまま暗号化します。復号もそのまま復号します。
 
+これは大変脆弱なことが知られているので暗号として使ってはいけません。
+
 $$
 \begin{aligned}
 C_i & = E_K(P_i) \\
@@ -144,11 +146,14 @@ P_i & = E_K(C_i)
 \end{aligned}
 $$
 
-これは大変脆弱なことが知られているので暗号として使ってはいけません。
+![](/images/ECB_encryption.png)
+![](/images/ECB_decryption.png)
 
 ### AES-CBC (Cipher Block Chaining)
 Padding Oracle Attack で大きな衝撃を与えたモードです。
 CBC モードでは鍵以外に初期ベクトル IV (Initialization Vector) を追加します。これを初期状態として前の暗号文と平文と掛け合わせて暗号化することを繰り返して暗号化します。これによって ECB であった脆弱性を防ぐことができます。
+
+ただプロトコルによっては脆弱となりうるので極力使用するのは避けましょう。
 
 $$
 \begin{aligned}
@@ -160,7 +165,8 @@ P_i & = E_K(C_i)\oplus C_{i-1}
 \end{aligned}
 $$
 
-ただプロトコルによっては脆弱となりうるので極力使用するのは避けましょう。
+![](/images/CBC_encryption.png)
+![](/images/CBC_decryption.png)
 
 ### AES-GCM (Galois/Counter Mode)
 AES 利用モードの中で TLS 1.3 で使われている唯一のモードです。ガロア体 (有限体) 上で Counter (CTR) モードを実行するのでこんな名前になってます。
@@ -245,7 +251,7 @@ Lucky Thirteen Attack
 
 Padding Oracle Attackでは最後の1文字総当り時に全く同じとき例外として落とす必要がある。
 
-他にも Integral Cryptanalysis や Differencial cryptanalysis がありますがそれらは「ハッシュと SMT」で紹介します。
+他にも共通鍵暗号への攻撃には Integral Cryptanalysis や Differencial cryptanalysis がありますがそれらは「ハッシュと SMT」で紹介します。
 
 ## Stream cipher
 ### ChaCha20-Poly1305
