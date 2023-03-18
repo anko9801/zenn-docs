@@ -106,7 +106,7 @@ $K = \mathbb{F}_q[x]/(x^n + 1)$ のとき Module-LWE 問題
 
 
 
-簡単の為に $R_q = \mathbb{F}_q[x]/(x^n+1)$ とおきます。
+簡単の為に $R_q = \mathbb{F}_q[x]/(x^n+1)$, $R = \mathbb{Z}[x]/(x^n+1)$ とおきます。
 
 乱数分布
 使われる乱数に用いる分布について秘密情報については二項分布であることなど細かいところは元論文を当たって欲しい。
@@ -133,29 +133,29 @@ $$
 $$
 
 また $R_q$ であれば各要素に対して圧縮を行う。
+圧縮 $\mathrm{Compress}_q(x, d)$
 
 ### CRYSTALS-KYBER
+行列の圧縮には
+シード値 $\rho$ から多項式を生成する関数 $Sam(\rho)$ を用いる。
+$n = 256$ ビットの
 
 鍵生成
-1. 256 ビットの乱数を用いて $\boldsymbol{A}, \boldsymbol{s}, \boldsymbol{e}$ を生成し、$\boldsymbol{t} = \mathrm{Compress}_q(\boldsymbol{A}\boldsymbol{s} + \boldsymbol{e}, d_t)$ を計算する
-2. $(\boldsymbol{t}, \boldsymbol{A})$ を公開鍵、$\boldsymbol{s}$ を秘密鍵とする
+1. $n$ ビットの疑似乱数を用いて $\boldsymbol{A}\in R_q^{k\times k}, \boldsymbol{s}, \boldsymbol{e}\in R^{k}$ を生成し、$\boldsymbol{t} = \boldsymbol{A}\boldsymbol{s} + \boldsymbol{e}$ を計算する
+2. $(\boldsymbol{t}, \boldsymbol{A})$ を圧縮したものを公開鍵、$\boldsymbol{s}$ を秘密鍵とする
 
 暗号化
 平文 $m$ を用いて
-1. $\boldsymbol{A}, \boldsymbol{r}, \boldsymbol{e}_1, e_2$ を生成する
-2. $\boldsymbol{t} = \mathrm{Decompress}_q(\boldsymbol{t}, d_t)$
-3. $\boldsymbol{u} = \mathrm{Compress}_q(\boldsymbol{A}^T\boldsymbol{r} + \boldsymbol{e}_1, d_u)$
-4. $v = \mathrm{Compress}_q(\boldsymbol{t}^T\boldsymbol{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m, d_v)$
-5. $c = (\boldsymbol{u}, v)$ を暗号文として返す
+1. $\boldsymbol{r}, \boldsymbol{e}_1\in R^k, e_2\in R$ を生成する
+2. $\boldsymbol{u} = \boldsymbol{A}^T\boldsymbol{r} + \boldsymbol{e}_1$
+3. $\boldsymbol{t}$ を解凍して $v = \boldsymbol{t}^T\boldsymbol{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m$
+4. $c = (\boldsymbol{u}, v)$ を圧縮したものを暗号文として返す
 
 復号
-1. $\boldsymbol{u} = \mathrm{Decompress}_q(\boldsymbol{u}, d_u)$
-2. $v = \mathrm{Decompress}_q(v, d_v)$
-3. $\mathrm{Compress}_q(v - \boldsymbol{s}^T\boldsymbol{u}, 1)$ を平文として返す
+1. $\boldsymbol{u}, v$ を解凍して $\mathrm{Compress}_q(v - \boldsymbol{s}^T\boldsymbol{u}, 1)$ を平文として返す
 
 ### NTRU
 CRYSTALS と引き合いとして出されるのが NTT が開発した NTRU 暗号です。
-簡略化の為、$R = \mathbb{Z}[x]/(x^n+1)$
 
 > **Def. Ternary Polynomials**
 > 係数が $\pm 1$ の多項式の集合である。具体的には $\mathcal{T}(d_{+1}, d_{-1})$ を $d_{+1}$ 個の $+1$ 係数と $d_{-1}$ 個の $-1$ 係数のある多項式の集合とする。
