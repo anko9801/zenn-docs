@@ -64,17 +64,21 @@ SVP は原点に最も近い格子点を求める問題でしたが CVP はあ�
 この近似解を解く代表的な方法に Babai’s nearest plane algorithm と Kannan's embedding method があります。
 
 > **Babai’s nearest plane algorithm**
-> 最も近い平面を 1 つ選ぶ
+> $n$ 次元の格子について目標ベクトルに対して最も近い $n-1$ 次元超平面を $1$ つ選ぶことを帰納的に繰り返すことで CVP を解く。
+
+$n$ 次元の格子を $n-1$ 次の $W\subset \Lambda$ とその直交補空間 $W^\top$ に分割します。
 
 $$
 \begin{aligned}
-  \boldsymbol{w} = \sum a_i\boldsymbol{b}_i \\
-  U + \boldsymbol{y} = \lbrace \boldsymbol{u} + \boldsymbol{y}\mid \boldsymbol{u}\in U\rbrace
+  \boldsymbol{w} & = \sum a_i\boldsymbol{b}_i \\
+  U + \boldsymbol{y} & = \lbrace \boldsymbol{u} + \boldsymbol{y}\mid \boldsymbol{u}\in U\rbrace
 \end{aligned}
 $$
 
 > **Kannan’s embedding method**
 > CVP の目標ベクトル $w$ と解ベクトル $v$ の差 $e = w - v$ のノルムについて $\|e\| < \lambda_1/2$ が成り立つとき SVP を解くことで求まる。
+
+次の行列を基底簡約することで
 
 $$
 \begin{pmatrix}
@@ -83,33 +87,28 @@ $$
 \end{pmatrix}
 $$
 
-このような格子の分野において求解困難な問題はたくさんあり、これを用いた暗号はたくさんあります。その中で CVP を用いる暗号を LWE (Learning With Error) 暗号と言ったりします。
+このような格子の分野において求解困難な問題はたくさんあり、これを用いた暗号はたくさんあります。CVP を応用した問題 LWE (Learning With Error) 問題を用いた暗号を LWE 格子暗号といいます。
 
 ### LWE格子暗号
 
 機械学習理論から派生した求解困難な問題で
-簡単の為に一般の LWE 問題 (自己流) を紹介しその他派生を表現する。
-これが $B \geq 2\sqrt{n}$ のとき計算困難な問題であることが知られている
 
 > **LWE 問題**
-> $K$ を体とする。$\boldsymbol{A}\in M_{m,n}(K), \boldsymbol{s}\in K^m$ を掛けて誤差ベクトル $\boldsymbol{e}\in K^n$ を与えた $\boldsymbol{b}\in K^n$ に対し $(\boldsymbol{A}, \boldsymbol{b})$ が与えられたときに $\boldsymbol{s}$ を求める問題を LWE 問題と呼ぶ。
+> $K$ を体とする。$\boldsymbol{A}\in K^{m\times n}, \boldsymbol{s}\in K^m$ を掛けて誤差ベクトル $\boldsymbol{e}\in K^n$ を与えた $\boldsymbol{b}\in K^n$ に対し $(\boldsymbol{A}, \boldsymbol{b})$ が与えられたときに $\boldsymbol{s}$ を求める問題を LWE 問題と呼ぶ。
 >
 > $$
 \boldsymbol{A}\boldsymbol{s} + \boldsymbol{e} = \boldsymbol{b}
 $$
 
-$q$ を素数として
-$K = \mathbb{F}_q$ のとき LWE 問題
-$K = \mathbb{F}_q[x]/(x^n + 1)$ かつ $m = 1$ のとき Ring-LWE 問題
-$K = \mathbb{F}_q[x]/(x^n + 1)$ のとき Module-LWE 問題
-注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体です。
-
-
-
-簡単の為に $R_q = \mathbb{F}_q[x]/(x^n+1)$, $R = \mathbb{Z}[x]/(x^n+1)$ とおきます。
+$q$ を素数として $K = \mathbb{F}_q$ のとき LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ かつ $m = 1$ のとき Ring-LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ のとき Module-LWE 問題といいます。注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体となります。
 
 乱数分布
+これが $B \geq 2\sqrt{n}$ のとき計算困難な問題であることが知られています。
 使われる乱数に用いる分布について秘密情報については二項分布であることなど細かいところは元論文を当たって欲しい。
+
+### Module-LWE
+
+今後簡単の為に $R_q = \mathbb{F}_q[x]/(x^n+1)$, $R = \mathbb{Z}[x]/(x^n+1)$ とおきます。
 
 多項式同士の積で畳み込みを計算するので数論変換 NTT; Number Theoretic Transform を用いると次数 $n$ として $\mathcal{O}(n\log n)$ と高速に計算できる。
 
@@ -141,15 +140,13 @@ $$
 $n = 256$ ビットの
 
 鍵生成
-1. $n$ ビットの疑似乱数を用いて $\boldsymbol{A}\in R_q^{k\times k}, \boldsymbol{s}, \boldsymbol{e}\in R^{k}$ を生成し、$\boldsymbol{t} = \boldsymbol{A}\boldsymbol{s} + \boldsymbol{e}$ を計算する
+1. $\boldsymbol{A}\in R_q^{k\times k}, \boldsymbol{s}, \boldsymbol{e}\in R^{k}$ を生成し、$\boldsymbol{t} = \boldsymbol{A}\boldsymbol{s} + \boldsymbol{e}$ を計算する
 2. $(\boldsymbol{t}, \boldsymbol{A})$ を圧縮したものを公開鍵、$\boldsymbol{s}$ を秘密鍵とする
 
 暗号化
 平文 $m$ を用いて
 1. $\boldsymbol{r}, \boldsymbol{e}_1\in R^k, e_2\in R$ を生成する
-2. $\boldsymbol{u} = \boldsymbol{A}^T\boldsymbol{r} + \boldsymbol{e}_1$
-3. $\boldsymbol{t}$ を解凍して $v = \boldsymbol{t}^T\boldsymbol{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m$
-4. $c = (\boldsymbol{u}, v)$ を圧縮したものを暗号文として返す
+2. $\boldsymbol{t}$ を解凍して $(\boldsymbol{u}, v) = (\boldsymbol{A}^T\boldsymbol{r} + \boldsymbol{e}_1, \boldsymbol{t}^T\boldsymbol{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m)$ を圧縮したものを暗号文として返す
 
 復号
 1. $\boldsymbol{u}, v$ を解凍して $\mathrm{Compress}_q(v - \boldsymbol{s}^T\boldsymbol{u}, 1)$ を平文として返す
@@ -168,13 +165,11 @@ f & = 1+3x+4x^2+5x^3+2x^5 \in R_p \\
 $$
 
 鍵生成
-1. $f\in\mathcal{T}(d+1, d)$, $g\in\mathcal{T}(d, d)$
-2. $h = (f^{-1} \bmod q)g$
+1. $f\in\mathcal{T}(d+1, d)$, $g\in\mathcal{T}(d, d)$ として $h = (f^{-1} \bmod q)g$
 
 暗号化
 1. $m \in R_p$ を Center lift する
-2. $r\in\mathcal{T}(d, d)$
-3. $e = prh + m \pmod q$ を返す
+2. $r\in\mathcal{T}(d, d)$ として $e = prh + m \pmod q$ を返す
 
 復号
 1. $a = fe\pmod q$ の Center lift をする
@@ -188,10 +183,11 @@ $$
 > **SDP; Syndrome Decoding Problem**
 > SDP とは符号長 $n$ として次元 $k$ をパリティ検査行列 $\boldsymbol{H}\in\mathbb{F}_2^{(n-k)\times n}$ とシンドローム $\boldsymbol{s}\in\mathbb{F}_2^{n-k}$ に対して $\boldsymbol{eH}^T = \boldsymbol{s}$ となるハミング重みが $w$ の $\boldsymbol{e}\in\mathbb{F}_2^n$ を求める問題である。
 
-つまり $1$ が $w$ 個、$0$ が $n-w$ 個ある符号でパリティチェックすると $\boldsymbol{s}$ となるような $\boldsymbol{e}$ を求める問題です。
+つまりハミング重み $w$ の符号 $\boldsymbol{e}$ をパリティチェックすると $\boldsymbol{s}$ となるような $\boldsymbol{e}$ を求める問題です。
 
-TODO:
-これがなぜ暗号となるのか？
+これは LWE 問題の派生と見ることができます。
+
+TODO: これがなぜ暗号となるのか？
 
 それぞれの暗号は使う符号が異なります。逆に言えばそれぞれの暗号の違いはほぼそれくらいです。
 
@@ -211,8 +207,9 @@ $p = w_A^{e_A}w_b^{e_B}f \pm 1$
 $\mathbb{F}_{p^2}$ 上の超特異楕円曲線 $E$
 位数 $w_A^{e_A}$ である点 $P_A, Q_A$ と位数 $w_B^{e_B}$ である点 $P_B, Q_B$
 
-$p = 2^{e_2}3^{e_3} - 1$ $2^{e_2}\approx 3^{e_3}$ $\#E = (p + 1)^2$
-$2^{e_2}$-ねじれ群 $E_0[2^{e_2}]$ $E_0[3^{e_3}]$
+$2^a\approx 3^b$ となるような素数 $p = 2^a3^bf - 1$ を用いて超特異楕円曲線 $E_0/\mathbb{F}_{p^2}$、つまり位数が $\#E_0(\mathbb{F}_{p^2}) = (p + 1)^2$ となる楕円曲線を生成する。
+$P_0, Q_0 \in E_0[2^a]$ $E_0[3^{e_3}]$
+$3^b$ 同種写像 $\varphi: E_0\to E$
 
 $$
 \begin{aligned}
@@ -235,22 +232,30 @@ E = EllipticCurve(x^3 + 6*x^2 + x)
 ```
 
 ### SIKE への攻撃
+去年
+
+$$
+y^2 = x^3 + x \qquad y^2 = x^3 + 6x^2 + x
+$$
+
+**Thm. Kani's theorem**
+
 
 https://eprint.iacr.org/2022/975
 
-
 ## ハッシュ関数署名 (Hash-based signature)
-ハッシュ値を用いるだけの退屈な署名です。1979 年の Lamport 署名について
+ハッシュ値を用いるだけの退屈な署名です。
 
 ### Lamport 署名
-Constructing Digital Signatures from a One Way Function
-1 ビットごとに署名します。
+Lamport 署名 とは 1979 年に構築されたハッシュ関数署名です。これは 1 ビットごとに署名します。
 
 1. 秘密鍵 $s_0, s_1$ を生成し、公開鍵 $p_i = H(s_i)$ を計算します
 2. 1 ビットのメッセージ $m$ を用いて $s_m$ を署名として公開します
 3. $p_m = H(s_m)$ となることを確認して検証します
 
 非常にシンプルな署名です。ただ公開鍵に大量のメモリを割いているので、これを短い公開鍵で大量のメッセージを署名できるように改良したいです。それには Merkle が提案した二分木の一種 Merkle 木を使います。
+
+HashMap とか HAMT
 
 $$
 h_{i+1,j/2} = H(h_{i,j}\|h_{i,j+1})
@@ -264,6 +269,6 @@ randomized tree-based stateless signature
 ## 参考文献
 - Post-Quantum Cryptography
 - 耐量子計算機暗号
-- [量子コンピュータに耐性のある暗号技術の
-標準化動向：米国政府標準暗号について](https://www.imes.boj.or.jp/research/papers/japanese/19-J-04.pdf)
+- [量子コンピュータに耐性のある暗号技術の標準化動向：米国政府標準暗号について](https://www.imes.boj.or.jp/research/papers/japanese/19-J-04.pdf)
 - [An efficient key recovery attack on SIDH](https://eprint.iacr.org/2022/975)
+- [Constructing Digital Signatures from a One Way Function](https://www.microsoft.com/en-us/research/publication/constructing-digital-signatures-one-way-function/)
