@@ -763,11 +763,35 @@ $$
 > 2. Lovasz 条件に合うように基底ベクトルの交換
 
 ```python
+def LLL(basis, delta=0.99):
+    assert 1 / 4 < delta < 1
+    n = basis.nrows()
+    B = [0 for _ in range(n)]
+    G, mu = basis.gram_schmidt()
+
+    i = 1
+    while i < n:
+        # size reduction
+        for j in range(i - 1, -1, -1):
+            if mu[i][j].abs() > 1 / 2:
+                q = mu[i][j].round()
+                basis[i] -= q * basis[j]
+                mu[i] -= q * mu[j]
+
+        B[i - 1] = G[i - 1].dot_product(G[i - 1])
+        B[i] = G[i].dot_product(G[i])
+
+        # Lovasz condition
+        if B[i] >= (delta - mu[i][i - 1] * mu[i][i - 1]) * B[i - 1]:
+            i += 1
+        else:
+            basis.swap_rows(i - 1, i)
+            G, mu = basis.gram_schmidt()
+            i = max(i - 1, 1)
+    return basis
 ```
 
 実際は LLL 簡約されていることを定義して、簡約されたときの上限などを示し、LLL 簡約された基底を返すアルゴリズムの well-defined 性や高速化を考えますが、前提知識などが不足していたり長くなるのでアルゴリズムとその特徴を天下り的に書いて終わらせます。
-
-0.99
 
 ### ナップサック暗号 (Markle-Hellman Knapsack encryption)
 一般の数列 $b_i$ に対して $c = \sum_i m_ib_i$ となる $c$ から $m_i$ を求めるのは難しいが $b_i$ が超増加列という性質を持つとき簡単になることを利用した暗号。
