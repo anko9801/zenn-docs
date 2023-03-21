@@ -23,11 +23,26 @@ CTF では AES 暗号の攻撃のみに焦点を当てているものが多い�
 ### ワンタイムパッド
 疑似乱数によって生成された数列を共通鍵として共有し、平文に対して繰り返し鍵で xor を掛ける暗号です。
 
-```
-key: 0x0a 0x6c 0x3e 0x78
-text: I'm your father
-```
+具体的には $i = 0,\ldots, m$ としてバイトごとに分けた平文 $P_i$ と $n$ バイトの鍵 $K_i$ について次のようにして暗号文 $C_i$ を計算します。
 
+$$
+C_i = P_i \oplus K_{i \bmod n}
+$$
+
+```python
+def onetime_pad(m: bytes, key: bytes) -> bytes:
+    n = len(key)
+    c = b""
+    for block in range(0, len(m), n):
+        for i in range(n):
+            if block + i >= len(m):
+                break
+            c += (m[block + i] ^ key[i]).to_bytes(1, "big")
+    return c
+
+c = onetime_pad(b"I'm your father", b"\x0a\x6c\x3e\x78")
+print(c)
+```
 
 ### Feistel 構造
 DES で使われた暗号化の為の内部構造です。下の式のように交互に関数を適用させていくことでシャッフルさせます。ただあまりシャッフル効率はよくないことが知られています。
@@ -92,7 +107,7 @@ const uint8_t inv_sbox[] = {
 シフトやスワップなどを用いてブロック内の転置を行います。
 
 :::message
-演習
+練習問題
 nullcon HackIM 2019 2FUN
 中間一致攻撃
 :::
@@ -114,15 +129,32 @@ AES はブロック暗号なので **16 バイトごとでしか** 暗号化で�
 
 PKCS #7 Padding は次のように余った数をそのままバイトに変換して余った数だけ繋げるようにします。
 
-```
-\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10
-a\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f
-...
-Cryptography\x04\x04\x04\x04
-GettingOverIt\x03\x03\x03
-Lycoris Recoil\x02\x02
-No Game No Life\x01
-Sound! Euphonium\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10
+```python
+from Crypto.Util.Padding import pad, unpad
+
+texts = [
+    b"",
+    b"a",
+    b"Cryptography",
+    b"GettingOverIt",
+    b"Lycoris Recoil",
+    b"No Game No Life",
+    b"Sound! Euphonium",
+]
+
+for text in texts:
+    assert text == unpad(pad(text, 16), 16)
+    assert len(pad(text, 16)) % 16 == 0
+    print(pad(text, 16))
+
+# stdout
+b'\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10'
+b'a\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f'
+b'Cryptography\x04\x04\x04\x04'
+b'GettingOverIt\x03\x03\x03'
+b'Lycoris Recoil\x02\x02'
+b'No Game No Life\x01'
+b'Sound! Euphonium\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10'
 ```
 
 パディングした平文を $P$ として $P = P_1\|\cdots\|P_n$ と複数のブロックに分割し、それぞれのブロックで暗号化します。
@@ -176,7 +208,7 @@ AES 利用モードの中で TLS 1.3 で使われている唯一のモードで�
 まず GHASH と GCTR という操作を定義します。
 
 > **Def. GHASH**
-> 128-bit ブロックの入力を $X = X_1\|\cdots\|X_n$、 $H = E_k(Z_{b, 128}(0))$ とおきます。このとき次のように $\lbrace Y_i\rbrace$ を生成したとき GHASH 関数を $\mathrm{GHASH}_H(X) = Y_n$ と定義します。
+> 128-bit ブロックの入力を $X = X_1\|\cdots\|X_n$、 $H = E_k(Z_{f, 128}(0))$ とおきます。このとき次のように $\lbrace Y_i\rbrace$ を生成したとき GHASH 関数を $\mathrm{GHASH}_H(X) = Y_n$ と定義します。
 >
 > $$
 \begin{aligned}
