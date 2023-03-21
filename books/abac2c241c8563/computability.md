@@ -73,7 +73,7 @@ ex.) XorShift、線形合同法、メルセンヌ・ツイスタ、LFSR
 それなら TRNG と DRBG を組み合わせれば長所と短所を互いに補ってよいじゃないかというのはごもっともで DRBG と TRNG を組み合わせた乱数生成器もしくは DRBG のみを疑似乱数生成器 (PRNG; Pseudo Random Number Generator) と呼びます。(実際は DRBG と PRNG は同じ意味らしいが便宜上この定義とする)
 
 :::message
-練習問題
+**練習問題**
 `/dev/random` や `/dev/urandom` を用いて乱数を生成してみよう
 :::
 
@@ -181,7 +181,7 @@ https://www.ambionics.io/blog/php-mt-rand-prediction
 これでは乱数を予測されてしまうので暗号には使えません。暗号で使えるような DRBG はあるのでしょうか？それらを次節で紹介します。
 
 :::message
-練習問題
+**練習問題**
 CPCTF22/the luck 2 より
 Python の `random` モジュールを予測してみよう
 `secrets` モジュールとの違いを考えよう

@@ -107,7 +107,7 @@ const uint8_t inv_sbox[] = {
 シフトやスワップなどを用いてブロック内の転置を行います。
 
 :::message
-練習問題
+**練習問題**
 nullcon HackIM 2019 2FUN
 中間一致攻撃
 :::
