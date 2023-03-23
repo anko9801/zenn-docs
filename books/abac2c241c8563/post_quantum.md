@@ -99,10 +99,33 @@ print(v)
 
 $$
 \begin{pmatrix}
-  B & \boldsymbol{0} \\
-  w & M
+  \boldsymbol{B} & \boldsymbol{0}^\top \\
+  \boldsymbol{w} & M
+\end{pmatrix}
+=
+\begin{pmatrix}
+b_{11} & \cdots & b_{1m} & 0 \\
+\vdots & \ddots & \vdots & \vdots \\
+b_{n1} & \cdots & b_{nm} & 0 \\
+w_1 & \cdots & w_m & M
 \end{pmatrix}
 $$
+
+```python
+def kannan(B, w):
+    M = 1
+    n = B.nrows()
+    BB = block_matrix([[B, matrix([0 for _ in range(n)]).transpose()], [w, M]])
+    BB = BB.LLL()
+    e = matrix(BB[0][0:n])
+    return w - e
+
+
+B = matrix([[1, 2, 3], [3, 0, -3], [3, -7, 3]])
+w = matrix([10, 6, 5])
+v = kannan(B, w)
+print(v)
+```
 
 このような格子の分野において求解困難な問題はたくさんあり、これを用いた暗号はたくさんあります。CVP を応用した問題 LWE (Learning With Error) 問題を用いた暗号を LWE 格子暗号といいます。
 
