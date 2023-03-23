@@ -75,6 +75,23 @@ $$
 \end{aligned}
 $$
 
+```python
+def babai(B, w):
+    n = B.nrows()
+    BB, _ = B.gram_schmidt()
+    b = w
+    for i in range(n)[::-1]:
+        c = (b.dot_product(BB[i]) / BB[i].dot_product(BB[i])).round()
+        b -= c * B[i]
+    return w - b
+
+
+B = matrix([[1, 2, 3], [3, 0, -3], [3, -7, 3]])
+w = vector([10, 6, 5])
+v = babai(B, w)
+print(v)
+```
+
 > **Kannan’s embedding method**
 > CVP の目標ベクトル $w$ と解ベクトル $v$ の差 $e = w - v$ のノルムについて $\|e\| < \lambda_1/2$ が成り立つとき SVP を解くことで求まる。
 
