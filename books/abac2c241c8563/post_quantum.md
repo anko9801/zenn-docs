@@ -76,19 +76,19 @@ $$
 $$
 
 ```python
-def babai(B, w):
+def babai_cvp(B, w):
     n = B.nrows()
     BB, _ = B.gram_schmidt()
-    b = w
+    e = w
     for i in range(n)[::-1]:
-        c = (b.dot_product(BB[i]) / BB[i].dot_product(BB[i])).round()
-        b -= c * B[i]
-    return w - b
+        c = (e.dot_product(BB[i]) / BB[i].dot_product(BB[i])).round()
+        e -= c * B[i]
+    return w - e
 
 
 B = matrix([[1, 2, 3], [3, 0, -3], [3, -7, 3]])
 w = vector([10, 6, 5])
-v = babai(B, w)
+v = babai_cvp(B, w)
 print(v)
 ```
 
@@ -112,7 +112,7 @@ w_1 & \cdots & w_m & M
 $$
 
 ```python
-def Kannan(B, w):
+def kannan_cvp(B, w):
     n = B.nrows()
     M = 1
     BB = block_matrix([[B, matrix([0 for _ in range(n)]).transpose()], [w, M]])
@@ -123,7 +123,7 @@ def Kannan(B, w):
 
 B = matrix([[1, 2, 3], [3, 0, -3], [3, -7, 3]])
 w = matrix([10, 6, 5])
-v = Kannan(B, w)
+v = kannan_cvp(B, w)
 print(v)
 ```
 
@@ -140,11 +140,45 @@ print(v)
 \boldsymbol{A}\boldsymbol{s} + \boldsymbol{e} = \boldsymbol{b}
 $$
 
-$q$ を素数として $K = \mathbb{F}_q$ のとき LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ かつ $m = 1$ のとき Ring-LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ のとき Module-LWE 問題といいます。注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体となります。
+平均 $0$ 標準偏差 $\sigma > 0$ の $\mathbb{Z}$ 上の離散 Gauss 分布 $\chi = D_{\mathbb{Z}, \sigma}$ から生成される。 $\exp(-x^2/2\sigma^2)$
+$q$ を素数として $K = \mathbb{F}_q$ のとき LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ かつ $m = 1$ のとき Ring-LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ のとき Module-LWE 問題といいます。注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体となります。$ に比例する離散確率分布
 
 乱数分布
 これが $B \geq 2\sqrt{n}$ のとき計算困難な問題であることが知られています。
 使われる乱数に用いる分布について秘密情報については二項分布であることなど細かいところは元論文を当たって欲しい。
+
+```python
+def solve_LWE(A, b):
+    m = A.nrows()
+    n = A.ncols()
+    q = 29
+    BB = block_matrix([[A.change_ring(ZZ).transpose()], [q * matrix.identity(m)]])
+    BB = BB.LLL()[n:]
+    v = babai_cvp(BB, b.change_ring(ZZ))
+    s = v[:n] * A[:n].transpose() ^ -1
+    return s
+
+
+q = 29
+A = matrix(
+    GF(q),
+    [
+        [1, 5, 21, 3, 14],
+        [17, 0, 12, 12, 13],
+        [12, 21, 15, 6, 6],
+        [4, 13, 24, 7, 16],
+        [20, 9, 22, 27, 8],
+        [19, 8, 19, 3, 1],
+        [18, 22, 4, 8, 18],
+        [6, 28, 9, 5, 18],
+        [10, 11, 19, 18, 21],
+        [28, 18, 24, 27, 20],
+    ],
+)
+b = vector(GF(q), [28, 2, 24, 16, 11, 14, 7, 28, 27, 13])
+s = solve_LWE(A, b)
+print(s)
+```
 
 ### Module-LWE
 
