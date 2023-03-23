@@ -115,7 +115,7 @@ $$
 def kannan_cvp(B, w):
     n = B.nrows()
     M = 1
-    BB = block_matrix([[B, matrix([0 for _ in range(n)]).transpose()], [w, M]])
+    BB = block_matrix([[B, matrix(ZZ, n, 1)], [w, M]])
     BB = BB.LLL()
     e = matrix(BB[0][0:n])
     return w - e
