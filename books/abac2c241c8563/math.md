@@ -645,22 +645,22 @@ GSO ベクトルの基本性質 2, 4 より次のことが分かる。
 > **Thm. Hadamardの不等式**
 >
 > $$
-\mathrm{vol}(L)\leq\prod _ {i=1}^n\|\boldsymbol{b} _ i\|
+\mathrm{vol}(L)\leq\prod_{i=1}^n\|\boldsymbol{b}_i\|
 $$
 >
-> 特に $\{\boldsymbol{b} _ {1},\ldots, \boldsymbol{b} _ {n}\}$ が直交基底$\iff\mathrm{vol}(L)=\prod _ {i=1}^n\|\boldsymbol{b} _ i\|$ である。
+> 特に $\{\boldsymbol{b}_{1},\ldots, \boldsymbol{b}_{n}\}$ が直交基底$\iff\mathrm{vol}(L)=\prod_{i=1}^n\|\boldsymbol{b}_i\|$ である。
 
 > **Def. 射影格子**
-> $n$ 次元格子 $L\subseteq\mathbb{R}^m$ の基底 $\{\boldsymbol{b} _ {1},\ldots, \boldsymbol{b} _ {n}\}$ に対し, 各 $1\leq l\leq n$ に対して $\langle\boldsymbol{b} _ {1},\ldots, \boldsymbol{b} _ {l-1}\rangle _ \mathbb{R}$ の直交補空間への直交射影を $\pi _ l:\mathbb{R}^m\to\langle\boldsymbol{b} _ {1},\ldots, \boldsymbol{b} _ {l-1}\rangle _ \mathbb{R}^\bot$ とする。 定理 2 の 1,3 より
+> $n$ 次元格子 $L\subseteq\mathbb{R}^m$ の基底 $\lbrace\boldsymbol{b}_1,\ldots, \boldsymbol{b}_n\rbrace$ に対し, 各 $1\leq l\leq n$ に対して $\langle\boldsymbol{b}_1,\ldots, \boldsymbol{b}_{l-1}\rangle_\mathbb{R}$ の直交補空間への直交射影を $\pi_l:\mathbb{R}^m\to\langle\boldsymbol{b}_1,\ldots, \boldsymbol{b}_{l-1}\rangle_\mathbb{R}^\bot$ とする。 定理 2 の 1,3 より
 >
 > $$
 \begin{aligned}
-\langle\boldsymbol{b} _ {1},\ldots, \boldsymbol{b} _ {l-1}\rangle _ \mathbb{R}^\bot &= \langle\boldsymbol{b} _ {1}^ * ,\ldots, \boldsymbol{b} _ {l-1}^ * \rangle _ \mathbb{R}^\bot = \langle\boldsymbol{b} _ {l}^ * ,\ldots, \boldsymbol{b} _ {n}^ * \rangle _ \mathbb{R} \\
-\pi _ l(\boldsymbol{b}_i) &= \sum _ {j=l}^i\mu _ {i,j}\boldsymbol{b} _ j^ * \\
+\langle\boldsymbol{b}_1, \ldots, \boldsymbol{b}_{l-1}\rangle_\mathbb{R}^\bot &= \langle\boldsymbol{b}_1^*, \ldots, \boldsymbol{b}_{l-1}^* \rangle_\mathbb{R}^\bot = \langle\boldsymbol{b}_l^*, \ldots, \boldsymbol{b}_n^* \rangle_\mathbb{R} \\
+\pi_l(\boldsymbol{b}_i) &= \sum_{j=l}^i \mu_{i,j}\boldsymbol{b}_j^* \\
 \end{aligned}
 $$
 >
-> となる。 すると集合 $\pi _ l(L)$ は $\{\pi _ l(\boldsymbol{b} _ {l}),\ldots,\pi _ l(\boldsymbol{b} _ {n})\}$ を基底に持つ $n-l+1$ 次元の格子であり, $\pi _ l(L)$ を射影格子 (projected lattice) と呼ぶ。
+> となる。 すると集合 $\pi_l(L)$ は $\lbrace\pi_l(\boldsymbol{b}_l), \ldots, \pi_l(\boldsymbol{b}_n)\rbrace$ を基底に持つ $n-l+1$ 次元の格子であり, $\pi_l(L)$ を射影格子 (projected lattice) と呼ぶ。
 
 ### 最短ベクトルの数え上げ
 
@@ -743,9 +743,9 @@ $$
 3 & -10 & 0
 \end{pmatrix}\to
 \begin{pmatrix}
-5 & -3 & -7 \\
-2 & -7 & -7 \\
-3 & -10 & 0
+ 5 & -3 & -7 \\
+-3 & -4 & 0 \\
+ 1 & -3 & 7
 \end{pmatrix}
 $$
 
@@ -761,11 +761,11 @@ $$
 > 2. Lovasz 条件に合うように基底ベクトルの交換
 
 ```python
-def LLL(basis, delta=0.99):
+def LLL(B, delta=0.99):
     assert 1 / 4 < delta < 1
-    n = basis.nrows()
-    B = [0 for _ in range(n)]
-    G, mu = basis.gram_schmidt()
+    n = B.nrows()
+    b = [0 for _ in range(n)]
+    BB, mu = B.gram_schmidt()
 
     i = 1
     while i < n:
@@ -773,20 +773,20 @@ def LLL(basis, delta=0.99):
         for j in range(i - 1, -1, -1):
             if mu[i][j].abs() > 1 / 2:
                 q = mu[i][j].round()
-                basis[i] -= q * basis[j]
+                B[i] -= q * B[j]
                 mu[i] -= q * mu[j]
 
-        B[i - 1] = G[i - 1].dot_product(G[i - 1])
-        B[i] = G[i].dot_product(G[i])
+        b[i - 1] = BB[i - 1].dot_product(BB[i - 1])
+        b[i] = BB[i].dot_product(BB[i])
 
         # Lovasz condition
-        if B[i] >= (delta - mu[i][i - 1] * mu[i][i - 1]) * B[i - 1]:
+        if b[i] >= (delta - mu[i][i - 1] * mu[i][i - 1]) * b[i - 1]:
             i += 1
         else:
-            basis.swap_rows(i - 1, i)
-            G, mu = basis.gram_schmidt()
+            B.swap_rows(i - 1, i)
+            BB, mu = B.gram_schmidt()
             i = max(i - 1, 1)
-    return basis
+    return B
 ```
 
 実際は LLL 簡約されていることを定義して、簡約されたときの上限などを示し、LLL 簡約された基底を返すアルゴリズムの well-defined 性や高速化を考えますが、前提知識などが不足していたり長くなるのでアルゴリズムとその特徴を天下り的に書いて終わらせます。
