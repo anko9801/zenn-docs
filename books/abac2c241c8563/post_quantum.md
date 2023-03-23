@@ -112,9 +112,9 @@ w_1 & \cdots & w_m & M
 $$
 
 ```python
-def kannan(B, w):
-    M = 1
+def Kannan(B, w):
     n = B.nrows()
+    M = 1
     BB = block_matrix([[B, matrix([0 for _ in range(n)]).transpose()], [w, M]])
     BB = BB.LLL()
     e = matrix(BB[0][0:n])
@@ -123,7 +123,7 @@ def kannan(B, w):
 
 B = matrix([[1, 2, 3], [3, 0, -3], [3, -7, 3]])
 w = matrix([10, 6, 5])
-v = kannan(B, w)
+v = Kannan(B, w)
 print(v)
 ```
 
