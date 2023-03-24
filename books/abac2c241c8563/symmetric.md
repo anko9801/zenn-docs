@@ -113,7 +113,10 @@ nullcon HackIM 2019 2FUN
 :::
 
 ## AES
-- 共通鍵暗号の標準的な暗号
+Stream cipher
+ChaCha20-Poly1305
+
+共通鍵暗号の標準的な暗号
 - AES-NI
   - 回路に組み込むことで高速化
 
@@ -254,45 +257,38 @@ $$
 
 とこのような感じです。まぁ僕も「なんですかこれ」って感じなので詳しい方、安全性とか色々教えてください。
 
-## AES 暗号への攻撃
+## AES への攻撃
+
+AES の暗号化関数自体には脆弱性は見つかっていませんが、暗号利用モードやプロトコルの脆弱性により攻撃できる場合があります。
 
 ### AES-ECB の脆弱性
-ECB モードはとっても脆弱でよく CTF に出てきます。
+ECB モードはとっても脆弱でよく CTF に出てきます。なぜ脆弱かというと
 
--
+- ブロックごとに平文と暗号文が対応する
+- 平文と暗号文の対応を知っていればどのブロックもそれに改ざんできる
 
-共通鍵を知らなくてもできてしまうことの具体例は
+からです。そうすると平文の予測のつく通信を傍受できたなら、それを元に対応表を作って改ざんして送るなどを考えれば、いかに脆弱なのかがわかると思います。
 
-- 任意のブロックをぐちゃぐちゃにできる
+その為に通信利用モードがあり、特に CBC モードでは対応表を作ることはできず、攻撃することはできません。
+
+ただしエラーかどうかという情報を攻撃者に返してしまうとたちまち脆弱となります。それが次に話す Padding Oracle Attack の根幹です。
 
 ### Padding Oracle Attack
-CBC モードで発見された脆弱性です。
-
-Oracle は企業の Oracle ではなくて神託と呼ばれる神様が発した言葉のことです。
+CBC モード自体は安全なのですが、プロトコルの作り方や組み合わせ方によっては安全ではなくなります。Oracle は企業の Oracle ではなくて神託と呼ばれる神様が発した言葉のことです。パディング
 
 CTF での典型的な解き方としては Padding Oracle Attack を使って暗号/復号化関数 $E_k$ を作れれば、鍵を考えなくても復号することができ、逆変換を辿るだけで解けます。
 
-POODLE Attack (Padding Oracle On Downgraded Legacy Encryption) CBC モード自体は安全なのですが、プロトコルの作り方や組み合わせ方によっては安全ではなくなる
+- POODLE Attack (Padding Oracle On Downgraded Legacy Encryption)
 
-さらにこれを応用して BEAST Attack; Browser Exploit Against SSL/TLS は TLS の脆弱性を用いた攻撃ができ、Cookie のセッション情報を狙うことができます。
-TLS_RSA_WITH_AES_256_CBC_SHAのようなCipherSuite
-
-Same Origin Policy
+さらにこれを応用して BEAST Attack (Browser Exploit Against SSL/TLS) は TLS の脆弱性を用いた攻撃ができ、Cookie のセッション情報を狙うことができるなど実用的な攻撃が通った。Same Origin Policy があることで
 
 Lucky Thirteen Attack
 
-Padding Oracle Attackでは最後の1文字総当り時に全く同じとき例外として落とす必要がある。
-
 他にも共通鍵暗号への攻撃には Integral Cryptanalysis や Differencial cryptanalysis がありますがそれらは「ハッシュと SMT」で紹介します。
 
-## Stream cipher
-### ChaCha20-Poly1305
-
 ## まとめ
-耐量子性
-Grover's algorithm: $2^{K}\to 2^{K/2}$
-鍵長を倍の長さにすることで同じセキュリティを担保できる。
+最近だと耐量子性も考える必要が出てきました。量子アルゴリズムの1つ Grover's algorithm によって全探索の計算量が $2^{K}\to 2^{K/2}$ と減少した為、鍵長を倍の長さにしないと同じ安全性を担保できません。
 
 ## 参考文献
 - [NIST Special Publication 800-38D Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC](https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38d.pdf)
-- https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89
+- [暗号利用モード - Wikipedia](https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89)
