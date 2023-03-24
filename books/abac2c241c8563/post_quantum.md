@@ -323,13 +323,28 @@ https://eprint.iacr.org/2022/975
 ハッシュ値を用いるだけの退屈な署名です。
 
 ### Lamport 署名
-Lamport 署名 とは 1979 年に構築されたハッシュ関数署名です。これは 1 ビットごとに署名します。
+Lamport 署名 とは 1979 年に Leslie Lamport が構築されたハッシュ関数署名です。これは 1 ビットごとに署名します。
 
 1. 秘密鍵 $s_0, s_1$ を生成し、公開鍵 $p_i = H(s_i)$ を計算します
 2. 1 ビットのメッセージ $m$ を用いて $s_m$ を署名として公開します
 3. $p_m = H(s_m)$ となることを確認して検証します
 
-非常にシンプルな署名です。ただ公開鍵に大量のメモリを割いているので、これを短い公開鍵で大量のメッセージを署名できるように改良したいです。それには Merkle が提案した二分木の一種 Merkle 木を使います。
+非常にシンプルな署名です。ただ公開鍵に大量のメモリを割いているので、これを短い公開鍵で大量のメッセージを署名できるように改良したいです。
+
+### One-time signature (Winternitz OTS)
+1. 32 個の 256 ビット乱数を秘密鍵とし、それぞれ 256 回ハッシュ関数を通したものを公開鍵とする
+2. メッセージを SHA-256 でハッシュ化した $N$ を 8 ビットごとに分けて $N = N_1\|\cdots\|N_{32}$ とする
+3. 公開鍵をそれぞれ $256N_i$ 回ハッシュ化したものを署名として公開する
+
+### Hash to Obtain Random Subset (HORS)
+1. 256 個の乱数を秘密鍵とし、それぞれハッシュ化したものを公開鍵とする
+2. メッセージを 128 ビットのハッシュ関数を通して 16 個の 8 ビットに分けて $N = N_1\|\cdots\|N_{16}$ とする
+3. $N_i$ 番目の公開鍵を連結させたものを署名として公開する
+
+### Merkle trees
+
+
+それには Merkle が提案した二分木の一種 Merkle 木を使います。
 
 HashMap とか HAMT
 
@@ -348,3 +363,18 @@ randomized tree-based stateless signature
 - [量子コンピュータに耐性のある暗号技術の標準化動向：米国政府標準暗号について](https://www.imes.boj.or.jp/research/papers/japanese/19-J-04.pdf)
 - [An efficient key recovery attack on SIDH](https://eprint.iacr.org/2022/975)
 - [Constructing Digital Signatures from a One Way Function](https://www.microsoft.com/en-us/research/publication/constructing-digital-signatures-one-way-function/)
+
+
+[1] Lamport, L. (1979). Constructing digital signatures from a one-way function (Vol. 238). Technical Report CSL-98, SRI International. [paper]
+
+[2] Buchmann, J., Dahmen, E., & Hülsing, A. (2011, November). XMSS-a practical forward secure signature scheme based on minimal security assumptions. In International Workshop on Post-Quantum Cryptography (pp. 117–129). Springer, Berlin, Heidelberg.
+
+[3] Hülsing, A., Butin, D., Gazdag, S., Rijneveld, J., & Mohaisen, A. (2018). XMSS: extended Merkle signature scheme (No. rfc8391).
+
+[4] Bernstein, D. J., Hopwood, D., Hülsing, A., Lange, T., Niederhagen, R., Papachristodoulou, L., … & Wilcox-O’Hearn, Z. (2015, April). SPHINCS: practical stateless hash-based signatures. In Annual international conference on the theory and applications of cryptographic techniques (pp. 368–397). Springer, Berlin, Heidelberg.
+
+[5] Bernstein, D. J., Hülsing, A., Kölbl, S., Niederhagen, R., Rijneveld, J., & Schwabe, P. (2019, November). The SPHINCS+ signature framework. In Proceedings of the 2019 ACM SIGSAC conference on computer and communications security (pp. 2129–2146).
+
+[6] Castelnovi, L., Martinelli, A., & Prest, T. (2018, April). Grafting trees: a fault attack against the SPHINCS framework. In International Conference on Post-Quantum Cryptography (pp. 165–184). Springer, Cham.
+
+[7] https://github.com/kasperdi/SPHINCSPLUS-golang/blob/2e1d517cf3b3f17614ada1422e7c4cf0af3669d0/tweakable/sha256Tweak.go#L109
