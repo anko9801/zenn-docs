@@ -4,6 +4,8 @@ title: "耐量子暗号"
 
 量子コンピュータにより DLP や素因数分解問題は Shor のアルゴリズムを用いて多項式時間で計算出来ることがわかりました。これにより従来多く用いられてきた公開鍵暗号である RSA 暗号や楕円曲線暗号は量子コンピュータによって解かれてしまいます。その為量子コンピュータに解かれないような暗号: 耐量子暗号を開発する必要が出てきました。
 
+OpenSSH や [AWS Key Management Service](https://aws.amazon.com/jp/blogs/news/round-2-post-quantum-tls-is-now-supported-in-aws-kms/) でも耐量子暗号をサポートし
+
 耐量子暗号の仕組みや攻撃について紹介します。ただなぜ量子コンピュータで解かれないのかについてはよく分かっていないのでお答え出来ません。ここらへんについて詳しい方がいたらご教授頂きたいです。
 
 ## Post-Quantum Cryptography Standardization
@@ -140,12 +142,14 @@ print(v)
 \boldsymbol{A}\boldsymbol{s} + \boldsymbol{e} = \boldsymbol{b}
 $$
 
-平均 $0$ 標準偏差 $\sigma > 0$ の $\mathbb{Z}$ 上の離散 Gauss 分布 $\chi = D_{\mathbb{Z}, \sigma}$ から生成される。 $\exp(-x^2/2\sigma^2)$
-$q$ を素数として $K = \mathbb{F}_q$ のとき LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ かつ $m = 1$ のとき Ring-LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ のとき Module-LWE 問題といいます。注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体となります。$ に比例する離散確率分布
+この誤差がなければ逆行列を掛ければすぐに求まるのですが、誤差があることで問題が難しくなります。
 
-乱数分布
+$s$ や $e$ は $0$ から離れ過ぎると他の解と混ざってしまうので $0$ に近い乱数値が選ばれます。この乱数の分布は正規分布や二項分布などが用いられます。
+
+$q$ を素数として $K = \mathbb{F}_q$ のとき LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ かつ $m = 1$ のとき Ring-LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ のとき Module-LWE 問題といいます。注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体となります。
+
 これが $B \geq 2\sqrt{n}$ のとき計算困難な問題であることが知られています。
-使われる乱数に用いる分布について秘密情報については二項分布であることなど細かいところは元論文を当たって欲しい。
+
 
 近似解は LLL して CVP 解く感じです。
 
@@ -216,16 +220,16 @@ $$
 $n = 256$ ビットの
 
 鍵生成
-1. $\boldsymbol{A}\in R_q^{k\times k}, \boldsymbol{s}, \boldsymbol{e}\in R^{k}$ を生成し、$\boldsymbol{t} = \boldsymbol{A}\boldsymbol{s} + \boldsymbol{e}$ を計算する
+1. 疑似乱数で $\boldsymbol{A}\in R_q^{k\times k}$ と二項分布で $\boldsymbol{s}, \boldsymbol{e}\in R^{k}$ を生成し、$\boldsymbol{t} = \boldsymbol{A}\boldsymbol{s} + \boldsymbol{e}$ を計算する
 2. $(\boldsymbol{t}, \boldsymbol{A})$ を圧縮したものを公開鍵、$\boldsymbol{s}$ を秘密鍵とする
 
 暗号化
 平文 $m$ を用いて
-1. $\boldsymbol{r}, \boldsymbol{e}_1\in R^k, e_2\in R$ を生成する
+1. 二項分布で $\boldsymbol{r}, \boldsymbol{e}_1\in R^k, e_2\in R$ を生成する
 2. $\boldsymbol{t}$ を解凍して $(\boldsymbol{u}, v) = (\boldsymbol{A}^T\boldsymbol{r} + \boldsymbol{e}_1, \boldsymbol{t}^T\boldsymbol{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m)$ を圧縮したものを暗号文として返す
 
 復号
-1. $\boldsymbol{u}, v$ を解凍して $\mathrm{Compress}_q(v - \boldsymbol{s}^T\boldsymbol{u}, 1)$ を平文として返す
+1. $\boldsymbol{u}, v$ を解凍して $\mathrm{Compress}_q(v - \boldsymbol{s}^T\boldsymbol{u}, 1)$ つまり $q / 2$ に近い値は $1$ 、$0$ に近い値は $0$ として返す
 
 ### NTRU
 CRYSTALS と引き合いとして出されるのが NTT が開発した NTRU 暗号です。
@@ -356,6 +360,7 @@ $$
 鍵生成コストを下げた
 randomized tree-based stateless signature
 
+## まとめ
 
 ## 参考文献
 - Post-Quantum Cryptography
@@ -369,7 +374,7 @@ randomized tree-based stateless signature
 
 [2] Buchmann, J., Dahmen, E., & Hülsing, A. (2011, November). XMSS-a practical forward secure signature scheme based on minimal security assumptions. In International Workshop on Post-Quantum Cryptography (pp. 117–129). Springer, Berlin, Heidelberg.
 
-[3] Hülsing, A., Butin, D., Gazdag, S., Rijneveld, J., & Mohaisen, A. (2018). XMSS: extended Merkle signature scheme (No. rfc8391).
+[3] Hülsing, A., Butin, D., Gazdag, S., Rijneveld, J., & Mohaisen, A. "XMSS: eXtended Merkle Signature Scheme", RFC 8391, DOI 10.17487/RFC8391, May 2018, <https://www.rfc-editor.org/info/rfc8391>.
 
 [4] Bernstein, D. J., Hopwood, D., Hülsing, A., Lange, T., Niederhagen, R., Papachristodoulou, L., … & Wilcox-O’Hearn, Z. (2015, April). SPHINCS: practical stateless hash-based signatures. In Annual international conference on the theory and applications of cryptographic techniques (pp. 368–397). Springer, Berlin, Heidelberg.
 
