@@ -257,6 +257,8 @@ $$
 
 とこのような感じです。まぁ僕も「なんですかこれ」って感じなので詳しい方、安全性とか色々教えてください。
 
+このように暗号化と同時に完全性や認証性も実現するための暗号方式が考案され、それらを総称して AEAD (Authenticated Encryption with Asocciated Data) と呼ばれます。暗号スイートの Mac の部分に AEAD という表記があるものは、暗号モードとして認証付き暗号の GCM が利用されています。
+
 ## AES への攻撃
 
 AES の暗号化関数自体には脆弱性は見つかっていませんが、暗号利用モードやプロトコルの脆弱性により攻撃できる場合があります。
@@ -283,6 +285,7 @@ POODLE Attack (Padding Oracle On Downgraded Legacy Encryption)
 さらにこれを応用して BEAST Attack (Browser Exploit Against SSL/TLS) は TLS の脆弱性を用いた攻撃ができ、Cookie のセッション情報を狙うことができるなど実用的な攻撃が通った。Same Origin Policy があることで防止された。
 
 Lucky Thirteen Attack では Oracle がわからずともパディング処理の微妙な遅れを検知して同様の攻撃をします。(元論文によると時間差は80nsらしい)
+Al Fardan, N.J. and K.G. Paterson, "Lucky Thirteen: Breaking the TLS and DTLS record protocols", n.d., <https://ieeexplore.ieee.org/iel7/6547086/6547088/06547131.pdf>.
 
 他にも共通鍵暗号への攻撃には Integral Cryptanalysis や Differencial cryptanalysis がありますがそれらは「ハッシュと SMT」で紹介します。
 
