@@ -287,6 +287,9 @@ POODLE Attack (Padding Oracle On Downgraded Legacy Encryption)
 Lucky Thirteen Attack では Oracle がわからずともパディング処理の微妙な遅れを検知して同様の攻撃をします。(元論文によると時間差は80nsらしい)
 Al Fardan, N.J. and K.G. Paterson, "Lucky Thirteen: Breaking the TLS and DTLS record protocols", n.d., <https://ieeexplore.ieee.org/iel7/6547086/6547088/06547131.pdf>.
 
+### Nonce の使いまわし
+差分解読法
+
 他にも共通鍵暗号への攻撃には Integral Cryptanalysis や Differencial cryptanalysis がありますがそれらは「ハッシュと SMT」で紹介します。
 
 ## まとめ

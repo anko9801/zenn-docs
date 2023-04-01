@@ -277,6 +277,8 @@ TODO: これがなぜ暗号となるのか？
 | Classic McElience | Goppa 符号 | IND-CCA | TU Eindhoven |
 | HQC | Quasi-Cyclic 符号 | IND-CCA | University of Limoges |
 
+### Information Set Decoding
+
 ## 同種写像暗号
 超特異同種写像ディフィー・ヘルマン鍵共有 (SIDH / SIKE)
 CSIDH
