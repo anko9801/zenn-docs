@@ -958,6 +958,8 @@ $$
 | 1024bit RSA | $M = P_{71}$ |
 | 2048bit RSA | $M = P_{126}$ |
 
+https://news.err.ee/616732/potential-security-risk-could-affect-750-000-estonian-id-cards
+
 ### 乗法群の位数が $\phi(N) = se^n$ と表されるとき $e$ の逆元が取れない
 
 このとき位数 $se^n$ から $e^n$ 乗することで位数 $s$ の乗法群に落とし, そこでなら逆元を取れるので, 位数 $se^n$ の元を $e^n$ 回掛けて全探索すると平文が見つかる.

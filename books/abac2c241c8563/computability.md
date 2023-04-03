@@ -185,6 +185,7 @@ https://www.ambionics.io/blog/php-mt-rand-prediction
 CPCTF22/the luck 2 より
 Python の `random` モジュールを予測してみよう
 `secrets` モジュールとの違いを考えよう
+https://github.com/python/cpython/blob/main/Lib/random.py
 :::
 
 ### CSPRNG
