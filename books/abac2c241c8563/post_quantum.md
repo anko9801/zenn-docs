@@ -364,9 +364,9 @@ randomized tree-based stateless signature
 
 ## 多変数多項式暗号
 > **MQ 問題**
-> Given $\mathcal{F} = (f_1, \ldots, f_m)\in\mathbb{F}_q[x_1,\ldots,x_n]^m$ $\deg f_i = 2$
-> find one solution $(a_1, \ldots, a_n)\in\mathbb{F}_q^n$ $\mathcal{F}(a_1,\ldots,a_n) = \mathbf{0}\in\mathbb{F}_q^m$
+> 有限体 $\mathbb{F}_q$ 上を係数とする $m$ 個の $n$ 変数の $2$ 次多項式の共通解をひとつ求めよ
 
+グレブナー基底
 
 ## まとめ
 

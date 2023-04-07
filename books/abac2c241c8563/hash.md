@@ -44,11 +44,11 @@ $H(m_1)$ $H(m_1\|m_2)$ を求める
 ## ハッシュの応用
 ### HMAC (Hash-based MAC)
 これを秘密鍵を用いて検査するコードのことをメッセージ認証コード (message authentication codes; MAC) と言います。その中でハッシュを用いる MAC を HMAC と呼びます。
+
 - ハッシュ関数 `H`
-- `H` のハッシュ値のバイト長 `B`
 - 秘密鍵 `K`
-- `outer_pad = the byte 0x5C repeated B times`
-- `inner_pad = the byte 0x36 repeated B times`
+- `outer_pad` `0x5C` をハッシュ値のバイト長だけ繰り返す
+- `inner_pad` `0x36` をハッシュ値のバイト長だけ繰り返す
 
 として HMAC の値は
 

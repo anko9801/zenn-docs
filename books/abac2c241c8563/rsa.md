@@ -31,7 +31,7 @@ m &= c^{d} &\pmod N
 \end{aligned}
 $$
 
-ここで $N, e$ を知っていても $p, q, d$ いずれも知らないとき、素因数分解の計算困難性から復号化は難しいとされています。これを用いた暗号をRSA暗号 (Rivest-Shamir-Adleman encryption) と呼びます。
+ここで $N, e$ を知っていても $p, q, d$ いずれも知らないとき、素因数分解の計算困難性を仮定すると復号化は難しいと証明されています。これを用いた暗号をRSA暗号 (Rivest-Shamir-Adleman encryption) と呼びます。
 
 具体的には次の手順で暗号化された通信します。
 
@@ -87,7 +87,7 @@ print(plaintext)
 
 ### RSA-CRT
 
-RSAの復号をする際に $c^d$ を計算しますが、 $d = e^{-1} \pmod {\phi (N)}$ は比較的大きいので処理が重くなります。これに対してRSA-CRTは中国剰余定理(CRT)を利用して高速化を図っています。
+RSA の復号をする際に $c^d$ を計算しますが、 $d = e^{-1} \pmod {\phi (N)}$ は比較的大きいので処理が重くなります。これに対して RSA-CRT は中国剰余定理 (CRT) を利用して高速化を図っています。
 
 $$
 \begin{aligned}
@@ -98,7 +98,9 @@ m &= \mathrm{CRT}(m_p, m_q) & \pmod {N} \\
 \end{aligned}
 $$
 
-これより下の値を秘密鍵として持つことになります。
+計算量としては同じですが、小さな値で計算して最後に CRT で戻すようになるので多倍長整数の処理分だけ高速化が図れます。
+
+そして通常、$d, p, q$ に加えて次の値を秘密鍵として持ちます。
 
 $$
 \begin{aligned}
@@ -133,13 +135,10 @@ RFC 8017: PKCS #1 V2.2 (RSA Cryptography Specifications Version 2.2)
 > **Prop.**
 > 離散対数問題が解けるならば素因数分解が解ける。
 
-累乗根を求める
-原始根 $g$ を底として対数を取る
+原始根 $g$ を底として対数を取る。
 
 $$
-\begin{aligned}
-\log_g a
-\end{aligned}
+\log_g m = (\log_g c) e^{-1} \pmod{\phi(N)}
 $$
 
 それとわかりやすいように暗号化, 復号化関数 $\mathcal{E}_{pk}, \mathcal{D}_{sk}$ を定義しておきます。
@@ -698,35 +697,43 @@ $$
 これに対する防御方法として平文にパディングを施し、復号化した際にパディング形式が違うときは相手に渡さないようにするという方法があります。これによって正当な暗号文しか受け入れず、適応的選択暗号文攻撃を防げます。
 
 ### パディングによるエラー内容を知られてはいけない (Bleichenbacher's Attack)
-これは平文の一部がしられてはいけない
 
 これについてパディングが合っているかどうかを相手に送ってしまうと Padding Oracle Attack で攻撃でき、PKCS #1 v1.5では200万程度送ると平文が読めてしまいます。
+
+:::message
+**練習問題**
+(SECCON CTF 2022 this_is_not_lsb より)
+:::
 
 ### 暗号文を復号した結果の偶奇を知られてはいけない (LSB Decryption Oracle Attack)
 
 全てが分かっていなくとも偶奇さえ分かれば任意の暗号文を復号できるという攻撃です。
 
-まず平文 $m$ に関してある範囲 $k/2^s\leq m<(k+1)/2^s$ にあるとき
+まず平文 $m$ に関して整数 $0\leq k < 2^s$ を用いてある範囲 $kN/2^s\leq m<(k+1)N/2^s$ にあると書けるとき
 
 $$
 \begin{aligned}
 \mathcal{D}(2^{(s+1)e}c) & = 2^{s+1}m \bmod N \\
 & = \begin{dcases}
-2^{s+1}m - 2kN & \left(\frac{2k}{2^{s+1}}\leq m < \frac{2k+1}{2^{s+1}}\right) \\
-2^{s+1}m - (2k+1)N & \left(\frac{2k+1}{2^{s+1}}\leq m < \frac{2k+2}{2^{s+1}}\right)
+2^{s+1}m - 2kN & \left(\frac{2k}{2^{s+1}}N\leq m < \frac{2k+1}{2^{s+1}}N\right) \\
+2^{s+1}m - (2k+1)N & \left(\frac{2k+1}{2^{s+1}}N\leq m < \frac{2k+2}{2^{s+1}}N\right)
 \end{dcases}
 \end{aligned}
 $$
 
-となります。この上下を判別出来れば平文となり得る範囲を半分にすることができます。ここで最下位ビットについてよく見ると値の偶奇から上のとき $0$、下のとき $1$ となることがわかります。
+となります。この上下を判別出来れば平文となり得る範囲を半分にすることができます。ここで最下位ビットについてよく見ると値の偶奇を考えることで上のとき $0$、下のとき $1$ となることがわかります。
 
 この判別を $s = 0$ から始めることで平文を探し出すことができます。
+
+より一般化して考えると平文に関する情報を一部でも与える仕組みがあれば、ガチャガチャすることで全ての内容が分かってしまうという訳です。
+- Padding Oracle Attack ... パディングによる数値の範囲の情報
+- LSB Decryption Oracle Attack ... $m\bmod 2$ の情報
 
 :::message
 **練習問題**
 1. 異なる $N$ について平文の最下位ビットがわかるときはどうすればよいか (InCTF waRSAw より)
 https://github.com/ashutosh1206/Crypton/tree/master/RSA-encryption/Attack-LSBit-Oracle-variant
-2. 平文の $\bmod 3$ がわかるときはどうすればよいか (BambooFox 2019 Oracle より)
+2. $m\bmod 3$ がわかるときはどうすればよいか (BambooFox 2019 Oracle より)
 :::
 
 ### RSA-CRT にバグがあってはならない (RSA-CRT Fault Attack)

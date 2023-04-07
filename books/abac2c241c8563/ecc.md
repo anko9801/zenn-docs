@@ -312,7 +312,6 @@ $E(\mathbb{F}_{p^k}^*)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
 
 ### Supersingular な曲線を用いてはいけない
 SSSA Attack
-$E/\mathbb{F}_q, \gcd(t, q) > 1$ 埋め込み次数 $k\leq6$ 全埋込み次数は既知
 $E[p]  \mathbb{Z}/p\mathbb{Z}$
 $\pi:\mathbb{P}^2(\mathbb{Q}_p) \to \mathbb{P}^2(\mathbb{F}_p)$
 $\phi:\ker\pi \to \mathcal{E}(p\mathbb{Z}_p)$
