@@ -45,18 +45,15 @@ $H(m_1)$ $H(m_1\|m_2)$ を求める
 ### HMAC (Hash-based MAC)
 これを秘密鍵を用いて検査するコードのことをメッセージ認証コード (message authentication codes; MAC) と言います。その中でハッシュを用いる MAC を HMAC と呼びます。
 
-- ハッシュ関数 `H`
-- 秘密鍵 `K`
-- `outer_pad` `0x5C` をハッシュ値のバイト長だけ繰り返す
-- `inner_pad` `0x36` をハッシュ値のバイト長だけ繰り返す
+秘密鍵 $K$ とハッシュ値長 $B$ として HMAC の値 $C$ を次のように定義します。
 
-として HMAC の値は
-
-```cpp
-H(K XOR outer_pad, H(K XOR inner_pad, data))
-```
-
-と計算します。
+$$
+\begin{aligned}
+pad_{in} & := \overbrace{\mathrm{0x36}\|\cdots\|\mathrm{0x36}}^B \\
+pad_{out} & := \overbrace{\mathrm{0x5C}\|\cdots\|\mathrm{0x5C}}^B \\
+C & := H(K \oplus pad_{out} \| H(K \oplus pad_{in} \| data))
+\end{aligned}
+$$
 
 ### CRC
 ビット列を $\mathbb{F}_2[x]/(f(x))$ に変換して誤り検出する方法です。$f(x)$ を生成多項式と呼び、CRC-32 では次の生成多項式を用います。
