@@ -226,6 +226,8 @@ https://gist.github.com/theoremoon/8bcb9b87dcb1289cf13c9db4431db324
 
 このように暗号化と同時に完全性や認証性も実現するための暗号方式が考案され、それらを総称して AEAD (Authenticated Encryption with Asocciated Data) と呼ばれます。暗号スイートの Mac の部分に AEAD という表記があるものは、暗号モードとして認証付き暗号の GCM が利用されています。
 
+また CTF で出題される他の暗号利用モード OFB, CTR などは Wikipedia を参照すれば良いでしょう。
+
 ## AES への攻撃
 
 AES の暗号化関数自体には脆弱性は見つかっていませんが、暗号利用モードやプロトコルの脆弱性により攻撃できる場合があります。
