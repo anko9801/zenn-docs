@@ -12,6 +12,7 @@ chapters:
   - ecc
   - hash
   - computability
+  - random
   - post_quantum
   - homomorphic
   - blockchain
