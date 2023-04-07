@@ -51,7 +51,7 @@ $$
 \begin{aligned}
 pad_{in} & := \overbrace{\mathrm{0x36}\|\cdots\|\mathrm{0x36}}^B \\
 pad_{out} & := \overbrace{\mathrm{0x5C}\|\cdots\|\mathrm{0x5C}}^B \\
-C & := H(K \oplus pad_{out} \| H(K \oplus pad_{in} \| data))
+\mathrm{HMAC}(K, V) & := H(K \oplus pad_{out} \| H(K \oplus pad_{in} \| V))
 \end{aligned}
 $$
 

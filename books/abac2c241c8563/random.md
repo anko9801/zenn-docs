@@ -1,8 +1,7 @@
 ---
-title: "疑似乱数"
+title: "乱数生成"
 ---
 
-## 乱数生成
 誰にも予測できないような乱数を作るにはどうすればいいでしょうか？
 
 例えばこんな例を考えてみましょう。
@@ -21,6 +20,7 @@ title: "疑似乱数"
 
 このような乱数を生成することはできるのでしょうか？この章ではそのような乱数生成器を紹介していきます。
 
+## 乱数生成
 ### 真性乱数生成器 (TRNG)
 最も原始的で簡単な方法がノイズを用いる方法です。ノイズといっても音のノイズではなく、熱のノイズや電気のノイズ、トンネル効果などを用いた量子の確率的挙動などです。それらノイズの情報をエントロピーが低くなるまで掻き集めて、乱数として返します。これを真性乱数生成器 (TRNG; True Random Number Generator) と呼びます。真性乱数でも意図的に負荷を掛けてノイズの予測を立てられることもあるので、一概にエントロピーが低いことを保証できないことを確認しておきます。
 
@@ -160,7 +160,7 @@ Python の `random` モジュールを予測してみよう
 https://github.com/python/cpython/blob/main/Lib/random.py
 :::
 
-### CSPRNG
+## CSPRNG
 暗号でも使えるような PRNG を暗号論的擬似乱数生成器 (CSPRNG; Cryptographically Secure Pseudo Random Number Generator) と呼びます。
 標準化されている CSPRNG は次のようなものがあります。
 
@@ -174,7 +174,7 @@ https://github.com/python/cpython/blob/main/Lib/random.py
 それぞれの詳細や実装は以下の規格書を読んでもらうことにして、基本的なアイデアを掻い摘んで紹介します。
 [NIST SP 800-90A (Recommendation for Random Number Generation Using Deterministic Random Bit Generators)](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-90a.pdf)
 
-#### Hash_DRBG
+### Hash_DRBG
 bcrypt などのハッシュ関数 $H$ とシード値 $V_0$ を用いて乱数を生成します。
 
 $$
@@ -185,7 +185,7 @@ $$
 
 ハッシュ関数を繰り返し適用せず、インクリメントする理由はハッシュ関数を何回か適用すると元に戻る性質を持つとき脆弱になるからです(通常は Preimage Resistance よりそんなこと起こりえませんが)。
 
-#### HMAC_DRBG
+### HMAC_DRBG
 HMAC とシード値 $V_0$ を用いて乱数を生成します。
 
 $$
@@ -196,7 +196,7 @@ $$
 
 HMAC は SHA-256 を使うことが多いです。
 
-#### CTR_DRBG
+### CTR_DRBG
 AES-CTR の暗号化関数 $E_K$ とシード値 $V_0$ を用いて乱数を生成します。
 
 $$
@@ -205,7 +205,7 @@ $$
 \end{aligned}
 $$
 
-#### Dual_EC_DRBG
+### Dual_EC_DRBG
 
 NIST-p256, NIST-p384, NIST-p521 において点 $P, Q$ と初期シード $s_0$ を用いて乱数を生成します。
 
@@ -220,7 +220,7 @@ $r_i$ は剰余未満の数であり、その上位 2 バイト程を削除し�
 
 しかし、もし NSA がこの点について ECDLP が解けている場合、内部状態を復元できる為、バックドアとなります。この為、2006 年に NIST SP800-90A に組み込まれましたが、2013 年に利用すべきではないと勧告されています。
 
-#### コラム
+### コラム
 RTA
 
 ## 参考文献
