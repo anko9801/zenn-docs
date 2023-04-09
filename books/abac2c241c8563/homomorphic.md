@@ -114,12 +114,52 @@ $\mathbb{T}_N[X] := \mathbb{R}[X]/(X^N + 1)\bmod 1$
 approximate decomposition
 
 LWE は次のようなものだった。
-> **LWE**
-> 環 $R$ に対して $GL_n(R)$ のベクトル空間
+
+$\boldsymbol{a}$: $U_{\mathbb{T}^n}$
+$e$: $\mathcal{D}_{\mathbb{T},\alpha}$
+$\boldsymbol{s}$: $U_{\mathbb{B}^n}$
 
 $$
-b - \boldsymbol{a}\cdot\boldsymbol{s} = m + e
+\begin{aligned}
+b & = \boldsymbol{a}\cdot\boldsymbol{s} + m + e \\
+m & \in\mathbb{B}, \mu = \frac{1}{8}\in\mathbb{T} \\
+b & = \boldsymbol{a}\cdot\boldsymbol{s} + \mu(2\cdot m - 1) + e \\
+m & = \frac{sgn(b - \boldsymbol{a}\cdot\boldsymbol{s}) + 1}{2}
+\end{aligned}
 $$
+
+Torus Ring-LWE
+SampleExtractIndex
+
+$$
+\begin{aligned}
+\lceil Bg\cdot(a_0, a_1, b)\rfloor\cdot\frac{\mu}{Bg} & = (a_0^r, a_1^r, b^r) \approx \mu\cdot(a_0, a_1, b) \\
+b^r - \boldsymbol{a}^r\cdot\boldsymbol{s} & = \mu(b - \boldsymbol{a}\cdot\boldsymbol{s} + e_r)
+\end{aligned}
+$$
+
+Decomposition
+
+$$
+\begin{aligned}
+& \arg\min\sum_{j=0}^{N-1}\left(a_j - \sum_{i=1}^l\frac{\overline{a}_{ij}}{Bg^i}\right)^2 \\
+\overline{a}_{ij}& \in\left[-\frac{Bg}{2}, \frac{Bg}{2}\right) \\
+\lceil Bg\cdot(a, b)\rfloor \\
+(a, b)\approx(\overline{a}_1, \ldots, \overline{a}_l, \overline{b}_1, \ldots, \overline{b}_l)
+\begin{pmatrix}
+\frac{1}{Bg} & 0 \\
+\frac{1}{Bg^2} & 0 \\
+\vdots & \\
+\frac{1}{Bg^l} & 0 \\
+0 & \frac{1}{Bg} \\
+0 & \frac{1}{Bg^2} \\
+\vdots & \\
+0 & \frac{1}{Bg^l} \\
+\end{pmatrix}
+\end{aligned}
+$$
+
+Blind Rotate
 
 これで準同型暗号に興味を持った方は Zama プロジェクトを調べてみると楽しいと思います。誰にも知られずに人工知能の推論や
 
