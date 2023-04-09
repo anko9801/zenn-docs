@@ -231,6 +231,91 @@ $n = 256$ ビットの
 復号
 1. $\boldsymbol{u}, v$ を解凍して $\mathrm{Compress}_q(v - \boldsymbol{s}^T\boldsymbol{u}, 1)$ つまり $q / 2$ に近い値は $1$ 、$0$ に近い値は $0$ として返す
 
+```python
+from Crypto.Util.number import bytes_to_long
+from Crypto.Random.random import randint, getrandbits
+
+def num2bins(x):
+    y = []
+    while x != 0:
+        y.append(x & 1)
+        x >>= 1
+    return y
+
+def bins2num(x):
+    y = 0
+    for i in range(len(x)):
+        y += x[i] * (1 << i)
+    return y
+
+class Crystals_Cyber:
+    def binomial_poly(self):
+        res = []
+        for i in range(self.N):
+            tmp = 0
+            for i in range(self.eta):
+                a = getrandbits(1)
+                b = getrandbits(1)
+                tmp += a - b
+            res.append(tmp)
+        return self.Rq(res)
+
+    def random_poly(self):
+        return self.Rq([randint(int(0), int(self.q)) for _ in range(self.N)])
+
+    def __init__(self, q, k, eta, N):
+        K = GF(q)
+        PR.<X> = PolynomialRing(GF(q))
+        Rq.<x> = PR.quotient(X^N + 1)
+        self.Rq = Rq
+        self.q = q
+        self.k = k
+        self.eta = eta
+        self.N = N
+
+        A = matrix([[self.random_poly() for _ in range(k)] for _ in range(k)])
+        s = vector([self.binomial_poly() for _ in range(k)])
+        e = vector([self.binomial_poly() for _ in range(k)])
+        t = A * s + e
+
+        self.pub = (t, A)
+        self.priv = s
+
+    def encrypt(self, m):
+        Rq.<x> = self.Rq
+        (t, A) = self.pub
+
+        m = Rq(num2bins(m))
+        r = vector([self.binomial_poly() for _ in range(self.k)])
+        e1 = vector([self.binomial_poly() for _ in range(self.k)])
+        e2 = self.binomial_poly()
+
+        u = A.transpose() * r + e1
+        v = t * r + e2 + (q / 2).round() * m
+        return (u, v)
+
+    def decrypt(self, c):
+        s = self.priv
+
+        u, v = c
+        m = v - s * u
+        ms = []
+        # 1 if the coeff is close to q / 2
+        for coeff in m.lift().coefficients(sparse=False):
+            coeff = QQ(coeff) * 2 / q
+            coeff = coeff.round() % 2
+            ms.append(coeff)
+        return bins2num(ms)
+
+q, k, eta, N = 7681, 3, 4, 256
+enc = Crystals_Cyber(q, k, eta, N)
+m = 11
+assert m < 2^N
+c = enc.encrypt(m)
+_m = enc.decrypt(c)
+assert m == _m
+```
+
 ### NTRU
 CRYSTALS と引き合いとして出されるのが NTT が開発した NTRU 暗号です。
 
