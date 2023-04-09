@@ -166,3 +166,5 @@ Blind Rotate
 ## 参考文献
 
 - [ペアリングベースの効率的なレベル2準同型暗号（SCIS2018） (slideshare.net)](https://www.slideshare.net/herumi/2scis2018)
+
+この資料は CC0 ライセンスです。

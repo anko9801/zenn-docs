@@ -227,3 +227,5 @@ RTA
 
 - [メルセンヌ・ツイスタをわかった気になる](https://6715.jp/posts/5/)
 - [Mersenne Twisterの出力を推測してみる](https://inaz2.hatenablog.com/entry/2016/03/07/194147)
+
+この資料は CC0 ライセンスです。

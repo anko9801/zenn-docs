@@ -294,5 +294,4 @@ Al Fardan, N.J. and K.G. Paterson, "Lucky Thirteen: Breaking the TLS and DTLS re
 
 tweakable block cipher
 
-
-
+この資料は CC0 ライセンスです。

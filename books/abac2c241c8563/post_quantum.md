@@ -476,3 +476,5 @@ randomized tree-based stateless signature
 [6] Castelnovi, L., Martinelli, A., & Prest, T. (2018, April). Grafting trees: a fault attack against the SPHINCS framework. In International Conference on Post-Quantum Cryptography (pp. 165–184). Springer, Cham.
 
 [7] https://github.com/kasperdi/SPHINCSPLUS-golang/blob/2e1d517cf3b3f17614ada1422e7c4cf0af3669d0/tweakable/sha256Tweak.go#L109
+
+この資料は CC0 ライセンスです。

@@ -1351,3 +1351,5 @@ ECDH だと $s$ の $x$ 座標をハッシュ化したものを共有鍵とし�
 - [整数論テクニック集のpdf](https://kirika-comp.hatenablog.com/entry/2018/03/12/210446)
 - [General purpose integer factoring](https://eprint.iacr.org/2017/1087)
 - [katagaitai workshop #7 crypto ナップサック暗号と低密度攻撃](https://www.slideshare.net/trmr105/katagaitai-workshop-7-crypto)
+
+この資料は CC0 ライセンスです。

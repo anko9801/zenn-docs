@@ -232,3 +232,5 @@ SMT ソルバに与える入力の形式 SMT-LIB v2 についてまとまって�
 - [SMT-LIB-benchmarks / QF_UF · GitLab (uiowa.edu)](https://clc-gitlab.cs.uiowa.edu:2443/SMT-LIB-benchmarks/QF_UF)
 QF_UF のベンチマーク用入力が大量に用意されている
 - [TokyoWesterns の z3 解説](https://wiki.mma.club.uec.ac.jp/CTF/Toolkit/z3py)
+
+この資料は CC0 ライセンスです。

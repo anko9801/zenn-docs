@@ -1009,3 +1009,5 @@ $$
 - [SageMathを使ってCoppersmith's Attackをやってみる](https://inaz2.hatenablog.com/entry/2016/01/20/022936)
 - [RTACTF](https://xagawa.hatenablog.com/entry/2021/12/20/232133)
 - [Crypto Challenge](https://mystiz.hk)
+
+この資料は CC0 ライセンスです。

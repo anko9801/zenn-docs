@@ -370,3 +370,5 @@ $$
 - [Imaginary hyperelliptic curve - Wikipedia](https://en.wikipedia.org/wiki/Imaginary_hyperelliptic_curve)
 - https://blog.z.cash/new-snark-curve/ : BLS12-381: New zk-SNARK Elliptic Curve Construction
 - Python での高速な実装 fastecdsa
+
+この資料は CC0 ライセンスです。

@@ -167,3 +167,5 @@ SSL は TLS の前身で現在は使用されていない。
 
 - [Schnorr署名 ―― 30年の時を超えて注目を集める電子署名](https://blog.visvirial.com/articles/721)
 - [RFC8235](https://datatracker.ietf.org/doc/html/rfc8235)
+
+この資料は CC0 ライセンスです。
