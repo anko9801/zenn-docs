@@ -157,7 +157,7 @@ $q$ を素数として $K = \mathbb{F}_q$ のとき LWE 問題、 $K = \mathbb{F
 def solve_LWE(A, b):
     m = A.nrows()
     n = A.ncols()
-    q = 29
+    q = A.base_ring().order()
     BB = block_matrix([[A.change_ring(ZZ).transpose()], [q * matrix.identity(m)]])
     BB = BB.LLL()[n:]
     v = babai_cvp(BB, b.change_ring(ZZ))
