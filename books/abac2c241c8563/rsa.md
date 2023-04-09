@@ -603,11 +603,13 @@ def WienersAttack(n, e):
     return -1
 ```
 
-さらにWiener's Attackより強い攻撃としてBoneh-Durfee Attackがあります。まず以下のように変形します。
+さらに Wiener's Attack より強い攻撃として Boneh-Durfee Attack があります。
 
 > **Boneh-Durfee Attack**
 >
 > $d < N^{0.292}$ のとき Coppersmith Method を用いて解ける。
+
+まず以下のように変形します。
 
 $$
 \begin{aligned}
@@ -619,9 +621,9 @@ ed &= k \phi + 1 & (over \ \mathbb{Z}) \\
 \end{aligned}
 $$
 
-この方程式について $f(x,y) = x (A + y) + 1$ とおき、関数 $f(x,y)$ に対して Multivariate Coppersmith Method を用いることで $p + q$ が求まり、解くことができます。
+この方程式について $f(x,y) = 2x (A + y) + 1$ とおき、関数 $f(x,y)$ に対して Coppersmith Method を用いることで $p + q$ が求まり、解くことができます。
 
-SageMath は標準に Multivariate Coppersmith Method を使うことができません。 [defund/coppersmith](https://github.com/defund/coppersmith) というリポジトリにそれが実装されているので、それを用いて攻撃することが多いです。
+SageMath は標準に多変数の Coppersmith Method を使うことができません。 [defund/coppersmith](https://github.com/defund/coppersmith) というリポジトリにそれが実装されているので、それを用いて攻撃することが多いです。
 
 ```python
 load('coppersmith.sage')
@@ -878,6 +880,21 @@ https://eprint.iacr.org/2020/1506.pdf
 
 ### 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない (Franklin-Reiter Related Message Attack)
 
+$$
+\begin{aligned}
+m_1 &= pad_1 + m \\
+m_2 &= pad_2 + m \\
+&= m_1 + pad_2 - pad_1 \\
+c_1 &= m_1^e \pmod N \\
+c_2 &= m_2^e = (m_1 + pad_2 - pad_1)^e \pmod N \\
+f_1(x) &= x^e - c_1 \\
+&= (x - m_1)h_1(x) \\
+f_2(x) &= (x + pad_2 - pad_1)^e - c_2 \\
+&= (x - m_1)h_2(x) \\
+x - m_1 &= \gcd(f_1, f_2) \\
+\end{aligned}
+$$
+
 Approximate GCD Problem を用いて
 
 $f(m_1) = m_2$
@@ -925,22 +942,6 @@ def short_pad_attack(c1, c2, e, n):
     kbits = n.nbits()//(2*e*e)
     diff = h.small_roots(X=2^kbits, beta=0.5)[0]
 ```
-### Franklin-Reiter Related Message Attack
-
-$$
-\begin{aligned}
-m_1 &= pad_1 + m \\
-m_2 &= pad_2 + m \\
-&= m_1 + pad_2 - pad_1 \\
-c_1 &= m_1^e \pmod N \\
-c_2 &= m_2^e = (m_1 + pad_2 - pad_1)^e \pmod N \\
-f_1(x) &= x^e - c_1 \\
-&= (x - m_1)h_1(x) \\
-f_2(x) &= (x + pad_2 - pad_1)^e - c_2 \\
-&= (x - m_1)h_2(x) \\
-x - m_1 &= \gcd(f_1, f_2) \\
-\end{aligned}
-$$
 
 ### The Return of Coppersmith's Attack
 鍵生成アルゴリズムが仕様に沿わないと暗号学的に脆弱となる可能性がある。
