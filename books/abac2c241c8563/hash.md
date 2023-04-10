@@ -110,23 +110,21 @@ https://www.youtube.com/watch?v=d76e4hV1iJY
 各変数は探索する変数の優先順位を決定させるスコアを持ち、$i$ 回目にコンフリクト時にコンフリクトした変数のスコアに $\rho^{-i}$ だけ足されます。(ex. $\rho=0.95$) つまり後の方になればなるほど増加するスピードが速くなり、古いコンフリクトは無視されるようになります。
 
 ## SMT
-- 形式手法
+- 論理式に帰着できるすべての問題のソルバ
+- 形式手法 / モデル検査
   - TLA+
-- モデル検査
+  - seL4
 - 自動定理証明支援系
 - シンボリック実行エンジン
-- モデル検査
-  - seL4
-- 論理式に帰着できるすべての問題のソルバ
 - Differential Cryptoanalysis
 
-今回は BitVector しか使わないのでそれだけ解説する。他にも EUF (Equality logic with Uninterpreted Functions) に関するアルゴリズムや blahblah など色々あるので興味ある方は参考文献などを参照されて頂きたい。
+今回は BitVector しか使わないのでそれだけ解説します。他にも EUF (Equality logic with Uninterpreted Functions) に関するアルゴリズムや blahblah など色々あるので興味ある方は参考文献などを参照してください。
 
 ### BitVector
 
-それぞれの n bit 演算を論理式に落とし、 SAT に投げることで解く。
-使われる演算としては $a\land b$, $\lnot a$, $a < b$, $a = b$, $a[i]$, $\sim a$, $a\mathop{\|}b$, $a\mathop{\&}b$, $a \oplus b$, $a \ll b$, $a \gg b$, $a + b$, $a - b$, $a \times b$, $a / b$, $\mathrm{ext}(a)$, $a\circ b$, $a[b:c]$, $c?a:b$ があるので、これらを論理式に落とせることは CPU を自作したことがある人ならわかると思う。
-例えば $a + b$ なら全加算器を論理式に落とせばよい。
+それぞれの n bit 演算を論理式に落とし、 SAT に投げることで解きます。
+使われる演算としては $a\land b$, $\lnot a$, $a < b$, $a = b$, $a[i]$, $\sim a$, $a\mathop{\|}b$, $a\mathop{\&}b$, $a \oplus b$, $a \ll b$, $a \gg b$, $a + b$, $a - b$, $a \times b$, $a / b$, $\mathrm{ext}(a)$, $a\circ b$, $a[b:c]$, $c?a:b$ があるので、これらを論理式に落とせることは CPU を自作したことがある人ならわかると思います。
+例えば $a + b$ なら全加算器から論理式に落とせます。
 
 SMT ソルバの入力形式は SMT-LIBv2 を用います。
 
