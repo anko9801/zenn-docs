@@ -21,10 +21,9 @@ title: "準同型暗号"
 ### 具体例
 加法/乗法準同型暗号の具体例を並べる。
 
-乗法準同型暗号
-- Unpadded RSA
-
-$$
+> Unpadded RSA (乗法準同型暗号)
+>
+> $$
 \begin{aligned}
 \mathcal{E}(m_1)\times\mathcal{E}(m_2) &= m_1^em_2^e & \bmod n \\
 &= (m_1m_2)^e & \bmod n \\
@@ -32,9 +31,9 @@ $$
 \end{aligned}
 $$
 
-- ElGamal暗号
-
-$$
+> ElGamal暗号 (乗法準同型暗号)
+>
+> $$
 \begin{aligned}
 \mathcal{E}(m_1)\times\mathcal{E}(m_2) &= (g^{r_1},m_1h^{r_1})(g^{r_2},m_2h^{r_2}) \\
 &= (g^{r_1+r_2},m_1m_2h^{r_1+r_2}) \\
@@ -42,10 +41,9 @@ $$
 \end{aligned}
 $$
 
-加法準同型暗号
-- Paillier暗号
-
-$$
+> Paillier暗号 (加法準同型暗号)
+>
+> $$
 \begin{aligned}
 \mathcal{E}(m_1)\times\mathcal{E}(m_2) &= (g^{m_1}r_1^n)(g^{m_2}r_2^n) & \bmod n^2 \\
 &= g^{m_1+m_2}(r_1r_2)^n & \bmod n^2 \\
