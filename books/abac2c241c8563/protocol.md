@@ -123,6 +123,11 @@ zer0pts CTF 2020 より dirty laundry
 
 > **秘匿共通集合演算 (Private Set Intersection)**
 
+
+秘密計算といえば TEE
+Intel SGX
+Controlled-Channel Attacks、Sealing Replay Attack、Foreshadow、Plundervolt、LVI、ÆPIC Leakなど
+
 ## SSH
 
 OpenSSH 9.0 ポスト量子暗号化時代への対応として、格子暗号系の「Streamlined NTRU Prime」と、楕円曲線暗号系の「x25519」からなるハイブリッド手法がデフォルトとなっている。
