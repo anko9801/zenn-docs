@@ -56,7 +56,6 @@ $$
 Schoof のアルゴリズムはモジュラー多項式によって $O(\log^8p)$ から $O(\log^6p)$ へ高速化できるのですが、本筋とズレるので気になる方は楕円曲線について学習された上、論文などを参照してください。
 
 ## 超楕円曲線
-超楕円曲線
 ヤコビ多様体
 Mumford 表現
 
@@ -205,35 +204,57 @@ $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 | ---- | --- | ---- |
 | なし | ECDLP | 単純に ECDLP を解く |
 | 位数が Smooth number $\#E/\mathbb{F}_p = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ | Pohlig Hellman Attack | 位数 $p_i$ の小さな ECDLP に分解できる |
-| Anomalous な曲線 $\#E/\mathbb{F}_p = p$ | MOV/FR Reduction | $\mathbb{F}_p^+$ 上の DLP に帰着できる |
-| Supersingular な曲線 $\#E/\mathbb{F}_p = p+1$ | SSSA Attack | 埋め込み次数 $k$ を用いて $\mathbb{F}_{p^k}^\times$ 上の DLP に帰着できる |
+| Anomalous な曲線 $\#E/\mathbb{F}_p = p$ | SSSA Attack | $\mathbb{F}_p^+$ 上の DLP に帰着できる |
+| Supersingular な曲線 $\#E/\mathbb{F}_p = p+1$ | MOV/FR Reduction | 埋め込み次数 $k$ を用いて $\mathbb{F}_{p^k}^\times$ 上の DLP に帰着できる |
 | Singular な曲線 $\Delta(E/\mathbb{F}_p) = 0$ | Singular Curve Point Decompression Attack | $\mathbb{F}_p^+$ や $\mathbb{F}_p^\times, \mathbb{F}_{p^2}^\times$ 上の DLP に帰着できる |
 | 楕円曲線上に存在しない点や位数の少ない点を指定できる | Invalid Curve Attack | 秘密鍵の情報を取り出すことができる |
 
-
-
-
 ### MOV/FR Reduction
-楕円曲線が Anomalous という性質を持つとき、ペアリングを用いて有限体上の DLP に帰着できるという方法です。
+楕円曲線が超特異 supersingular という性質を持つとき、ペアリングを用いて有限体上の DLP に帰着できるという方法です。
 
-#### ペアリング
-MOV Reduction (Menezes-Okamoto-Vanstone Reduction)
-Weil pairing $e_n: E[n]\times E[n]\to \mu_n\subseteq \mathbb{F}_{p^k}^*$
+> **Weil pairing**
+> 楕円曲線の等分点群と同型な部分群が有限体の乗法群に含まれるためには有限体を拡大する必要がある。
+>
+> $$
+e: E[m]\times E[m] \to \mu_m\subseteq\mathbb{F}_{q^d}^\times
+$$
+>
+> 必要となる最小の拡大次数 $d$ を埋め込み次数という。
+
+
+FFDLP に落とし込める
+埋め込み次数が高いと ECDLP の方が計算量が小さくなってしまうので
+
+> **超特異曲線の埋め込み次数**
+> 超特異楕円曲線の埋め込み次数は $6$ 以下である。
+
+**Proof.**
+
+| $-t$ | $\#E(\mathbb{F}_{q^2})$ | $\#\mathbb{F}_{q^d}^\times$ | $d$ |
+|:-:|:-:|:--|:-:|
+| $0$ | $p^2 + 1$ | $p^4 - 1 = (p^2 + 1)(p^2 - 1)$ | $4$ |
+| $p$ | $p^2 + p + 1$ | $p^3 - 1 = (p - 1)(p^2 + p + 1)$ | $3$ |
+| $-p$ | $p^2 - p + 1$ | $p^6 - 1 = (p^3 - 1)(p + 1)(p^2 - p + 1)$ | $6$ |
+| $2p$ | $(p + 1)^2$ | $p^2 - 1 = (p + 1)(p - 1)$ | $2$ |
+| $-2p$ | $(p - 1)^2$ | $p - 1 = p - 1$ | $1$ |
+
+$e_n(P, Q)$
+
+> **MOV Reduction (Menezes-Okamoto-Vanstone Reduction)**
+> 1. $E[n]\subseteq E(\mathbb{F}_{p^k})$ となる最小の $k$ を持ってくる
+> 2. 位数 $n$ の $\alpha=e_n(P, Q)$ となるように $Q \in E[n]$ を取ってくる
+> 3. $\beta = e_n(dP, Q)$
+> 4. $\mathbb{F}_{p^k}^\times$ 上のDLPを $\alpha, \beta$ を用いて解く
+
+> **Tate-pairing**
+
 FR Reduction (Frey-Rück Reduction)
-Tate-pairing
 Bilinear-paring
 
-1. $E[n]\subseteq E(\mathbb{F}_{p^k})$ となる最小の $k$ を持ってくる
-2. 位数 $n$ の $\alpha=e_n(P, Q)$ となるように $Q \in E[n]$ を取ってくる
-3. $\beta = e_n(dP, Q)$
-4. $\mathbb{F}_{p^k}^*$ 上のDLPを $\alpha, \beta$ を用いて解く
-
-$k$ は多くとも6まで
 $E(\mathbb{F}_{p^k}^*)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
 
-### Supersingular な曲線を用いてはいけない
-SSSA Attack
-$E[p]  \mathbb{Z}/p\mathbb{Z}$
+### Anomalous な曲線を用いてはいけない
+Anomalous の楕円曲線では SSSA Attack が有効です。
 $\pi:\mathbb{P}^2(\mathbb{Q}_p) \to \mathbb{P}^2(\mathbb{F}_p)$
 $\phi:\ker\pi \to \mathcal{E}(p\mathbb{Z}_p)$
 
