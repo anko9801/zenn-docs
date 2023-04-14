@@ -212,6 +212,10 @@ $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 ### MOV/FR Reduction
 楕円曲線が超特異 supersingular という性質を持つとき、ペアリングを用いて有限体上の DLP に帰着できるという方法です。
 
+$$
+y^2 = x^3 + (1 - b)x + b
+$$
+
 > **Weil pairing**
 > 楕円曲線の等分点群と同型な部分群が有限体の乗法群に含まれるためには有限体を拡大する必要がある。
 >
@@ -220,7 +224,6 @@ e: E[m]\times E[m] \to \mu_m\subseteq\mathbb{F}_{q^d}^\times
 $$
 >
 > 必要となる最小の拡大次数 $d$ を埋め込み次数という。
-
 
 FFDLP に落とし込める
 埋め込み次数が高いと ECDLP の方が計算量が小さくなってしまうので
@@ -247,6 +250,10 @@ $e_n(P, Q)$
 > 4. $\mathbb{F}_{p^k}^\times$ 上のDLPを $\alpha, \beta$ を用いて解く
 
 > **Tate-pairing**
+>
+> $$
+e: E(\mathbb{F}_p)[l]\times E(\mathbb{F}_{p^2})/lE(\mathbb{F}_{p^2})\to \mathbb{F}_{p^2}^\times/(\mathbb{F}_{p^2}^\times)^l
+$$
 
 FR Reduction (Frey-Rück Reduction)
 Bilinear-paring
