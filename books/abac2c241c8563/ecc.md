@@ -8,7 +8,7 @@ title: "楕円曲線暗号への攻撃"
 TODO: かなり書き直す
 
 > **Def. 楕円曲線**
-> $K$ を体、 $f(x) \in K[x]$ を 3 次方程式としたときに関数 $y^2 = f(x)$ を楕円曲線という。また $x, y$ の線形変換によって 2 次項を消すことができ、次のように書ける。
+> $K$ を体、 $f(x) \in K[x]$ を 3 次方程式としたときに関数 $y^2 = f(x)$ を楕円曲線という。また $K$ の標数が $2, 3$ でないとき $x, y$ の線形変換によって 2 次項を消すことができ、次のように書ける。
 >
 > $$
 y^2 = x^3 + ax + b \qquad ()
@@ -51,7 +51,7 @@ $$
 **Proof.**
 
 > **Schoof のアルゴリズム**
->
+> 楕円曲線 $E/K$
 
 Schoof のアルゴリズムはモジュラー多項式によって $O(\log^8p)$ から $O(\log^6p)$ へ高速化できるのですが、本筋とズレるので気になる方は楕円曲線について学習された上、論文などを参照してください。
 
@@ -218,12 +218,8 @@ $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 
 #### ペアリング
 MOV Reduction (Menezes-Okamoto-Vanstone Reduction)
-Weil-pairing
-FR Reduction (Frey-Rück Reduction)
-Tate-pairing
-
-Weil-pairing
 Weil pairing $e_n: E[n]\times E[n]\to \mu_n\subseteq \mathbb{F}_{p^k}^*$
+FR Reduction (Frey-Rück Reduction)
 Tate-pairing
 Bilinear-paring
 
