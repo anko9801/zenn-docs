@@ -154,10 +154,16 @@ https://www.ambionics.io/blog/php-mt-rand-prediction
 
 :::message
 **練習問題**
-CPCTF22/the luck 2 より
-Python の `random` モジュールを予測してみよう
-`secrets` モジュールとの違いを考えよう
+Python の `random.random()` を読んでみよう。
 https://github.com/python/cpython/blob/main/Lib/random.py
+:::
+
+:::message
+**演習問題**
+[CTF archive](https://cryptohack.org/challenges/ctf-archive/) から出題
+- Twist and Shout (Zh3r0 CTF V2)
+- import numpy as MT (Zh3r0 CTF V2)
+- Real Mersenne (Zh3r0 CTF V2)
 :::
 
 ## CSPRNG

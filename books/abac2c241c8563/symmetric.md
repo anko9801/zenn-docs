@@ -113,7 +113,7 @@ TLS 1.3 で使われているもう一つの暗号です。
 :::message
 **練習問題**
 - AES を作ってみましょう。[CryptoHack](https://cryptohack.org/challenges/aes/) を見るとよさそう。
-- A2S や nullcon HackIM 2019 2FUN を考えてみよう。 中間一致攻撃
+- Pwn2Win CTF 2021 A2S や nullcon HackIM 2019 2FUN を考えてみよう。 中間一致攻撃
 :::
 
 ### パディング
