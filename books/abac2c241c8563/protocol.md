@@ -112,7 +112,7 @@ Controlled-Channel Attacks、Sealing Replay Attack、Foreshadow、Plundervolt、
 
 > **検索可能暗号**
 
-正規表現は不可能
+正規表現いけそう
 
 ## SSH
 

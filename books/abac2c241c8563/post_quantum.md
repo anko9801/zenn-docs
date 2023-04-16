@@ -81,7 +81,7 @@ TODO: これがなぜ暗号となるのか？
 | Classic McElience | Goppa 符号 | IND-CCA | TU Eindhoven |
 | HQC | Quasi-Cyclic 符号 | IND-CCA | University of Limoges |
 
-### Information Set Decoding
+> **Information Set Decoding**
 
 ## 同種写像暗号
 超特異同種写像ディフィー・ヘルマン鍵共有 (SIDH / SIKE)
@@ -96,11 +96,10 @@ $\mathbb{F}_{p^2}$ 上の超特異楕円曲線 $E$
 $2^a\approx 3^b$ となるような素数 $p = 2^a3^bf - 1$ を用いて超特異楕円曲線 $E_0/\mathbb{F}_{p^2}$、つまり位数が $\#E_0(\mathbb{F}_{p^2}) = (p + 1)^2$ となる楕円曲線を生成する。
 $P_0, Q_0 \in E_0[2^a]$ $E_0[3^{e_3}]$
 $3^b$ 同種写像 $\varphi: E_0\to E$
+$j$-不変量
 
 $$
-\begin{aligned}
-y^2 & = x^3 + x & y^2 & = x^3 + 6x^2 + x
-\end{aligned}
+y^2 = x^3 + x \qquad y^2 = x^3 + 6x^2 + x
 $$
 
 ```python
@@ -114,17 +113,15 @@ p = 2^356 * 3^215 - 1
 Fp2<I> = GF(p, 2)
 assert I^2 == -1
 R<x> = PolynomialRing(Fp2)
+E = EllipticCurve(x^3 + x)
 E = EllipticCurve(x^3 + 6*x^2 + x)
 ```
 
 ### SIKE への攻撃
-去年
 
-$$
-y^2 = x^3 + x \qquad y^2 = x^3 + 6x^2 + x
-$$
 
-**Thm. Kani's theorem**
+
+> **Thm. Kani's theorem**
 
 
 https://eprint.iacr.org/2022/975
@@ -132,28 +129,26 @@ https://eprint.iacr.org/2022/975
 ## ハッシュ関数署名 (Hash-based signature)
 ハッシュ値を用いるだけの退屈な署名です。
 
-### Lamport 署名
 Lamport 署名 とは 1979 年に Leslie Lamport が構築されたハッシュ関数署名です。これは 1 ビットごとに署名します。
 
-1. 秘密鍵 $s_0, s_1$ を生成し、公開鍵 $p_i = H(s_i)$ を計算します
-2. 1 ビットのメッセージ $m$ を用いて $s_m$ を署名として公開します
-3. $p_m = H(s_m)$ となることを確認して検証します
+> **Lamport 署名**
+> 1. 秘密鍵 $s_0, s_1$ を生成し、公開鍵 $p_i = H(s_i)$ を計算します
+> 2. 1 ビットのメッセージ $m$ を用いて $s_m$ を署名として公開します
+> 3. $p_m = H(s_m)$ となることを確認して検証します
 
 非常にシンプルな署名です。ただ公開鍵に大量のメモリを割いているので、これを短い公開鍵で大量のメッセージを署名できるように改良したいです。
 
-### One-time signature (Winternitz OTS)
-1. 32 個の 256 ビット乱数を秘密鍵とし、それぞれ 256 回ハッシュ関数を通したものを公開鍵とする
-2. メッセージを SHA-256 でハッシュ化した $N$ を 8 ビットごとに分けて $N = N_1\|\cdots\|N_{32}$ とする
-3. 公開鍵をそれぞれ $256N_i$ 回ハッシュ化したものを署名として公開する
+> **One-time signature (Winternitz OTS)**
+> 1. 32 個の 256 ビット乱数を秘密鍵とし、それぞれ 256 回ハッシュ関数を通したものを公開鍵とする
+> 2. メッセージを SHA-256 でハッシュ化した $N$ を 8 ビットごとに分けて $N = N_1\|\cdots\|N_{32}$ とする
+> 3. 公開鍵をそれぞれ $256N_i$ 回ハッシュ化したものを署名として公開する
 
-### Hash to Obtain Random Subset (HORS)
-1. 256 個の乱数を秘密鍵とし、それぞれハッシュ化したものを公開鍵とする
-2. メッセージを 128 ビットのハッシュ関数を通して 16 個の 8 ビットに分けて $N = N_1\|\cdots\|N_{16}$ とする
-3. $N_i$ 番目の公開鍵を連結させたものを署名として公開する
+> **Hash to Obtain Random Subset (HORS)**
+> 1. 256 個の乱数を秘密鍵とし、それぞれハッシュ化したものを公開鍵とする
+> 2. メッセージを 128 ビットのハッシュ関数を通して 16 個の 8 ビットに分けて $N = N_1\|\cdots\|N_{16}$ とする
+> 3. $N_i$ 番目の公開鍵を連結させたものを署名として公開する
 
 ### Merkle trees
-
-
 それには Merkle が提案した二分木の一種 Merkle 木を使います。
 
 HashMap とか HAMT
@@ -167,6 +162,9 @@ $$
 randomized tree-based stateless signature
 
 ## 多変数多項式暗号
+> 松本勉と今井秀樹は隠れ単項式暗号系というエレガントな方法を 1988 年開催の国際会議 EUROCRYPT で発表した。これは現在、松本-今井暗号と呼ばれている。1996年、パタリン (J. Patarin) は松本-今井暗号を解読し、翌 97 年、松本-今井暗号を拡張した HFE (Hidden Field Equation) を提案した。この HFE は 2003 年に J.-C. Fauge`re と A. Joux により、グレブナー基底という一見直截的な攻撃法によって破られている。
+> 暗号理論と楕円曲線より
+
 > **MQ 問題**
 > 有限体 $\mathbb{F}_q$ 上を係数とする $m$ 個の $n$ 変数の $2$ 次多項式の共通解をひとつ求めよ
 
