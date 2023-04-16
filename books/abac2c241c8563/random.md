@@ -171,19 +171,18 @@ https://github.com/python/cpython/blob/main/Lib/random.py
 標準化されている CSPRNG は次のようなものがあります。
 
 - Hash_DRBG
-bcrypt などのハッシュ関数 $H$ とシード値 $V_0$ を用いて $V_{i+1} = H(V_i + 1)$ 乱数を生成します。
+bcrypt などのハッシュ関数 $H$ とシード値 $V_0$ を用いて $V_{i+1} = H(V_i + 1)$ と生成する
 - HMAC_DRBG
-HMAC とシード値 $V_0$ を用いて $V_{i+1} = \mathrm{HMAC}(K, V_i)$ と乱数を生成します。
+HMAC とシード値 $V_0$ を用いて $V_{i+1} = \mathrm{HMAC}(K, V_i)$ と生成する
 - CTR_DRBG
-AES-CTR の暗号化関数 $E_K$ とシード値 $V_0$ を用いて $V_{i+1} = E_K(V_i + 1)$ と乱数を生成します。
+AES-CTR の暗号化関数 $E_K$ とシード値 $V_0$ を用いて $V_{i+1} = E_K(V_i + 1)$ と生成する
 - Dual_EC_DRBG (deprecated)
+楕円曲線の加算を用いて生成する (後述)
 
 これらに共通することとして乱数、Nonce、ユーザーによって指定される文字列を入力し、内部状態であるシード値を生成します。このシード値を用いて、指定されたビット数に達するまで乱数を生成し続けて連結させたものを出力します。何回か生成したらシード値の再生成 (reseed) を行い、エントロピーを上げます。
 
 攻撃する方法としては今までと同様に内部状態を復元することで乱数予測することができます。
 
-
-それぞれの詳細や実装は以下の規格書を読んでもらうことにして、基本的なアイデアを掻い摘んで紹介します。
 [NIST SP 800-90A (Recommendation for Random Number Generation Using Deterministic Random Bit Generators)](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-90a.pdf)
 
 ### Dual_EC_DRBG
@@ -202,7 +201,7 @@ $r_i$ は剰余未満の数であり、その上位 2 バイト程を削除し�
 しかし、もし NSA がこの点について ECDLP が解けている場合、内部状態を復元できる為、バックドアとなります。この為、2006 年に NIST SP800-90A に組み込まれましたが、2013 年に利用すべきではないと勧告されています。
 
 ### コラム
-RTA
+乱数調整
 
 ## 参考文献
 
