@@ -125,12 +125,12 @@ zer0lfsr, zer0lfsr+, zer0lfsr++ を解こう
 
 $$
 \begin{aligned}
-  \boldsymbol{x}_{k+n} & = \boldsymbol{x}_{k+m}\hspace{-10px}&& \oplus((\boldsymbol{x}_k\mid\boldsymbol{x}_{k+1})\gg 1)\oplus(\mathrm{LSB}(\boldsymbol{x}_{k+1})\mathop{\mathrm{AND}}\boldsymbol{a}) \\
+  \boldsymbol{x}_{k+n} & = \boldsymbol{x}_{k+m}\oplus((\boldsymbol{x}_k\mid\boldsymbol{x}_{k+1})\gg 1)\oplus(\mathrm{LSB}(\boldsymbol{x}_{k+1})\mathop{\mathrm{AND}}\boldsymbol{a}) \\
   \boldsymbol{y} & \leftarrow \boldsymbol{x}_k \\
-  \boldsymbol{y} & \leftarrow \boldsymbol{y} && \oplus\ \,(\boldsymbol{y}\gg 11) \\
-  \boldsymbol{y} & \leftarrow \boldsymbol{y} && \oplus((\boldsymbol{y}\ll\ \ 7) \mathop{\mathrm{AND}} \boldsymbol{b}) \\
-  \boldsymbol{y} & \leftarrow \boldsymbol{y} && \oplus((\boldsymbol{y}\ll 15) \mathop{\mathrm{AND}} \boldsymbol{c}) \\
-  \boldsymbol{y} & \leftarrow \boldsymbol{y} &&\oplus\ \,(\boldsymbol{y}\gg 18) \\
+  \boldsymbol{y} & \leftarrow \boldsymbol{y} \oplus\ \,(\boldsymbol{y}\gg 11) \\
+  \boldsymbol{y} & \leftarrow \boldsymbol{y} \oplus((\boldsymbol{y}\ll\ \ 7) \mathop{\mathrm{AND}} \boldsymbol{b}) \\
+  \boldsymbol{y} & \leftarrow \boldsymbol{y} \oplus((\boldsymbol{y}\ll 15) \mathop{\mathrm{AND}} \boldsymbol{c}) \\
+  \boldsymbol{y} & \leftarrow \boldsymbol{y} \oplus\ \,(\boldsymbol{y}\gg 18) \\
 \end{aligned}
 $$
 
