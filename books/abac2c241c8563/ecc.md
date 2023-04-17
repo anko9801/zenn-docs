@@ -47,7 +47,7 @@ $$
 **Proof.**
 
 > **Schoof のアルゴリズム**
-> 楕円曲線 $E/\mathbb{F}_p$ の位数を求められる。
+> 楕円曲線 $E/\mathbb{F}_p$ の位数を $O(\log^8p)$ で求められる。
 
 Hasse-Weil 定理より
 
@@ -125,9 +125,10 @@ Alice と Bob は AES などの共通鍵暗号を用いて暗号通信しよう�
 
 ここに図
 
-1. 公開: 楕円曲線 $E/\mathbb{F}_p$ とベースポイント $P\in E/\mathbb{F}_p$ を共有する
-2. 鍵生成: Alice と Bob はそれぞれ疑似乱数 $d_A, d_B$ を生成し、$d_A, d_B$ を秘密鍵、$Q_A = d_AP, Q_B = d_BP$ を公開鍵として公開する
-3. 鍵交換: Alice と Bob は自分の秘密鍵と相手の公開鍵を掛けると $S = d_Ad_BP = d_AQ_B = d_BQ_A$ となり、$S$ の $x$ 座標をハッシュ化したものが Alice と Bob のみが知る共通鍵となる
+> **楕円曲線ディフィーヘルマン鍵共有 (ECDH)**
+> 1. セットアップ: 楕円曲線 $E/\mathbb{F}_p$ とベースポイント $P\in E/\mathbb{F}_p$ を共有する
+> 2. 鍵生成: Alice と Bob はそれぞれ疑似乱数 $d_A, d_B$ を生成し、$d_A, d_B$ を秘密鍵、$Q_A = d_AP, Q_B = d_BP$ を公開鍵として公開する
+> 3. 鍵交換: Alice と Bob は自分の秘密鍵と相手の公開鍵を掛けると $S = d_Ad_BP = d_AQ_B = d_BQ_A$ となり、$S$ の $x$ 座標をハッシュ化したものが Alice と Bob のみが知る共通鍵となる
 
 このように攻撃者は $(G, dG)$ が分かっても ECDLP が解けない為に $d$ が分からず、安全に共通鍵を共有することができます。
 
@@ -287,8 +288,25 @@ $E(\mathbb{F}_{p^k}^*)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
 
 ### Anomalous な曲線を用いてはいけない
 Anomalous の楕円曲線では SSSA Attack が有効です。
-$\pi:\mathbb{P}^2(\mathbb{Q}_p) \to \mathbb{P}^2(\mathbb{F}_p)$
-$\phi:\ker\pi \to \mathcal{E}(p\mathbb{Z}_p)$
+
+$$
+\lambda_E: E(\mathbb{F}_p)\xrightarrow{u}E(\mathbb{Q}_p)\xrightarrow{\times p}\ker\pi\xrightarrow{Formal \log}p\mathbb{Z}_p\xrightarrow{\bmod{p^2}} p\mathbb{Z}_p/p^2\mathbb{Z}_p\cong \mathbb{F}_p
+$$
+
+$\psi(x:y:z) := x/y$
+
+$$
+\log_E(t) := t - \frac{a_1}{2}t^2 + \frac{a_1^2 + a_2}{3}t^3 - \frac{a_1^3 + 2a_1a_2 + a_3}{4}t^4 + \cdots
+$$
+
+$A := (X_1, Y_1)\in E(\mathbb{Z}/p^2\mathbb{Z})$ $\bmod p$ 写像 $\pi(A) = P$ となる
+$(X_{p-1}, Y_{p-1}) := (p-1)A$
+
+$X_{p-1} \neq X_1$ なら
+
+$$
+\lambda_E(P) = \left(\frac{X_{p-1} - X_1}{p}\bmod p\right)(Y_{p-1} - Y_1\bmod p)^{-1}
+$$
 
 ### Singular な曲線を用いてはいけない
 
