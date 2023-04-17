@@ -225,13 +225,20 @@ $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 | Anomalous な曲線 $\#E/\mathbb{F}_p = p$ | SSSA Attack | $\mathbb{F}_p^+$ 上の DLP に帰着できる |
 | Supersingular な曲線 $\#E/\mathbb{F}_p = p+1$ | MOV/FR Reduction | 埋め込み次数 $k$ を用いて $\mathbb{F}_{p^k}^\times$ 上の DLP に帰着できる |
 | Singular な曲線 $\Delta(E/\mathbb{F}_p) = 0$ | Singular Curve Point Decompression Attack | $\mathbb{F}_p^+$ や $\mathbb{F}_p^\times, \mathbb{F}_{p^2}^\times$ 上の DLP に帰着できる |
-| 楕円曲線上に存在しない点や位数の少ない点を指定できる | Invalid Curve Attack | 秘密鍵の情報を取り出すことができる |
+| 楕円曲線上に存在しない点や位数の少ない点を指定できる | Invalid Curve Attack / Small-Subgroup Attack | さまざまな少ない位数の点を収集して中国剰余定理 |
 
-### MOV/FR Reduction
+### Supersingular な曲線を用いてはならない (MOV/FR Reduction)
 楕円曲線が超特異 supersingular という性質を持つとき、ペアリングを用いて有限体上の DLP に帰着できるという方法です。
 
 $$
 y^2 = x^3 + (1 - b)x + b
+$$
+
+> **Def. 双線形 (bilinear)**
+> 任意の $a, b\in \mathbb{F}_q^\times$ と $P, Q\in E$ について次を満たすとき $e$ は双線形であるという。
+>
+> $$
+e(aP, bQ) = e(P, Q)^{ab}
 $$
 
 > **Weil pairing**
@@ -261,11 +268,13 @@ FFDLP に落とし込める
 
 $e_n(P, Q)$
 
-> **MOV Reduction (Menezes-Okamoto-Vanstone Reduction)**
+> **Miller's algorithm**
 > 1. $E[n]\subseteq E(\mathbb{F}_{p^k})$ となる最小の $k$ を持ってくる
 > 2. 位数 $n$ の $\alpha=e_n(P, Q)$ となるように $Q \in E[n]$ を取ってくる
 > 3. $\beta = e_n(dP, Q)$
 > 4. $\mathbb{F}_{p^k}^\times$ 上のDLPを $\alpha, \beta$ を用いて解く
+
+MOV Reduction (Menezes-Okamoto-Vanstone Reduction)
 
 > **Tate-pairing**
 >

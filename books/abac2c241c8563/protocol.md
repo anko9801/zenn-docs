@@ -49,6 +49,39 @@ zk-SNARKs
 
 [zk-SNARKsの理論 (zenn.dev)](https://zenn.dev/kyosuke/articles/a1854b9be26c01df13eb)
 
+インタラクティブなゼロ知識証明
+
+1. 証明者はコミットメントという疑似乱数を生成し、検証者に送る
+2. 検証者はチャレンジという擬似乱数で応答する
+3. 証明者はコミットメントとチャレンジで証明する
+
+$h = g^x$
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Prover
+    participant Verifier
+    Note left of Prover: 疑似乱数 r
+    Prover->>Verifier: u = g^r
+    Note right of Verifier: 疑似乱数 c
+    Verifier->>Prover: c
+    Prover->>Verifier: z = r + xc
+    Note right of Verifier: g^z = uh^c ?
+```
+
+非インタラクティブなゼロ知識証明
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Prover
+    participant Verifier
+    Note left of Prover: 疑似乱数 r
+    Prover->>Verifier: u = g^r, c = H(g, q, h, u), z = r + xc
+    Note right of Verifier: c = H(g, q, h, u)?, g^z = uh^c?
+```
+
 ## 関数型暗号
 > **ID ベース暗号**
 
