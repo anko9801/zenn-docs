@@ -49,6 +49,8 @@ zk-SNARKs
 
 [zk-SNARKsの理論 (zenn.dev)](https://zenn.dev/kyosuke/articles/a1854b9be26c01df13eb)
 
+https://www.zkdocs.com/
+
 インタラクティブなゼロ知識証明
 
 1. 証明者はコミットメントという疑似乱数を生成し、検証者に送る
