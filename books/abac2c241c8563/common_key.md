@@ -154,7 +154,7 @@ b'No Game No Life\x01'
 b'Sound! Euphonium\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10'
 ```
 
-### 暗号利用モード
+## 暗号利用モード
 通常の暗号化関数のみで実装するとストリーム暗号が使えなかったり、セキュリティ的に脆弱な危険性があります。これを改善する為に作られたのが暗号利用モードです。
 
 特に CTF では ECB, CBC, GCM モードが使われるのでこれについて紹介します。その他の暗号利用モードは Wikipedia を参照すると良いです。
@@ -277,17 +277,17 @@ https://gist.github.com/theoremoon/8bcb9b87dcb1289cf13c9db4431db324
 
 このように暗号化と同時に完全性や認証性も実現するための暗号方式が考案され、それらを総称して AEAD (Authenticated Encryption with Asocciated Data) と呼ばれます。暗号スイートの Mac の部分に AEAD という表記があるものは、暗号モードとして認証付き暗号の GCM が利用されています。
 
-また CTF で出題される他の暗号利用モード OFB, CTR などは Wikipedia を参照すれば良いでしょう。
-
 ### AES-GCM への攻撃 (Nonce の使いまわし)
 差分解読法
 
-### 耐量子性
+## その他
+耐量子性
 最近だと耐量子性も考える必要が出てきました。量子アルゴリズムの1つ Grover's algorithm によって全探索の計算量が $2^{K}\to 2^{K/2}$ と減少した為、鍵長を倍の長さにしないと同じ安全性を担保できません。
 
-他にも共通鍵暗号への攻撃には Integral Cryptanalysis や Differencial cryptanalysis がありますがそれらは「ハッシュと SMT」で紹介します。
+他にも共通鍵暗号への攻撃には Integral Cryptanalysis がありますがそれらは「ハッシュと SMT」で紹介します。
 
 ## まとめ
+共通鍵暗号の仕組みと AES の構築/攻撃を学びました。
 
 ## 参考文献
 - [NIST Special Publication 800-38D Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC](https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38d.pdf)
