@@ -3,22 +3,26 @@ title: "楕円曲線暗号への攻撃"
 ---
 
 楕円曲線の理論は群環体、ガロア理論、可換環論、代数幾何学と理解した先になるので付け焼き刃程度しか書けないです。
+網羅的かつ短くまとめるのが難しいので前提知識や行間が多量にあると思いますが悪しからず。
+特に数学的背景は難しいので楕円曲線の定義だけ見て飛ばすことをお勧めします。
 
 ## 楕円曲線
+
 > **Def. 楕円曲線**
-> $K$ を体、 $f(x) \in K[x]$ を 3 次方程式としたときに関数 $y^2 = f(x)$ を楕円曲線という。また $K$ の標数が $2, 3$ でないとき $x, y$ の線形変換によって 2 次項を消すことができ、次のように書ける。
+> $K$ を体、 $f(x) \in K[x]$ を 3 次方程式としたときに関数 $y^2 = f(x)$ を楕円曲線という。また $K$ の標数が $2, 3$ でないとき $x, y$ の線形変換によって 2 次項を消すことができ、$a, b\in K$ を用いて次のように書ける。
 >
 > $$
-y^2 = x^3 + ax + b
+E: y^2 = x^3 + ax + b
 $$
 
-Weierstrass, Montgomery, twisted Edwards, Hessian などの種類の曲線がありますがあまり重要ではないので詳しくはググってください。
+ここにグラフ
 
-楕円曲線上の点全体に加えてその曲線上に存在すると考えたいきわめて重要な無限遠点と呼ばれるものがあります。
-これは複素関数論において、複素平面に無限遠点を添加してリーマン球面を形成することと同じようなものです。このことを正確に扱う為には体 $k$ 上の 3 次元アフィン空間 $\mathbb{A}_k^3$ の同値類として定義される射影平面 $\mathbb{P}_k^2$ の元 $(x:y:z)$ を座標と定義しますが、本質的ではないので省きます。必要であれば $(x/z, y/z) := (x:y:z)$ と対応すると考えればよいです。
+楕円曲線上の点全体に加えてその曲線上に存在すると考えたいきわめて重要な無限遠点と呼ばれるものがあります。これは複素関数論において、複素平面に無限遠点を添加してリーマン球面を形成することと同じようなものです。
+
+このことを正確に扱う為には体 $k$ 上の 3 次元アフィン空間 $\mathbb{A}_k^3$ の同値類として定義される射影平面 $\mathbb{P}_k^2$ の元 $(x:y:z)$ を座標と定義しますが、本質的ではないので詳細は省きます。 $(x/z, y/z) := (x:y:z)$ と対応すると考えればよいです。ここで無限遠点 $\mathcal{O}$ を $(1:0:0)$ と定義します。
 
 > **Def. 楕円曲線上の和**
-> 楕円曲線 $E$ 上の点同士の演算 $+: E\times E \to E$ の群 $(E, +)$ を定義する。まず単位元を無限遠点 $O(1:0:0)$、点 $P(x, y)$ の逆元を $-P = (x, -y)$ とする。このとき $P(x_1, y_1), Q(x_2, y_2)$ に対して $R(x_3, y_3) = P + Q$ を次のように定義する。
+> 楕円曲線 $E$ 上の点同士の演算 $+: E\times E \to E$ の群 $(E, +)$ を定義する。まず単位元を無限遠点 $\mathcal{O}$、点 $P(x, y)$ の逆元を $-P = (x, -y)$ とする。このとき $P(x_1, y_1), Q(x_2, y_2)$ に対して $R(x_3, y_3) = P + Q$ を次のように定義する。
 >
 > $$
 \begin{aligned}
@@ -34,7 +38,40 @@ $$
 >
 > これは交換法則、可換則を満たし、可換群となる。
 
-特に実数体 $\mathbb{R}$ 上の楕円曲線のグラフ上でこの和の構成を見ると、点 $P, Q$ に対して直線 $PQ$ ($P = Q$ のとき点 $P$ での接線) と曲線との交点について $y$ 座標を符号反転した点が $P + Q$ となります。
+ここに図
+
+特に実数体 $\mathbb{R}$ 上の楕円曲線のグラフ上で見ると、点 $P, Q$ に対して直線 $PQ$ ($P = Q$ のとき点 $P$ での接線) と曲線との交点について $y$ 座標を符号反転した点が $P + Q$ となります。
+
+https://andrea.corbellini.name/ecc/interactive/reals-add.html
+
+交換法則が成り立つので $nP := \overbrace{P + \cdots + P}^n$ と定義します。
+
+ここに具体例
+
+
+ここに実装
+
+ここでは特に $\mathbb{Q}, \mathbb{F}_q$ のときについて考える。
+torsion point
+
+まずこの群の位数を求める為に群構造を明らかにする。
+
+> **Prop. 楕円曲線の群構造**
+> $m, n$ を整数として $E(\mathbb{F}_p) \cong \mathbb{Z}/m\mathbb{Z}\times\mathbb{Z}/n\mathbb{Z}$ となる。
+
+**Proof.**
+
+ところで Weierstrass の $\wp$ 関数というものがあり、次のように定義されます。
+
+$L = \mathbb{Z}\omega_1 + \mathbb{Z}\omega_2$
+
+$$
+\begin{aligned}
+\wp(u) & = \frac{1}{u^2} + \sum_{\substack{\omega\in L \\ \omega \neq 0}}\left(\frac{1}{(u - \omega)^2} - \frac{1}{\omega^2}\right) \\
+\wp'(u) & = - \sum_{\omega\in L}\frac{1}{(u - \omega)^3} \\
+(\wp')^2 & = 4\wp^3 - 60\sum_{\substack{\omega\in L \\ \omega \neq 0}}\frac{1}{\omega^4}\wp - 140\sum_{\substack{\omega\in L \\ \omega \neq 0}}\frac{1}{\omega^6}
+\end{aligned}
+$$
 
 > **Thm. Hasse の定理**
 > $p$ を素数, $E/\mathbb{F}_p$ を楕円曲線とする。
@@ -44,12 +81,13 @@ $$
 $$
 > ただし、$\#E/\mathbb{F}_p$ で群位数を表す。
 
-**Proof.**
+証明は次の資料を参照
+https://tsujimotter.hatenablog.com/entry/hasses-theorem
 
 > **Schoof のアルゴリズム**
 > 楕円曲線 $E/\mathbb{F}_p$ の位数を $O(\log^8p)$ で求められる。
 
-Hasse-Weil 定理より
+Hasse の定理より
 
 $$
 q+1-2\sqrt{q}\leq|E(\mathbb{F}_q)|\leq q+1+2\sqrt{q}
@@ -71,48 +109,8 @@ $$
 
 Schoof のアルゴリズムはモジュラー多項式によって $O(\log^8p)$ から $O(\log^6p)$ へ高速化できるのですが、本筋とズレるので気になる方は楕円曲線について学習された上、論文などを参照してください。
 
-## 超楕円曲線
-ヤコビ多様体
-Mumford 表現
+上で示した楕円曲線は限定的な定義でこれより一般の楕円曲線や特殊な曲線として Weierstrass, Montgomery, twisted Edwards, Hessian などなどさまざまな曲線がありますが、あまり重要ではないので詳しくは CM の後で！
 
-$$
-y^2 + h(x)y = f(x)
-$$
-
-$$
-f(x) = x^{2g+1} + a_{2g}x^{2g} + \cdots + a_1x + a_0 \in\mathbb{F}_p[x] \\
-C: y^2 = f(x)
-$$
-
-$\deg f = 2g + 1$ と書けるなら虚超楕円曲線と呼び、$g$ を種数
-
-> **加算アルゴリズム**
-> まず $d = \gcd(u_1, u_2, v_1 + v_2 + h) = s_1u_1 + s_2u_2 + s_3(v_1 + v_2 + h)$ を計算し、次のように加算を行う。
->
-> $$
-\begin{aligned}
-u & = \frac{u_1u_2}{d^2} \\
-v & = \frac{s_1u_1v_2 + s_2u_2v_1 + s_3(v_1v_2 + f)}{d} & \pmod u
-\end{aligned}
-$$
-
-> **還元アルゴリズム**
-> $\deg u > g$ なら次のように計算して $u$ をモニックとする。
->
-> $$
-\begin{aligned}
-u' & = \frac{f - vh - v^2}{u} \\
-v' & = - h - v & \pmod{u'}
-\end{aligned}
-$$
-
-位数
-
-$$
-(\sqrt{p}-1)^{2g} \leq \#\mathcal{J}_C(\mathbb{F}_p) \leq (\sqrt{p}+1)^{2g}
-$$
-
-$\#\mathcal{J}_C(\mathbb{F}_p) \approx p^g$
 
 ## 楕円曲線暗号
 
@@ -375,6 +373,50 @@ $$
 **練習問題**
 - tiramisu (Google CTF)
 :::
+
+## 超楕円曲線
+ヤコビ多様体
+Mumford 表現
+
+$$
+y^2 + h(x)y = f(x)
+$$
+
+$$
+f(x) = x^{2g+1} + a_{2g}x^{2g} + \cdots + a_1x + a_0 \in\mathbb{F}_p[x] \\
+C: y^2 = f(x)
+$$
+
+$\deg f = 2g + 1$ と書けるなら虚超楕円曲線と呼び、$g$ を種数
+
+> **加算アルゴリズム**
+> まず $d = \gcd(u_1, u_2, v_1 + v_2 + h) = s_1u_1 + s_2u_2 + s_3(v_1 + v_2 + h)$ を計算し、次のように加算を行う。
+>
+> $$
+\begin{aligned}
+u & = \frac{u_1u_2}{d^2} \\
+v & = \frac{s_1u_1v_2 + s_2u_2v_1 + s_3(v_1v_2 + f)}{d} & \pmod u
+\end{aligned}
+$$
+
+> **還元アルゴリズム**
+> $\deg u > g$ なら次のように計算して $u$ をモニックとする。
+>
+> $$
+\begin{aligned}
+u' & = \frac{f - vh - v^2}{u} \\
+v' & = - h - v & \pmod{u'}
+\end{aligned}
+$$
+
+位数
+
+$$
+(\sqrt{p}-1)^{2g} \leq \#\mathcal{J}_C(\mathbb{F}_p) \leq (\sqrt{p}+1)^{2g}
+$$
+
+$\#\mathcal{J}_C(\mathbb{F}_p) \approx p^g$
+
 
 ## 参考文献
 - [Imaginary hyperelliptic curve - Wikipedia](https://en.wikipedia.org/wiki/Imaginary_hyperelliptic_curve)
