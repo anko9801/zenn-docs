@@ -117,6 +117,8 @@ TLS 1.3 で使われているもう一つの暗号です。
 - Pwn2Win CTF 2021 A2S や nullcon HackIM 2019 2FUN を考えてみよう。 中間一致攻撃
 :::
 
+AES の暗号化関数自体には脆弱性は見つかっていませんが、暗号利用モードやプロトコルの脆弱性により攻撃できる場合があります。
+
 ### パディング
 AES はブロック暗号なので **16 バイトごとでしか** 暗号化できません。平文の始めから 16 バイトずつ切り出して暗号化していくと最後に余るデータがあります。当然それも暗号化して送りたいので 16 バイトになるように適当なデータをくっつけて暗号化します。この操作をパディングと呼び、AES では PKCS #7 パディングという規格でパディングを行います。
 
@@ -173,11 +175,22 @@ $$
 ![](/images/ECB_encryption.png)
 ![](/images/ECB_decryption.png)
 
+### AES-ECB の脆弱性
+ECB モードはとっても脆弱でよく CTF に出てきます。なぜ脆弱かというと
+
+- ブロックごとに平文と暗号文が対応する
+- 平文と暗号文の対応を知っていればどのブロックもそれに改ざんできる
+
+からです。そうすると平文の予測のつく通信を傍受できたなら、それを元に対応表を作って改ざんして送るなどを考えれば、いかに脆弱なのかがわかると思います。
+
+その為に通信利用モードがあり、特に CBC モードでは対応表を作ることはできず、攻撃することはできません。
+
 ### AES-CBC (Cipher Block Chaining)
 Padding Oracle Attack で大きな衝撃を与えたモードです。
 CBC モードでは鍵以外に初期ベクトル IV (Initialization Vector) を追加します。これを初期状態として前の暗号文と平文と掛け合わせて暗号化することを繰り返して暗号化します。これによって ECB であった脆弱性を防ぐことができます。
 
 ただプロトコルによっては脆弱となりうるので TLS 1.3 で廃止されました。
+ただしエラーかどうかという情報を攻撃者に返してしまうとたちまち脆弱となります。それが次に話す Padding Oracle Attack の根幹です。
 
 $$
 \begin{aligned}
@@ -191,6 +204,20 @@ $$
 
 ![](/images/CBC_encryption.png)
 ![](/images/CBC_decryption.png)
+
+### Padding Oracle Attack
+CBC モード自体は安全なのですが、プロトコルの作り方や組み合わせ方によっては安全ではなくなります。Oracle は企業の Oracle ではなくて神託と呼ばれる神様が発した言葉のことです。パディング
+
+CTF での典型的な解き方としては Padding Oracle Attack を使って暗号/復号化関数 $E_k$ を作れれば、鍵を考えなくても復号することができ、逆変換を辿るだけで解けます。
+
+POODLE Attack (Padding Oracle On Downgraded Legacy Encryption)
+
+さらにこれを応用して BEAST Attack (Browser Exploit Against SSL/TLS) は TLS の脆弱性を用いた攻撃ができ、Cookie のセッション情報を狙うことができるなど実用的な攻撃が通った。Same Origin Policy があることで防止された。
+
+Lucky Thirteen Attack では Oracle がわからずともパディング処理の微妙な遅れを検知して同様の攻撃をします。(元論文によると時間差は80nsらしい)
+Al Fardan, N.J. and K.G. Paterson, "Lucky Thirteen: Breaking the TLS and DTLS record protocols", n.d., <https://ieeexplore.ieee.org/iel7/6547086/6547088/06547131.pdf>.
+
+この Padding Oracle Attack で攻撃できないような暗号利用モードが AES-GCM です。
 
 ### AES-GCM (Galois/Counter Mode)
 AES 利用モードの中で TLS 1.3 で使われている唯一のモードです。ガロア体 (有限体) 上で Counter (CTR) モードを実行するのでこんな名前になってます。
@@ -252,35 +279,7 @@ https://gist.github.com/theoremoon/8bcb9b87dcb1289cf13c9db4431db324
 
 また CTF で出題される他の暗号利用モード OFB, CTR などは Wikipedia を参照すれば良いでしょう。
 
-## AES への攻撃
-
-AES の暗号化関数自体には脆弱性は見つかっていませんが、暗号利用モードやプロトコルの脆弱性により攻撃できる場合があります。
-
-### AES-ECB の脆弱性
-ECB モードはとっても脆弱でよく CTF に出てきます。なぜ脆弱かというと
-
-- ブロックごとに平文と暗号文が対応する
-- 平文と暗号文の対応を知っていればどのブロックもそれに改ざんできる
-
-からです。そうすると平文の予測のつく通信を傍受できたなら、それを元に対応表を作って改ざんして送るなどを考えれば、いかに脆弱なのかがわかると思います。
-
-その為に通信利用モードがあり、特に CBC モードでは対応表を作ることはできず、攻撃することはできません。
-
-ただしエラーかどうかという情報を攻撃者に返してしまうとたちまち脆弱となります。それが次に話す Padding Oracle Attack の根幹です。
-
-### Padding Oracle Attack
-CBC モード自体は安全なのですが、プロトコルの作り方や組み合わせ方によっては安全ではなくなります。Oracle は企業の Oracle ではなくて神託と呼ばれる神様が発した言葉のことです。パディング
-
-CTF での典型的な解き方としては Padding Oracle Attack を使って暗号/復号化関数 $E_k$ を作れれば、鍵を考えなくても復号することができ、逆変換を辿るだけで解けます。
-
-POODLE Attack (Padding Oracle On Downgraded Legacy Encryption)
-
-さらにこれを応用して BEAST Attack (Browser Exploit Against SSL/TLS) は TLS の脆弱性を用いた攻撃ができ、Cookie のセッション情報を狙うことができるなど実用的な攻撃が通った。Same Origin Policy があることで防止された。
-
-Lucky Thirteen Attack では Oracle がわからずともパディング処理の微妙な遅れを検知して同様の攻撃をします。(元論文によると時間差は80nsらしい)
-Al Fardan, N.J. and K.G. Paterson, "Lucky Thirteen: Breaking the TLS and DTLS record protocols", n.d., <https://ieeexplore.ieee.org/iel7/6547086/6547088/06547131.pdf>.
-
-### Nonce の使いまわし
+### AES-GCM への攻撃 (Nonce の使いまわし)
 差分解読法
 
 ### 耐量子性
