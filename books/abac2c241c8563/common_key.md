@@ -119,8 +119,6 @@ TLS 1.3 で使われているもう一つの暗号です。
 - Hard: AES のラウンド回数が 2 回など少ない場合、解読出来てしまいます。どうすれば解読できるでしょうか。(Pwn2Win CTF 2021 A2S)
 :::
 
-AES の暗号化関数自体には脆弱性は見つかっていませんが、暗号利用モードやプロトコルの脆弱性により攻撃できる場合があります。
-
 ### パディング
 AES はブロック暗号なので **16 バイトごとでしか** 暗号化できません。平文の始めから 16 バイトずつ切り出して暗号化していくと最後に余るデータがあります。当然それも暗号化して送りたいので 16 バイトになるように適当なデータをくっつけて暗号化します。この操作をパディングと呼び、AES では PKCS #7 パディングという規格でパディングを行います。
 
@@ -159,7 +157,7 @@ b'Sound! Euphonium\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x
 ## 暗号利用モード
 通常の暗号化関数のみで実装するとストリーム暗号が使えなかったり、セキュリティ的に脆弱な危険性があります。これを改善する為に作られたのが暗号利用モードです。
 
-特に CTF では ECB, CBC, GCM モードが使われるのでこれについて紹介します。その他の暗号利用モードは Wikipedia を参照すると良いです。
+AES の暗号化関数自体の解読不可能性をバイパスして暗号利用モードやプロトコルの脆弱性により攻撃できる場合があります。特に CTF では ECB, CBC, GCM モードが使われるのでこれについて紹介します。その他の暗号利用モードは Wikipedia を参照すると良いです。
 
 https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89
 
@@ -219,8 +217,7 @@ POODLE Attack (Padding Oracle On Downgraded Legacy Encryption)
 
 さらにこれを応用して BEAST Attack (Browser Exploit Against SSL/TLS) は TLS の脆弱性を用いた攻撃ができ、Cookie のセッション情報を狙うことができるなど実用的な攻撃が通った。Same Origin Policy があることで防止された。
 
-Lucky Thirteen Attack では Oracle がわからずともパディング処理の微妙な遅れを検知して同様の攻撃をします。(元論文によると時間差は80nsらしい)
-Al Fardan, N.J. and K.G. Paterson, "Lucky Thirteen: Breaking the TLS and DTLS record protocols", n.d., <https://ieeexplore.ieee.org/iel7/6547086/6547088/06547131.pdf>.
+Lucky Thirteen Attack では Oracle がわからずともパディング処理の微妙な遅れを検知して同様の攻撃をします。(元論文によると時間差 80ns を繰り返して)
 
 ### AES-GCM (Galois/Counter Mode)
 AES 利用モードの中で TLS 1.3 で使われている唯一のモードです。ガロア体 (有限体) 上で Counter (CTR) モードを実行するのでこんな名前になってます。
@@ -281,13 +278,13 @@ $$
 このように暗号化と同時に完全性や認証性も実現するための暗号方式が考案され、それらを総称して AEAD (Authenticated Encryption with Asocciated Data) と呼ばれます。暗号スイートの MAC の部分に AEAD という表記があるものは、暗号モードとして認証付き暗号の GCM が利用されています。
 
 ### Nonce の使いまわし
-Nonce とは $IV$ と $K$ のこと。Nonce がランダムではないとすると、ある平文と暗号文のペアが分かれば任意の暗号の解読が出来てしまいます。
+Nonce とは初期ベクトル $IV$ と鍵 $K$ のこと。Nonce がランダムではないとすると、ある平文と暗号文のペアが分かれば任意の暗号の解読が出来てしまいます。
 
-これは GCTR における予測困難な値がペアを XOR することで得られてしまうからである。
+これは GCTR における予測困難な値がペアを XOR することで得られてしまうからです。
 
-さらに認証タグについても差分解読法を用いて解読できる。
+さらに認証タグについても差分解読法を用いて解読できます。
 
-## その他
+### その他の攻撃
 耐量子性
 最近だと耐量子性も考える必要が出てきました。量子アルゴリズムの1つ Grover's algorithm によって全探索の計算量が $2^{K}\to 2^{K/2}$ と減少した為、鍵長を倍の長さにしないと同じ安全性を担保できません。
 
@@ -303,6 +300,7 @@ Nonce とは $IV$ と $K$ のこと。Nonce がランダムではないとする
 - [暗号利用モード - Wikipedia](https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89)
 - https://www.scutum.jp/information/waf_tech_blog/2011/10/waf-blog-008.html
 - https://gist.github.com/theoremoon/8bcb9b87dcb1289cf13c9db4431db324
+- Al Fardan, N.J. and K.G. Paterson, "Lucky Thirteen: Breaking the TLS and DTLS record protocols", n.d., <https://ieeexplore.ieee.org/iel7/6547086/6547088/06547131.pdf>.
 
 tweakable block cipher
 
