@@ -23,7 +23,7 @@ title: "共通鍵暗号"
 > - ビット列 $D$ に対して $n$-bit ブロックとして前置, 後置ゼロパディングする関数をそれぞれ $Z_{f, n}(D), Z_{b, n}(D)$ と書く。
 
 ## AES
-AES (Advanced Encryption Standard) は 2000 年に NIST が公募し選定した暗号標準で、 2001 年 11 月に FIPS PUB 197 として公表されました。
+AES (Advanced Encryption Standard) は 2000 年に NIST が公募し選定した暗号標準で、 2001 年 11 月に [FIPS PUB 197](https://nvlpubs.nist.gov/nistpubs/fips/nist.fips.197.pdf) として公表されました。
 
 AES の選定では次のような条件を課しました。
 
@@ -68,6 +68,7 @@ const uint8_t sbox[] = {
 ```
 
 細かい実装は練習問題に回すとして AES の応用について考えます。
+
 AES-NI: CPU 命令を追加することで高速化
 
 他の共通鍵暗号としてはワンタイムパッドや DES, ChaCha20-Poly1305 があります。
@@ -113,8 +114,9 @@ TLS 1.3 で使われているもう一つの暗号です。
 
 :::message
 **練習問題**
-- AES を作ってみましょう。[CryptoHack](https://cryptohack.org/challenges/aes/) を見るとよさそう。
-- Pwn2Win CTF 2021 A2S や nullcon HackIM 2019 2FUN を考えてみよう。 中間一致攻撃
+- Medium: AES を作ってみましょう。[CryptoHack](https://cryptohack.org/challenges/aes/) を見るとよさそう。
+- Easy: AES では暗号化関数だけで復号が出来ます。なぜでしょうか。
+- Hard: AES のラウンド回数が 2 回など少ない場合、解読出来てしまいます。どうすれば解読できるでしょうか。(Pwn2Win CTF 2021 A2S)
 :::
 
 AES の暗号化関数自体には脆弱性は見つかっていませんが、暗号利用モードやプロトコルの脆弱性により攻撃できる場合があります。
@@ -162,8 +164,7 @@ b'Sound! Euphonium\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x
 https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89
 
 ### AES-ECB (Electronic CodeBlock)
-最も単純なモードです。平文をそのまま暗号化します。復号もそのまま復号します。
-これは脆弱なので暗号として使われていません。
+平文を 16 バイトブロックごとに暗号化して暗号文を作り、復号もブロックごとに復号するという最も単純な暗号利用モードです。
 
 $$
 \begin{aligned}
@@ -175,22 +176,18 @@ $$
 ![](/images/ECB_encryption.png)
 ![](/images/ECB_decryption.png)
 
-### AES-ECB の脆弱性
-ECB モードはとっても脆弱でよく CTF に出てきます。なぜ脆弱かというと
+### リプレイ攻撃
+一見ﾖｼｯって言いたくなりますが各ブロックでリプレイ攻撃が可能です。
 
 - ブロックごとに平文と暗号文が対応する
 - 平文と暗号文の対応を知っていればどのブロックもそれに改ざんできる
 
-からです。そうすると平文の予測のつく通信を傍受できたなら、それを元に対応表を作って改ざんして送るなどを考えれば、いかに脆弱なのかがわかると思います。
-
-その為に通信利用モードがあり、特に CBC モードでは対応表を作ることはできず、攻撃することはできません。
+それぞれのブロックに細工を仕込んで意図したリプレイ攻撃が出来ないようにしたいです。そのようにして考えられたのが次で紹介する CBC モードです。
 
 ### AES-CBC (Cipher Block Chaining)
-Padding Oracle Attack で大きな衝撃を与えたモードです。
-CBC モードでは鍵以外に初期ベクトル IV (Initialization Vector) を追加します。これを初期状態として前の暗号文と平文と掛け合わせて暗号化することを繰り返して暗号化します。これによって ECB であった脆弱性を防ぐことができます。
+CBC モードはプロトコルによっては脆弱となりうるので TLS 1.3 で廃止されました。
 
-ただプロトコルによっては脆弱となりうるので TLS 1.3 で廃止されました。
-ただしエラーかどうかという情報を攻撃者に返してしまうとたちまち脆弱となります。それが次に話す Padding Oracle Attack の根幹です。
+CBC モードでは鍵以外に初期ベクトル IV (Initialization Vector) を追加します。これを初期状態として前の暗号文と平文と掛け合わせて暗号化することを繰り返して暗号化します。これによって各ブロックでのリプレイ攻撃を防ぐことができます。
 
 $$
 \begin{aligned}
@@ -202,13 +199,21 @@ P_i & = E_K(C_i)\oplus C_{i-1}
 \end{aligned}
 $$
 
+しかしよく考えてみると依然として全体のリプレイ攻撃は出来てしまいます。それを解決させるには初回で話したメッセージ改ざん検知: MAC を用いることで検証を行い、リプレイ攻撃されたかどうかを検知します。
+
 ![](/images/CBC_encryption.png)
 ![](/images/CBC_decryption.png)
 
 ### Padding Oracle Attack
+ただしエラーかどうかという情報を攻撃者に返してしまうとたちまち脆弱となります。それが次に話す Padding Oracle Attack の根幹です。
 CBC モード自体は安全なのですが、プロトコルの作り方や組み合わせ方によっては安全ではなくなります。Oracle は企業の Oracle ではなくて神託と呼ばれる神様が発した言葉のことです。パディング
 
 CTF での典型的な解き方としては Padding Oracle Attack を使って暗号/復号化関数 $E_k$ を作れれば、鍵を考えなくても復号することができ、逆変換を辿るだけで解けます。
+
+```mermaid
+flowchart LR
+    A(POODLE Attack) ---> B(BEAST Attack) ---> C(Lucky Thirteen Attack)
+```
 
 POODLE Attack (Padding Oracle On Downgraded Legacy Encryption)
 
@@ -217,14 +222,12 @@ POODLE Attack (Padding Oracle On Downgraded Legacy Encryption)
 Lucky Thirteen Attack では Oracle がわからずともパディング処理の微妙な遅れを検知して同様の攻撃をします。(元論文によると時間差は80nsらしい)
 Al Fardan, N.J. and K.G. Paterson, "Lucky Thirteen: Breaking the TLS and DTLS record protocols", n.d., <https://ieeexplore.ieee.org/iel7/6547086/6547088/06547131.pdf>.
 
-この Padding Oracle Attack で攻撃できないような暗号利用モードが AES-GCM です。
-
 ### AES-GCM (Galois/Counter Mode)
 AES 利用モードの中で TLS 1.3 で使われている唯一のモードです。ガロア体 (有限体) 上で Counter (CTR) モードを実行するのでこんな名前になってます。
 
-これはちょっと今の段階では構造が複雑な上に有限体というよくわからない概念を利用してて難しいので読み飛ばしていいです。後で有限体を解説するのでそのときまた読み直しましょう。
+CBC モードで可能だった Padding Oracle Attack は GCM モードで構造を複雑にすることで防いでいます。更にメッセージ改ざん検知を暗号化と一緒に行うようにすることでリプレイ攻撃にも耐性が付いています。
 
-まず GHASH と GCTR という操作を定義します。
+これを理解するにはまず GHASH と GCTR という操作を定義します。
 
 > **Def. GHASH**
 > 128-bit ブロックの入力を $X = X_1\|\cdots\|X_n$、 $H = E_k(Z_{f, 128}(0))$ とおきます。このとき次のように $\lbrace Y_i\rbrace$ を生成したとき GHASH 関数を $\mathrm{GHASH}_H(X) = Y_n$ と定義します。
@@ -242,10 +245,12 @@ $$
 > 128-bit ブロックの入力を $X = X_1\|\cdots\|X_n$、鍵を $K$ として生成した $\lbrace Y_i\rbrace$ に対して $Y = Y_1\|\cdots\|Y_n$ とすると GCTR 関数を $\mathrm{GCTR}_K(ICB, X) = Y$ と定義します。
 >
 > $$
-Y_i = E_k(ICB + (i-1)) \oplus X_i \qquad (i = 1,\ldots,n)
+Y_i = E_K(ICB + (i-1)) \oplus X_i \qquad (i = 1,\ldots,n)
 $$
 
-これらを用いて実装します。まず暗号文を計算します。
+このモードの本質は GCTR です。$E_K$ で作られた予測困難な値と平文とを XOR することで暗号文を作り出します。このとき $ICB$ が予測可能なら解読されてしまいますが、 $IV$ と $K$ を用いて構成するのでそれらを知られない限り予測できません。
+
+それでは実際にこれらを用いて実装します。まず暗号文を計算します。
 
 $$
 \begin{aligned}
@@ -271,18 +276,22 @@ $$
 P = \mathrm{GCTR}_K(J_0 + 1, C)
 $$
 
-とこのような感じです。まぁ私も「なんですか、これ」って感じなので詳しい方、安全性とか色々教えてください。
+暗号化と認証タグの GCTR の初期ベクトルが 1 だけ違うのを見ると認証タグから鍵導出のヒントをもらうのを防いでいそうな感じがします。
 
-https://gist.github.com/theoremoon/8bcb9b87dcb1289cf13c9db4431db324
+このように暗号化と同時に完全性や認証性も実現するための暗号方式が考案され、それらを総称して AEAD (Authenticated Encryption with Asocciated Data) と呼ばれます。暗号スイートの MAC の部分に AEAD という表記があるものは、暗号モードとして認証付き暗号の GCM が利用されています。
 
-このように暗号化と同時に完全性や認証性も実現するための暗号方式が考案され、それらを総称して AEAD (Authenticated Encryption with Asocciated Data) と呼ばれます。暗号スイートの Mac の部分に AEAD という表記があるものは、暗号モードとして認証付き暗号の GCM が利用されています。
+### Nonce の使いまわし
+Nonce とは $IV$ と $K$ のこと。Nonce がランダムではないとすると、ある平文と暗号文のペアが分かれば任意の暗号の解読が出来てしまいます。
 
-### AES-GCM への攻撃 (Nonce の使いまわし)
-差分解読法
+これは GCTR における予測困難な値がペアを XOR することで得られてしまうからである。
+
+さらに認証タグについても差分解読法を用いて解読できる。
 
 ## その他
 耐量子性
 最近だと耐量子性も考える必要が出てきました。量子アルゴリズムの1つ Grover's algorithm によって全探索の計算量が $2^{K}\to 2^{K/2}$ と減少した為、鍵長を倍の長さにしないと同じ安全性を担保できません。
+
+サイドチャネル攻撃
 
 他にも共通鍵暗号への攻撃には Integral Cryptanalysis がありますがそれらは「ハッシュと SMT」で紹介します。
 
@@ -293,6 +302,7 @@ https://gist.github.com/theoremoon/8bcb9b87dcb1289cf13c9db4431db324
 - [NIST Special Publication 800-38D Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC](https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38d.pdf)
 - [暗号利用モード - Wikipedia](https://ja.wikipedia.org/wiki/%E6%9A%97%E5%8F%B7%E5%88%A9%E7%94%A8%E3%83%A2%E3%83%BC%E3%83%89)
 - https://www.scutum.jp/information/waf_tech_blog/2011/10/waf-blog-008.html
+- https://gist.github.com/theoremoon/8bcb9b87dcb1289cf13c9db4431db324
 
 tweakable block cipher
 
