@@ -249,7 +249,7 @@ $$
 P = \mathrm{GCTR}_K(J_0 + 1, C)
 $$
 
-このように暗号化と同時に完全性や認証性も実現するための暗号方式が考案され、それらを総称して AEAD (Authenticated Encryption with Asocciated Data) と呼ばれます。暗号スイートの MAC の部分に AEAD という表記があるものは、暗号モードとして認証付き暗号の GCM が利用されています。
+一般に暗号化と同時に完全性や認証性を実現するための暗号方式が考案され、それらを総称して AEAD (Authenticated Encryption with Asocciated Data) と呼ばれます。暗号スイートの MAC の部分に AEAD という表記があるものは、暗号モードとして認証付き暗号の GCM が利用されています。
 
 ### Nonce の使いまわし
 Nonce とは初期ベクトル $IV$ と鍵 $K$ のこと。
