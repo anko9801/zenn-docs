@@ -37,14 +37,12 @@ AES はあるラウンド関数を繰り返す SPN 構造 (Substitution Permutat
 
 1. AddRoundKey
 秘密鍵からラウンド数に応じたラウンド鍵を生成し XOR を取る。
-2. SubBytes
-1 バイトの置換表 S-box を用いてバイトごとに変換します。具体的には下のような表を用います。単純ですがほとんどの置換表は非線形変換となり、差分解析法などの攻撃に対してかなり強く、AES の安全性の要となっています。
-3. ShiftRows
+2. SubBytes (Substitution)
+1 バイトの置換表 S-box を用いてバイトごとに変換します。AES では下の S-box を用います。単純ですがほとんどの置換表は非線形変換となり、差分解析法などの攻撃に対してかなり強く、AES の安全性の要となっています。
+3. ShiftRows (Permutation)
 $16$ バイトを $4\times 4$ に分け、行ごとにサイクリックシフトする。
-4. MixColumn
+4. MixColumn (Permutation)
 $16$ バイトを $4\times 4$ に分け、列ごとに $\mathbb{F}_{2^8} \cong \mathbb{F}_2[x]/(x^8 + x^4 + x^3 + x + 1)$ 上でビット演算する。
-
-SPN 構造の名前の由来である置換 (Substitution) と並べ替え (Permutation) はそれぞれ SubBytes と ShiftRows, MixColumn に対応します。
 
 ![](/images/aes.png)
 
@@ -72,47 +70,6 @@ const uint8_t sbox[] = {
 細かい実装は練習問題に回すとして AES の応用について考えます。
 
 AES-NI: CPU 命令を追加することで高速化
-
-他の共通鍵暗号としてはワンタイムパッドや DES, ChaCha20-Poly1305 があります。
-
-> **バーナム暗号 (ワンタイムパッド)**
-> 疑似乱数によって生成された数列を共通鍵として共有し、平文に対して繰り返し鍵で XOR を掛ける暗号です。
->
-> 具体的には $i = 0,\ldots, m$ としてバイトごとに分けた平文 $P_i$ と $n$ バイトの鍵 $K_i$ として暗号文 $C_i = P_i \oplus K_{i \bmod n}$ と計算する。
-
-TODO: 脆弱性
-
-```python
-def onetime_pad(m: bytes, key: bytes) -> bytes:
-    n = len(key)
-    c = b""
-    for block in range(0, len(m), n):
-        for i in range(n):
-            if block + i >= len(m):
-                break
-            c += (m[block + i] ^ key[i]).to_bytes(1, "big")
-    return c
-
-c = onetime_pad(b"I'm your father", b"\x0a\x6c\x3e\x78")
-print(c)
-```
-
-AES 以前に使われていた共通鍵暗号
-DES は内部で Feistel 構造を取っていて
-
-> **Feistel 構造**
-> DES で使われた暗号化の為の内部構造です。
->
-> 暗号化: $R_{r+1} = L_r \oplus F(R_r, k_r)$, $L_{r+1} = R_r$
-> 復号: $L_r = R_{r+1} \oplus F(L_{r+1}, k_r)$, $R_r = L_{r+1}$
-
-撹拌性はよくないことが知られています。
-TODO: 撹拌性の検証コードを実装する
-
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Feistel.png/220px-Feistel.png)
-
-ストリーム暗号 ChaCha20-Poly1305
-TLS 1.3 で使われているもう一つの暗号です。
 
 :::message
 **練習問題**
@@ -260,7 +217,9 @@ $$
 
 ![](/images/aes_gcm.png)
 
-それでは実際にこれらを用いて実装します。まず暗号文を計算します。
+それでは実際にこれらを用いて実装します。
+
+まず暗号文を計算します。$J_0$ という見慣れない記号がありますが、要するに初期ベクトル $IV$ のハッシュ値だと思えばいいです。
 
 $$
 \begin{aligned}
@@ -272,13 +231,17 @@ C & = \mathrm{GCTR}_K(J_0 + 1, P)
 \end{aligned}
 $$
 
-また暗号文とは別に認証タグを生成します。これは復号するときにこのタグと一緒に入力することで暗号文が改ざんされたかどうかを検知することができる代物です。暗号文 $C$ とオプショナルの認証データ (AAD; Additional Authenticated Data) $A$ を用意して投げると出てきます。
+これで暗号文が作れました！
+
+暗号化では暗号文とは別に認証タグを生成します。認証タグとは暗号文と共にこの認証タグを付けて復号することでが改ざんされたかどうかを検知できるシステムです。
+
+認証タグは暗号文 $C$ とオプショナルの認証データ (AAD; Additional Authenticated Data) $A$ を用意して投げると出てきます。まず次のように計算して...
 
 $$
 T = \mathrm{GCTR}_K(J_0, \mathrm{GHASH}_H(Z_{b, 128}(A)\|Z_{b, 128}(C)\|Z_{f, 64}(\mathrm{len}(A))\|Z_{f, 64}(\mathrm{len}(C))))
 $$
 
-このように計算して出てきた $T$ を上から平文の長さだけ取ってきたものが認証タグとなります。
+計算して出てきた $T$ を上から平文の長さだけ取ってきたものが認証タグとなります。
 
 復号は認証タグを同様に計算して送られてきたタグと一致しなかったら失敗、一致してたら次のように平文を計算して返します。
 
@@ -289,17 +252,54 @@ $$
 このように暗号化と同時に完全性や認証性も実現するための暗号方式が考案され、それらを総称して AEAD (Authenticated Encryption with Asocciated Data) と呼ばれます。暗号スイートの MAC の部分に AEAD という表記があるものは、暗号モードとして認証付き暗号の GCM が利用されています。
 
 ### Nonce の使いまわし
-Nonce とは初期ベクトル $IV$ と鍵 $K$ のこと。Nonce がランダムではないとすると、ある平文と暗号文のペアが分かれば XOR を取ることで先ほどの乱数列が分かり、任意の暗号文の解読が出来てしまいます。
+Nonce とは初期ベクトル $IV$ と鍵 $K$ のこと。
+
+Nonce がランダムではないとすると、ある平文と暗号文のペアが分かれば XOR を取ることで先ほどの乱数列が分かり、任意の暗号文の解読が出来てしまいます。
 
 さらに認証タグについても差分解読法を用いて解読できます。
 
-### その他の攻撃
-耐量子性
+### さらなる攻撃
+- サイドチャネル攻撃
+周辺に漏れ出る電磁波や、処理によって異なる消費電力の差などを観測して認証情報を推測したり、不正な電圧を印加することでセキュリティ上の防御処理をスキップし
+- 差分解読法 (Differential Cryptoanalysis)
+FEAL4
+- 線形解読法 (Integral Cryptoanalysis)
+[traP に 記事があるらしい](https://trap.jp/post/641/)
+- 耐量子性
 最近だと耐量子性も考える必要が出てきました。量子アルゴリズムの1つ Grover's algorithm によって全探索の計算量が $2^{K}\to 2^{K/2}$ と減少した為、鍵長を倍の長さにしないと同じ安全性を担保できません。
 
-サイドチャネル攻撃
+## その他の共通鍵暗号
+CTFer は AES だけを知っていれば共通鍵暗号をマスターしたと言ってもいいのですが、暗号好きer なら他にもあることを覚えていってほしいです。まぁ CTF でもたまに知識問として出るしね。
 
-他にも共通鍵暗号への攻撃には Integral Cryptanalysis がありますがそれらは「ハッシュと SMT」で紹介します。
+### ワンタイムパッド
+
+> **ワンタイムパッド (バーナム暗号)**
+> 疑似乱数によって生成された数列を共通鍵として共有し、平文に対して繰り返し鍵で XOR を掛ける暗号です。
+>
+> 具体的には $i = 0,\ldots, m$ としてバイトごとに分けた平文 $P_i$ と $n$ バイトの鍵 $K_i$ として暗号文 $C_i = P_i \oplus K_{i \bmod n}$ と計算する。
+
+頻度解析とかすればサクッと解読できるので現在使われていません。ただ CTF ではよく出てくるので出てきたら CyberChef とかに任せると良さそう。
+
+### DES
+AES 以前に使われていた共通鍵暗号
+DES は内部で Feistel 構造を取っていて
+
+> **Feistel 構造**
+> DES で使われた暗号化の為の内部構造です。
+>
+> 暗号化: $R_{r+1} = L_r \oplus F(R_r, k_r)$, $L_{r+1} = R_r$
+> 復号: $L_r = R_{r+1} \oplus F(L_{r+1}, k_r)$, $R_r = L_{r+1}$
+
+撹拌性はよくないことが知られています。
+TODO: 撹拌性の検証コードを実装する
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Feistel.png/220px-Feistel.png)
+
+### ChaCha20-Poly1305
+ストリーム暗号
+TLS 1.3 で使われているもう一つの暗号です。
+
+### tweakable block cipher
 
 ## まとめ
 共通鍵暗号の仕組みと AES の構築/攻撃を学びました。
@@ -310,7 +310,5 @@ Nonce とは初期ベクトル $IV$ と鍵 $K$ のこと。Nonce がランダム
 - https://www.scutum.jp/information/waf_tech_blog/2011/10/waf-blog-008.html
 - https://gist.github.com/theoremoon/8bcb9b87dcb1289cf13c9db4431db324
 - Al Fardan, N.J. and K.G. Paterson, "Lucky Thirteen: Breaking the TLS and DTLS record protocols", n.d., <https://ieeexplore.ieee.org/iel7/6547086/6547088/06547131.pdf>.
-
-tweakable block cipher
 
 この資料は CC0 ライセンスです。
