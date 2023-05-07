@@ -8,7 +8,6 @@ chapters:
   - introduction
   - common_key
   - public_key
-  - math
   - rsa
   - ecc
   - hash
@@ -19,3 +18,4 @@ chapters:
   - blockchain
   - protocol
   - environment
+  - math
