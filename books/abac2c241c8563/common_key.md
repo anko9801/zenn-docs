@@ -73,7 +73,7 @@ AES-NI: CPU 命令を追加することで高速化
 
 :::message
 **練習問題**
-- Medium: AES を作ってみましょう。[CryptoHack](https://cryptohack.org/challenges/aes/) を見るとよさそう。
+- Medium: AES を自作してみましょう。[CryptoHack](https://cryptohack.org/challenges/aes/) を見るとよさ。
 - Easy: AES では暗号化関数だけで復号が出来ます。なぜでしょうか。
 - Hard: AES のラウンド回数が 2 回など少ない場合、解読出来てしまいます。どうすれば解読できるでしょうか。(Pwn2Win CTF 2021 A2S)
 :::
@@ -186,6 +186,10 @@ POODLE Attack (Padding Oracle On Downgraded Legacy Encryption)
 
 Lucky Thirteen Attack では Oracle がわからずともパディング処理の微妙な遅れを検知して同様の攻撃をします。(元論文によると時間差 80ns を繰り返して)
 
+:::message
+**練習問題**
+:::
+
 ### AES-GCM (Galois/Counter Mode)
 AES 利用モードの中で TLS 1.3 で使われている唯一のモードです。ガロア体 (有限体) 上で Counter (CTR) モードを実行するのでこんな名前になってます。
 
@@ -259,6 +263,10 @@ Nonce とは初期ベクトル $IV$ と鍵 $K$ のこと。
 Nonce がランダムではないとすると、ある平文と暗号文のペアが分かれば XOR を取ることで先ほどの乱数列が分かり、任意の暗号文の解読が出来てしまいます。
 
 さらに認証タグについても差分解読法を用いて解読できます。
+
+:::message
+**練習問題**
+:::
 
 ### さらなる攻撃
 - サイドチャネル攻撃
