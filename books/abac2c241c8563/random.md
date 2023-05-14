@@ -153,6 +153,17 @@ https://6715.jp/posts/6/
 更に初期状態については 2 つの値さえ分かっていれば内部状態を復元できてしまいます。
 https://www.ambionics.io/blog/php-mt-rand-prediction
 
+連続する 624 個の 32 ビット出力なら一意に解けますが次のようなときはどうでしょう。
+
+- 連続ではなかったら？
+- 情報が足りず、一意でなくともいいなら？
+- より一般の乱数生成では？
+
+これらを論理的に計算するのはとても骨が折れます。
+
+こういうときには SMT で解けます！
+全探索より速いアルゴリズムがないときは SMT が強い
+
 これでは乱数を予測されてしまうので暗号には使えません。暗号で使えるような DRBG はあるのでしょうか？それらを次節で紹介します。
 
 :::message
@@ -164,6 +175,7 @@ https://github.com/python/cpython/blob/main/Lib/random.py
 :::message
 **演習問題**
 [CTF archive](https://cryptohack.org/challenges/ctf-archive/) から出題
+- Z3 を
 - Twist and Shout (Zh3r0 CTF V2)
 - import numpy as MT (Zh3r0 CTF V2)
 - Real Mersenne (Zh3r0 CTF V2)
@@ -206,19 +218,60 @@ $r_i$ は剰余未満の数であり、その上位 2 バイト程を削除し�
 ### コラム
 乱数調整
 
-## 充足可能性問題 SAT
-充足可能性問題 (SAT; SATisfiability Problem)
-連言標準形(CNF)
-任意の命題論理式をCNFに変換する為のアルゴリズムが存在する。(Tseitin Encoding)
-CNFの入力形式 DIMACS
+## 充足可能性問題 SAT / SMT
+命題論理式
 
-SAT を解くには指数時間掛かると信じられている。
-
-$$
-((a\land\lnot b\land\lnot c)\lor(b\land c\land\lnot d))\land(\lnot b\lor\lnot c)
+> **連言標準形 (CNF; Conjunctive Normal Form)**
+> 変数 $A$ に関して $A, \lnot A$ をリテラルと定義される。このとき連言標準形とはリテラル $l_{i,j}$ に対して次のように書ける論理式である。
+>
+> $$
+\bigwedge_i\bigvee_j l_{i,j}
 $$
 
-これは $(a,b,c,d)=(\top,\bot,\bot,\top)$
+例えば次のような論理式は CNF である。
+
+$$
+\begin{aligned}
+& A\land B \\
+& \lnot A\land(B\lor C) \\
+& (A\lor B)\land(\lnot B\lor C\lor\lnot D)\land(D\lor\lnot E) \\
+& (\lnot B\lor C).
+\end{aligned}
+$$
+
+次のような論理式は CNF ではない。
+
+$$
+\begin{aligned}
+& \lnot(B\lor C) \\
+& (A\land B)\lor C \\
+& A\land(B\lor(D\land E)).
+\end{aligned}
+$$
+
+> **Tseitin Encoding**
+> 任意の命題論理式を CNF に変換するアルゴリズムが存在する。
+
+これより次のように
+
+$$
+\begin{aligned}
+& \lnot B\land\lnot C \\
+& (A\lor C)\land(B\lor C) \\
+& A\land(B\lor D)\land(B\lor E).
+\end{aligned}
+$$
+
+> **充足可能性問題 (SAT; SATisfiability Problem)**
+> ある命題論理式が与えられたとき、それを満たす変数の値を定める問題である。
+
+SAT は NP 完全である。
+
+$$
+(A\land\lnot B\land\lnot C)\lor(B\land C\land\lnot D)\land(\lnot B\lor\lnot C)
+$$
+
+これは $(A,B,C,D)=(\top,\bot,\bot,\top)$ のとき論理式を満たす。
 
 まずは単純に全探索を考えます。リテラルが 1 つしかない節を単位節と呼ぶとして次の操作を繰り返します。
 
@@ -234,10 +287,13 @@ $$
 
 https://www.youtube.com/watch?v=d76e4hV1iJY&t=760s
 
-実装は節 $x_k$, $\lnot x_k$ はそれぞれ $2k$, $2k+1$ と表して合計で $2n$ 個の配列が必要になり、各節はリテラルのポインタを格納するリンクリストを持ちます。
-各変数は探索する変数の優先順位を決定させるスコアを持ち、$i$ 回目にコンフリクト時にコンフリクトした変数のスコアに $\rho^{-i}$ だけ足されます。(ex. $\rho=0.95$) つまり後の方になればなるほど増加するスピードが速くなり、古いコンフリクトは無視されるようになります。
+実装は節 $x_k$, $\lnot x_k$ はそれぞれ $2k$, $2k+1$ と表して合計で $2n$ 個の配列が必要になり、各節はリテラルのポインタを格納するリンクリストを持ちます。各変数は探索する変数の優先順位を決定させるスコアを持ち、$i$ 回目にコンフリクト時にコンフリクトした変数のスコアに $\rho^{-i}$ だけ足されます。(ex. $\rho=0.95$) つまり後の方になればなるほど増加するスピードが速くなり、古いコンフリクトは無視されるようになります。
 
-## SMT
+> **SMT; Satisfiability Modulo Theories**
+> ある数式が与えられたとき、それを満たす変数の値を定める問題である。
+
+SMT は SAT について実数、整数、リスト、配列、文字列など様々なデータ構造を含むより複雑な数式に一般化したものです。SMT ソルバは実際次のように応用されます。
+
 - 論理式に帰着できるすべての問題のソルバ
 - 形式手法 / モデル検査
   - TLA+
@@ -246,25 +302,20 @@ https://www.youtube.com/watch?v=d76e4hV1iJY&t=760s
 - シンボリック実行エンジン
 - Differential Cryptoanalysis
 
-今回は BitVector しか使わないのでそれだけ解説します。他にも EUF (Equality logic with Uninterpreted Functions) に関するアルゴリズムや blahblah など色々あるので興味ある方は参考文献などを参照してください。
+SMT ソルバのアルゴリズムには EUF; Equality logic with Uninterpreted Functions や BitVector などがあり、今回は BitVector のみを紹介します。
 
-### BitVector
+> **BitVector**
+> $n$ ビットの四則演算などの演算について、それぞれのビットに関する論理式を立てることで SMT を SAT に置き換えることができる。
 
-それぞれの n bit 演算を論理式に落とし、 SAT に投げることで解きます。
-使われる演算としては $a\land b$, $\lnot a$, $a < b$, $a = b$, $a[i]$, $\sim a$, $a\mathop{\|}b$, $a\mathop{\&}b$, $a \oplus b$, $a \ll b$, $a \gg b$, $a + b$, $a - b$, $a \times b$, $a / b$, $\mathrm{ext}(a)$, $a\circ b$, $a[b:c]$, $c?a:b$ があるので、これらを論理式に落とせることは CPU を自作したことがある人ならわかると思います。
-例えば $a + b$ なら全加算器から論理式に落とせます。
+使われる演算としては $a\land b$, $\lnot a$, $a < b$, $a = b$, $a[i]$, $\sim a$, $a\mathop{\|}b$, $a\mathop{\&}b$, $a \oplus b$, $a \ll b$, $a \gg b$, $a + b$, $a - b$, $a \times b$, $a / b$, $\mathrm{ext}(a)$, $a\circ b$, $a[b:c]$, $c?a:b$ などなので、これらを論理式に落とせることは CPU を自作したことがある人ならわかると思います。
 
-SMT ソルバの入力形式は SMT-LIBv2 を用います。
+例えば 1 ビットの $a + b$ なら $a\oplus b = (a\land\lnot b)\lor(\lnot a\land b)$ と置き換えられます。
 
-## Z3
-デファクトスタンダードな SMT ソルバです。
-私が知っている Z3 を使える言語は Python, Rust です。ラッパを書けば
-
-使えるデータ
-- bool, int, float, float32, double, real, string
-- array, set, enumeration, bitvector
+デファクトスタンダードな SMT ソルバに Z3 があります。
+私が知っている Z3 を使える言語は Python, Rust です。ラッパを書けばよさそう。
 
 ```python
+bool, int, float, float32, double, real, string, array, set, enumeration, bitvector
 BitVec()
 IntVector()
 Real()
@@ -303,5 +354,8 @@ SMT ソルバに与える入力の形式 SMT-LIB v2 についてまとまって�
 - [SMT-LIB-benchmarks / QF_UF · GitLab (uiowa.edu)](https://clc-gitlab.cs.uiowa.edu:2443/SMT-LIB-benchmarks/QF_UF)
 QF_UF のベンチマーク用入力が大量に用意されている
 - [TokyoWesterns の z3 解説](https://wiki.mma.club.uec.ac.jp/CTF/Toolkit/z3py)
+
+CNFの入力形式 DIMACS
+SMT ソルバの入力形式は SMT-LIBv2 を用います。
 
 この資料は CC0 ライセンスです。
