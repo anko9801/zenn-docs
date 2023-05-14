@@ -775,11 +775,7 @@ $$
 秘密鍵を部分的に知っていさえいれば、Coppersmith Method を用いて解けてしまう。
 $n$ を $N$ のビット数とする。
 
-```
-small_roots(X, beta)
-X: 解の最大値
-beta: factor >= n^beta
-```
+`small_roots(X, beta)` 解が $x \leq X$ の範囲で剰余 $p \geq N^\beta$
 
 #### $p, q$ のどちらかを $n/4$ ビット程度知っているとき
 
@@ -890,7 +886,7 @@ $$
 このように同じ解を持つ方程式は $\gcd$ を取ることで平文が求まる。ただし SageMath で実装されている $\gcd$ は遅いので次数 $n$ に対して $O(n\log^2n)$ で動く Half GCD というアルゴリズムを用いて解きがちです。
 
 > **Coppersmith's Short Pad Attack**
-> 特に $m_1, m_2 \approx N$ に対して小さな値 $r \approx O(N^{1/e^2})$ を用いて $m_2 = m_1 + r$ という関係があるとき、 $r$ が小さければ全探索して最大公約元を取ればいいが $r$ が全探索できないほど大きいときにも実は解けるというのが Coppersmith's Short Pad Attack である。
+> 特に $m_1, m_2 \approx N$ に対して小さな値 $r \approx O(N^{1/e^2})$ を用いて $m_2 = m_1 + r$ という関係があるとき、 $r$ が小さければ全探索して最大公約元を取ればいいが $r$ が全探索できないほど大きいときにも実は解けるというのが Coppersmith's Short Pad Attack である。ただし $e$ は自然対数の底である。
 
 まず次のように方程式 $f_1, f_2$ を立てる。
 
