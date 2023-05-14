@@ -182,8 +182,7 @@ https://github.com/python/cpython/blob/main/Lib/random.py
 :::
 
 ## CSPRNG
-暗号でも使えるような PRNG を暗号論的擬似乱数生成器 (CSPRNG; Cryptographically Secure Pseudo Random Number Generator) と呼びます。
-標準化されている CSPRNG は次のようなものがあります。
+暗号でも使えるような PRNG を暗号論的擬似乱数生成器 (CSPRNG; Cryptographically Secure Pseudo Random Number Generator) と呼びます。現在、標準化されている CSPRNG は [NIST SP 800-90A (Recommendation for Random Number Generation Using Deterministic Random Bit Generators)](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-90a.pdf) に書かれてあります。
 
 - Hash_DRBG
 bcrypt などのハッシュ関数 $H$ とシード値 $V_0$ を用いて $V_{i+1} = H(V_i + 1)$ と生成する
@@ -197,8 +196,6 @@ AES-CTR の暗号化関数 $E_K$ とシード値 $V_0$ を用いて $V_{i+1} = E
 これらに共通することとして乱数、Nonce、ユーザーによって指定される文字列を入力し、内部状態であるシード値を生成します。このシード値を用いて、指定されたビット数に達するまで乱数を生成し続けて連結させたものを出力します。何回か生成したらシード値の再生成 (reseed) を行い、エントロピーを上げます。
 
 攻撃する方法としては今までと同様に内部状態を復元することで乱数予測することができます。
-
-[NIST SP 800-90A (Recommendation for Random Number Generation Using Deterministic Random Bit Generators)](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-90a.pdf)
 
 ### Dual_EC_DRBG
 
