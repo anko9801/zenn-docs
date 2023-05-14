@@ -618,7 +618,9 @@ $$
 
 この方程式について $f(x,y) = 2x (A + y) + 1$ とおき、関数 $f(x,y)$ に対して Coppersmith Method を用いることで $p + q$ が求まり、解くことができます。
 
-SageMath は標準に多変数の Coppersmith Method を使うことができません。 [defund/coppersmith](https://github.com/defund/coppersmith) というリポジトリにそれが実装されているので、それを用いて攻撃することが多いです。
+SageMath は標準で多変数多項式の Coppersmith Method は実装されていないので世界の Crypto プレイヤー defund さんによる実装 [defund/coppersmith](https://github.com/defund/coppersmith) を用いて攻撃することが多いです。
+
+https://github.com/defund/coppersmith
 
 ```python
 load('coppersmith.sage')
