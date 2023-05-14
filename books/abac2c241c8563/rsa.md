@@ -453,7 +453,7 @@ RSA 暗号ではこのような攻撃が発見されてきました。
 | アンチケース                                                              | 攻撃名                                 | 方法                                                   |
 | ------------------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------ |
 | 公開鍵 $e$ が小さすぎてはいけない                                         | Low Public Exponent Attack             | 整数上の $e$ 乗根に落とし込む                          |
-| 秘密鍵 $d$ が小さすぎてはいけない                                         | Wiener's Attack, Boneh-Durfee Attack   | 近似分数から見積もる, Coppersmith Method               |
+| 秘密鍵 $d$ が小さすぎてはいけない                                         | Wiener's Attack / Boneh-Durfee Attack   | 近似分数から見積もる, Coppersmith Method               |
 | 同一の平文を同一の $N$ 異なる $e$ で暗号化した暗号文を与えてはいけない    | Common Modulus Attack                  | $e$ について拡張ユークリッドの互除法                   |
 | 同一の平文を異なる $N$ で暗号化した暗号文を与えてはいけない               | Håstad's Broadcast Attack              | 中国剰余定理                                           |
 | 同一の平文を同一の $d$ 異なる $e, N$ で暗号化した暗号文を与えてはいけない | Small Common Private Exponent Attack   | Coppersmith Method                                     |
@@ -462,7 +462,7 @@ RSA 暗号ではこのような攻撃が発見されてきました。
 | エラーの内容を知られてはならない                                          | Bleichenbacher's Attack                | 二分探索など                                           |
 | 平文を部分的にでも知られてはならない                                      | LSB Decryption Oracle Attack など      | 二分探索                                               |
 | 秘密鍵を部分的にでも知られてはならない                                    | Partial Key Exposure Attack            | Coppersmith Method                                     |
-| 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない          | Franklin-Reiter Related Message Attack | 最大公約式                                             |
+| 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない          | Franklin-Reiter Related Message Attack / Coppersmith's Short pad Attack | 最大公約式                                             |
 
 ### $e$ が小さすぎてはいけない (Low Public Exponent Attack)
 
@@ -874,7 +874,7 @@ Coppersmith method を使ったより様々な攻撃を知りたければ次の�
 https://eprint.iacr.org/2020/1506.pdf
 
 ### 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない (Franklin-Reiter Related Message Attack)
-2 つの平文 $m_1, m_2$ について代数的な関係 $m_2 = f(m_1)$ があるとき次のように方程式 $f_1, f_2$ を立てて最大公約元を計算することで $\gcd(f_1, f_2) = x - m_1$ と平文が求まる。 Half GCD
+2 つの平文 $m_1, m_2$ について代数的な関係 $m_2 = f(m_1)$ があるとき次のように方程式 $f_1, f_2$ を立てて最大公約元を計算することで $\gcd(f_1, f_2) = x - m_1$ と平文が求まる。
 
 $$
 \begin{aligned}
@@ -883,8 +883,11 @@ f_2(x) & = f(x)^e - c_2 & \pmod{N}
 \end{aligned}
 $$
 
-特に $m_1, m_2$ のオーダーに対して小さなオーダーの $r$ を用いて $m_2 = m_1 + r$ という関係があるとき、 $r$ が小さければ $r$ について上のことを全探索すればいい。
-さらに $r$ が全探索できないほど大きいとき、まず次のように $f_1, f_2$ を立てる。
+このように同じ解を持つ方程式は $\gcd$ を取ることで平文が求まる。ただし SageMath で実装されている $\gcd$ は遅いので次数 $n$ に対して $O(n\log^2n)$ で動く Half GCD というアルゴリズムを用いて解きがちです。
+
+特に $m_1, m_2 \approx N$ に対して小さな値 $r \approx O(N^{1/e^2})$ を用いて $m_2 = m_1 + r$ という関係があるとき、 $r$ が小さければ全探索して最大公約元を取ればいいが $r$ が全探索できないほど大きいときにも実は解けるというのが Franklin-Reiter Related Message Attack です。
+
+まず次のように方程式 $f_1, f_2$ を立てる。
 
 $$
 \begin{aligned}
@@ -896,25 +899,6 @@ $$
 $x$ に関して $f_1$ と $f_2$ に同一の解があるとき、それらの終結式 $\mathrm{Res}(f_1, f_2)$ は $\mathrm{Res}(f_1, f_2) = 0$ を満たす。このとき $\mathrm{Res}(f_1, f_2) = 0 \pmod{N}$ は $y$ の方程式であり、 Coppersmith Method を用いて $y = r$ が求まる。
 
 Approximate GCD Problem
-
-### Coppersmith's Short Pad Attack
-
-二つの暗号文について平文の上位bitが $n$ のbit数の $1-1/e^2$ 程度共通する場合、これらからそれぞれの平文を求めることができる。 具体的には、次のような手順となる。
-$y$ の値を代入した
-
-$$
-\begin{aligned}
-g_1(x) & = x^e - c_1 \\
-g_2(x, y) & = (x+y)^e - c_2 \\
-\mathrm{Res}(g_1, g_2) & = \\
-\gcd(g_1(x), g_2(x)) & =
-\end{aligned}
-$$
-
-1. [終結式 (resultant)](https://ja.wikipedia.org/wiki/%E7%B5%82%E7%B5%90%E5%BC%8F)を求め、その根として $y$ の値を得る
-2. その根として $m_1$ を得る
-3. $m_2 = m_1 + y$ より $m_2$ を得る
-多項式GCD $O(n\log^2n)$ を使う
 
 ```python
 def short_pad_attack(c1, c2, e, n):
