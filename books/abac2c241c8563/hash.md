@@ -24,7 +24,7 @@ MD5 や SHA-1 などよく使われるハッシュ関数はこれです。この
 
 ## ハッシュの応用
 ### HMAC (Hash-based MAC)
-これを秘密鍵を用いて検査するコードのことをメッセージ認証コード (message authentication codes; MAC) と言います。その中でハッシュを用いる MAC を HMAC と呼びます。
+これを秘密鍵を用いて検査するコードのことをメッセージ認証コード (Message Authentication Codes; MAC) と言います。その中でハッシュを用いる MAC を HMAC と呼びます。
 
 秘密鍵 $K$ とハッシュ値長 $B$ として HMAC の値 $C$ を次のように定義します。
 
