@@ -34,7 +34,7 @@ MD5 や SHA-1 などよく使われるハッシュ関数はこれです。この
 
 HMAC はハッシュを用いるメッセージ認証コード (Message Authentication Codes; MAC) で改ざん検知を行います。
 
-> **HMAC (Hash-based MAC)**
+> **HMAC; Hash-based MAC**
 > 秘密鍵 $K$ とハッシュ値長 $B$ として次のように定義します。
 >
 > $$
@@ -45,10 +45,10 @@ pad_{out} & := \overbrace{\mathrm{0x5C}\|\cdots\|\mathrm{0x5C}}^B \\
 \end{aligned}
 $$
 
-ビット列を有限体を用いて短いビット列に変換するハッシュ関数です。CRC はデータ転送時の誤り検出に用いられていて CRC は暗号学的ハッシュ関数ではないです。
+CRC とはビット列を有限体を用いて短いビット列に変換するハッシュ関数です。CRC はデータ転送時の誤り検出に用いられています。ただ CRC は暗号学的ハッシュ関数ではないので改ざんには弱いです。
 
-> **巡回冗長検査 CRC**
-> 次数 $n$ の生成多項式 $f(x)\in\mathbb{F}_2[x]$ を用いて表される有限体 $\mathbb{F}_{2^n} \cong \mathbb{F}_2[x]/(f(x))$ において次の関数 $g: \mathbb{F}_2[x]/(f(x))\ni m \mapsto mx^n\in\mathbb{F}_2[x]/(f(x))$ を定義とする。
+> **巡回冗長検査 (CRC; Cyclic Redundancy Check)**
+> 次数 $n$ の生成多項式 $f(x)\in\mathbb{F}_2[x]$ を用いて表される有限体 $\mathbb{F}_{2^n} \cong \mathbb{F}_2[x]/(f(x))$ において関数 $g: \mathbb{F}_2[x]/(f(x))\ni m \mapsto mx^n\in\mathbb{F}_2[x]/(f(x))$ を CRC の定義とする。
 
 例えば生成多項式が $f(x) = x^4 + x + 1$ (CRC-4-ITU) のときのハッシュ化において入力が $1011000_{(2)}$ なら次の計算から出力は $1111_{(2)}$ となります。
 
