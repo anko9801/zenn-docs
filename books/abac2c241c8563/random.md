@@ -259,7 +259,7 @@ $$
 \end{aligned}
 $$
 
-> **充足可能性問題 (SAT; SATisfiability Problem)**
+> **充足可能性問題 (SAT; SATisfiability problem)**
 > ある命題論理式が与えられたとき、それを満たす変数の値を定める問題である。
 
 SAT は NP 完全である。
