@@ -874,7 +874,11 @@ Coppersmith method を使ったより様々な攻撃を知りたければ次の�
 https://eprint.iacr.org/2020/1506.pdf
 
 ### 上位ビットが共通する二つの平文に対する暗号文を知られてはいけない (Franklin-Reiter Related Message Attack)
-2 つの平文 $m_1, m_2$ について代数的な関係 $m_2 = f(m_1)$ があるとき次のように方程式 $f_1, f_2$ を立てて最大公約元を計算することで $\gcd(f_1, f_2) = x - m_1$ と平文が求まる。
+
+> **Franklin-Reiter Related Message Attack**
+> 2 つの平文 $m_1, m_2$ について代数的な関係 $m_2 = f(m_1)$ があるとき、それらの暗号文 $c_1, c_2$ から平文を求められる。
+
+次のように方程式 $f_1, f_2$ を立てて最大公約元を計算することで $\gcd(f_1, f_2) = x - m_1$ と平文が求まる。
 
 $$
 \begin{aligned}
@@ -885,7 +889,8 @@ $$
 
 このように同じ解を持つ方程式は $\gcd$ を取ることで平文が求まる。ただし SageMath で実装されている $\gcd$ は遅いので次数 $n$ に対して $O(n\log^2n)$ で動く Half GCD というアルゴリズムを用いて解きがちです。
 
-特に $m_1, m_2 \approx N$ に対して小さな値 $r \approx O(N^{1/e^2})$ を用いて $m_2 = m_1 + r$ という関係があるとき、 $r$ が小さければ全探索して最大公約元を取ればいいが $r$ が全探索できないほど大きいときにも実は解けるというのが Franklin-Reiter Related Message Attack です。
+> **Coppersmith's Short Pad Attack**
+> 特に $m_1, m_2 \approx N$ に対して小さな値 $r \approx O(N^{1/e^2})$ を用いて $m_2 = m_1 + r$ という関係があるとき、 $r$ が小さければ全探索して最大公約元を取ればいいが $r$ が全探索できないほど大きいときにも実は解けるというのが Coppersmith's Short Pad Attack である。
 
 まず次のように方程式 $f_1, f_2$ を立てる。
 
