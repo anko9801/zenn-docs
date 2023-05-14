@@ -309,7 +309,7 @@ SMT ソルバのアルゴリズムには EUF; Equality logic with Uninterpreted 
 
 使われる演算としては $a\land b$, $\lnot a$, $a < b$, $a = b$, $a[i]$, $\sim a$, $a\mathop{\|}b$, $a\mathop{\&}b$, $a \oplus b$, $a \ll b$, $a \gg b$, $a + b$, $a - b$, $a \times b$, $a / b$, $\mathrm{ext}(a)$, $a\circ b$, $a[b:c]$, $c?a:b$ などなので、これらを論理式に落とせることは CPU を自作したことがある人ならわかると思います。
 
-例えば 1 ビットの $a + b$ なら $a\oplus b = (a\land\lnot b)\lor(\lnot a\land b)$ と置き換えられます。
+例えば 1 ビットの $a + b$ なら $a + b = a\oplus b = (a\land\lnot b)\lor(\lnot a\land b)$ と置き換えられます。
 
 デファクトスタンダードな SMT ソルバに Z3 があります。
 私が知っている Z3 を使える言語は Python, Rust です。ラッパを書けばよさそう。
@@ -337,25 +337,11 @@ print(solver.model())
 
 - [メルセンヌ・ツイスタをわかった気になる](https://6715.jp/posts/5/)
 - [Mersenne Twisterの出力を推測してみる](https://inaz2.hatenablog.com/entry/2016/03/07/194147)
-
-SMT ソルバ全般
 - [SAT/SMTソルバの仕組み](https://www.slideshare.net/sakai/satsmt)
 - [ミュンヘン工科大学の夏学期の自動推論に関する授業](https://www21.in.tum.de/teaching/sar/SS20/)
-
-SAT/SMTソルバのサーベイ論文
 - [SATソルバ・SMTソルバの技術と応用](https://www.jstage.jst.go.jp/article/jssst/27/3/27_3_3_24/_pdf)
-- [A Survey of Satisfiability Modulo Theory](https://arxiv.org/abs/1606.04786)
-
-SMT-LIBv2
-- [The SMT-LIBv2 Language and Tools: A Tutorial](http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf)
-p20. SMT-LIBv2 の token が表になって並んでおり、どのような正規表現でマッチさせられるか掲載している
-- [SMT-LIB The Satisfiability Modulo Theories Library](http://smtlib.cs.uiowa.edu/)
-SMT ソルバに与える入力の形式 SMT-LIB v2 についてまとまっている Web サイト
-- [SMT-LIB-benchmarks / QF_UF · GitLab (uiowa.edu)](https://clc-gitlab.cs.uiowa.edu:2443/SMT-LIB-benchmarks/QF_UF)
-QF_UF のベンチマーク用入力が大量に用意されている
 - [TokyoWesterns の z3 解説](https://wiki.mma.club.uec.ac.jp/CTF/Toolkit/z3py)
 
-CNFの入力形式 DIMACS
-SMT ソルバの入力形式は SMT-LIBv2 を用います。
+SAT / SMT ソルバの入力形式は DIMACS / SMT-LIBv2 を用います。
 
 この資料は CC0 ライセンスです。
