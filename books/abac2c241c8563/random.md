@@ -1,5 +1,5 @@
 ---
-title: "乱数生成"
+title: "乱数生成とSMT"
 ---
 
 誰にも予測できないような乱数を作るにはどうすればいいでしょうか？
@@ -203,9 +203,102 @@ $r_i$ は剰余未満の数であり、その上位 2 バイト程を削除し�
 ### コラム
 乱数調整
 
+## 充足可能性問題 SAT
+充足可能性問題 (SAT; SATisfiability Problem)
+連言標準形(CNF)
+任意の命題論理式をCNFに変換する為のアルゴリズムが存在する。(Tseitin Encoding)
+CNFの入力形式 DIMACS
+
+SAT を解くには指数時間掛かると信じられている。
+
+$$
+((a\land\lnot b\land\lnot c)\lor(b\land c\land\lnot d))\land(\lnot b\lor\lnot c)
+$$
+
+これは $(a,b,c,d)=(\top,\bot,\bot,\top)$
+
+まずは単純に全探索を考えます。リテラルが 1 つしかない節を単位節と呼ぶとして次の操作を繰り返します。
+
+1. 単位節があればその変数の値は確定する
+2. 単位節がなければ変数のどれか1つを深さ優先探索する
+3. コンフリクトしたなら失敗、コンフリクトなしに変数を全て割り当てられたら成功とする
+
+これは DPLL (Davis Putnam Logemann Loveland) アルゴリズムと呼ばれています。
+
+この全探索に加え、コンフリクトしたときにその探索状態だと失敗することを条件に入れます。この操作を節学習と呼び、節学習されて条件が多くなると、探索をしなくて済むようになり高速化します。これを CDCL (Constrait-Driven Clause Learning) アルゴリズムと呼び、これにより SAT ソルバは画期的に速くなります。
+
+この資料がわかりやすいなと思っています。
+
+https://www.youtube.com/watch?v=d76e4hV1iJY&t=760s
+
+実装は節 $x_k$, $\lnot x_k$ はそれぞれ $2k$, $2k+1$ と表して合計で $2n$ 個の配列が必要になり、各節はリテラルのポインタを格納するリンクリストを持ちます。
+各変数は探索する変数の優先順位を決定させるスコアを持ち、$i$ 回目にコンフリクト時にコンフリクトした変数のスコアに $\rho^{-i}$ だけ足されます。(ex. $\rho=0.95$) つまり後の方になればなるほど増加するスピードが速くなり、古いコンフリクトは無視されるようになります。
+
+## SMT
+- 論理式に帰着できるすべての問題のソルバ
+- 形式手法 / モデル検査
+  - TLA+
+  - seL4
+- 自動定理証明支援系
+- シンボリック実行エンジン
+- Differential Cryptoanalysis
+
+今回は BitVector しか使わないのでそれだけ解説します。他にも EUF (Equality logic with Uninterpreted Functions) に関するアルゴリズムや blahblah など色々あるので興味ある方は参考文献などを参照してください。
+
+### BitVector
+
+それぞれの n bit 演算を論理式に落とし、 SAT に投げることで解きます。
+使われる演算としては $a\land b$, $\lnot a$, $a < b$, $a = b$, $a[i]$, $\sim a$, $a\mathop{\|}b$, $a\mathop{\&}b$, $a \oplus b$, $a \ll b$, $a \gg b$, $a + b$, $a - b$, $a \times b$, $a / b$, $\mathrm{ext}(a)$, $a\circ b$, $a[b:c]$, $c?a:b$ があるので、これらを論理式に落とせることは CPU を自作したことがある人ならわかると思います。
+例えば $a + b$ なら全加算器から論理式に落とせます。
+
+SMT ソルバの入力形式は SMT-LIBv2 を用います。
+
+## Z3
+デファクトスタンダードな SMT ソルバです。
+私が知っている Z3 を使える言語は Python, Rust です。ラッパを書けば
+
+使えるデータ
+- bool, int, float, float32, double, real, string
+- array, set, enumeration, bitvector
+
+```python
+BitVec()
+IntVector()
+Real()
+from z3 import Solver, Context, RecFunction, RecAddDefinition, IntSort, Int, If, simplify
+
+ctx = Context()
+f = RecFunction("f", IntSort(ctx), IntSort(ctx))
+x = Int("x", ctx)
+RecAddDefinition(f, x, If(x <= 2, 1, f(x-1) + f(x-2)))
+
+solver = Solver(ctx=ctx)
+solver.add(f(x) == 10946)
+
+print(solver.check())
+print(solver.model())
+```
+
 ## 参考文献
 
 - [メルセンヌ・ツイスタをわかった気になる](https://6715.jp/posts/5/)
 - [Mersenne Twisterの出力を推測してみる](https://inaz2.hatenablog.com/entry/2016/03/07/194147)
+
+SMT ソルバ全般
+- [SAT/SMTソルバの仕組み](https://www.slideshare.net/sakai/satsmt)
+- [ミュンヘン工科大学の夏学期の自動推論に関する授業](https://www21.in.tum.de/teaching/sar/SS20/)
+
+SAT/SMTソルバのサーベイ論文
+- [SATソルバ・SMTソルバの技術と応用](https://www.jstage.jst.go.jp/article/jssst/27/3/27_3_3_24/_pdf)
+- [A Survey of Satisfiability Modulo Theory](https://arxiv.org/abs/1606.04786)
+
+SMT-LIBv2
+- [The SMT-LIBv2 Language and Tools: A Tutorial](http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf)
+p20. SMT-LIBv2 の token が表になって並んでおり、どのような正規表現でマッチさせられるか掲載している
+- [SMT-LIB The Satisfiability Modulo Theories Library](http://smtlib.cs.uiowa.edu/)
+SMT ソルバに与える入力の形式 SMT-LIB v2 についてまとまっている Web サイト
+- [SMT-LIB-benchmarks / QF_UF · GitLab (uiowa.edu)](https://clc-gitlab.cs.uiowa.edu:2443/SMT-LIB-benchmarks/QF_UF)
+QF_UF のベンチマーク用入力が大量に用意されている
+- [TokyoWesterns の z3 解説](https://wiki.mma.club.uec.ac.jp/CTF/Toolkit/z3py)
 
 この資料は CC0 ライセンスです。
