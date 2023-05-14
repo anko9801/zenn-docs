@@ -374,12 +374,8 @@ def fermat(N: int, a: int = 1, b: int = 1) -> tuple[int, int]:
             x += 1
 
     if (x + y) % a == 0:
-        assert (x + y) % a == 0
-        assert (x - y) % b == 0
         return ((x - y) // b, (x + y) // a)
     else:
-        assert (x + y) % b == 0
-        assert (x - y) % a == 0
         return ((x - y) // a, (x + y) // b)
 ```
 
