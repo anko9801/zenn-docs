@@ -14,7 +14,7 @@ CRC
 >
 
 - MD5
-- SHA
+- [SHA; Secure Hash Algorithm](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf)
   - 現代で最も使われている
 
 暗号ではパスワードの保存や HMAC, 署名などに使われていたりします。ただ暗号で使うためには攻撃者がハッシュ値に対する元の入力に関する情報を得られないようにしないといけません。これを原像計算困難性といいます。

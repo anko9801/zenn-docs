@@ -19,9 +19,9 @@ title: "RSA暗号への攻撃"
 
 ## RSA暗号
 
-RSA暗号とは剰余上での累乗は簡単でも累乗根は難しいという非対称性を使った暗号です。
+[RSA 暗号](https://datatracker.ietf.org/doc/html/rfc8017)とは素因数分解の困難性をベースとした暗号です。
 
-事前に大きな素数 $p, q$ と自然数 $e$ を生成し、$N = pq$ を公開します。(素数生成の方法はコラムへ)
+事前に大きな素数 $p, q$ と自然数 $e$ を生成し、$N = pq$ を公開します。(素数生成の方法は他の章へ)
 そして平文 $m$ に対して暗号文を $m^e \bmod N$ とします。そして復号化については逆に $e^{-1}$ 乗します。具体的にはカーマイケルの定理から $(\mathbb{Z}/pq\mathbb{Z})^×≅\mathbb{Z}/\mathrm{lcm}(p−1, q-1)\mathbb{Z}$ より $\phi(N) = (p - 1)(q - 1)$ として $d = e^{-1} \pmod{\phi(N)}$ 乗すれば $m$ を復号できます。
 
 $$
@@ -111,9 +111,7 @@ q_{inv} &= q^{-1} \bmod p \\
 $$
 
 ### パディング
-メッセージが改ざんされずに届けられていることを確認するのにパディングは用いられます。RSAでは主に次の3つのパディングが使われます。
-
-RFC 8017: PKCS #1 V2.2 (RSA Cryptography Specifications Version 2.2)
+メッセージが改ざんされずに届けられていること(完全性)を確認するのにパディングは用いられます。RSA では [RFC 8017: PKCS #1 V2.2 (RSA Cryptography Specifications Version 2.2)](https://datatracker.ietf.org/doc/html/rfc8017) の主に次の 3 つのパディングが使われます。
 
 - PKCS#1 v1.5; Public-Key Cryptography Standards#1 v1.5
   - `0002<random>00<hashprefix><message>`
@@ -123,14 +121,22 @@ RFC 8017: PKCS #1 V2.2 (RSA Cryptography Specifications Version 2.2)
 - PSS; Probabilistic Signature Scheme
   - 署名でよく使われる
 
-このようなパディングを用いたRSAをRSA-[パディング名]などと呼んだりします。
+このようなパディングを用いた RSA を RSA-[パディング名] などと呼んだりします。
 
 ### 安全性
 > **Prop.**
-> 素因数分解が解けるならば RSA 暗号が解ける。
+> 素因数分解が計算可能 (多項式時間で解ける) ならば RSA 暗号も計算可能である。
 
 **Proof.**
 素因数分解が解けるから $N = pq$ となる $p, q$ がわかる。これより $\phi(N) = (p-1)(q-1)$, $d = e^{-1} \pmod{\phi(N)}$, $m = c^d \pmod{N}$ は計算可能である。 $\Box$
+
+逆に素因数分解が解けなければ RSA 暗号が解けないことの証明はありますが、非常に長くなるので他の文献に任せます。一般に計算困難性を示すのは難しい問題で未解決問題も多いです。代表例だと判定が計算可能なら解くのも計算可能という主張の P = NP 問題は肯定的に解決したら全ての暗号は解けてしまう。
+
+> **Prop.**
+> 素因数分解が計算困難 (多項式時間で解けない) ならば RSA-OAEP は IND-CCA2 である。
+
+**Proof.**
+参照: [OAEP Reconsidered - Victor Shoup](https://eprint.iacr.org/2000/060.pdf)
 
 それとわかりやすいように暗号化, 復号化関数 $\mathcal{E}_{pk}, \mathcal{D}_{sk}$ を定義しておきます。
 
@@ -140,11 +146,7 @@ $$
 \end{aligned}
 $$
 
-
 ## 素因数分解
-:::
-CTF では本質的ではないので読み飛ばすことをおすすめします。
-:::
 
 計算機で解くことの難しい部類 NP 完全の問題です。素因数分解したい数 $N$ **のビット数** に対して多項式時間 $\mathcal{O}((\log N)^k)$ で解くアルゴリズムは量子アルゴリズムを除いて見つかっていません。
 
