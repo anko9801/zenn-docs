@@ -215,7 +215,7 @@ $r_i$ は剰余未満の数であり、その上位 2 バイト程を削除し�
 ### コラム
 乱数調整
 
-## 充足可能性問題 SAT / SMT
+## SAT と SMT
 命題論理式
 
 > **連言標準形 (CNF; Conjunctive Normal Form)**
@@ -320,7 +320,7 @@ SMT ソルバのアルゴリズムには EUF; Equality logic with Uninterpreted 
 例えば 1 ビットの $a + b$ なら $a + b = a\oplus b = (a\land\lnot b)\lor(\lnot a\land b)$ と置き換えられます。
 
 デファクトスタンダードな SMT ソルバに Z3 があります。
-私が知っている Z3 を使える言語は Python, Rust です。ラッパを書けばよさそう。
+Z3 を使える言語は C, C++, JavaScript, Python, Rust などなど、今回は Python でやっていきます。
 
 ```python
 bool, int, float, float32, double, real, string, array, set, enumeration, bitvector
