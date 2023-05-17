@@ -98,9 +98,10 @@ texts = [
 ]
 
 for text in texts:
-    assert text == unpad(pad(text, 16), 16)
-    assert len(pad(text, 16)) % 16 == 0
-    print(pad(text, 16))
+    padded = pad(text, 16)
+    assert text == unpad(padded, 16)
+    assert len(padded) % 16 == 0
+    print(padded)
 
 # stdout
 b'\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10'
@@ -112,16 +113,22 @@ b'No Game No Life\x01'
 b'Sound! Euphonium\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10'
 ```
 
-逆にエラーを吐く場合を考える。
+逆にパディングされた文字列から元の文字列に戻すときは最後のバイトの数を見てその数だけ削ったものになります。このときエラーが吐くのは次のようになります。
+
 エラーを吐く例
-b"abcdefghijklmnop"
-b"abcdefghijklmno\x02"
-b"abcdefghijkl\x04\x04\x03\x03"
-b"abcdefghijkl\x04\x03\x04\x04"
+```python
+b"0123456789abcdef"
+b"0123456789abcde\x02"
+b"0123456789ab\x04\x04\x03\x03"
+b"0123456789ab\x04\x03\x04\x04"
+```
+
 エラーを吐かない例
-b"abcdefghijklmn\x02\x02"
-b"abcdefghijklmnop" + b"\x10"×16
-b"abcdefghijklm\x03\x02\x01" -> パディングが1つとして扱われる
+```python
+b"0123456789abcd\x02\x02"
+b"0123456789abcdef" + b"\x10" * 16
+b"0123456789abc\x03\x02\x01" -> パディングが1つとして扱われる
+```
 
 ## 暗号利用モード
 通常の暗号化関数のみで実装するとストリーム暗号が使えなかったり、セキュリティ的に脆弱な危険性があります。これを改善する為に作られたのが暗号利用モードです。
