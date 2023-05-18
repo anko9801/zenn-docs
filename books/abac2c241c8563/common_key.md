@@ -78,56 +78,32 @@ AES-NI: CPU 命令を追加することで高速化
 :::
 
 ### パディング
-AES はブロック暗号なので **16 バイトごとでしか** 暗号化できません。平文の始めから 16 バイトずつ切り出して暗号化していくと最後に余るデータがあります。当然それも暗号化して送りたいので 16 バイトになるように適当なデータをくっつけて暗号化します。この操作をパディングと呼び、AES では [PKCS #7 Padding](https://datatracker.ietf.org/doc/html/rfc2315#section-10.3) という規格でパディングを行います。
+AES はブロック暗号なので **16 バイトごとでしか** 暗号化できません。平文の始めから 16 バイトずつ切り出して暗号化していくと最後に余るデータがあります。当然それも暗号化して送りたいので 16 バイトになるように適当なデータをくっつけて暗号化します。この操作をパディングと呼びます。
 
 ![](/images/padding.png)
 
-PKCS #7 Padding は次のように余った数をそのままバイトに変換して余った数だけ繋げるようにします。
+AES では [PKCS #7 Padding](https://datatracker.ietf.org/doc/html/rfc2315#section-10.3) という規格でパディングを行います。PKCS #7 Padding は次のように余った数をそのままバイトに変換して余った数だけ繋げるようにします。逆にパディングされた文字列から元の文字列に戻すときは最後のバイトの数を見てその数だけ削ったものになります。このときエラーが吐くのは次のようになります。
 
 ```python
 from Crypto.Util.Padding import pad, unpad
 
-texts = [
-    b"",
-    b"a",
-    b"Cryptography",
-    b"GettingOverIt",
-    b"Lycoris Recoil",
-    b"No Game No Life",
-    b"Sound! Euphonium",
-]
+# pad(text, 16)
+b''                 -> b'\x10' * 0x10
+b'a'                -> b'a' + b'\x0f' * 0xf
+b'Cryptography'     -> b'Cryptography\x04\x04\x04\x04'
+b'GettingOverIt'    -> b'GettingOverIt\x03\x03\x03'
+b'Lycoris Recoil'   -> b'Lycoris Recoil\x02\x02'
+b'No Game No Life'  -> b'No Game No Life\x01'
+b'Sound! Euphonium' -> b'Sound! Euphonium' + b'\x10' * 0x10
 
-for text in texts:
-    padded = pad(text, 16)
-    assert text == unpad(padded, 16)
-    assert len(padded) % 16 == 0
-    print(padded)
-
-# stdout
-b'\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10'
-b'a\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f'
-b'Cryptography\x04\x04\x04\x04'
-b'GettingOverIt\x03\x03\x03'
-b'Lycoris Recoil\x02\x02'
-b'No Game No Life\x01'
-b'Sound! Euphonium\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10'
-```
-
-逆にパディングされた文字列から元の文字列に戻すときは最後のバイトの数を見てその数だけ削ったものになります。このときエラーが吐くのは次のようになります。
-
-エラーを吐く例
-```python
-b"0123456789abcdef"
-b"0123456789abcde\x02"
-b"0123456789ab\x04\x04\x03\x03"
-b"0123456789ab\x04\x03\x04\x04"
-```
-
-エラーを吐かない例
-```python
-b"0123456789abcd\x02\x02"
-b"0123456789abcdef" + b"\x10" * 16
-b"0123456789abc\x03\x02\x01" -> パディングが1つとして扱われる
+# unpad(text, 16)
+b'0123456789ab\x04\x03\x04\x04'    -> error
+b'0123456789ab\x04\x04\x03\x03'    -> error
+b'0123456789abc\x03\x02\x01'       -> b'0123456789abc\x03\x02'
+b'0123456789abcd\x02\x02'          -> b'0123456789abcd'
+b'0123456789abcde\x02'             -> error
+b'0123456789abcdef'                -> error
+b'0123456789abcdef' + b'\x10' * 16 -> b'0123456789abcdef'
 ```
 
 ## 暗号利用モード
