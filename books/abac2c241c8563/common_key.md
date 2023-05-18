@@ -82,7 +82,9 @@ AES はブロック暗号なので **16 バイトごとでしか** 暗号化で�
 
 ![](/images/padding.png)
 
-AES では [PKCS #7 Padding](https://datatracker.ietf.org/doc/html/rfc2315#section-10.3) という規格でパディングを行います。PKCS #7 Padding は次のように余った数をそのままバイトに変換して余った数だけ繋げるようにします。逆にパディングされた文字列から元の文字列に戻すときは最後のバイトの数を見てその数だけ削ったものになります。このときエラーが吐くのは次のようになります。
+AES では [PKCS #7 Padding](https://datatracker.ietf.org/doc/html/rfc2315#section-10.3) という規格でパディングを行います。PKCS #7 Padding は次のように余った数をそのままバイトに変換して余った数だけ繋げるようにします。逆にパディングされた文字列から元の文字列に戻すときは最後のバイトの数を見てその数だけ削ったものになります。
+
+具体例としては次のようになります。
 
 ```python
 from Crypto.Util.Padding import pad, unpad
