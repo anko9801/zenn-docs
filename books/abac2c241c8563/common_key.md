@@ -87,7 +87,7 @@ AES では [PKCS #7 Padding](https://datatracker.ietf.org/doc/html/rfc2315#sect
 ```python
 from Crypto.Util.Padding import pad, unpad
 
-# pad(text, 16)
+# text -> pad(text, 16)
 b''                 -> b'\x10' * 0x10
 b'a'                -> b'a' + b'\x0f' * 0xf
 b'Cryptography'     -> b'Cryptography\x04\x04\x04\x04'
@@ -96,7 +96,7 @@ b'Lycoris Recoil'   -> b'Lycoris Recoil\x02\x02'
 b'No Game No Life'  -> b'No Game No Life\x01'
 b'Sound! Euphonium' -> b'Sound! Euphonium' + b'\x10' * 0x10
 
-# unpad(text, 16)
+# text -> unpad(text, 16)
 b'0123456789ab\x04\x03\x04\x04'    -> error
 b'0123456789ab\x04\x04\x03\x03'    -> error
 b'0123456789abc\x03\x02\x01'       -> b'0123456789abc\x03\x02'
