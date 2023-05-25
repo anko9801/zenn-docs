@@ -230,7 +230,7 @@ D:   ~   ~  ...   ~ \xa9\x13
 
 このように繰り返すことで $\mathrm{Dec}_K(C_n)$ のすべてが分かり、元の $C_{n-1}$ と XOR することで $P_n$ が分かります！
 
-このように Oracle を利用して AES-CBC を解読する攻撃を POODLE Attack (Padding Oracle On Downgraded Legacy Encryption) とも言います。CTF では Padding Oracle Attack を使って 1 ブロック分の暗号化/復号関数 $E_k, D_k$ を作り、暗号文に適用していくことで解いていきます。
+このように Oracle を利用して AES-CBC を解読する攻撃を Padding Oracle Attack あるいは POODLE Attack (Padding Oracle On Downgraded Legacy Encryption) とも言います。CTF では Padding Oracle Attack を使って 1 ブロック分の暗号化/復号関数 $E_k, D_k$ を作り、暗号文に適用していくことで解いていきます。
 
 さらにこれを応用して BEAST Attack (Browser Exploit Against SSL/TLS) は TLS の脆弱性を用いた攻撃ができ、Cookie のセッション情報を狙うことができるなど実用的な攻撃が通った。Same Origin Policy があることで防止された。
 
