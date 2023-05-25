@@ -4,7 +4,7 @@ title: "耐量子暗号"
 
 量子コンピュータにより DLP や素因数分解問題は Shor のアルゴリズムを用いて多項式時間で計算出来ることがわかりました。これにより従来多く用いられてきた公開鍵暗号である RSA 暗号や楕円曲線暗号は量子コンピュータによって解かれてしまいます。その為量子コンピュータに解かれないような暗号: 耐量子暗号を開発する必要が出てきました。
 
-OpenSSH や [AWS Key Management Service](https://aws.amazon.com/jp/blogs/news/round-2-post-quantum-tls-is-now-supported-in-aws-kms/) でも耐量子暗号をサポートし
+OpenSSH や [AWS Key Management Service](https://aws.amazon.com/jp/blogs/news/round-2-post-quantum-tls-is-now-supported-in-aws-kms/) でも耐量子暗号をサポートし普及しています。
 
 耐量子暗号の仕組みや攻撃について紹介します。ただなぜ量子コンピュータで解かれないのかについてはよく分かっていないのでお答え出来ません。ここらへんについて詳しい方がいたらご教授頂きたいです。
 
@@ -32,6 +32,8 @@ https://csrc.nist.gov/Projects/post-quantum-cryptography/post-quantum-cryptograp
 
 今回はこれらの紹介をしていきたいと思います。
 また量子の性質を用いて鍵配送問題を解決する量子暗号プロトコルがあります。これは誰かに見られたかを判定します。他の資料におまかせします。
+
+[CRYPTREC 耐量子計算機暗号の研究動向調査報告書](https://www.cryptrec.go.jp/report/cryptrec-tr-2001-2022.pdf)
 
 ## 格子暗号
 
