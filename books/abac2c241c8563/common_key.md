@@ -356,8 +356,6 @@ ChaCha20 がストリーム暗号で Poly1305 が MAC で全体で AEAD の暗�
 
 https://tex2e.github.io/blog/crypto/chacha20poly1305
 
-### tweakable block cipher
-
 ## まとめ
 共通鍵暗号の仕組みと AES の構築/攻撃を学びました。
 
