@@ -232,11 +232,11 @@ D:   ~   ~  ...   ~ \xa9\x13
 
 このように Oracle を利用して AES-CBC を解読する攻撃を Padding Oracle Attack あるいは POODLE Attack (Padding Oracle On Downgraded Legacy Encryption) とも言います。CTF では Padding Oracle Attack を使って 1 ブロック分の暗号化/復号関数 $E_k, D_k$ を作り、暗号文に適用していくことで解いていきます。
 
-さらにこれを応用して BEAST Attack (Browser Exploit Against SSL/TLS) は TLS の脆弱性を用いた攻撃ができ、Cookie のセッション情報を狙うことができるなど実用的な攻撃が通った。Same Origin Policy があることで防止された。
+さらにこれを応用して BEAST Attack (Browser Exploit Against SSL/TLS) は TLS の脆弱性を用いた攻撃ができ、Cookie のセッション情報を狙うことができるなど実用的な攻撃が通りました。現在は Same Origin Policy によって防止されました。
 
-Lucky Thirteen Attack では Oracle がわからずともパディング処理の微妙な遅れを検知して同様の攻撃をします。([元論文](https://ieeexplore.ieee.org/iel7/6547086/6547088/06547131.pdf) によると時間差 80ns を繰り返して)
+Lucky Thirteen Attack では Oracle ではなくパディング処理の微妙な遅れを検知して同様の攻撃をします。([元論文](https://ieeexplore.ieee.org/iel7/6547086/6547088/06547131.pdf) によると 1 回の暗号化では時間差 80ns 程度しかなので数千回繰り返すことで差を検知します。)
 
-CBC モード自体は安全なのですが、プロトコルの作り方や組み合わせ方によっては安全ではなくなります。
+まとめると CBC モード自体は安全なのですが、プロトコルの作り方や組み合わせ方によっては安全ではなるということが分かります。
 
 :::message
 **練習問題**
