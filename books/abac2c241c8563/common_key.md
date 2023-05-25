@@ -337,8 +337,7 @@ CTFer は AES だけを知っていれば共通鍵暗号をマスターしたと
 頻度解析すれば解読できるので現在使われていません。CTF で出てきたら CyberChef とかに任せるとよさそう。
 
 ### DES
-AES 以前に使われていた共通鍵暗号
-DES は内部で Feistel 構造を取っていて
+DES は AES 以前に使われていた共通鍵暗号です。DES は内部で Feistel 構造を用いています。
 
 > **Feistel 構造**
 > DES で使われた暗号化の為の内部構造です。
@@ -346,10 +345,9 @@ DES は内部で Feistel 構造を取っていて
 > 暗号化: $R_{r+1} = L_r \oplus F(R_r, k_r)$, $L_{r+1} = R_r$
 > 復号: $L_r = R_{r+1} \oplus F(L_{r+1}, k_r)$, $R_r = L_{r+1}$
 
-撹拌性はよくないことが知られています。
-TODO: 撹拌性の検証コードを実装する
-
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Feistel.png/220px-Feistel.png)
+
+ただし Feistel 構造は撹拌性がよくないことが知られています。これが DES の脆弱性となり、その対策として鍵長を 3 倍にした 3-DES が考案されたが、本質的には同じである為より強い共通鍵暗号を求め AES が策定された。
 
 ### ChaCha20-Poly1305
 TLS 1.3 で使われている唯一の政府機関に依らない暗号です。
