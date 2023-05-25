@@ -352,7 +352,7 @@ TODO: 撹拌性の検証コードを実装する
 ![](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Feistel.png/220px-Feistel.png)
 
 ### ChaCha20-Poly1305
-TLS 1.3 で使われているもう一つの暗号です。政府機関に依らない暗号アルゴリズムです。
+TLS 1.3 で使われている唯一の政府機関に依らない暗号です。
 ChaCha20 がストリーム暗号で Poly1305 が MAC で全体で AEAD の暗号方式となっています。
 詳細は次の良資料を読みましょう！
 
