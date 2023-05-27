@@ -358,7 +358,7 @@ ChaCha20 がストリーム暗号で Poly1305 が MAC で全体で AEAD の暗�
 https://tex2e.github.io/blog/crypto/chacha20poly1305
 
 ## まとめ
-共通鍵暗号の仕組みと AES の構築/攻撃を学びました。
+共通鍵暗号の仕組みと AES の構築/攻撃を学びました。これで鍵がすでに共有されている状態なら誰にも知られずに通信できます。ただ一番肝心な鍵を誰にも知られずに共有する方法が分かりません。これを解決する方法を次の章で学びます。
 
 ## 参考文献
 - [NIST Special Publication 800-38D Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC](https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38d.pdf)
