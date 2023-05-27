@@ -96,6 +96,8 @@ $$
 
 
 ### TFHE
+https://eprint.iacr.org/2018/421.pdf
+https://nindanaoto.github.io/
 現状で最も高速な部類に入る完全準同型暗号です。
 
 $\mathbb{T} := \mathbb{R}/\mathbb{Z}$ は環ではないです。
