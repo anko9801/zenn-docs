@@ -37,26 +37,23 @@ $$
 
 ただ RSA 暗号は $N$ の素因数分解できると解かれてしまいます。
 
-
-
-素因数分解の計算困難性を仮定すれば、解読できないことがわかりました。
-
 現在、公開鍵暗号は **素因数分解問題** か **離散対数問題** をベースにした暗号がよく使われています。
 
 > **素因数分解問題**
-> ある整数 $N$ が素数 $p, q$ を用いて $N = pq$ の素因数分解が難しい
+> ある合成数 $N$ が与えられたときに素数 $p_i$ と整数 $e_i$ を用いて $N = p_1^{e_1}\cdots p_n^{e_n}$ と素因数分解する問題。
 
 > **離散対数問題**
->
+> 位数 $N$ の巡回群 $G$ について $g, y\in G$ が与えられたときに $g^x = y$ となる最小の $x\in \mathbb{N}$ を求める問題。
 
-Trap-door function
+桁数の大きい 2 つの素数から構成される合成数の素因数分解問題や位数の大きい離散対数問題は困難であることが知られています。
+trap-door function
 
-### DH 鍵共有
 共有鍵を作る為の操作である。共有鍵を作ることができれば共有鍵暗号を用いて通信できる。
 
-1. AliceとBobが巡回群 $G$ とその生成元 $g$ を共有する。
-2. AliceとBobはそれぞれ秘密鍵 $x_a, x_b$ を生成し、公開鍵 $y_a = g^{x_a}, y_b = g^{x_b}$ を公開する。
-3. AliceとBobは自分の秘密鍵と相手の公開鍵を掛けると $s = g^{x_ax_b} = y_b^{x_a} = y_a^{x_b}$ となり、$s$ はAliceとBobのみが知る共有鍵となる。
+> **DH 鍵共有**
+> 1. AliceとBobが巡回群 $G$ とその生成元 $g$ を共有する。
+> 2. AliceとBobはそれぞれ秘密鍵 $x_a, x_b$ を生成し、公開鍵 $y_a = g^{x_a}, y_b = g^{x_b}$ を公開する。
+> 3. AliceとBobは自分の秘密鍵と相手の公開鍵を掛けると $s = g^{x_ax_b} = y_b^{x_a} = y_a^{x_b}$ となり、$s$ はAliceとBobのみが知る共有鍵となる。
 
 ECDH だと $s$ の $x$ 座標をハッシュ化したものを共有鍵として使う。
 
@@ -92,8 +89,6 @@ Hard: IP 偽装を署名を用いて防ぐことはできるでしょうか？
 #### Frozen Heart
 
 Frozen Heartは、Fiat-Shamir変換でチャレンジのハッシュ計算の際の入力に、証明するステートメントに関するすべての公開値（ランダムなコミットメント値を含む）を含める必要があるということ（↑の例だと入力は、G、V、P、UserID、OtherInfo）を遵守していないプロトコルや実装による脆弱性。
-
-詳しいことはすべてここに
 
 - [Fiat-Shamir変換の安全でない適用による脆弱性Frozen Heart - Develop with pleasure! (hatenablog.com)](https://techmedia-think.hatenablog.com/entry/2022/04/19/193400#:~:text=Fiat%2DShamir%E5%A4%89%E6%8F%9B%E3%81%A8%E3%81%AF,%E9%9D%9E%E5%AF%BE%E8%A9%B1%E5%9E%8B%E3%81%AB%E3%81%99%E3%82%8B%E3%80%82)
 - [Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
