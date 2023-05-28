@@ -289,7 +289,7 @@ $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 ### Supersingular な曲線を用いてはならない (MOV/FR Reduction)
 Supersingular な楕円曲線のとき、ペアリングを用いて有限体上の DLP に帰着できるという方法です。
 
-まず Supersingular (超特異) な楕円曲線というのは
+まず Supersingular (超特異) な楕円曲線というのは位数が $q + 1$ となるような楕円曲線です。
 
 $$
 y^2 = x^3 + (1 - b)x + b
@@ -307,13 +307,20 @@ f(x, y_1y_2) = f(x, y_1)f(x, y_2)
 \end{aligned}
 $$
 
-楕円曲線暗号では Weil pairing や Tate pairing などを使いますが、それらのペアリングに使われる Miller's algorithm というものがあります。
+楕円曲線暗号では Weil pairing や Tate pairing などを使いますが、これらのペアリングは因子 (divisor) と呼ばれる概念を通じて理解します。
+
+> **Def. 因子 (divisor)**
+> $\mathcal{D} \in\mathrm{Div}(C)$ 自由アーベル群
+
+この因子を求めるアルゴリズムを Miller's algorithm といいます。
 
 > **Miller's algorithm**
 >
 > $$
 N = \epsilon_0 + \epsilon_1\cdot 2 + \cdots + \epsilon_t\cdot 2^t
 $$
+>
+> $\mu_m$ $\mu_m\subseteq\mathbb{F}_{q^d}^\times$
 >
 > $$
 h_{P, Q} = \begin{dcases}
@@ -346,14 +353,20 @@ def miller(E, P, Q, m):
 ```
 
 > **Weil pairing**
-> $e_m: E[m]\times E[m] \to \mu_m$ となる $\mu_m\subseteq\mathbb{F}_{q^d}^\times$
+> $e_m: E[m]\times E[m] \to \mu_m$ となる
 >
 > $$
 e_m(P, Q) = \frac{f_P(Q + S)}{f_P(S)}\bigg/\frac{f_Q(P - S)}{f_Q(-S)}
 $$
 
 > **Prop.**
-> Weil pairing はペアリングである。
+> Weil pairing は次の条件を満たす。
+> 1. 双線形 (bilinear)
+> $e_n$ が双線形写像である。
+> 2. 同一性 (idenntity)
+> $e_n(P, P) = 1$
+> 3. 非退化 (non-degenerate)
+> 任意の $Q\in E[n]$ に対して $e_n(P, Q) = 1$ ならば $P = \mathcal{O}$ である。
 
 $$
 f_P(Q + S) = 103
