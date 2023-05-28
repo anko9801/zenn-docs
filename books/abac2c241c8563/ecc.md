@@ -133,7 +133,7 @@ $D > 0$ とすると 2 つの解 $\alpha$, $\beta$ が存在するが、整数 $
 よって $D \leq 0$、つまり標数 5 以上の Hasse の定理が示された。
 
 $$
-|\#E/\mathbb{F}_p - (p+1)|\leq 2\sqrt{p}
+|\#E/\mathbb{F}_q - (q+1)|\leq 2\sqrt{q}
 $$
 $\Box$
 
