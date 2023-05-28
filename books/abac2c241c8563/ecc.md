@@ -87,7 +87,7 @@ $$
 E/\mathbb{F}_q: y^2 = x^3 + ax + b
 $$
 
-次に $s^2 = f(t) = t^3 + at + b$ とおいたときの有理関数体上の楕円曲線 $E^{tw}/\mathbb{F}_q(t)$ を定義する。
+次に $s^2 = f(t) = t^3 + at + b$ とおき、有理関数体上の楕円曲線 $E^{tw}/\mathbb{F}_q(t)$ を定義する。
 
 $$
 E^{tw}/\mathbb{F}_q(t): f(t)y^2 = x^3 + ax + b
