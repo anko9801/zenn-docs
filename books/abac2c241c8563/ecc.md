@@ -289,9 +289,13 @@ $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 ### Supersingular な曲線を用いてはならない (MOV/FR Reduction)
 Supersingular な楕円曲線のとき、ペアリングを用いて有限体上の DLP に帰着できるという方法です。
 
+まず Supersingular (超特異) な楕円曲線というのは
+
 $$
 y^2 = x^3 + (1 - b)x + b
 $$
+
+ペアリングというのは双線形写像のことです。
 
 > **Def. 双線形写像 (Bilinear map)**
 > 群 $G_1, G_2$ について写像 $f: G_1\times G_1\to G_2$ が次を満たすとき、$f$ を双線形写像あるいはペアリングという。
@@ -303,13 +307,15 @@ f(x, y_1y_2) = f(x, y_1)f(x, y_2)
 \end{aligned}
 $$
 
+楕円曲線暗号では Weil pairing や Tate pairing などを使いますが、それらのペアリングに使われる Miller's algorithm というものがあります。
+
 > **Miller's algorithm**
 >
 > $$
 N = \epsilon_0 + \epsilon_1\cdot 2 + \cdots + \epsilon_t\cdot 2^t
 $$
-
-$$
+>
+> $$
 h_{P, Q} = \begin{dcases}
 \frac{y - y_P - \lambda(x - x_P)}{x + x_P + x_Q - \lambda^2 - a_1\lambda + a_2} & (\lambda\neq\infty) \\
 x - x_P & (\lambda = \infty)
@@ -366,7 +372,7 @@ def weil_pairing(E, P, Q, m, S=None):
     return (fpqs / fps) / (fqps / fqs)
 ```
 
-Tate-Lichtenbaum Pairing
+Weil pairing の代替として Tate-Lichtenbaum Pairing というペアリングも使います。
 
 > **Def. Tate-Lichtenbaum Pairing**
 > 楕円曲線 $E/K$ に対し 整数 $n$
@@ -405,8 +411,13 @@ e_n(Q^\sigma - Q, T) = \frac{\sqrt[n]{\alpha}^\sigma}{\sqrt[n]{\alpha}} \qquad \
 \tau(P, T) = \alpha \bmod (K^\times)^n
 $$
 
-$E(\mathbb{F}_{p^k}^\times)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
+```python
+def tate_pairing(E, P, Q, m, k=2):
+    f = miller(E, P, Q, m)
+    return f ^ ((p ^ k - 1) // m)
+```
 
+$E(\mathbb{F}_{p^k}^\times)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
 必要となる最小の拡大次数 $d$ を埋め込み次数という。
 
 > **Prop.**
@@ -429,16 +440,18 @@ $$
 
 $\Box$
 
-- Weil pairing を用いて Miller's algorithm を回すのを MOV Reduction; Menezes-Okamoto-Vanstone Reduction という。
+そうしてできたペアリングについて
+
+> **MOV/FR Reduction**
+> ペアリング $f$ について
+> $e_m(P, Q)$
+>
+
+- Weil pairing を用いて MOV Reduction; Menezes-Okamoto-Vanstone Reduction という。
 - Tate pairing を用いて Miller's algorithm を回すのを FR Reduction; Frey-Rück Reduction という。
 
 FFDLP に落とし込めるが埋め込み次数が高いと ECDLP の方が計算量が小さくなってしまうので
 
-```python
-def tate_pairing(E, P, Q, m, k=2):
-    f = miller(E, P, Q, m)
-    return f ^ (((E.field.p ** k) - 1) // m)
-```
 
 
 ```python
