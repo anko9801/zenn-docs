@@ -72,10 +72,10 @@ $$
 $$
 
 > **Thm. Hasse の定理**
-> 楕円曲線 $E/\mathbb{F}_q$ の位数 $\#E/\mathbb{F}_q$ について次の条件で押さえられる。
+> 楕円曲線 $E/\mathbb{F}_q$ の位数 $\#E(\mathbb{F}_q)$ について次の条件で押さえられる。
 >
 > $$
-|\#E/\mathbb{F}_q - (q+1)|\leq 2\sqrt{q}
+|\#E(\mathbb{F}_q) - (q+1)|\leq 2\sqrt{q}
 $$
 
 詳しい証明は [Hasse's Theorem on Elliptic Curves](https://fse.studenttheses.ub.rug.nl/10999/1/opzet.pdf) に書いてあります。ここでは標数が 5 以上のときについての筋書きだけ記します。
@@ -133,9 +133,12 @@ $D > 0$ とすると 2 つの解 $\alpha$, $\beta$ が存在するが、整数 $
 よって $D \leq 0$、つまり標数 5 以上の Hasse の定理が示された。
 
 $$
-|\#E/\mathbb{F}_q - (q+1)|\leq 2\sqrt{q}
+|\#E(\mathbb{F}_q) - (q+1)|\leq 2\sqrt{q}
 $$
 $\Box$
+
+例えば
+
 
 > **Schoof のアルゴリズム**
 > 楕円曲線 $E/\mathbb{F}_p$ の位数を $O(\log^8p)$ で求められる。
