@@ -293,14 +293,19 @@ $$
 y^2 = x^3 + (1 - b)x + b
 $$
 
-> **Def. 双線形 (bilinear)**
-> 任意の $a, b\in \mathbb{F}_q^\times$ と $P, Q\in E$ について次を満たすとき $e$ は双線形であるという。
+> **Def. 双線形写像 (Bilinear map)**
+> 群 $G_1, G_2$ について写像 $f: G_1\times G_1\to G_2$ が次を満たすとき、$f$ を双線形写像あるいはペアリングという。
 >
 > $$
-e(aP, bQ) = e(P, Q)^{ab}
+\begin{aligned}
+f(x_1x_2, y) = f(x_1, y)f(x_2, y) \\
+f(x, y_1y_2) = f(x, y_1)f(x, y_2)
+\end{aligned}
 $$
 
-> **Weil pairing**
+楕円曲線においては $e: E\times E \to \mathbb{F}_q$
+
+> **Def. Weil pairing**
 > 楕円曲線の等分点群と同型な部分群が有限体の乗法群に含まれるためには有限体を拡大する必要がある。
 >
 > $$
@@ -309,11 +314,16 @@ $$
 >
 > 必要となる最小の拡大次数 $d$ を埋め込み次数という。
 
-FFDLP に落とし込める
-埋め込み次数が高いと ECDLP の方が計算量が小さくなってしまうので
+> **Def. Tate pairing**
+>
+> $$
+e: E(\mathbb{F}_p)[l]\times E(\mathbb{F}_{p^2})/lE(\mathbb{F}_{p^2})\to \mathbb{F}_{p^2}^\times/(\mathbb{F}_{p^2}^\times)^l
+$$
 
-> **超特異曲線の埋め込み次数**
-> 超特異楕円曲線の埋め込み次数は $6$ 以下である。
+$E(\mathbb{F}_{p^k}^\times)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
+
+> **Prop.**
+> Supersingular な楕円曲線の埋め込み次数は $6$ 以下である。
 
 **Proof.**
 $q = p^2$ において Hasse の定理から次のようになる。
@@ -330,7 +340,7 @@ $$
 | $2p$ | $(p^2 + 1) + 2p = (p + 1)^2$ | $p^2 - 1 = (p + 1)(p - 1)$ | $2$ |
 | $-2p$ | $(p^2 + 1) - 2p = (p - 1)^2$ | $p - 1 = p - 1$ | $1$ |
 
-$e_n(P, Q)$
+$\Box$
 
 > **Miller's algorithm**
 > 1. $E[n]\subseteq E(\mathbb{F}_{p^k})$ となる最小の $k$ を持ってくる
@@ -338,18 +348,10 @@ $e_n(P, Q)$
 > 3. $\beta = e_n(dP, Q)$
 > 4. $\mathbb{F}_{p^k}^\times$ 上のDLPを $\alpha, \beta$ を用いて解く
 
-MOV Reduction (Menezes-Okamoto-Vanstone Reduction)
+- Weil pairing を用いて Miller's algorithm を回すのを MOV Reduction; Menezes-Okamoto-Vanstone Reduction という。
+- Tate pairing を用いて Miller's algorithm を回すのを FR Reduction; Frey-Rück Reduction という。
 
-> **Tate-pairing**
->
-> $$
-e: E(\mathbb{F}_p)[l]\times E(\mathbb{F}_{p^2})/lE(\mathbb{F}_{p^2})\to \mathbb{F}_{p^2}^\times/(\mathbb{F}_{p^2}^\times)^l
-$$
-
-FR Reduction (Frey-Rück Reduction)
-Bilinear-paring
-
-$E(\mathbb{F}_{p^k}^*)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
+FFDLP に落とし込めるが埋め込み次数が高いと ECDLP の方が計算量が小さくなってしまうので
 
 ```python
 def miller(E, P, Q, m):
