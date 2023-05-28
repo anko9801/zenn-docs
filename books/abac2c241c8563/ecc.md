@@ -71,6 +71,8 @@ $$
 \end{aligned}
 $$
 
+CTF において楕円曲線の問題が出されたときに位数はバチクソ重要です。その位数に関する最も重要な定理があります。
+
 > **Thm. Hasse の定理**
 > 楕円曲線 $E/\mathbb{F}_q$ の位数 $\#E(\mathbb{F}_q)$ について次の条件で押さえられる。
 >
@@ -78,7 +80,7 @@ $$
 |\#E(\mathbb{F}_q) - (q+1)|\leq 2\sqrt{q}
 $$
 
-詳しい証明は [Hasse's Theorem on Elliptic Curves](https://fse.studenttheses.ub.rug.nl/10999/1/opzet.pdf) に書いてあります。ここでは標数が 5 以上のときについての筋書きだけ記します。
+詳しい証明は [Hasse's Theorem on Elliptic Curves](https://fse.studenttheses.ub.rug.nl/10999/1/opzet.pdf) に書いてあります。ここでは標数が 5 以上についての証明の筋書きだけ記します。
 
 **Proof.**
 まずベースとなる楕円曲線 $E/\mathbb{F}_q$ を次のように定義する。
