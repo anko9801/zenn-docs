@@ -287,7 +287,7 @@ $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$
 | 楕円曲線上に存在しない点や位数の少ない点を指定できる | Invalid Curve Attack / Small-Subgroup Attack | さまざまな少ない位数の点を収集して中国剰余定理 |
 
 ### Supersingular な曲線を用いてはならない (MOV/FR Reduction)
-楕円曲線が超特異 supersingular という性質を持つとき、ペアリングを用いて有限体上の DLP に帰着できるという方法です。
+Supersingular な楕円曲線のとき、ペアリングを用いて有限体上の DLP に帰着できるという方法です。
 
 $$
 y^2 = x^3 + (1 - b)x + b
@@ -303,24 +303,111 @@ f(x, y_1y_2) = f(x, y_1)f(x, y_2)
 \end{aligned}
 $$
 
-楕円曲線においては $e: E\times E \to \mathbb{F}_q$
-
-> **Def. Weil pairing**
-> 楕円曲線の等分点群と同型な部分群が有限体の乗法群に含まれるためには有限体を拡大する必要がある。
+> **Miller's algorithm**
 >
 > $$
-e: E[m]\times E[m] \to \mu_m\subseteq\mathbb{F}_{q^d}^\times
+N = \epsilon_0 + \epsilon_1\cdot 2 + \cdots + \epsilon_t\cdot 2^t
+$$
+
+$$
+h_{P, Q} = \begin{dcases}
+\frac{y - y_P - \lambda(x - x_P)}{x + x_P + x_Q - \lambda^2 - a_1\lambda + a_2} & (\lambda\neq\infty) \\
+x - x_P & (\lambda = \infty)
+\end{dcases}
+$$
+
+```python
+def h(P, Q, R):
+    if (P == Q and P.y == 0) or (P != Q and P.x == Q.x):
+      return R.x - P.x
+    L = P.line_coeff(Q)
+    p = R.y - P.y - L * (R.x - P.x)
+    q = R.x + P.x + Q.x - L * L
+    return p / q
+
+def miller(E, P, Q, m):
+    if P == Q:
+        return 1
+    b = m.bits()
+    b.reverse()
+    f = 1
+    T = P
+    for i in b:
+        f = f * f * h(T, T, Q)
+        T = T + T
+        if i == 1:
+            f = f * h(T, P, Q)
+            T = T + P
+    return f
+```
+
+> **Weil pairing**
+> $e_m: E[m]\times E[m] \to \mu_m$ となる $\mu_m\subseteq\mathbb{F}_{q^d}^\times$
+>
+> $$
+e_m(P, Q) = \frac{f_P(Q + S)}{f_P(S)}\bigg/\frac{f_Q(P - S)}{f_Q(-S)}
+$$
+
+> **Prop.**
+> Weil pairing はペアリングである。
+
+$$
+f_P(Q + S) = 103
+$$
+
+```python
+def weil_pairing(E, P, Q, m, S=None):
+    if S is None:
+        S = E.random_point()
+    fpqs = miller(E, P, Q + S, m)
+    fps = miller(E, P, S, m)
+    fqps = miller(E, Q, P - S, m)
+    fqs = miller(E, Q, -S, m)
+    return (fpqs / fps) / (fqps / fqs)
+```
+
+Tate-Lichtenbaum Pairing
+
+> **Def. Tate-Lichtenbaum Pairing**
+> 楕円曲線 $E/K$ に対し 整数 $n$
+> $P\in E(K)$ と $T\in E(K)[N]$ $Q\in E(\overline{K})$ $nQ = P$
+>
+> $$
+G_{\overline{K}/K}\to \mu_m \\
+\sigma\mapsto e_m(Q^\sigma - Q, T)
 $$
 >
-> 必要となる最小の拡大次数 $d$ を埋め込み次数という。
-
-> **Def. Tate pairing**
->
 > $$
-e: E(\mathbb{F}_p)[l]\times E(\mathbb{F}_{p^2})/lE(\mathbb{F}_{p^2})\to \mathbb{F}_{p^2}^\times/(\mathbb{F}_{p^2}^\times)^l
+\begin{aligned}
+& \tau: \frac{E(K)}{nE(K)}\times E(K)[n] \to \frac{K^\times}{(K^\times)^n} \\
+& \tau(P, T) = f(P)\bmod (K^\times)^N
+\end{aligned}
+$$
+
+$$
+K^\times/(K^\times)^m\to H^1(G_{\overline{K}/K}, \mu_m)
+$$
+
+> **Prop.**
+> Tate-Lichtenbaum Pairing はペアリングである
+
+**Proof.**
+$\xi(\sigma) = e_m(Q^\sigma - Q, T)$ は $\xi: G_{\overline{K}/K}\to\mu_m$
+
+$$
+\begin{aligned}
+\xi(\sigma\tau)
+\end{aligned}
+$$
+
+$$
+e_n(Q^\sigma - Q, T) = \frac{\sqrt[n]{\alpha}^\sigma}{\sqrt[n]{\alpha}} \qquad \forall \sigma\in G_{\overline{K}/K} \\
+\tau(P, T) = \alpha \bmod (K^\times)^n
 $$
 
 $E(\mathbb{F}_{p^k}^\times)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
+
+必要となる最小の拡大次数 $d$ を埋め込み次数という。
 
 > **Prop.**
 > Supersingular な楕円曲線の埋め込み次数は $6$ 以下である。
@@ -342,122 +429,19 @@ $$
 
 $\Box$
 
-> **Miller's algorithm**
-> 1. $E[n]\subseteq E(\mathbb{F}_{p^k})$ となる最小の $k$ を持ってくる
-> 2. 位数 $n$ の $\alpha=e_n(P, Q)$ となるように $Q \in E[n]$ を取ってくる
-> 3. $\beta = e_n(dP, Q)$
-> 4. $\mathbb{F}_{p^k}^\times$ 上のDLPを $\alpha, \beta$ を用いて解く
-
 - Weil pairing を用いて Miller's algorithm を回すのを MOV Reduction; Menezes-Okamoto-Vanstone Reduction という。
 - Tate pairing を用いて Miller's algorithm を回すのを FR Reduction; Frey-Rück Reduction という。
 
 FFDLP に落とし込めるが埋め込み次数が高いと ECDLP の方が計算量が小さくなってしまうので
 
 ```python
-def miller(E, P, Q, m):
-  from six.moves import map
-  """
-  Calculate Divisor by Miller's Algorithm
-  Args:
-    E: The Elliptic Curve
-    P: A point over E which has order m
-    Q: A point over E which has order m to apply function f_P
-    m: The order of P, Q on E
-  Returns:
-    f_P(Q)
-  """
-  def h(P, Q, R):
-    # if \lambda is infinity
-    if (P == Q and P.y == 0) or (P != Q and P.x == Q.x):
-      return R.x - P.x
-    L = P.line_coeff(Q)
-    p = R.y - P.y - L * (R.x - P.x)
-    q = R.x + P.x + Q.x - L * L
-    return p / q
-  if P == Q:
-    return 1
-  b = map(int, bin(m)[2:])
-  next(b)
-  f = 1
-  T = P
-  for i in b:
-    f = f * f * h(T, T, Q)
-    T = T + T
-    if i:
-      f = f * h(T, P, Q)
-      T = T + P
-  return f
-
-
-def weil_pairing(E, P, Q, m, S=None):
-  """
-  Calculate Weil Pairing
-  Args:
-    E: The Elliptic Curve
-    P: A point over E which has order m
-    Q: A point over E which has order m
-    m: The order of P, Q on E
-    S: [Optional] A random point on E
-  Returns:
-    e_m(P, Q)
-  """
-  if S is None:
-    S = E.random_point()
-  from ecpy.utils.util import is_enable_native, _native
-  from ecpy.fields.ExtendedFiniteField import ExtendedFiniteFieldElement
-  if is_enable_native:
-    P = _native.EC_elem(E.ec, tuple(P.x), tuple(P.y), tuple(P.z))
-    Q = _native.EC_elem(E.ec, tuple(Q.x), tuple(Q.y), tuple(Q.z))
-    S = _native.EC_elem(E.ec, tuple(S.x), tuple(S.y), tuple(S.z))
-    if E.ec.type == 1:
-      t = _native.FF_elem(0)
-    elif E.ec.type == 2:
-      t = _native.EF_elem(0, 0)
-    _native.weil_pairing(t, E.ec, P, Q, S, m)
-    if E.ec.type == 1:
-      return t.to_python()
-    elif E.ec.type == 2:
-      t = t.to_python()
-      return ExtendedFiniteFieldElement(E.field, t[0], t[1])
-  else:
-    fpqs = miller(E, P, Q + S, m)
-    fps = miller(E, P, S, m)
-    fqps = miller(E, Q, P - S, m)
-    fqs = miller(E, Q, -S, m)
-    return E.field._inv(fps * fqps) * fpqs * fqs
-
-
 def tate_pairing(E, P, Q, m, k=2):
-  """
-  Calculate Tate Pairing
-  Args:
-    E: The Elliptic Curve
-    P: A point over E which has order m
-    Q: A point over E which has order m
-    m: The order of P, Q on E
-    k: [Optional] The Embedding Degree of m on E
-  """
-  from ecpy.utils.util import is_enable_native, _native
-  if is_enable_native:
-    P = _native.EC_elem(E.ec, tuple(P.x), tuple(P.y), tuple(P.z))
-    Q = _native.EC_elem(E.ec, tuple(Q.x), tuple(Q.y), tuple(Q.z))
-    if E.ec.type == 1:
-      t = _native.FF_elem(0)
-    elif E.ec.type == 2:
-      t = _native.EF_elem(0, 0)
-    _native.tate_pairing(t, E.ec, P, Q, m, k)
-    if E.ec.type == 1:
-      from ecpy.fields.Zmod import ZmodElement
-      return ZmodElement(E.field, t.to_python())
-    elif E.ec.type == 2:
-      from ecpy.fields.ExtendedFiniteField import ExtendedFiniteFieldElement
-      t = t.to_python()
-      return ExtendedFiniteFieldElement(E.field, t[0], t[1])
-  else:
     f = miller(E, P, Q, m)
-    return f ** (((E.field.p ** k) - 1) // m)
+    return f ^ (((E.field.p ** k) - 1) // m)
+```
 
 
+```python
 def MapToPoint(E, y):
   """
   MapToPoint Function: Given by Boneh-Durfee's ID-based Encryption Paper.
@@ -473,96 +457,6 @@ def MapToPoint(E, y):
   Q = E(x, y)
   return 6 * Q
 
-
-def gen_supersingular_ec(bits=70):
-  """
-  Generate Super-Singluar Elliptic Curve
-  Args:
-    bits: The Security Parameter: log_2 p = bits
-
-  Returns:
-    A (Super Singular) Elliptic Curve, Extended Finite Field, l
-    l is need to calculate Pairing
-  """
-  from ecpy.fields import ExtendedFiniteField
-  from .EllipticCurve import EllipticCurve
-
-  def _next_prime(n):
-    from ecpy.util import is_prime
-    """
-    return next prime of n
-    """
-    while not is_prime(n):
-      n += 1
-    return n
-
-  """
-  If you have gmpy, use gmpy.next_prime
-  in other hand, use slow function
-  """
-  try:
-    from gmpy import next_prime
-  except:
-    next_prime = _next_prime
-
-  def gen_prime():
-    from ecpy.util import is_prime
-    from random import randint
-    while True:
-      p = int(next_prime(randint(2**(bits - 1), 2**bits)))
-      if is_prime(p * 6 - 1):
-        break
-    return p * 6 - 1, p
-
-  p, l = gen_prime()
-  F = ExtendedFiniteField(p, "x^2+x+1")
-  return EllipticCurve(F, 0, 1), F, l
-
-
-def find_point_by_order(E, l):
-  """
-  Find a Elliptic Curve Point P which has order l.
-  Args:
-    E: The Elliptic Curve
-    l: Order of Point on E
-
-  Returns:
-    Point on E which has order l.
-  """
-  i = 3
-  while True:
-    r = E.get_corresponding_y(i)
-    if r != None:
-      P = E(i, r)
-      if (P * l).is_infinity():
-        return P
-    i += 1
-
-
-def symmetric_weil_pairing(E, P, Q, m):
-  """
-  Symmetric Weil Pairing
-  \hat{e}(P, Q) = e(P, \phi(Q)) (\phi is Distortion Map)
-  Args:
-    E: The Elliptic Curve
-    P: A point on E which has order m
-    Q: A point on E which has order m
-    m: The order of P, Q
-  """
-  return weil_pairing(E, P, Q.distortion_map(), m)
-
-
-def symmetric_tate_pairing(E, P, Q, m, k=2):
-  """
-  Symmetric Tate Pairing
-  \hat{e}(P, Q) = e(P, \phi(Q)) (\phi is Distortion Map)
-  Args:
-    E: The Elliptic Curve
-    P: A point on E which has order m
-    Q: A point on E which has order m
-    m: The order of P, Q
-    k: [Optional] The Embedding Degree of m on E
-  """
   return tate_pairing(E, P, Q.distortion_map(), m)
 ```
 
