@@ -334,11 +334,9 @@ def h(P, Q, R):
 def miller(E, P, Q, m):
     if P == Q:
         return 1
-    b = m.bits()
-    b.reverse()
     f = 1
     T = P
-    for i in b:
+    for i in reversed(m.bits()):
         f = f * f * h(T, T, Q)
         T = T + T
         if i == 1:
