@@ -201,28 +201,28 @@ DLP で書いた手法を用いることで解くことができます。Pollard
 
 中国剰余定理を用いて大きな群を複数の小さな群の直積に分けます。楕円曲線暗号の楕円曲線の位数は細かく素因数分解できることが多いので有効な手法になります。
 
-楕円曲線の位数 $\#E = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ と素因数分解して $Q = dP$ となるとき次のように $z_i$ を定義する。
+楕円曲線の位数 $\#E = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ と素因数分解して $Q = dP$ となるとき次のように $d_i$ を定義する。
 
 $$
-d = z_0+z_1p_i+z_2p_i^2+\ldots+z_{e_i−1}p_i^{e_i−1} \quad \pmod{p_i^{e_i}} \\
+d = d_0+d_1p_i+d_2p_i^2+\ldots+d_{e_i−1}p_i^{e_i−1} \quad \pmod{p_i^{e_i}} \\
 $$
 
 これより次の関係式が成り立つ。
 
 $$
-\frac{\#E}{p_i}Q = z_0\left(\frac{\#E}{p_i}P\right)
+\frac{\#E}{p_i}Q = d_0\left(\frac{\#E}{p_i}P\right)
 $$
 
-この $z_0$ は ECDLP を用いて $\mathcal{O}(\sqrt{p_i})$ で求まります。次に $z_0,\ldots,z_{j-1}$ を知っているときに $z_j$ を計算する為に次のように変形します。
+この $d_0$ は ECDLP を用いて $\mathcal{O}(\sqrt{p_i})$ で求まります。次に $d_0,\ldots,d_{j-1}$ を知っているときに $d_j$ を計算する為に次のように変形します。
 
 $$
 \begin{aligned}
-\frac{\#E}{p_i^{j+1}}Q & = (z_0+\cdots+z_{j}p_i^{j})\left(\frac{\#E}{p_i^{j+1}}P\right) \\
-\frac{\#E}{p_i^{j+1}}Q & - (z_0+\cdots+z_{j−1}p_i^{j−1})\left(\frac{\#E}{p_i^{j+1}}P\right) = z_{j}\left(\frac{\#E}{p_i}P\right)
+\frac{\#E}{p_i^{j+1}}Q & = (d_0+\cdots+d_{j}p_i^{j})\left(\frac{\#E}{p_i^{j+1}}P\right) \\
+\frac{\#E}{p_i^{j+1}}Q & - (d_0+\cdots+d_{j−1}p_i^{j−1})\left(\frac{\#E}{p_i^{j+1}}P\right) = d_{j}\left(\frac{\#E}{p_i}P\right)
 \end{aligned}
 $$
 
-これより ECDLP を解くことで $z_j$ が求まります。
+これより ECDLP を解くことで $d_j$ が求まります。
 
 ```python
 fact = factor(G.order())
