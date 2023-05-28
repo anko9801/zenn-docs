@@ -50,28 +50,7 @@ https://andrea.corbellini.name/ecc/interactive/reals-add.html
 
 ここでは特に有理数体 $\mathbb{Q}$ または有限体 $\mathbb{F}_q$ のときについて考える。
 
-torsion point
-
-まずこの群の位数を求める為に群構造を明らかにする。
-
-> **Prop. 楕円曲線の群構造**
-> $m, n$ を整数として $E(\mathbb{F}_p) \cong \mathbb{Z}/m\mathbb{Z}\times\mathbb{Z}/n\mathbb{Z}$ となる。
-
-**Proof.**
-
-ところで Weierstrass の $\wp$ 関数というものがあり、次のように定義されます。
-
-$L = \mathbb{Z}\omega_1 + \mathbb{Z}\omega_2$
-
-$$
-\begin{aligned}
-\wp(u) & = \frac{1}{u^2} + \sum_{\substack{\omega\in L \\ \omega \neq 0}}\left(\frac{1}{(u - \omega)^2} - \frac{1}{\omega^2}\right) \\
-\wp'(u) & = - \sum_{\omega\in L}\frac{1}{(u - \omega)^3} \\
-(\wp')^2 & = 4\wp^3 - 60\sum_{\substack{\omega\in L \\ \omega \neq 0}}\frac{1}{\omega^4}\wp - 140\sum_{\substack{\omega\in L \\ \omega \neq 0}}\frac{1}{\omega^6}
-\end{aligned}
-$$
-
-CTF において楕円曲線の問題が出されたときに位数はバチクソ重要です。その位数に関する最も重要な定理があります。
+CTF において楕円曲線の問題が出されたときに位数は解法を決定する要素としてバチクソ重要です。その位数に関して最も重要な定理があります。
 
 > **Thm. Hasse の定理**
 > 楕円曲線 $E/\mathbb{F}_q$ の位数 $\#E(\mathbb{F}_q)$ について次の条件で押さえられる。
@@ -141,17 +120,20 @@ $\Box$
 
 例えば
 
+次に実際に位数を計算する為にはフロベニウス写像の特性多項式を理解する必要があるのですがそれには楕円曲線の群構造を知っておかないと分かりません。ただこれも凄い定理です。
+
 
 > **Schoof のアルゴリズム**
-> 楕円曲線 $E/\mathbb{F}_p$ の位数を $O(\log^8p)$ で求められる。
+> 楕円曲線 $E/\mathbb{F}_q$ の位数 $\#E(\mathbb{F}_q)$ を $O(\log^8p)$ で求められる。
 
-Hasse の定理より
+**Proof.**
+Hasse の定理より $q + 1$ 付近に分布していることが分かる。
 
 $$
-q+1-2\sqrt{q}\leq|E(\mathbb{F}_q)|\leq q+1+2\sqrt{q}
+|\#E(\mathbb{F}_q) - (q+1)|\leq 2\sqrt{q}
 $$
 
-$|E(\mathbb{F}_q)|=q+1+t$ とおける。$\mathbb{F}_q$ のフロベニウス写像 $\sigma$ のトレース $t$ を計算できれば位数が求まる。しかし $t$ は $2\sqrt{q}$ のオーダーであるため、直接計算できない。そこで素数 $l$ を剰余にとってそれぞれの $t$ の値を求め、中国剰余定理によって $t$ を求める。
+ここで $t = \#E(\mathbb{F}_q) - (q+1)$ とおくと $t\approx 2\sqrt{q}$ なのでかなり大きい。中国剰余定理によって $t$ を求める。
 
 具体的には特性多項式の $t$ に $0,\ldots,\frac{l-1}{2}$ の値を代入して確かめる。
 
@@ -774,3 +756,54 @@ $\#\mathcal{J}_C(\mathbb{F}_p) \approx p^g$
 - Python での高速な実装 fastecdsa
 
 この資料は CC0 ライセンスです。
+
+ゴミ
+
+**Proof.**
+まず楕円関数を定義する。
+
+> **Def. 楕円関数**
+> 複素平面上の格子 $L$ を周期とする関数を楕円関数という。
+>
+> $$
+\forall z\in\mathbb{C}, \forall \omega\in L, f(z + \omega) = f(z)
+$$
+
+ところで Weierstrass の $\wp$ 関数というものがある。
+
+ある線形独立な複素数 $\omega_1, \omega_2\in \mathbb{C}$ に対し、格子 $L = \mathbb{Z}\omega_1 + \mathbb{Z}\omega_2$ を構成する。このとき Weierstrass の $\wp$ 関数を次のように定義する。
+
+$$
+\wp(z) = \wp(z, L) = \frac{1}{z^2} + \sum_{\substack{\omega\in L \\ \omega \neq 0}}\left(\frac{1}{(z - \omega)^2} - \frac{1}{\omega^2}\right)
+$$
+
+また $z$ に関して微分すると次のようになる。
+
+$$
+\begin{aligned}
+\wp'(z) & = - 2\sum_{\omega\in L}\frac{1}{(z - \omega)^3} \\
+\end{aligned}
+$$
+
+このとき $\wp(z), \wp'(z)$ が収束することを示す。総和の中身は $\omega \gg z$ において次のように近似できる。
+
+$$
+\begin{aligned}
+\left|\frac{1}{(z - \omega)^2} - \frac{1}{\omega^2}\right| & = \left|\frac{z^2 - 2\omega z}{(z - \omega)^2\omega^2} \right| \approx \frac{1}{|\omega|^3} \\
+\left|\frac{1}{(z - \omega)^3}\right| & \approx \frac{1}{|\omega|^3}
+\end{aligned}
+$$
+
+これより総和を取っても $1/|\omega|$ 程度であるから $\wp(z), \wp'(z)$ は絶対収束することが分かる。また $\wp(z), \wp'(z)$ は総和を取っているので楕円関数である。
+ここで色々計算すると次のような関係式が成り立つ。
+
+$$
+(\wp'(z))^2 = 4\wp^3 - 60\bigg(\sum_{\substack{\omega\in L \\ \omega \neq 0}}\frac{1}{\omega^4}\bigg)\wp - 140\bigg(\sum_{\substack{\omega\in L \\ \omega \neq 0}}\frac{1}{\omega^6}\bigg)
+$$
+
+これらの係数が収束することは明らかなので $g_2, g_3$ とおく。ここで $(\wp(z), \wp'(z))$ を平面上の点と見立てた曲線は (非特異な) 楕円曲線となる。
+
+$$
+y^2 = 4x^3 - g_2x - g_3
+$$
+
