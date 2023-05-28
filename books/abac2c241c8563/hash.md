@@ -80,6 +80,9 @@ $$
 ### 伸長攻撃 (Length Extension Attack)
 $H(m_1)$ から $H(m_1\|m_2)$ を求める
 
+https://github.com/bwall/HashPump
+https://pypi.org/project/hashpumpy/1.0/
+
 ### 誕生日攻撃 (Birthday Attack)
 誕生日のパラドックスを用いた攻撃です。
 
@@ -89,6 +92,9 @@ $H(m_1)$ から $H(m_1\|m_2)$ を求める
 この衝突を恣意的に起こせるとハッシュ値で改ざんを検知してるシステムを騙すことが出来てしまいます。これは誕生日攻撃を用いて恣意的に起こすことができます。
 
 誕生日攻撃というのはハッシュ値のビット数を $n$ として平文 $m$ とそのハッシュ値 $H(m)$ の対応を $O(2^{n/2})$ 程度集めるとハッシュが同じとなるような $m$ が $50\%$ の確率で見つかるという誕生日のパラドックスによる攻撃です。
+
+https://github.com/corkami/collisions
+https://github.com/cr-marcstevens/hashclash
 
 ### Differenctial Cryptoanalysis
 暗号を解析しながら SMT を用いて解く
