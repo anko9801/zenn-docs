@@ -489,8 +489,8 @@ $$
 
 ```python
 def hensel_lift(P):
-    x, y = P.x, P.y
-    t = GF(p)(lift(x ^ 3 + a * x + b - y ^ 2) // p) / (2 * y)
+    x, y = lift(P.x), lift(P.y)
+    t = GF(p)((x ^ 3 + a * x + b - y ^ 2) // p) / (2 * y)
     return (x, y + p * lift(t))
 
 
