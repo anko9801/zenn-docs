@@ -902,17 +902,32 @@ $x$ に関して $f_1$ と $f_2$ に同一の解があるとき、それらの�
 Approximate GCD Problem
 
 ```python
-def short_pad_attack(c1, c2, e, n):
-    PRxy.<x,y> = PolynomialRing(Zmod(n))
-    PRx.<xn> = PolynomialRing(Zmod(n))
-    g1 = x^e - c1
-    g2 = (x+y)^e - c2
-    h = q2.resultant(q1)
-    h = h.univariate_polynomial()
-    h = h.change_ring(PRx).subs(y=xn)
-    h = h.monic()
+def franklinReiter(n, e, r, c1, c2):
+    R.<x> = PolynomialRing(Zmod(n))
+    f1 = x^e - c1
+    f2 = (x + r)^e - c2
+    return - polygcd(f1, f2).coefficients()[0]
+
+def polygcd(a, b):
+    if(b == 0):
+        return a.monic()
+    else:
+        return polygcd(b, a % b)
+
+def CoppersmithShortPadAttack(e, n, C1, C2, eps=1/30):
+    P.<x,y> = PolynomialRing(ZZ)
+    g1 = x^e - C1
+    g2 = (x + y)^e - C2
+    res = g1.resultant(g2)
+
+    Py.<y> = PolynomialRing(Zmod(n))
+    res = res.univariate_polynomial()
+    res = res.change_ring(Py).subs(y=y)
+    res = res.monic()
     kbits = n.nbits()//(2*e*e)
-    diff = h.small_roots(X=2^kbits, beta=0.5)[0]
+    diff = res.small_roots(X=2^kbits, epsilon=eps)
+
+    return franklinReiter(n, e, diff[0], C1, C2)
 ```
 
 ### The Return of Coppersmith's Attack
