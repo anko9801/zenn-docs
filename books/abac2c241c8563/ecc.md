@@ -396,8 +396,8 @@ $$
 >
 > $$
 \begin{aligned}
-& \tau: \frac{E(K)}{nE(K)}\times E(K)[n] \to \frac{K^\times}{(K^\times)^n} \\
-& \tau(P, T) = f(P)\bmod (K^\times)^N
+& \tau: \frac{E(K)}{mE(K)}\times E(K)[m] \to \frac{K^\times}{(K^\times)^m} \\
+& \tau(P, T) = f(P)\bmod (K^\times)^m
 \end{aligned}
 $$
 
