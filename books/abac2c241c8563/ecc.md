@@ -447,7 +447,7 @@ $$
 | $p$ | $(p^2 + 1) + p$ | $p^3 - 1 = (p - 1)(p^2 + p + 1)$ | $3$ |
 | $-p$ | $(p^2 + 1) - p$ | $p^6 - 1 = (p^3 - 1)(p + 1)(p^2 - p + 1)$ | $6$ |
 | $2p$ | $(p^2 + 1) + 2p = (p + 1)^2$ | $p^2 - 1 = (p + 1)(p - 1)$ | $2$ |
-| $-2p$ | $(p^2 + 1) - 2p = (p - 1)^2$ | $p - 1 = p - 1$ | $1$ |
+| $-2p$ | $(p^2 + 1) - 2p = (p - 1)^2$ | $p - 1$ | $1$ |
 
 $\Box$
 
@@ -463,26 +463,7 @@ $\Box$
 
 FFDLP に落とし込めるが埋め込み次数が高いと ECDLP の方が計算量が小さくなってしまうので
 
-
-
-```python
-def MapToPoint(E, y):
-  """
-  MapToPoint Function: Given by Boneh-Durfee's ID-based Encryption Paper.
-  Args:
-    E: The Elliptic Curve
-    y: Any Value (should be E.field element)
-
-  Returns:
-    Correspond point of y on E
-  """
-  from ecpy.utils import cubic_root
-  x = cubic_root(y**2 - 1)
-  Q = E(x, y)
-  return 6 * Q
-
-  return tate_pairing(E, P, Q.distortion_map(), m)
-```
+`tate_pairing(E, P, Q.distortion_map(), m)`
 
 ### Anomalous な曲線を用いてはいけない
 Anomalous の楕円曲線では SSSA (Semaev-Smart-Satoh-Araki) Attack が有効です。
