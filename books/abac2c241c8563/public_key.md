@@ -139,7 +139,7 @@ sequenceDiagram
 
 > **非対話型ゼロ知識証明**
 > 秘密を知っていることは分かるが秘密自体を知ることができない。
-> 1. 信頼できる第三者は証明者と検証者にコミットメントを送る。
+> 1. 信頼できる第三者 (鍵生成者) は証明者と検証者にコミットメントを送る。
 > 2. 証明者はコミットメントからチャレンジを生成し、それに秘密を用いて作った証明を送る。
 > 3. 検証者は証明を検証する。
 
@@ -173,6 +173,9 @@ sequenceDiagram
 
 非対話型ゼロ知識証明を用いて電子署名を作り出すことができます。
 
+> **電子署名**
+>
+
 > **Schnorr Signature**
 > 非対話型ゼロ知識証明な署名の一種。
 >
@@ -195,30 +198,10 @@ sequenceDiagram
 > - 検証
 >   1. $v = (g^{s^{-1}H(m)}y^{s^{-1}r} \bmod p)\bmod q$ を計算して $r = v$ なら正当な署名となる。
 
-ゼロ知識証明の性質
-- 完全性 (Completeness)
-    - 証明者の主張が真であるならば、検証者は真であることが必ずわかること。
-- 健全性 (Soundness)
-    - 証明者の主張が偽であれば、検証者はかなり高い確率でそれが偽であること見抜けること。
-- ゼロ知識性 (Zero Knowledge)
-	- あらゆる場合において、検証者が証明者から何らかの知識（情報）を盗もうとしても、証明者の主張が真であること以上の知識は得られない
 
-zk-SNARKs
-- Succinct (簡潔)
-    - 証明のサイズがステートメントのサイズと比べて非常に小さい
-- Non-interactive (非対話型)
-    - 証明者と検証者の間で何度も対話をする必要がない
-- ARgument
-    - 証明者の計算能力には限りがある
-- Knowledge
-    - 証明者は、知識なしでは証明を生成することは不可能である。
+https://zenn.dev/kyosuke/articles/a1854b9be26c01df13eb
 
-[ZenGo-X/zk-paillier: A collection of Paillier cryptosystem zero knowledge proofs (github.com)](https://github.com/ZenGo-X/zk-paillier)
-[zk-SNARKsの理論 (zenn.dev)](https://zenn.dev/kyosuke/articles/a1854b9be26c01df13eb)
-https://www.zkdocs.com/
 
-位置情報共有
-Intel HEXL
 
 :::message
 **練習問題**
@@ -231,3 +214,7 @@ Hard: IP 偽装を署名を用いて防ぐことはできるでしょうか？
 公開鍵暗号の基礎と応用の部分をやりました。暗号の中でもかなり不思議なものだったと思います。私も経験的に納得してるだけで直観的には納得しきれてません。なのでここで納得できてなくても大丈夫です。ここら辺は CTF をすれば咀嚼できるようになれると思います。
 
 次はお待ちかね、CTF の中で最も出題されていると言っても過言ではない RSA 暗号への攻撃です！数学をかなり使うのでそれを補う「計算機代数」の章も参照しながらやっていくといいと思います。
+
+## 参考文献
+- https://www.zkdocs.com/
+- [ZenGo-X/zk-paillier: A collection of Paillier cryptosystem zero knowledge proofs (github.com)](https://github.com/ZenGo-X/zk-paillier)
