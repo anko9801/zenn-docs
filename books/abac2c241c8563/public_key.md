@@ -100,41 +100,79 @@ ECDH だと $s$ の $x$ 座標をハッシュ化したものを共有鍵とし�
 
 ### ゼロ知識証明と電子署名
 ゼロ知識という言葉はシミュレーションパラダイムにおいて出てくる言葉なのですが
+対話型ゼロ知識証明は証明者と検証者がやりとりを繰り返し、証明者が本当に正しい情報を持っているかを確率的に検証する方式です。
 
 > **ゼロ知識証明**
 > 秘密を知っていることは分かるが秘密自体を知ることができない。
-> 1. 証明者は乱数や公開鍵などの公開情報を送る。
+> 1. 証明者は乱数や公開鍵などのコミットメントを送る。
 > 2. 検証者はチャレンジを送る。
-> 3. 証明者はチャレンジと秘密を用いて一方向性の生成して送る。
-> 4. 検証者は秘密を知らずに検証できる。
+> 3. 証明者はチャレンジとコミットメント、秘密を用いて証明を作成して送る。
+> 4. 検証者は証明を検証する。
 
-> **代表的なゼロ知識証明**
-> $y$ に対して $y = x^2 \pmod n$ となる $x$ があることをゼロ知識証明する。
-> 1. 証明者は乱数 $r\in\mathbb{Z}/n\mathbb{Z}$ を生成して $a = r^2 \bmod n$ を送る。
-> 2. 検証者はチャレンジと呼ばれる乱数 $b\in\lbrace 0, 1\rbrace$ を送る。
-> 3. 証明者は $c = x^br\bmod n$ を送る。
-> 4. 検証者は $c^2 = y^ba\bmod n$ となることを検証する。
+```mermaid
+sequenceDiagram
+    autonumber
+    participant 証明者
+    participant 検証者
+    証明者 ->> 検証者: コミットメント
+    検証者 ->> 証明者: チャレンジ
+    証明者 ->> 検証者: 証明
+    Note right of 検証者: 検証
+```
 
-> **DLP のゼロ知識証明**
-> 1. 証明者は乱数 $r$ を生成して $a = g^r \bmod p$ を送る。
-> 2. 検証者はチャレンジと呼ばれる乱数 $b$ を送る。
-> 3. 証明者は $c = r + bx\bmod q$ を送る。
-> 4. 検証者は $g^c = y^ba\bmod p$ となることを検証する。
+具体的には
 
-これだけだと検証者がチャレンジを送るまで待つという
+> **ゼロ知識証明の例 1**
+> $y$ に対して $y = x^2 \pmod n$ となる秘密 $x$ があることをゼロ知識証明する。
+> 1. コミットメント: 乱数 $r\in\mathbb{Z}/n\mathbb{Z}$ と $u = r^2 \bmod n$
+> 2. チャレンジ: $c\in\lbrace 0, 1\rbrace$
+> 3. 証明: $z = x^cr\bmod n$
+> 4. 検証: $z^2 \equiv y^cu\bmod n$
 
-ここでランダムオラクルモデル (決定論的な乱数生成) 特に暗号学的ハッシュ関数をよく用いる。
+> **ゼロ知識証明の例 2**
+> 秘密 $x$ と $g$
+> 1. コミットメント: 乱数 $r$ と $u = g^r \bmod p$
+> 2. チャレンジ: 乱数 $c$
+> 3. 証明: $z = r + xc\bmod q$
+> 4. 検証: $g^z \equiv uy^c\bmod p$
 
-[Fiat-Shamir 変換](https://link.springer.com/content/pdf/10.1007/3-540-47721-7_12.pdf) は
-[Gennaroら](https://eprint.iacr.org/2012/215.pdf) が効率的な非対話化方式を編み出したらしいが、読んでないので紹介できず。
+これだけだと証明者と検証者はやりとりをしないといけません。
+Fiat-Shamir 変換はコミットメントをハッシュ関数に通したものをチャレンジとすることで非対話化させる方式です。ハッシュ関数がランダムオラクルモデル (決定論的な乱数生成) であることを仮定しています。
+
+> **非対話型ゼロ知識証明**
+> 秘密を知っていることは分かるが秘密自体を知ることができない。
+> 1. 信頼できる第三者は証明者と検証者にコミットメントを送る。
+> 2. 証明者はコミットメントからチャレンジを生成し、それに秘密を用いて作った証明を送る。
+> 3. 検証者は証明を検証する。
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant 信頼できる第三者
+    participant 証明者
+    participant 検証者
+    信頼できる第三者 ->> 検証者: CRS
+    信頼できる第三者 ->> 証明者: CRS
+    証明者 ->> 検証者: 証明
+    Note right of 検証者: 検証
+```
+
+[Fiat-Shamir 変換](https://link.springer.com/content/pdf/10.1007/3-540-47721-7_12.pdf) は [Gennaroら](https://eprint.iacr.org/2012/215.pdf) が効率的な非対話化方式を編み出したらしいが、読んでないので紹介できず。
+
+チャレンジにすべての公開値を含めないと Frozen Heart プロトコルや実装による脆弱性。
+一方、非対話型のゼロ知識証明は証明者と検証者はやりとりをせずに証明することが可能です。対話を行う代わりに証明者と検証者の間に第三者を置き、CRSと呼ばれる事前に公開される情報を証明者と検証者に送ります。証明者はそのCRSを用いて正しい情報を持っているという証明を生成し、それを検証者に一回だけ送ります。受け取った検証者はそれを検証するだけで非対話なゼロ知識証明が実現できます。事前にCRSを生成することを一般的に信頼されたセットアップといい、第三者は証明者、検証者にとって信頼される存在となります。
+
+- [Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
 
 > **Fiat-Shamir 変換**
-> Fiat-Shamir 変換はハッシュ関数を用いて対話型のゼロ知識証明を非対話型に変換する方法の 1 つである。
 > 1. 証明者は乱数や公開鍵などの公開情報をハッシュ化した $e = H(x)$ と $s = r - xe$ を送る。
 > 3. 証明者はチャレンジと秘密を用いて一方向性の生成して送る。
 > 4. 検証者は $x' = g^yp^{H(x)}$
-> 検証者がランダムに選択するチャレンジの値
 > $b := H(com)$
+
+> **DLP のゼロ知識証明**
+> 1. 証明者はコミットメント $u = g^r$、チャレンジ $c = H(g, q, h, u)$、証明 $z = r + xc$ を作成して送る。
+> 2. 検証者は $c \equiv H(g, q, h, u)$、$g^z \equiv uh^c$ を検証する。
 
 > **Schnorr Signature**
 > 非対話型ゼロ知識証明な署名の一種。
@@ -143,9 +181,27 @@ ECDH だと $s$ の $x$ 座標をハッシュ化したものを共有鍵とし�
 > 2. 署名 : 疑似乱数 $k$ を生成し、署名したいメッセージ $M$ を用いて $e = H(g^k \| M), s = k - xe$ を計算して $(s, e)$ を署名値として公開する。
 > 3. 検証 : $e' = H(g^sy^e \| M)$ を計算し、 $e = e'$ となれば署名が有効であると検証されたことになる。
 
-チャレンジにすべての公開値を含めないと Frozen Heart プロトコルや実装による脆弱性。
+ゼロ知識証明の性質
+- 完全性 (Completeness)
+    - 証明者の主張が真であるならば、検証者は真であることが必ずわかること。
+- 健全性 (Soundness)
+    - 証明者の主張が偽であれば、検証者はかなり高い確率でそれが偽であること見抜けること。
+- ゼロ知識性 (Zero Knowledge)
+	- あらゆる場合において、検証者が証明者から何らかの知識（情報）を盗もうとしても、証明者の主張が真であること以上の知識は得られない
 
-- [Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
+zk-SNARKs
+- Succinct（簡潔）
+    - 証明のサイズがステートメントのサイズと比べて非常に小さい
+- Non-interactive（非対話型）
+    - 証明者と検証者の間で何度も対話をする必要がない
+- ARgument
+    - 証明者の計算能力には限りがある
+- Knowledge
+    - 証明者は、知識なしでは証明を生成することは不可能である。
+
+[ZenGo-X/zk-paillier: A collection of Paillier cryptosystem zero knowledge proofs (github.com)](https://github.com/ZenGo-X/zk-paillier)
+[zk-SNARKsの理論 (zenn.dev)](https://zenn.dev/kyosuke/articles/a1854b9be26c01df13eb)
+https://www.zkdocs.com/
 
 位置情報共有
 Intel HEXL
