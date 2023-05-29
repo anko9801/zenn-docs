@@ -508,7 +508,7 @@ def SSSA_Attack(F, E, P, Q):
     dy1 = Zmod(p^2)(U.y - y1)
     dx2 = Zmod(p^2)((V.x - x2) // p)
     dy2 = Zmod(p^2)(V.y - y2)
-    return (dy1 * dx2) / (dx1 * dy2)
+    return (dy1 / dx1) / (dy2 / dx2)
 ```
 
 ### Singular な曲線を用いてはいけない
