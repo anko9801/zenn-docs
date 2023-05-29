@@ -386,8 +386,8 @@ def weil_pairing(E, P, Q, m, S=None):
 Weil pairing の代替として Tate-Lichtenbaum Pairing というペアリングも使います。
 
 > **Def. Tate-Lichtenbaum Pairing**
-> 楕円曲線 $E/K$ に対し 整数 $n$
-> $P\in E(K)$ と $T\in E(K)[N]$ $Q\in E(\overline{K})$ $nQ = P$
+> 楕円曲線 $E/K$ に対し 整数 $m$
+> $P\in E(K)$ と $T\in E(K)[m]$ $Q\in E(\overline{K})$ $mQ = P$
 >
 > $$
 G_{\overline{K}/K}\to \mu_m \\
