@@ -201,6 +201,15 @@ https://neuromancer.sk/std/
 
 DLP で書いた手法を用いることで解くことができます。Pollard-rho 法や GSBS 法は簡単に応用が効くので飛ばします。あとよく分かってないですけど数体ふるい法は ECDLP 上では有効ではないらしいので Pohlig-Hellman と Index Calculus Algorithm とその派生を紹介します。詳しい方ここらへん教えてください。
 
+```mermaid
+flowchart LR
+    id0(全探索) --> id1(ρ 法)
+    id0 --> id20(Baby Step Giant Step)
+    id0 --> id21(Pohlig-Hellman)
+    id0 --> id3(Index Calculus Algorithm) --> id4(GHS-Weil descent)
+    id12(量子アルゴリズム) --> id7(位数発見問題) --> id8(Shor のアルゴリズム)
+```
+
 ### Pohlig-Hellman
 
 中国剰余定理を用いて大きな群を複数の小さな群の直積に分けます。楕円曲線暗号の楕円曲線の位数は細かく素因数分解できることが多いので有効な手法になります。
