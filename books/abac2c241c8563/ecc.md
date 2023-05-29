@@ -199,15 +199,14 @@ https://neuromancer.sk/std/
 
 ## ECDLP
 
-DLP で書いた手法を用いることで解くことができます。Pollard-rho 法や GSBS 法は計算機代数の章を見ながら実装すればいいです。あと数体ふるい法は ECDLP 上では有効ではないらしいので Pohlig-Hellman と Index Calculus Algorithm とその派生を紹介します。詳しい方ここらへん教えてください。
+DLP で書いた手法を用いることで解くことができます。Pollard-rho 法や GSBS 法は計算機代数の章を見ながら実装すればいいです。あと数体ふるい法は ECDLP 上では有効ではないらしいので Pohlig-Hellman と Index Calculus Algorithm とその派生を紹介します。詳しい方ここらへん教えてください。位数発見問題なので Shor のアルゴリズムが使えます。
 
 ```mermaid
 flowchart LR
-    id0(全探索) --> id1(ρ 法)
-    id0 --> id20(Baby Step Giant Step)
-    id0 --> id21(Pohlig-Hellman)
-    id0 --> id3(Index Calculus Algorithm) --> id4(GHS-Weil descent)
-    id12(量子アルゴリズム) --> id7(位数発見問題) --> id8(Shor のアルゴリズム)
+    id0(全探索) --> id3(Pohlig-Hellman) --> id1(ρ 法)
+    id3 --> id2(Baby Step Giant Step)
+    id3 --> id4(Index Calculus Algorithm) --> id5(GHS-Weil descent)
+    id8(Shor のアルゴリズム)
 ```
 
 ### Pohlig-Hellman
@@ -238,15 +237,17 @@ $$
 これより ECDLP を解くことで $d_j$ が求まります。
 
 ```python
-fact = factor(G.order())
-ord = int(G.order())
-dlogs = []
-for p, e in fact:
-    t = ord // p ^ e
-    dlog = discrete_log(t * Q, t * G, operation="+")
-    dlogs += [dlog]
-
-print(crt(dlogs, primes))
+def PohligHellman(G):
+    fact = factor(G.order())
+    order = int(G.order())
+    dlogs = []
+    primes = []
+    for p, e in fact:
+        t = order // p ^ e
+        dlog = discrete_log(t * Q, t * G, operation="+")
+        dlogs.append(dlog)
+        primes.append(p ^ e)
+    return crt(dlogs, primes)
 ```
 
 ### Index Calculus Algorithm
@@ -392,7 +393,7 @@ def weil_pairing(E, P, Q, m, S=None):
     return (fpqs / fps) / (fqps / fqs)
 ```
 
-Weil pairing は比較的遅く、Weil pairing の代替として Tate-Lichtenbaum Pairing というペアリングがあります。
+Weil pairing の計算は比較的遅くて、この上位互換として Tate-Lichtenbaum Pairing というペアリングがあります。
 
 > **Def. Tate-Lichtenbaum Pairing**
 > 楕円曲線 $E/K$ に対し 整数 $m$
