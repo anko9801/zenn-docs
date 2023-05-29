@@ -120,8 +120,6 @@ sequenceDiagram
     Note right of 検証者: 検証
 ```
 
-具体的には
-
 > **ゼロ知識証明の例 1**
 > $y$ に対して $y = x^2 \pmod n$ となる秘密 $x$ があることをゼロ知識証明する。
 > 1. コミットメント: 乱数 $r\in\mathbb{Z}/n\mathbb{Z}$ と $u = r^2 \bmod n$
