@@ -497,7 +497,7 @@ $$
 \log_E(t) := t - \frac{a_1}{2}t^2 + \frac{a_1^2 + a_2}{3}t^3 - \frac{a_1^3 + 2a_1a_2 + a_3}{4}t^4 + \cdots
 $$
 
-$A := (X_1, Y_1)\in E(\mathbb{Z}/p^2\mathbb{Z})$ $\bmod p$ 写像 $\pi(A) = P$ となる
+$A := (X_1, Y_1)\in E(\mathbb{Z}/p^2\mathbb{Z})$ 写像 $\pi(A) = P$ となる
 $(X_{p-1}, Y_{p-1}) := (p-1)A$
 
 $X_{p-1} \neq X_1$ なら
