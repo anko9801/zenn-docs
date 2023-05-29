@@ -51,7 +51,7 @@ https://andrea.corbellini.name/ecc/interactive/reals-add.html
 
 ここに実装
 
-ここからは特に有限体 $\mathbb{F}_q$ のときについて考える。
+ここからは特に素数 $p$ を用いて $q = p^n$ とおき、有限体 $\mathbb{F}_q\cong \mathbb{F}_p[x]/(f(x))$ のときについて考える。
 
 CTF において楕円曲線の問題が出されたときに位数は解法を決定する要素としてバチクソ重要です。その位数に関して最も重要な定理があります。
 
