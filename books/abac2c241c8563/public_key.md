@@ -157,21 +157,23 @@ sequenceDiagram
     Note right of 検証者: 検証
 ```
 
+> **非対話型ゼロ知識証明の例**
+> 1. 信頼できる第三者から証明者と検証者に CRS (コミットメント) $r$ $q$? を送られる。
+> 2. 証明者は $u = g^r$、チャレンジ $c = H(g, q, h, u)$、証明 $z = r + xc$ を作成して送る。
+> 3. 検証者は $c \equiv H(g, q, h, u)$、$g^z \equiv uh^c$ を検証する。
+
 対話型のゼロ知識証明を非対話化させる為にはコミットメントをハッシュ関数に通したものをチャレンジとすることで非対話型となります。ハッシュ関数がランダムオラクルモデル (決定論的な乱数生成) であることを仮定しています。
 
-[Fiat-Shamir 変換](https://link.springer.com/content/pdf/10.1007/3-540-47721-7_12.pdf) は Gennaro らが [効率的な非対話化方式](https://eprint.iacr.org/2012/215.pdf) を編み出したらしいが、読んでないので紹介できず。
+非対話化する方法としては [Fiat-Shamir 変換](https://link.springer.com/content/pdf/10.1007/3-540-47721-7_12.pdf) や [Gennaro らが編み出した効率的な非対話化方式](https://eprint.iacr.org/2012/215.pdf) などがあります。私は Fiat-Shamir 変換しか知らないのでそれだけ載せます。
 
 > **Fiat-Shamir 変換**
 > 1. 証明者は乱数や公開鍵などの公開情報をハッシュ化した $e = H(x)$ と $s = r - xe$ を送る。
 > 2. 証明者はチャレンジと秘密を用いて一方向性の生成して送る。
 > 3. 検証者は $x' = g^yp^{H(x)}$ $b := H(com)$
 
-チャレンジにすべての公開値を含めないと Frozen Heart プロトコルや実装による脆弱性。
-[Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
+ただしチャレンジにすべての公開値を含めないと脆弱性 (Frozen Heart) となります。[Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
 
-> **非対話型ゼロ知識証明の例 1**
-> 1. 証明者はコミットメント $u = g^r$、チャレンジ $c = H(g, q, h, u)$、証明 $z = r + xc$ を作成して送る。
-> 2. 検証者は $c \equiv H(g, q, h, u)$、$g^z \equiv uh^c$ を検証する。
+非対話型ゼロ知識証明を用いて電子署名を作り出すことができます。
 
 > **Schnorr Signature**
 > 非対話型ゼロ知識証明な署名の一種。
@@ -179,6 +181,21 @@ sequenceDiagram
 > 1. 鍵生成 : 巡回群 $G$ 上で生成元 $g\in G$ と秘密鍵 $x\in\mathbb{N}$ を用いて公開鍵 $y = g^x$ を生成する。
 > 2. 署名 : 疑似乱数 $k$ を生成し、署名したいメッセージ $M$ を用いて $e = H(g^k \| M), s = k - xe$ を計算して $(s, e)$ を署名値として公開する。
 > 3. 検証 : $e' = H(g^sy^e \| M)$ を計算し、 $e = e'$ となれば署名が有効であると検証されたことになる。
+
+> **BLS 署名**
+> 1. 鍵生成 : $0$ 以上 $r$ 未満の乱数 $s$ を一つ取り秘密鍵とします。公開鍵は $sQ$ です。
+> 2. 署名 : メッセージ $m$ に対してそのハッシュ値 $H(m)$ をとり、秘密鍵 $s$ 倍して署名 $sH(m)$ を作ります。
+> 3. 検証 : メッセージ $m$ と署名 $σ$ をもらった人は自分でハッシュ値 $H(m)$ を計算し公開鍵 $sQ$ を使って
+
+> **DSA; Digital Signature Algorithm**
+> - 鍵生成
+>   1. $p = 2q + 1$ となる素数 $p, q$ を生成すると $\mathbb{F}_p^\times \cong \mathbb{F}_q\times\mathbb{F}_2$ となる。
+>   2. $g\in\mathbb{F}_p$ と $x\in\mathbb{F}_q$ を生成して $y = g^x \bmod p$ を計算する。
+> - 署名
+>   1. ランダムに $k$ を生成する。
+>   2. $r = (g^k\bmod p)\bmod q$ と $s = k^{-1}(H(m) + xr) \bmod q$ を署名として公開する。
+> - 検証
+>   1. $v = (g^{s^{-1}H(m)}y^{s^{-1}r} \bmod p)\bmod q$ を計算して $r = v$ なら正当な署名となる。
 
 ゼロ知識証明の性質
 - 完全性 (Completeness)
@@ -204,22 +221,6 @@ https://www.zkdocs.com/
 
 位置情報共有
 Intel HEXL
-> **BLS署名**
-> 1. 鍵生成 : $0$ 以上 $r$ 未満の乱数 $s$ を一つ取り秘密鍵とします。公開鍵は $sQ$ です。
-> 2. 署名 : メッセージ $m$ に対してそのハッシュ値 $H(m)$ をとり、秘密鍵 $s$ 倍して署名 $sH(m)$ を作ります。
-> 3. 検証 : メッセージ $m$ と署名 $σ$ をもらった人は自分でハッシュ値 $H(m)$ を計算し公開鍵 $sQ$ を使って
-
-署名の方法にはいろいろありますが、暗号のレイヤーを抽象化すると
-
-> **DSA; Digital Signature Algorithm**
-> - 鍵生成
->   1. $p = 2q + 1$ となる素数 $p, q$ を生成すると $\mathbb{F}_p^\times \cong \mathbb{F}_q\times\mathbb{F}_2$ となる。
->   2. $g\in\mathbb{F}_p$ と $x\in\mathbb{F}_q$ を生成して $y = g^x \bmod p$ を計算する。
-> - 署名
->   1. ランダムに $k$ を生成する。
->   2. $r = (g^k\bmod p)\bmod q$ と $s = k^{-1}(H(m) + xr) \bmod q$ を署名として公開する。
-> - 検証
->   1. $v = (g^{s^{-1}H(m)}y^{s^{-1}r} \bmod p)\bmod q$ を計算して $r = v$ なら正当な署名となる。
 
 :::message
 **練習問題**
