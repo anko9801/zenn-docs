@@ -130,14 +130,14 @@ sequenceDiagram
 > 4. 検証: $z^2 \equiv y^cu\bmod n$
 
 > **ゼロ知識証明の例 2**
-> 秘密 $x$ と $g$
+> ベース $g$ に対して秘密 $x$ から DLP
 > 1. コミットメント: 乱数 $r$ と $u = g^r \bmod p$
 > 2. チャレンジ: 乱数 $c$
 > 3. 証明: $z = r + xc\bmod q$
 > 4. 検証: $g^z \equiv uy^c\bmod p$
 
 これだけだと証明者と検証者はやりとりをしないといけません。
-Fiat-Shamir 変換はコミットメントをハッシュ関数に通したものをチャレンジとすることで非対話化させる方式です。ハッシュ関数がランダムオラクルモデル (決定論的な乱数生成) であることを仮定しています。
+非対話型ゼロ知識証明は証明者と検証者はやりとりをせずに証明することが可能です。対話を行う代わりに証明者と検証者の間に信頼された第三者を置き、CRS; Common Reference String と呼ばれる事前に公開される情報を証明者と検証者に送ります。証明者はその CRS をコミットメントとし、証明を生成し、検証者に送ります。受け取った検証者はそれを検証するだけで非対話なゼロ知識証明が実現できます。
 
 > **非対話型ゼロ知識証明**
 > 秘密を知っていることは分かるが秘密自体を知ることができない。
@@ -157,18 +157,17 @@ sequenceDiagram
     Note right of 検証者: 検証
 ```
 
+対話型のゼロ知識証明を非対話化させる為にはコミットメントをハッシュ関数に通したものをチャレンジとすることで非対話型となります。ハッシュ関数がランダムオラクルモデル (決定論的な乱数生成) であることを仮定しています。
+
 [Fiat-Shamir 変換](https://link.springer.com/content/pdf/10.1007/3-540-47721-7_12.pdf) は [Gennaroら](https://eprint.iacr.org/2012/215.pdf) が効率的な非対話化方式を編み出したらしいが、読んでないので紹介できず。
-
-チャレンジにすべての公開値を含めないと Frozen Heart プロトコルや実装による脆弱性。
-一方、非対話型のゼロ知識証明は証明者と検証者はやりとりをせずに証明することが可能です。対話を行う代わりに証明者と検証者の間に第三者を置き、CRSと呼ばれる事前に公開される情報を証明者と検証者に送ります。証明者はそのCRSを用いて正しい情報を持っているという証明を生成し、それを検証者に一回だけ送ります。受け取った検証者はそれを検証するだけで非対話なゼロ知識証明が実現できます。事前にCRSを生成することを一般的に信頼されたセットアップといい、第三者は証明者、検証者にとって信頼される存在となります。
-
-- [Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
 
 > **Fiat-Shamir 変換**
 > 1. 証明者は乱数や公開鍵などの公開情報をハッシュ化した $e = H(x)$ と $s = r - xe$ を送る。
-> 3. 証明者はチャレンジと秘密を用いて一方向性の生成して送る。
-> 4. 検証者は $x' = g^yp^{H(x)}$
-> $b := H(com)$
+> 2. 証明者はチャレンジと秘密を用いて一方向性の生成して送る。
+> 3. 検証者は $x' = g^yp^{H(x)}$ $b := H(com)$
+
+チャレンジにすべての公開値を含めないと Frozen Heart プロトコルや実装による脆弱性。
+- [Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
 
 > **DLP のゼロ知識証明**
 > 1. 証明者はコミットメント $u = g^r$、チャレンジ $c = H(g, q, h, u)$、証明 $z = r + xc$ を作成して送る。
@@ -190,9 +189,9 @@ sequenceDiagram
 	- あらゆる場合において、検証者が証明者から何らかの知識（情報）を盗もうとしても、証明者の主張が真であること以上の知識は得られない
 
 zk-SNARKs
-- Succinct（簡潔）
+- Succinct (簡潔)
     - 証明のサイズがステートメントのサイズと比べて非常に小さい
-- Non-interactive（非対話型）
+- Non-interactive (非対話型)
     - 証明者と検証者の間で何度も対話をする必要がない
 - ARgument
     - 証明者の計算能力には限りがある
