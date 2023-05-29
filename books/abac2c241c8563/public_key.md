@@ -126,13 +126,13 @@ sequenceDiagram
 > $y$ に対して $y = x^2 \pmod n$ となる秘密 $x$ があることをゼロ知識証明する。
 > 1. コミットメント: 乱数 $r\in\mathbb{Z}/n\mathbb{Z}$ と $u = r^2 \bmod n$
 > 2. チャレンジ: $c\in\lbrace 0, 1\rbrace$
-> 3. 証明: $z = x^cr\bmod n$
-> 4. 検証: $z^2 \equiv y^cu\bmod n$
+> 3. 証明: $z = rx^c\bmod n$
+> 4. 検証: $z^2 \equiv uy^c\bmod n$
 
 > **ゼロ知識証明の例 2**
 > ベース $g$ に対して秘密 $x$ から DLP
-> 1. コミットメント: 乱数 $r$ と $u = g^r \bmod p$
-> 2. チャレンジ: 乱数 $c$
+> 1. コミットメント: 乱数 $r\in\mathbb{F}_p$ と $u = g^r \bmod p$
+> 2. チャレンジ: 乱数 $c\in\mathbb{F}_p$
 > 3. 証明: $z = r + xc\bmod q$
 > 4. 検証: $g^z \equiv uy^c\bmod p$
 
@@ -159,7 +159,7 @@ sequenceDiagram
 
 対話型のゼロ知識証明を非対話化させる為にはコミットメントをハッシュ関数に通したものをチャレンジとすることで非対話型となります。ハッシュ関数がランダムオラクルモデル (決定論的な乱数生成) であることを仮定しています。
 
-[Fiat-Shamir 変換](https://link.springer.com/content/pdf/10.1007/3-540-47721-7_12.pdf) は [Gennaroら](https://eprint.iacr.org/2012/215.pdf) が効率的な非対話化方式を編み出したらしいが、読んでないので紹介できず。
+[Fiat-Shamir 変換](https://link.springer.com/content/pdf/10.1007/3-540-47721-7_12.pdf) は Gennaro らが [効率的な非対話化方式](https://eprint.iacr.org/2012/215.pdf) を編み出したらしいが、読んでないので紹介できず。
 
 > **Fiat-Shamir 変換**
 > 1. 証明者は乱数や公開鍵などの公開情報をハッシュ化した $e = H(x)$ と $s = r - xe$ を送る。
@@ -167,9 +167,9 @@ sequenceDiagram
 > 3. 検証者は $x' = g^yp^{H(x)}$ $b := H(com)$
 
 チャレンジにすべての公開値を含めないと Frozen Heart プロトコルや実装による脆弱性。
-- [Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
+[Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
 
-> **DLP のゼロ知識証明**
+> **非対話型ゼロ知識証明の例 1**
 > 1. 証明者はコミットメント $u = g^r$、チャレンジ $c = H(g, q, h, u)$、証明 $z = r + xc$ を作成して送る。
 > 2. 検証者は $c \equiv H(g, q, h, u)$、$g^z \equiv uh^c$ を検証する。
 
@@ -208,8 +208,6 @@ Intel HEXL
 > 1. 鍵生成 : $0$ 以上 $r$ 未満の乱数 $s$ を一つ取り秘密鍵とします。公開鍵は $sQ$ です。
 > 2. 署名 : メッセージ $m$ に対してそのハッシュ値 $H(m)$ をとり、秘密鍵 $s$ 倍して署名 $sH(m)$ を作ります。
 > 3. 検証 : メッセージ $m$ と署名 $σ$ をもらった人は自分でハッシュ値 $H(m)$ を計算し公開鍵 $sQ$ を使って
-
-双線形写像 (Bilinear map) (ペアリング)
 
 署名の方法にはいろいろありますが、暗号のレイヤーを抽象化すると
 
