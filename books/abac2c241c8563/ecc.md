@@ -362,7 +362,7 @@ def miller(E, P, Q, m):
 ```
 
 > **Weil pairing**
-> $e_m: E[m]\times E[m] \to \mu_m$ となる
+> Miller's algorithm で得た因子 $f_P, f_Q$ から得られる $e_m: E[m]\times E[m] \to \mu_m$ を Weil pairing という。
 >
 > $$
 e_m(P, Q) = \frac{f_P(Q + S)}{f_P(S)}\bigg/\frac{f_Q(P - S)}{f_Q(-S)}
@@ -392,7 +392,7 @@ def weil_pairing(E, P, Q, m, S=None):
     return (fpqs / fps) / (fqps / fqs)
 ```
 
-Weil pairing の代替として Tate-Lichtenbaum Pairing というペアリングも使います。
+Weil pairing は比較的遅く、Weil pairing の代替として Tate-Lichtenbaum Pairing というペアリングがあります。
 
 > **Def. Tate-Lichtenbaum Pairing**
 > 楕円曲線 $E/K$ に対し 整数 $m$
@@ -409,8 +409,8 @@ $$
 & \tau(P, T) = f(P)\bmod (K^\times)^m
 \end{aligned}
 $$
-
-$$
+>
+> $$
 K^\times/(K^\times)^m\to H^1(G_{\overline{K}/K}, \mu_m)
 $$
 
@@ -438,7 +438,11 @@ def tate_pairing(E, P, Q, m, k=2):
 ```
 
 $E(\mathbb{F}_{p^k}^\times)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
-必要となる最小の拡大次数 $d$ を埋め込み次数という。
+
+> **埋め込み次数**
+> 必要となる最小の拡大次数 $d$ を埋め込み次数という。
+
+$\mu_m$ の埋め込み次数が小さい楕円曲線ならば ECDLP より FFDLP の方が素早く計算できそうです。そのような楕円曲線というのが Supersingular な楕円曲線です。
 
 > **Prop.**
 > Supersingular な楕円曲線の埋め込み次数は $6$ 以下である。
@@ -466,11 +470,10 @@ $\Box$
 > ペアリング $f$ について
 > $e_m(P, Q)$
 >
+> - Weil pairing を用いるものを MOV (Menezes-Okamoto-Vanstone) Reduction という。
+> - Tate pairing を用いるものを FR (Frey-Rück) Reduction という。
 
-- Weil pairing を用いて MOV Reduction; Menezes-Okamoto-Vanstone Reduction という。
-- Tate pairing を用いて Miller's algorithm を回すのを FR Reduction; Frey-Rück Reduction という。
-
-FFDLP に落とし込めるが埋め込み次数が高いと ECDLP の方が計算量が小さくなってしまうので
+任意の楕円曲線も FFDLP に落とし込めますが、埋め込み次数が高いと ECDLP を解いた方が早いともなります。
 
 `tate_pairing(E, P, Q.distortion_map(), m)`
 
