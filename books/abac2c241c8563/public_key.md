@@ -130,7 +130,7 @@ sequenceDiagram
 > 4. 検証: $z^2 \equiv uy^c\bmod n$
 
 > **ゼロ知識証明の例 2**
-> ベース $g$ に対して秘密 $x$ から DLP
+> 生成元 $g$ に対して DLP $g^x$ を用いて秘密 $x$ をゼロ知識証明する。
 > 1. コミットメント: 乱数 $r\in\mathbb{F}_p$ と $u = g^r \bmod p$
 > 2. チャレンジ: 乱数 $c\in\mathbb{F}_p$
 > 3. 証明: $z = r + xc\bmod q$
