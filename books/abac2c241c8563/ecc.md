@@ -307,7 +307,7 @@ f(x, y_1y_2) = f(x, y_1)f(x, y_2)
 \end{aligned}
 $$
 
-楕円曲線暗号では Weil pairing や Tate pairing などを使いますが、これらのペアリングは因子 (divisor) と呼ばれる概念を通じて理解します。
+楕円曲線暗号では Weil pairing や Tate pairing などのペアリングを使いますが、これらのペアリングは因子 (divisor) と呼ばれる概念を通じて理解します。
 
 > **Def. 因子 (divisor)**
 > $\mathcal{D} \in\mathrm{Div}(C)$ 自由アーベル群
@@ -563,8 +563,11 @@ def SingularCusp(a, b, p):
 
 $y = 0$ 上の特異点が原点 $O(0, 0)$ となるように平行移動させると $y^2 = x^3 + kx^2$ となる。
 
-$(\partial F/\partial x, \partial F/\partial y) = (3x^2 + 2kx, 2y)$ より特異点が原点しかないことがわかります。このとき $y = \lambda x$ との交点を考えます。$P = (\lambda^2 - k, \lambda(\lambda^2 - k))$
-これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^\times$ を次のように定義する。
+$$
+\left(\frac{\partial F}{\partial x}, \frac{\partial F}{\partial y}\right) = ((3x + 2k)x, 2y)
+$$
+
+より特異点が原点しかないことがわかります。このとき $y = \lambda x$ との交点を考えます。$P = (\lambda^2 - k, \lambda(\lambda^2 - k))$ これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^\times$ を次のように定義する。
 
 $$
 \begin{aligned}
@@ -600,6 +603,16 @@ def SingularNode(a, b, p):
 ```
 
 ### Invalid Curve Attack
+楕円曲線に乗らない点を乗っているように演算すると位数の小さい点となる。
+
+> **Prop.**
+> 位数が小さくなりがち
+
+**Proof.**
+
+$\Box$
+
+これを用いて中国剰余定理で ECDLP が解ける。
 
 :::message
 **練習問題**
@@ -614,12 +627,14 @@ $$
 y^2 + h(x)y = f(x)
 $$
 
-$$
-f(x) = x^{2g+1} + a_{2g}x^{2g} + \cdots + a_1x + a_0 \in\mathbb{F}_p[x] \\
-C: y^2 = f(x)
+> **Def. 超楕円曲線**
+> 体 $K$
+> $\deg f = 2g + 1$ と書けるなら虚超楕円曲線と呼び、$g$ を種数
+>
+> $$
+C/K: y^2 = x^{2g+1} + a_{2g}x^{2g} + \cdots + a_1x + a_0
 $$
 
-$\deg f = 2g + 1$ と書けるなら虚超楕円曲線と呼び、$g$ を種数
 
 > **加算アルゴリズム**
 > まず $d = \gcd(u_1, u_2, v_1 + v_2 + h) = s_1u_1 + s_2u_2 + s_3(v_1 + v_2 + h)$ を計算し、次のように加算を行う。
