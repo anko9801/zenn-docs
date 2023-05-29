@@ -600,17 +600,45 @@ $$
 
 楕円曲線の曲線は高々 1 回交わることになるので 2 つのタイプに分けられます。1 つは普通に交わるノード、もう 1 つは自分自身と接しながら交わるカスプです。
 
+#### カスプ
+
+どんな尖っている楕円曲線も平行移動や線形変換により $y^2 = x^3$ の形になります。
+
+このとき $y = \lambda x$ との交点は $(\lambda^2, \lambda^3)$ 、接線は $y = 0$ となります。
+これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^+$ を次のように定義する。
+
+$$
+f(x,y) = \frac{x}{y} \\
+f(\infty) = 0
+$$
+
+これは $\mathbb{F}_p^+$ の DLP となる。
+
+```python
+def SingularCusp(a, b, p):
+    PR.<x> = PolynomialRing(GF(p))
+    E = x^3 + a*x + b
+    roots = E.roots()
+    dx = next(filter(lambda x: x[1] == 3, roots))[0]
+    dy = 0
+
+    def f(P):
+        if P == 0:
+            return 0
+        x, y = P[0], P[1]
+        return x / y
+
+    g = f((gx - dx, gy - dy))
+    p = f((px - dx, py - dy))
+    return p / g
+```
+
 #### ノード
 
 $y = 0$ 上の特異点が原点 $O(0, 0)$ となるように平行移動させると $y^2 = x^3 + kx^2$ となる。
 
-$(\partial F/\partial x, \partial F/\partial y) = (3x^2 + 2kx, 2y)$ より特異点が原点しかないことがわかります。
-このとき $y = \lambda x$ との交点を考えます。
-まず接線となる。
-
-$P = (\lambda^2 - k, \lambda(\lambda^2 - k))$
-
-$f: E/\mathbb{F}_p \to \mathbb{F}_p^\times$
+$(\partial F/\partial x, \partial F/\partial y) = (3x^2 + 2kx, 2y)$ より特異点が原点しかないことがわかります。このとき $y = \lambda x$ との交点を考えます。$P = (\lambda^2 - k, \lambda(\lambda^2 - k))$
+これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^\times$ を次のように定義する。
 
 $$
 \begin{aligned}
@@ -619,20 +647,31 @@ f(\infty) & = 1
 \end{aligned}
 $$
 
-#### カスプ
+これは $\mathbb{F}_p^\times$ の DLP となる。
 
-どんな尖っている楕円曲線も平行移動や線形変換により $y^2 = x^3$ の形になります。
+```python
+def SingularNode(a, b, p):
+    PR.<x> = PolynomialRing(GF(p))
+    E = x^3 + a*x + b
+    roots = E.roots()
+    dx = next(filter(lambda x: x[1] == 2, roots))[0]
+    dy = 0
 
-このとき $y = \lambda x$ との交点は $(\lambda^2, \lambda^3)$ 、接線は $y = 0$ となります。
+    E_ = E.subs(x = x + dx)
+    roots = E_.roots()
+    k = next(filter(lambda x: x[1] == 1, roots))[0]
+    k = (-k).square_root()
 
-$f:E/\mathbb{F}_p \to \mathbb{F}_p^+$
+    def f(P):
+        if P == 0:
+            return 1
+        x, y = P[0], P[1]
+        return (y + k * x) / (y - k * x)
 
-$$
-f(x,y) = \frac{x}{y} \\
-f(\infty) = 0
-$$
-
-
+    g = f((gx - dx, gy - dy))
+    p = f((px - dx, py - dy))
+    return p.log(g)
+```
 
 ### Invalid Curve Attack
 
