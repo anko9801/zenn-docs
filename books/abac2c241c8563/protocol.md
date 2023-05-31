@@ -131,7 +131,7 @@ Controlled-Channel Attacks、Sealing Replay Attack、Foreshadow、Plundervolt、
 
 例えば準同型暗号には次のようなものがあります。
 
-> Unpadded RSA (乗法準同型暗号)
+> **Unpadded RSA (乗法準同型暗号)**
 >
 > $$
 \begin{aligned}
@@ -141,7 +141,7 @@ Controlled-Channel Attacks、Sealing Replay Attack、Foreshadow、Plundervolt、
 \end{aligned}
 $$
 
-> ElGamal暗号 (乗法準同型暗号)
+> **ElGamal暗号 (乗法準同型暗号)**
 >
 > $$
 \begin{aligned}
@@ -151,7 +151,7 @@ $$
 \end{aligned}
 $$
 
-> Paillier暗号 (加法準同型暗号)
+> **Paillier暗号 (加法準同型暗号)**
 >
 > $$
 \begin{aligned}
@@ -161,7 +161,7 @@ $$
 \end{aligned}
 $$
 
-> Lifted-ElGamal暗号 (レベル $2$ 準同型暗号)
+> **Lifted-ElGamal暗号 (レベル 2 準同型暗号)**
 > 楕円曲線 $E/\mathbb{F}_p$, と生成元 $P\in E$
 > 秘密鍵 $s\in\mathbb{F}_p$ と公開鍵 $sP$
 > 平文 $m$ に対して乱数 $r$ をとり $c=(mP+rsP, rP)$
