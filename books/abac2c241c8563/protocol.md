@@ -37,7 +37,23 @@ title: "より高機能な暗号"
 - 準同型暗号
 - 検索可能暗号
 
-> **秘密分散 (Secret Sharing)**
+ここで目標を提示する。
+秘匿検索システム
+特許検索、紛失検索、医学データベース等
+Beacon検索, ゲノム配列解析, 医療関連文書検索, 決定木の評価, 化合物検索
+
+ゲノムは 40 塩基で個人情報と成り得ます。
+保有するゲノム配列をデータベースと照合して、疾患リスクを算出したい。
+ただゲノム配列は秘密
+互いのゲノム配列を秘密にしたまま検索できないのか
+指紋情報
+
+両者の持つ機密情報を不正させずに共有することを実現する紛失通信を学ぶ。
+信頼できる第三者がいれば、両者の機密情報をそこに渡し、両者に配ればよい。
+
+https://www.ntt.com/business/services/secihi.html
+
+> **Def. 秘密分散 (Secret Sharing)**
 > 秘密情報を $n$ 個に分割して $t$ 個以上わかれば情報を復元でき、$t$ 個未満であれば全く復元出来ないように分散できるもの。
 
 > **秘密分散の例 1 (Shamir's secret sharing)**
@@ -50,17 +66,12 @@ title: "より高機能な暗号"
 >
 > これは $n$ 枚中 $t$ 枚以上分かると $1$ つの点で交わり、$t$ 枚未満だと分からないので秘密分散の性質を満たす。 (でも例 1 とは違って次元が絞られるのでは？)
 
-https://www.ntt.com/business/services/secihi.html
 
 :::message
 **練習問題**
 zer0pts CTF 2020 より dirty laundry
 :::
 
-次に両者の持つ機密情報を不正させずに共有することを実現する紛失通信を学ぶ。
-信頼できる第三者がいれば、両者の機密情報をそこに渡し、両者に配ればよい。
-
-特許検索、紛失検索、医学データベース等
 
 > **Def. 紛失通信 (Oblivious Transfer)**
 > 送信者は $n$ 個のメッセージを保有し、受信者はその内 $k$ 個を受信したいとする。このとき送信者が送った $n$ 個のメッセージのうち、どの $k$ 個を受信したか送信者が分からないような通信を k-out of-n 紛失通信という。
@@ -77,17 +88,21 @@ zer0pts CTF 2020 より dirty laundry
 受信者は送られてきた情報のうち、一つの情報以外は得られない
 2. 一方が不正に誤った情報を送る
 
-> **Goldwasser–Micali cryptosystem**
+DDH assumption によって大幅に緩和された
 
-> **秘匿共通集合演算 (Private Set Intersection)**
+紛失通信プロトコルを用いて秘匿共通集合演算プロトコルというものを実現できる。
 
-秘密計算といえば TEE
-Intel SGX
-Controlled-Channel Attacks、Sealing Replay Attack、Foreshadow、Plundervolt、LVI、ÆPIC Leakなど
+> **Def. 秘匿共通集合演算 (Private Set Intersection)**
+>
+
+**Goldwasser–Micali cryptosystem**
+
+> **Def. TEE**
+> TEE Intel SGX
+> Controlled-Channel Attacks、Sealing Replay Attack、Foreshadow、Plundervolt、LVI、ÆPIC Leakなど
 
 > **検索可能暗号 (Publickey Encryption with Keyword Serach)**
 > 暗号 + 全順序準同型
-
 完全一致
 部分一致
 大小比較
@@ -98,7 +113,6 @@ Controlled-Channel Attacks、Sealing Replay Attack、Foreshadow、Plundervolt、
 データに含まれる文字列を検索
 異なるテーブルデータに対して結合しつつ検索
 複雑な複合クエリを用いた検索
-
 正規表現いけそう
 
 
@@ -189,9 +203,6 @@ $$
 &=e(mP_1,m'P_2)=e(P_1,P_2)^{mm'}
 \end{aligned}
 $$
-
-
-
 
 ### 完全準同型暗号
 格子ベースの暗号で完全準同型暗号
