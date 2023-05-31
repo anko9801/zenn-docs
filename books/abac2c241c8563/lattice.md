@@ -914,3 +914,8 @@ c = enc.encrypt(m)
 _m = enc.decrypt(c)
 assert m == _m
 ```
+
+## まとめ
+
+## 参考文献
+- https://www.cryptrec.go.jp/exreport/cryptrec-ex-2404-2014.pdf
