@@ -919,3 +919,4 @@ assert m == _m
 
 ## 参考文献
 - https://www.cryptrec.go.jp/exreport/cryptrec-ex-2404-2014.pdf
+- https://joint.imi.kyushu-u.ac.jp/wp-content/uploads/2022/08/220801_03hiromasa.pdf
