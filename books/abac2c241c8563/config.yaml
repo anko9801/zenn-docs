@@ -10,11 +10,10 @@ chapters:
   - public_key
   - rsa
   - ecc
-  - hash
   - random
   - lattice
   - post_quantum
   - homomorphic
   - protocol
-  - environment
+  - tools
   - math

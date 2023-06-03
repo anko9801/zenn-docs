@@ -1,5 +1,5 @@
 ---
-title: "乱数生成とSMT"
+title: "ハッシュと乱数生成"
 ---
 
 誰にも予測できないような乱数を作るにはどうすればいいでしょうか？
@@ -215,132 +215,6 @@ $r_i$ は剰余未満の数であり、その上位 2 バイト程を削除し�
 ### コラム
 乱数調整
 
-## SAT と SMT
-命題論理式
-
-> **連言標準形 (CNF; Conjunctive Normal Form)**
-> 変数 $A$ に関して $A, \lnot A$ をリテラルと定義する。このとき連言標準形とはリテラル $l_{i,j}$ に対して次のように書ける命題論理式である。
->
-> $$
-\bigwedge_i\bigvee_j l_{i,j}
-$$
->
-> このとき $\bigvee_j l_{i,j}$ を節という。
-
-例えば次のような論理式は CNF です。
-
-$$
-\begin{aligned}
-& A\land B \\
-& \lnot A\land(B\lor C) \\
-& (A\lor B)\land(\lnot B\lor C\lor\lnot D)\land(D\lor\lnot E) \\
-& (\lnot B\lor C).
-\end{aligned}
-$$
-
-次のような論理式は CNF ではありません。
-
-$$
-\begin{aligned}
-& \lnot(B\lor C) \\
-& (A\land B)\lor C \\
-& A\land(B\lor(D\land E)).
-\end{aligned}
-$$
-
-二重否定の除去、ド・モルガンの法則、分配法則などを用いて CNF に変換することができます。実際、次のアルゴリズムが知られています。
-
-> **Tseitin Encoding**
-> 任意の命題論理式を CNF に変換するアルゴリズムが存在する。
-
-これより上で示した CNF でない論理式を CNF に変換でき、次のようになります。
-
-$$
-\begin{aligned}
-& \lnot B\land\lnot C \\
-& (A\lor C)\land(B\lor C) \\
-& A\land(B\lor D)\land(B\lor E).
-\end{aligned}
-$$
-
-CNF のような命題論理式について変数の値がどのようなときに真になるかを考えます。
-
-> **充足可能性問題 (SAT; SATisfiability problem)**
-> ある命題論理式が与えられたとき、それを満たす変数の値を定める問題を充足可能性問題 SAT という。
-
-SAT は NP 完全です。
-
-$$
-(A\land\lnot B\land\lnot C)\lor(B\land C\land\lnot D)\land(\lnot B\lor\lnot C)
-$$
-
-これは $(A,B,C,D)=(\top,\bot,\bot,\top)$ のときのみ上の論理式を満たします。
-
-SAT を解くアルゴリズムを SAT ソルバといい、CNF に変換すると何かと解析しやすいので CNF に絞って考えます。
-
-まずは単純に全探索を考えます。リテラルが 1 つしかない節を単位節と呼ぶとして次の操作を繰り返します。
-
-1. 単位節があればその変数の値は確定する
-2. 単位節がなければ変数のどれか1つを深さ優先探索する
-3. コンフリクトしたなら失敗、コンフリクトなしに変数を全て割り当てられたら成功とする
-
-これは DPLL (Davis Putnam Logemann Loveland) アルゴリズムと呼ばれています。
-
-この全探索に加え、コンフリクトしたときにその探索状態だと失敗することを条件に入れます。この操作を節学習と呼び、節学習されて条件が多くなると、探索をしなくて済むようになり高速化します。これを CDCL (Constrait-Driven Clause Learning) アルゴリズムと呼び、これにより SAT ソルバは画期的に速くなります。
-
-この資料がわかりやすいなと思っています。
-
-https://www.youtube.com/watch?v=d76e4hV1iJY&t=760s
-
-実装は節 $x_k$, $\lnot x_k$ はそれぞれ $2k$, $2k+1$ と表して合計で $2n$ 個の配列が必要になり、各節はリテラルのポインタを格納するリンクリストを持ちます。各変数は探索する変数の優先順位を決定させるスコアを持ち、$i$ 回目にコンフリクト時にコンフリクトした変数のスコアに $\rho^{-i}$ だけ足されます。(ex. $\rho=0.95$) つまり後の方になればなるほど増加するスピードが速くなり、古いコンフリクトは無視されるようになります。
-
-このように命題論理式は SAT ソルバを用いて解くことができます。SAT ソルバだけでもかなり有用なツールですが、ここではさらに発展させて SAT について実数、整数、リスト、配列、文字列など様々なデータ構造を含む、より複雑な数式に一般化した問題を考えます。
-
-> **SMT; Satisfiability Modulo Theories**
-> ある数式が与えられたとき、それを満たす変数の値を定める問題を SMT という。
-
-SMT ソルバはいろいろな応用先があり、例えば次のようなものがあります。
-
-- 数式に帰着できるすべての問題のソルバ
-かなり凄い、ネットワークの
-- 形式手法 / モデル検査
-  - TLA+
-  - seL4
-- シンボリック実行エンジン
-- 自動定理証明支援系
-- Differential Cryptoanalysis
-
-SMT ソルバのアルゴリズムには EUF; Equality logic with Uninterpreted Functions や BitVector などがありますが、今回は BitVector のみを紹介します。
-
-> **BitVector**
-> $n$ ビットの四則演算などの演算について、それぞれのビットに関する論理式を立てることで SMT を SAT に置き換えることができる。
-
-使われる演算としては $a\land b$, $\lnot a$, $a < b$, $a = b$, $a[i]$, $\sim a$, $a\mathop{\|}b$, $a\mathop{\&}b$, $a \oplus b$, $a \ll b$, $a \gg b$, $a + b$, $a - b$, $a \times b$, $a / b$, $\mathrm{ext}(a)$, $a\circ b$, $a[b:c]$, $c?a:b$ などなので、これらを論理式に落とせることは CPU を自作したことがある人ならわかると思います。
-
-例えば 1 ビットの $a + b$ なら $a + b = a\oplus b = (a\land\lnot b)\lor(\lnot a\land b)$ と置き換えられます。
-
-デファクトスタンダードな SMT ソルバに Z3 があります。
-Z3 を使える言語は C, C++, JavaScript, Python, Rust などなど、今回は Python でやっていきます。
-
-```python
-bool, int, float, float32, double, real, string, array, set, enumeration, bitvector
-BitVec()
-IntVector()
-Real()
-from z3 import Solver, Context, RecFunction, RecAddDefinition, IntSort, Int, If, simplify
-
-ctx = Context()
-f = RecFunction("f", IntSort(ctx), IntSort(ctx))
-x = Int("x", ctx)
-RecAddDefinition(f, x, If(x <= 2, 1, f(x-1) + f(x-2)))
-
-solver = Solver(ctx=ctx)
-solver.add(f(x) == 10946)
-
-print(solver.check())
-print(solver.model())
-```
-
 ## 安全性
 このように疑似乱数や公開鍵暗号などは無限の計算能力を持つ攻撃者の前では SMT を用いて内部情報を取り出したり、公開鍵から秘密鍵を求めたりと攻撃できてしまうので、現代暗号の標準モデルでは限られた計算能力を持つ攻撃者 (確率的多項式時間チューリングマシン) を仮定します。
 
@@ -354,17 +228,111 @@ print(solver.model())
 
 疑似乱数性を満たすなら安全な疑似乱数であるとすればよさそうです。
 
+## ハッシュ関数
+信頼できないソースの正当性を証明するものというのは世界中で必要とされています。
+
+> **ハッシュ関数**
+>
+
+CRC
+
+> **暗号学的ハッシュ関数**
+>
+
+- MD5
+- [SHA; Secure Hash Algorithm](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf)
+  - 現代で最も使われている
+
+暗号ではパスワードの保存や HMAC, 署名などに使われていたりします。ただ暗号で使うためには攻撃者がハッシュ値に対する元の入力に関する情報を得られないようにしないといけません。これを原像計算困難性といいます。
+
+![](/images/hash.png)
+
+これを満たしたハッシュというのは実際にあります。MD5 や SHA1, SHA-256 などなど、まぁそれぞれのハッシュの実装は結構荒っぽく作られてるので詳細は省きます。ただし攻撃するときの重要な性質として Merkle-Damgård construction というものがあるのでそれだけ知っておきましょう。
+
+### Merkle-Damgård construction
+ハッシュ関数は任意長のメッセージを固定長の出力に変換しないといけません。その為に入力を固定長のブロックに分割し、1つずつ内部状態に適用させます。
+![](/images/length_extension.png)
+
+MD5 や SHA-1 などよく使われるハッシュ関数はこれです。このときに成立する攻撃というのが伸長攻撃です。伸長攻撃には慎重につってね！フゥーワッ！
+
+## ハッシュの応用
+まず SHA-256 などの暗号学的ハッシュ関数を使う一番の例としては改ざん検知です。SHA-256 をそのまま貼り付けるのと HMAC
+
+HMAC はハッシュを用いるメッセージ認証コード (Message Authentication Codes; MAC) で改ざん検知を行います。
+
+> **HMAC; Hash-based MAC**
+> 秘密鍵 $K$ とハッシュ値長 $B$ として次のように定義します。
+>
+> $$
+\begin{aligned}
+pad_{in} & := \overbrace{\mathrm{0x36}\|\cdots\|\mathrm{0x36}}^B \\
+pad_{out} & := \overbrace{\mathrm{0x5C}\|\cdots\|\mathrm{0x5C}}^B \\
+\mathrm{HMAC}(K, V) & := H(K \oplus pad_{out} \| H(K \oplus pad_{in} \| V))
+\end{aligned}
+$$
+
+CRC とはビット列を有限体を用いて短いビット列に変換するハッシュ関数です。CRC はデータ転送時の誤り検出に用いられています。ただ CRC は暗号学的ハッシュ関数ではないので改ざんには弱いです。
+
+> **巡回冗長検査 (CRC; Cyclic Redundancy Check)**
+> 有限体 $\mathbb{F}_{2^n} \cong \mathbb{F}_2[x]/(f(x))$ 上の関数 $g(m) = mx^n$ をハッシュ関数とする冗長検査を CRC という。
+
+有限体を構成する多項式 $f(x)\in\mathbb{F}_2[x]$ は次数 $n$ の既約多項式です。これを生成多項式といいます。例えば生成多項式が $f(x) = x^4 + x + 1$ (CRC-4-ITU) のときのハッシュ化において入力が $1011000_{(2)}$ なら $x^6 + x^4 + x^3$ と対応して次の計算から出力は $1111_{(2)}$ となります。
+
+$$
+\begin{aligned}
+g(x^6 + x^4 + x^3) & = (x^6 + x^4 + x^3)x^4 = x^{10} + x^8 + x^7 \\
+& = x^3 + x^2 + x + 1 \pmod{x^4 + x + 1}
+\end{aligned}
+$$
+
+実際に使われる CRC-32 では次の生成多項式を用います。
+
+$$
+x^{32} + x^{26} + x^{23} + x^{22} + x^{16} + x^{12} + x^{11} + x^{10} + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+$$
+
+実装では多項式を反転させてビット演算に落とし込むことで高速化できます。
+
+> **ブロックチェーン**
+
+## ハッシュへの攻撃
+原像計算が攻撃
+
+### データベース
+大量の種類の平文とそのハッシュ値をデータベースに入れてハッシュ値から平文を出力するようなシステムを構成でき、それを逆ハッシュと言います。
+
+### 伸長攻撃 (Length Extension Attack)
+$H(m_1)$ から $H(m_1\|m_2)$ を求める
+
+https://github.com/bwall/HashPump
+https://pypi.org/project/hashpumpy/1.0/
+
+### 誕生日攻撃 (Birthday Attack)
+誕生日のパラドックスを用いた攻撃です。
+
+> **Def. ハッシュ値の衝突**
+> $H(m_1) = H(m_2)$ となる異なる $m_1, m_2$ が発見された状態
+
+この衝突を恣意的に起こせるとハッシュ値で改ざんを検知してるシステムを騙すことが出来てしまいます。これは誕生日攻撃を用いて恣意的に起こすことができます。
+
+誕生日攻撃というのはハッシュ値のビット数を $n$ として平文 $m$ とそのハッシュ値 $H(m)$ の対応を $O(2^{n/2})$ 程度集めるとハッシュが同じとなるような $m$ が $50\%$ の確率で見つかるという誕生日のパラドックスによる攻撃です。
+
+https://github.com/corkami/collisions
+https://github.com/cr-marcstevens/hashclash
+
+### Differenctial Cryptoanalysis
+暗号を解析しながら SMT を用いて解く
+
+ランダムオラクルモデル
+スタンダードモデル
+
 ## まとめ
+また[準同型のハッシュ関数](https://github.com/benwr/bromberg_sl2)などもあり、発展も期待です。
 
 ## 参考文献
-
+- [Length Extension Attackの原理と実装](https://ptr-yudai.hatenablog.com/entry/2018/08/28/205129)
+- https://vividot-de.fi/entry/beanstalk-exploit
 - [メルセンヌ・ツイスタをわかった気になる](https://6715.jp/posts/5/)
 - [Mersenne Twisterの出力を推測してみる](https://inaz2.hatenablog.com/entry/2016/03/07/194147)
-- [SAT/SMTソルバの仕組み](https://www.slideshare.net/sakai/satsmt)
-- [ミュンヘン工科大学の夏学期の自動推論に関する授業](https://www21.in.tum.de/teaching/sar/SS20/)
-- [SATソルバ・SMTソルバの技術と応用](https://www.jstage.jst.go.jp/article/jssst/27/3/27_3_3_24/_pdf)
-- [TokyoWesterns の z3 解説](https://wiki.mma.club.uec.ac.jp/CTF/Toolkit/z3py)
-
-SAT / SMT ソルバの入力形式は DIMACS / SMT-LIBv2 を用います。
 
 この資料は CC0 ライセンスです。
