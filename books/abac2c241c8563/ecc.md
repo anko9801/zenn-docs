@@ -149,7 +149,7 @@ $$
 t(x^q, y^q) = (x^{q^2}, y^{q^2}) + q(x, y)
 $$
 
-Hasse の定理より $t\approx 2\sqrt{q}$ とかなり大きいので全探索では間に合わなさそうです。これを中国剰余定理によって $t$ を求めるというのが Schoof のアルゴリズムです。
+Hasse の定理より $t\approx 2\sqrt{q}$ とかなり大きいので全探索で $t$ を求めるのは間に合わなさそうです。Schoof のアルゴリズムは中国剰余定理を使ってこの問題を高速に求めます。
 
 > **Schoof のアルゴリズム**
 > 楕円曲線 $E/\mathbb{F}_q$ の位数 $\#E(\mathbb{F}_q)$ を $O(\log^8q)$ で求められる。
@@ -340,7 +340,7 @@ $$
 > $\mu_m$ $\mu_m\subseteq\mathbb{F}_{q^d}^\times$
 >
 > $$
-h_{P, Q} = \begin{dcases}
+h_{P, Q}(x, y) = \begin{dcases}
 \frac{y - y_P - \lambda(x - x_P)}{x + x_P + x_Q - \lambda^2 - a_1\lambda + a_2} & (\lambda\neq\infty) \\
 x - x_P & (\lambda = \infty)
 \end{dcases}
