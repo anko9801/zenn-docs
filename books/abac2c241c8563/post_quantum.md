@@ -69,7 +69,7 @@ $$
 > **SDP; Syndrome Decoding Problem**
 > SDP とは符号長 $n$ として次元 $k$ をパリティ検査行列 $\boldsymbol{H}\in\mathbb{F}_2^{(n-k)\times n}$ とシンドローム $\boldsymbol{s}\in\mathbb{F}_2^{n-k}$ に対して $\boldsymbol{eH}^T = \boldsymbol{s}$ となるハミング重みが $w$ の $\boldsymbol{e}\in\mathbb{F}_2^n$ を求める問題である。
 
-つまりハミング重み $w$ の符号 $\boldsymbol{e}$ をパリティチェックすると $\boldsymbol{s}$ となるような $\boldsymbol{e}$ を求める問題です。
+つまり $w$ 個の 1 があるビット列 $\boldsymbol{e}$ に行列を作用させると $\boldsymbol{s}$ となるような $\boldsymbol{e}$ を求める問題です。
 
 これは LWE 問題の派生と見ることができます。
 
@@ -90,7 +90,8 @@ TODO: これがなぜ暗号となるのか？
 CSIDH
 現在 SIKE しかありませんが攻撃が見つかっている為選考に残るのは難しいです。
 
-### SIKE
+### 暗号の構成
+**SIKE**
 $p = w_A^{e_A}w_b^{e_B}f \pm 1$
 $\mathbb{F}_{p^2}$ 上の超特異楕円曲線 $E$
 位数 $w_A^{e_A}$ である点 $P_A, Q_A$ と位数 $w_B^{e_B}$ である点 $P_B, Q_B$
@@ -119,9 +120,8 @@ E = EllipticCurve(x^3 + x)
 E = EllipticCurve(x^3 + 6*x^2 + x)
 ```
 
-### SIKE への攻撃
-
-
+### 攻撃
+SIKE
 
 > **Thm. Kani's theorem**
 
@@ -167,11 +167,16 @@ randomized tree-based stateless signature
 > 松本勉と今井秀樹は隠れ単項式暗号系というエレガントな方法を 1988 年開催の国際会議 EUROCRYPT で発表した。これは現在、松本-今井暗号と呼ばれている。1996年、パタリン (J. Patarin) は松本-今井暗号を解読し、翌 97 年、松本-今井暗号を拡張した HFE (Hidden Field Equation) を提案した。この HFE は 2003 年に J.-C. Fauge`re と A. Joux により、グレブナー基底という一見直截的な攻撃法によって破られている。
 > 暗号理論と楕円曲線より
 
+### 暗号の構成
+> **MQ 問題**
+> 有限体 $\mathbb{F}_q$ 上を係数とする $m$ 個の $n$ 変数の $2$ 次多項式の共通解をひとつ求めよ
+
 > **Def. 松本-今井暗号**
 > $v$
 
-> **MQ 問題**
-> 有限体 $\mathbb{F}_q$ 上を係数とする $m$ 個の $n$ 変数の $2$ 次多項式の共通解をひとつ求めよ
+
+
+### 攻撃
 
 グレブナー基底
 

@@ -892,12 +892,12 @@ $$
 
 $$
 \begin{aligned}
-f_1(x, y) & = x^e - c_1 & (\mathrm{over}\ \mathbb{Z}) \\
-f_2(x, y) & = (x + y)^e - c_2 & (\mathrm{over}\ \mathbb{Z})
+f_1(x, y) & = x^e - c_1 & \pmod{N} \\
+f_2(x, y) & = (x + y)^e - c_2 & \pmod{N}
 \end{aligned}
 $$
 
-$x$ に関して $f_1$ と $f_2$ に同一の解があるとき、それらの終結式 $\mathrm{Res}(f_1, f_2)$ は $\mathrm{Res}(f_1, f_2) = 0$ を満たします。このとき $\mathrm{Res}(f_1, f_2) = 0 \pmod{N}$ は $y$ の方程式であり、 Coppersmith Method を用いて $y = r$ と求まります。
+$x$ に関して $f_1$ と $f_2$ に同一の解があるとき、それらの終結式 $\mathrm{Res}(f_1, f_2)$ は $\mathrm{Res}(f_1, f_2) = 0$ を満たします。このとき $\mathrm{Res}(f_1, f_2) = 0$ は $y$ の方程式である為、小さい解 $r$ を持つ $y$ は Coppersmith Method を用いて $y = r$ と求まります。
 
 Approximate GCD Problem
 
