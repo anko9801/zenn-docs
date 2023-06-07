@@ -9,7 +9,7 @@ title: "楕円曲線暗号への攻撃"
 - 超楕円曲線暗号の紹介
 - 超特異同種写像暗号の実装と攻撃
 
-楕円曲線の理論は本来、群環体、ガロア理論、可換環論、代数幾何学と理解した先で学習します。一番基礎となる群論などの部分は計算機代数の章で紹介しました。それを前提知識として周辺知識を絡め取りながら説明していきます。なのでとりあえず計算機代数は読んでください。
+楕円曲線の理論は本来、群環体、ガロア理論、可換環論、ホモロジー代数、代数幾何学と理解した先で学習します。私も楕円曲線暗号がわからなくて shiho さんを呼んで輪読会を生やして、最初は群環体から勉強していって10ヶ月以上掛けて紆余曲折しながらやっとここまで理解できるようになりました。ただ同じ道を歩ませたいという気持ちはあまりなくて、最短経路を作って楕円曲線をより理解を深めてほしいという気持ちで書いています。でも運がよければ楕円曲線を勉強したいと思う人が一人でも増えてくれたらと思います。一番基礎となる群論などの部分は計算機代数の章で紹介しましたので、とりあえずそこだけは読んで頂きたいです。
 
 暗号がやりたくて数学はあまりやりたくない人の為の記事も、数学をやりたい人の為の教科書も飽和しているので、その間の数学も暗号もちょっとやりたい人の為に基礎と応用をちょこっとずつ紹介する参考書にしたいなと思っています。
 
@@ -35,6 +35,7 @@ $$
 E/K: y^2 = x^3 + ax + b
 $$
 
+係数の順番おかしいだろとかなんでこの形なんだとか色々疑問が湧いてくると思います。本質的には楕円曲線を 1 次元アーベル多様体と定義してその因子によるベクトル空間に対して Riemann-Roch の定理を適用してわかってくるのですが、解説するにはちょっと余白が狭すぎるのでここでは書けません。すみません。
 **Proof.**
 $\ch(\overline{K}) \neq 2$ のとき Weierstrass 方程式を $(x, y)\mapsto(x, (y - a_1x - a_3)/2)$ と置換すると適切に $b_2, b_4, b_6$ をおくことで次のように簡約化できます。
 
@@ -65,7 +66,7 @@ $$
 
 $\Box$
 
-以下では特に断りがない限り標数が 2, 3 ではないと仮定します。実際 $\mathbb{F}_{2^n}$ 上で楕円曲線暗号を組み立てることもあるのですが、基礎が分かっていればそこら辺はすぐ求められるので大丈夫です。
+以下では特に断りがない限り標数が 2, 3 ではないと仮定します。実際 $\mathbb{F}_{2^n}$ 上で楕円曲線暗号を組み立てることもあるのですが、基礎が分かっていればそこら辺はすぐ求められるので省きます。
 
 ここにグラフ
 
@@ -85,61 +86,6 @@ y_3 &= \lambda(x_1 - x_3) - y_1 \\
 \end{dcases}
 \end{aligned}
 $$
-
-```python
-class ElipticCurveOverFp:
-    """
-    y^2 = x^3 + ax + b (mod p)
-    """
-    def __init__(self, a, b, p):
-        self.Fp = GF(p)
-        self.a = self.Fp(a)
-        self.b = self.Fp(b)
-        self.p = p
-
-
-class Point:
-    def __init__(self, curve: ElipticCurveOverFp, x, y, infty=False):
-        self.x = curve.Fp(x)
-        self.y = curve.Fp(y)
-        self.curve = curve
-        self.infty = infty
-        if self.y**2 != self.x**3 + self.curve.a * self.x + self.curve.b and not self.infty:
-            raise ValueError(f"Invalid point, x:{x}, y:{y} is not on the curve")
-
-    @staticmethod
-    def infinity(curve: ElipticCurveOverFp) -> "Point":
-        return Point(curve, 0, 0, True)
-
-    def is_infinity(self) -> bool:
-        return self.infty
-
-    def __add__(self, other) -> "Point":
-        if self.is_infinity():
-            return other
-        if other.is_infinity():
-            return self
-        if self.x == other.x and self.y == -other.y:
-            return Point.infinity(self.curve)
-
-        if self.x == other.x and self.y == other.y:
-            lambda = (3 * (self.x**2) + self.curve.a) / (2 * self.y)
-        else:
-            lambda = (other.y - self.y) / (other.x - self.x)
-        x = lambda**2 - self.x - other.x
-        y = lambda * (self.x - x) - self.y
-        return Point(self.curve, x, y)
-
-    def __rmul__(self, n: int) -> "Point":
-        temp = self
-        res = Point.infinity(self.curve)
-        while n > 0:
-            if n & 1 == 1:
-                res += temp
-            temp += temp
-            n >>= 1
-        return res
-```
 
 特に実数体 $\mathbb{R}$ 上の楕円曲線のグラフ上で見ると、点 $P, Q$ に対して直線 $PQ$ と曲線との交点について $y$ 座標を符号反転した点が $P + Q$ となります。
 
@@ -295,6 +241,60 @@ $\Box$
 - ある楕円曲線について位数を指定された点 (ねじれ群の元) を生成できる？
 :::
 
+```python
+class ElipticCurveOverFp:
+    """
+    y^2 = x^3 + ax + b (mod p)
+    """
+    def __init__(self, a, b, p):
+        self.Fp = GF(p)
+        self.a = self.Fp(a)
+        self.b = self.Fp(b)
+        self.p = p
+
+
+class Point:
+    def __init__(self, curve: ElipticCurveOverFp, x, y, infty=False):
+        self.x = curve.Fp(x)
+        self.y = curve.Fp(y)
+        self.curve = curve
+        self.infty = infty
+        if self.y**2 != self.x**3 + self.curve.a * self.x + self.curve.b and not self.infty:
+            raise ValueError(f"Invalid point, x:{x}, y:{y} is not on the curve")
+
+    @staticmethod
+    def infinity(curve: ElipticCurveOverFp) -> "Point":
+        return Point(curve, 0, 0, True)
+
+    def is_infinity(self) -> bool:
+        return self.infty
+
+    def __add__(self, other) -> "Point":
+        if self.is_infinity():
+            return other
+        if other.is_infinity():
+            return self
+        if self.x == other.x and self.y == -other.y:
+            return Point.infinity(self.curve)
+
+        if self.x == other.x and self.y == other.y:
+            lambda = (3 * (self.x**2) + self.curve.a) / (2 * self.y)
+        else:
+            lambda = (other.y - self.y) / (other.x - self.x)
+        x = lambda**2 - self.x - other.x
+        y = lambda * (self.x - x) - self.y
+        return Point(self.curve, x, y)
+
+    def __rmul__(self, n: int) -> "Point":
+        temp = self
+        res = Point.infinity(self.curve)
+        while n > 0:
+            if n & 1 == 1:
+                res += temp
+            temp += temp
+            n >>= 1
+        return res
+```
 ## 楕円曲線暗号
 
 楕円曲線暗号 (ECC) はRSA暗号と同時期に開発された暗号で1985年頃に Victor S. Miller と Neal Koblitz が同時期かつ独立に発明しました(ちなみにMiller-Rabin素数判定法のMillerはGary L. Millerで別人です)。特徴としては RSA 暗号よりも純粋に強い暗号であることや鍵長が短いことなどが挙げられます。
