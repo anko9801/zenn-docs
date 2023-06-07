@@ -913,7 +913,9 @@ $\#E_0(\mathbb{F}_{p^2}) = (p + 1)^2$
 j_E = 1728\frac{4a^3}{4a^3 + 27b^2}
 $$
 
-楕円曲線同士の同型写像の表現
+楕円曲線同士の同型写像を具体的に計算する方法
+
+https://eprint.iacr.org/2011/430.pdf
 
 > **Thm. Vélu の公式**
 > 楕円曲線 $E$, $E'$ に分離的な同型写像 $\phi: E\to E'$ が張られているとき、準同型定理より $E' = E/\ker\phi$ となります。$\phi$ の核 $F = \ker\phi$ の分割を $F = \lbrace\mathcal{O}\rbrace\cup F^+ \cup F^-$ とすると
@@ -1040,6 +1042,7 @@ $$
 - Python での高速な実装 fastecdsa
 - https://www.iisec.ac.jp/proc/vol0002/iisec_proc_002_p043.pdf
 - http://www.ipc.tohoku-gakuin.ac.jp/atsushi/article/velu.pdf
+- https://eprint.iacr.org/2011/430.pdf
 
 この資料は CC0 ライセンスです。
 
