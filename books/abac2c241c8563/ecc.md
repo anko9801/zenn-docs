@@ -2,16 +2,16 @@
 title: "楕円曲線暗号への攻撃"
 ---
 
-今回紹介するのは
+それで今回紹介するのは次のような内容です。
 
 - 楕円曲線の構成とその性質
 - 楕円曲線暗号の実装と攻撃
 - 超楕円曲線暗号の紹介
 - 超特異同種写像暗号の実装と攻撃
 
-と結構ヘビーです。楕円曲線暗号を元から知っている人の為の記事になりそうなので知らない人は他の記事を読んでから読みましょう。
+楕円曲線の理論は本来、群環体、ガロア理論、可換環論、代数幾何学と理解した先で学習します。一番基礎となる群論などの部分は計算機代数の章で紹介しました。それを前提知識として周辺知識を絡め取りながら説明していきます。なのでとりあえず計算機代数は読んでください。
 
-暗号がやりたくて数学はあまりやりたくない人の為の記事は需要が高くて飽和しているし、数学をガチガチにやりたい人の為のも天才が書いた本で飽和しているので、その間を狙った基礎と応用をちょこっとずつ紹介する記事にしたいなと思っています。ただ楕円曲線の理論は群環体、ガロア理論、可換環論、代数幾何学と理解した先に学習するものなので書けるのは付け焼き刃程度で削れるところは曖昧に書きます。計算機代数の章を読みながら、そこは許してください。
+暗号がやりたくて数学はあまりやりたくない人の為の記事も、数学をやりたい人の為の教科書も飽和しているので、その間の数学も暗号もちょっとやりたい人の為に基礎と応用をちょこっとずつ紹介する参考書にしたいなと思っています。
 
 ## 楕円曲線
 高校のときに習ったと思いますが、グラフで半径 1 の円といえば次のような式で表されました。
@@ -20,14 +20,52 @@ $$
 x^2 + y^2 = 1
 $$
 
-楕円曲線は言うなればこれの 3 次方程式バージョンです。(でもグラフの形と楕円の由来は全く関係ないです。)
+楕円曲線は言うなればこれの 3 次方程式バージョンです。(でも楕円の由来は楕円関数からです)
 
 > **Def. 楕円曲線**
-> $K$ を体、 $f(x) \in K[x]$ を 3 次方程式としたときに関数 $y^2 = f(x)$ を楕円曲線 $E/K$ という。また $K$ の標数が $2, 3$ でないとき $x, y$ の線形変換によって 2 次項を消すことができ、$a, b\in K$ を用いて次のように書ける。
+> $K$ を体、 $f(x) \in K[x]$ を 3 次方程式としたときに関数 $y^2 = f(x)$ を楕円曲線 $E/K$ という。Weierstrass 方程式
+>
+> $$
+  E: y^2 + a_1xy + a_3y = x^3 + a_2x^2 + a_4x + a_6
+$$
+>
+> また $K$ の標数が $2, 3$ でないとき $x, y$ の線形変換によって 2 次項を消すことができ、$a, b\in K$ を用いて次のように書ける。
 >
 > $$
 E/K: y^2 = x^3 + ax + b
 $$
+
+**Proof.**
+$\ch(\overline{K}) \neq 2$ のとき Weierstrass 方程式を $(x, y)\mapsto(x, (y - a_1x - a_3)/2)$ と置換すると適切に $b_2, b_4, b_6$ をおくことで次のように簡約化できます。
+
+$$
+\begin{aligned}
+  \left(\frac{1}{2}(y - a_1x - a_3)\right)&\left(\frac{1}{2}(y - a_1x - a_3) + a_1x + a_3\right) = x^3 + a_2x^2 + a_4x + a_6 \\
+  y^2                                 & = 4x^3 + (a_1^2 + 4a_2)x^2 + 2(a_1a_3 + 2a_4)x + (a_3^2 + 4a_6)           \\
+  y^2                                 & = 4x^3 + b_2x^2 + 2b_4x + b_6
+\end{aligned}
+$$
+
+さらに $\ch(\overline{K}) \neq 2, 3$ のとき $(x, y)\mapsto((x - 3b_2)/36, y/108)$ と置換すると適切に $c_4, c_6$ をおくことで次のようにより簡約化できます。
+
+$$
+\begin{aligned}
+  \left(\frac{y}{108}\right)^2 & = 4\left(\frac{x - 3b_2}{36}\right)^3 + b_2\left(\frac{x - 3b_2}{36}\right)^2 + 2b_4\left(\frac{x - 3b_2}{36}\right) + b_6 \\
+  y^2                   & = (x - 3b_2)^3 + 9b_2(x - 3b_2)^2 + 648b_4(x - 3b_2) + 108^2b_6                                       \\
+  y^2                   & = x^3 - 27(b_2^2 - 24b_4)x - 54(- b_2^3 + 36b_2b_4 - 216b_6)                                          \\
+  y^2                   & = x^3 - 27c_4x - 54c_6
+\end{aligned}
+$$
+
+こうして Weierstrass 方程式は標数が 2, 3 ではないとき次のように書き表されます。これを
+
+$$
+E/K: y^2 = x^3 + ax + b
+$$
+
+$\Box$
+
+以下では特に断りがない限り標数が 2, 3 ではないと仮定します。実際 $\mathbb{F}_{2^n}$ 上で楕円曲線暗号を組み立てることもあるのですが、基礎が分かっていればそこら辺はすぐ求められるので大丈夫です。
 
 ここにグラフ
 
@@ -49,6 +87,58 @@ y_3 &= \lambda(x_1 - x_3) - y_1 \\
 $$
 
 ```python
+class ElipticCurveOverFp:
+    """
+    y^2 = x^3 + ax + b (mod p)
+    """
+    def __init__(self, a, b, p):
+        self.Fp = GF(p)
+        self.a = self.Fp(a)
+        self.b = self.Fp(b)
+        self.p = p
+
+
+class Point:
+    def __init__(self, curve: ElipticCurveOverFp, x, y, infty=False):
+        self.x = curve.Fp(x)
+        self.y = curve.Fp(y)
+        self.curve = curve
+        self.infty = infty
+        if self.y**2 != self.x**3 + self.curve.a * self.x + self.curve.b and not self.infty:
+            raise ValueError(f"Invalid point, x:{x}, y:{y} is not on the curve")
+
+    @staticmethod
+    def infinity(curve: ElipticCurveOverFp) -> "Point":
+        return Point(curve, 0, 0, True)
+
+    def is_infinity(self) -> bool:
+        return self.infty
+
+    def __add__(self, other) -> "Point":
+        if self.is_infinity():
+            return other
+        if other.is_infinity():
+            return self
+        if self.x == other.x and self.y == -other.y:
+            return Point.infinity(self.curve)
+
+        if self.x == other.x and self.y == other.y:
+            lambda = (3 * (self.x**2) + self.curve.a) / (2 * self.y)
+        else:
+            lambda = (other.y - self.y) / (other.x - self.x)
+        x = lambda**2 - self.x - other.x
+        y = lambda * (self.x - x) - self.y
+        return Point(self.curve, x, y)
+
+    def __rmul__(self, n: int) -> "Point":
+        temp = self
+        res = Point.infinity(self.curve)
+        while n > 0:
+            if n & 1 == 1:
+                res += temp
+            temp += temp
+            n >>= 1
+        return res
 ```
 
 特に実数体 $\mathbb{R}$ 上の楕円曲線のグラフ上で見ると、点 $P, Q$ に対して直線 $PQ$ と曲線との交点について $y$ 座標を符号反転した点が $P + Q$ となります。
@@ -67,14 +157,7 @@ https://andrea.corbellini.name/ecc/interactive/reals-add.html
 
 **Proof.**
 
-ここからは特に素数 $p$ と整数 $n$ を用いて $q = p^n$ とおき、有限体 $\mathbb{F}_q\cong \mathbb{F}_p[x]/(f(x))$ のときについて考えます。そしてその有限体の重要な性質の 1 つにフロベニウス写像の存在があります。これは数学界で大変重宝する非自明な準同型写像でよく証明に使われます。これは楕円曲線にもあり、次のように定義されます。
-
-> **Def. 楕円曲線におけるフロベニウス写像**
-> 楕円曲線 $E/\mathbb{F}_q$ におけるフロベニウス写像 $\phi$ を次のように定義する。
->
-> $$
-\phi: (x, y)\mapsto (x^q, y^q)
-$$
+ここからは特に有限体、つまり $q$ を素数 $p$ の冪として $\mathbb{F}_q\cong \mathbb{F}_p[x]/(f(x))$ のときについて考えます。
 
 CTF において楕円曲線の問題が出されたときに位数は解法を決定する要素としてバチクソ重要です。その位数に関して最も重要な定理があります。
 
@@ -85,7 +168,7 @@ CTF において楕円曲線の問題が出されたときに位数は解法を�
 |\#E(\mathbb{F}_q) - (q+1)|\leq 2\sqrt{q}
 $$
 
-ここでは標数が 5 以上についての証明の筋書きだけ記します。詳しくは [Hasse's Theorem on Elliptic Curves](https://fse.studenttheses.ub.rug.nl/10999/1/opzet.pdf) をご覧ください。
+ここでは標数が 2, 3 ではないときの証明の筋書きだけ記します。詳しくは [Hasse's Theorem on Elliptic Curves](https://fse.studenttheses.ub.rug.nl/10999/1/opzet.pdf) をご覧ください。
 **Sketch.**
 まずベースとなる楕円曲線 $E/\mathbb{F}_q$ を次のように定義する。
 
@@ -151,15 +234,26 @@ $\Box$
 ![](/images/Hasse.png)
 [tsujimotterのノートブック - 楕円曲線のハッセの定理](https://tsujimotter.hatenablog.com/entry/hasses-theorem) より
 
-位数の範囲がわかってかなり現実的
+有限体上の楕円曲線について位数の範囲がわかって群として少しわかってきたんじゃないでしょうか。ただこれ、範囲は比較的簡単にわかるのですが、楕円曲線のパラメータを用いた一般的な位数の表式については **大変難しい未解決問題** となっています。これを解決できたら僕にこっそり教えてください。
 
-> **Def. $l$-ねじれ群**
+> **Def. ねじれ群**
+> 楕円曲線 $E$ の点 $P$ について $n$ 倍したら単位元 $\mathcal{O}$ となるとき $P$ を $n$-ねじれ点といい、$n$-ねじれ点を集めた群を $n$-ねじれ群 $E[n]$ という。
 >
+> $$
+E[n] = \lbrace P\in E(\overline{\mathbb{F}_q}) \mid nP = \mathcal{O}\rbrace
+$$
 
 位数の範囲が分かったので次は楕円曲線が与えられたときに実際に位数を計算する方法を考えます。
 これにはフロベニウス写像の特性多項式が重宝します。
+そしてその有限体の重要な性質の 1 つにフロベニウス写像の存在があります。これは証明の際に大変重宝する準同型写像です。これは楕円曲線にもあり、次のように定義されます。
 
-> **Prop. フロベニウス写像の特性多項式**
+> **Def. 楕円曲線におけるフロベニウス写像**
+> 楕円曲線 $E/\mathbb{F}_q$ におけるフロベニウス写像 $\phi$ を次のように定義する。
+>
+> $$
+\phi: (x, y)\mapsto (x^q, y^q)
+$$
+>
 > 楕円曲線 $E/\mathbb{F}_q$ のフロベニウス写像を $\phi$ として $t = \#E(\mathbb{F}_q) - (q+1)$ とおくと次の式が成り立つ。これをフロベニウス写像の特性多項式という。
 >
 > $$
@@ -194,6 +288,13 @@ $\Box$
 
 位数について大体分かったので楕円曲線暗号の説明について早速入っていきましょう。
 
+:::message
+**練習問題**
+- $x$ 座標から $y$ 座標を求められる？
+- 2 点 $P, Q$ から楕円曲線のパラメータを求められる？
+- ある楕円曲線について位数を指定された点 (ねじれ群の元) を生成できる？
+:::
+
 ## 楕円曲線暗号
 
 楕円曲線暗号 (ECC) はRSA暗号と同時期に開発された暗号で1985年頃に Victor S. Miller と Neal Koblitz が同時期かつ独立に発明しました(ちなみにMiller-Rabin素数判定法のMillerはGary L. Millerで別人です)。特徴としては RSA 暗号よりも純粋に強い暗号であることや鍵長が短いことなどが挙げられます。
@@ -206,6 +307,22 @@ $\Box$
 つまり楕円曲線の世界で「割り算」をしなさいという問題です。
 
 実はこの問題はとても難しく、これを解く効率的なアルゴリズムは現在見つかっていません。この ECDLP を利用して暗号の形にしたものが楕円曲線暗号です。
+
+暗号標準を定める国際機関によって楕円曲線が
+
+規格化された楕円曲線のパラメータの情報がすべてまとまっている資料があります。適当にパラパラめくるだけで面白いです。
+
+https://neuromancer.sk/std/nist/P-256
+
+また、より高速化させる為に様々な楕円曲線が考案されています。ただオーダーレベルでは変わらないです。
+
+| モデル | 式 | 座標 | スカラー倍 | 同種写像 |
+|:-:|:-:|:-:|:-:|:-:|
+| ワイエルシュトラス | $y^2 = x^3 + ax + b$ |
+| モンゴメリー | $y^2 = x^3 + Ax^2 + x$ |
+| エドワード | $x^2 + y^2 = 1 + dx^2y^2$ |
+| ハフ | $cx(y^2 - 1) = y(x^2 - 1)$ |
+| ヤコビ交差 | $ax^2 + y^2 = 1, bx^2 + z^2 = 1$ |
 
 ### ECDH (Elliptic Curve Diffie–Hellman key exchange)
 
@@ -226,9 +343,6 @@ Alice と Bob は AES などの共通鍵暗号を用いて暗号通信しよう�
 
 ```python
 ```
-
-暗号標準を定める国際機関によって楕円曲線が
-https://neuromancer.sk/std/
 
 ## ECDLP を解く
 
@@ -270,7 +384,7 @@ $$
 これより ECDLP を解くことで $d_j$ が求まります。
 
 ```python
-def PohligHellman(G):
+def pohlig_hellman(G):
     fact = factor(G.order())
     order = int(G.order())
     dlogs = []
@@ -322,8 +436,13 @@ $$
 
 この計算量は $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$ と知られています。
 
+```python
+```
+
 ### GHS-Weil descent 攻撃
 楕円曲線の $\mathbb{F}_{p^k}$ 有理点群 $E(\mathbb{F}_{p^k})$ を種数 $g\geq k$ の代数曲線 $C$ の Jacobian の有理点群 $\mathcal{J}_C(\mathbb{F}_p)$ に埋め込み、 $\mathcal{J}_C(\mathbb{F}_p)$ 上で Gaudry アルゴリズムで解く
+
+GHS (Gaudry Hess Smart)
 
 ## 攻撃手法
 
@@ -337,6 +456,184 @@ $$
 | Supersingular な曲線 $\#E/\mathbb{F}_p = p+1$ | MOV / FR Reduction | 埋め込み次数 $k$ を用いて $\mathbb{F}_{p^k}^\times$ 上の DLP に帰着できる |
 | Singular な曲線 $\Delta(E/\mathbb{F}_p) = 0$ | Singular Curve Point Decompression Attack | $\mathbb{F}_p^+$ や $\mathbb{F}_p^\times, \mathbb{F}_{p^2}^\times$ 上の DLP に帰着できる |
 | 楕円曲線上に存在しない点や位数の少ない点を指定できる | Invalid Curve Attack / Small-Subgroup Attack | さまざまな少ない位数の点を収集して中国剰余定理 |
+
+### 楕円曲線上に存在しない点や位数の少ない点を指定できてはいけない (Invalid Curve Attack / Small-Subgroup Attack)
+楕円曲線に乗らない点を乗っているように演算すると位数の小さい点となる。
+
+> **Prop.**
+
+**Proof.**
+
+$$
+y^2 = x^3 + ax + b_1 \pmod{p}
+$$
+
+$\Box$
+
+これを用いて中国剰余定理で ECDLP が解ける。
+
+https://zenn.dev/kurenaif/articles/9cf509d9a15815
+
+:::message
+**練習問題**
+- tiramisu (Google CTF)
+:::
+
+### Singularな曲線を用いてはいけない (Singular Curve Point Decompression Attack)
+
+Singular な楕円曲線のとき、特異点という特殊な点ができます。
+
+> **Def. 特異点**
+> ある関数 $f(x, y) = 0$ の特異点とは次を満たす $(X, Y)$ である。
+>
+> $$
+\left.\frac{\partial f}{\partial x}\right|_{(X, Y)} = \left.\frac{\partial f}{\partial y}\right|_{(X, Y)} = 0
+$$
+
+> **Prop. 楕円曲線の特異点**
+> 楕円曲線において特異点がある条件はかつあったときに $(X, Y) = (\pm\sqrt{-a/3}, 0)$ にある。
+
+**Proof.**
+$3x^2 + a = 2y = 0$
+
+このように微分値が不定となる点、グラフ上では関数の曲線が交差している点です。
+
+楕円曲線の曲線は高々 1 回交わることになるので 2 つのタイプに分けられます。1 つは普通に交わるノード、もう 1 つは自分自身と接しながら交わるカスプです。
+
+#### カスプ
+
+どんな尖っている楕円曲線も平行移動や線形変換により $y^2 = x^3$ の形になります。
+
+このとき $y = \lambda x$ との交点は $(\lambda^2, \lambda^3)$ 、接線は $y = 0$ となります。
+これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^+$ を次のように定義する。
+
+$$
+f(x,y) = \frac{x}{y} \\
+f(\infty) = 0
+$$
+
+これは $\mathbb{F}_p^+$ の DLP となる。
+
+#### ノード
+
+$y = 0$ 上の特異点が原点 $O(0, 0)$ となるように平行移動させると $y^2 = x^3 + kx^2$ となる。
+
+$$
+\left(\frac{\partial F}{\partial x}, \frac{\partial F}{\partial y}\right) = ((3x + 2k)x, 2y)
+$$
+
+より特異点が原点しかないことがわかります。このとき $y = \lambda x$ との交点を考えます。$P = (\lambda^2 - k, \lambda(\lambda^2 - k))$ これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^\times$ を次のように定義する。
+
+$$
+\begin{aligned}
+f(x,y) & = \frac{y + \sqrt{k}x}{y - \sqrt{k}x} \\
+f(\infty) & = 1
+\end{aligned}
+$$
+
+これは $\mathbb{F}_p^\times$ の DLP となる。
+
+```python
+def SingularCusp(a, b, p):
+    x = GF(p)["x"].gen()
+    PR.<x> = PolynomialRing(GF(p))
+    E = x^3 + a*x + b
+    roots = E.roots()
+    dx = next(filter(lambda x: x[1] == 3, roots))[0]
+    dy = 0
+
+    def f(P):
+        if P == 0:
+            return 0
+        x, y = P[0], P[1]
+        return x / y
+
+    g = f((gx - dx, gy - dy))
+    p = f((px - dx, py - dy))
+    return p / g
+
+def SingularNode(a, b, p):
+    PR.<x> = PolynomialRing(GF(p))
+    E = x^3 + a*x + b
+    roots = E.roots()
+    dx = next(filter(lambda x: x[1] == 2, roots))[0]
+    dy = 0
+
+    E_ = E.subs(x = x + dx)
+    roots = E_.roots()
+    k = next(filter(lambda x: x[1] == 1, roots))[0]
+    k = (-k).square_root()
+
+    def f(P):
+        if P == 0:
+            return 1
+        x, y = P[0], P[1]
+        return (y + k * x) / (y - k * x)
+
+    g = f((gx - dx, gy - dy))
+    p = f((px - dx, py - dy))
+    return p.log(g)
+```
+
+### Anomalous な曲線を用いてはいけない
+Anomalous の楕円曲線では SSSA (Semaev-Smart-Satoh-Araki) Attack が有効です。
+
+$$
+\lambda_E: E(\mathbb{F}_p)\xrightarrow{u}E(\mathbb{Q}_p)\xrightarrow{\times p}\ker\pi\xrightarrow{Formal \log}p\mathbb{Z}_p\xrightarrow{\bmod{p^2}} p\mathbb{Z}_p/p^2\mathbb{Z}_p\cong \mathbb{F}_p
+$$
+
+$\psi(x:y:z) := x/y$
+
+$$
+\log_E(t) := t - \frac{a_1}{2}t^2 + \frac{a_1^2 + a_2}{3}t^3 - \frac{a_1^3 + 2a_1a_2 + a_3}{4}t^4 + \cdots
+$$
+
+$A := (X_1, Y_1)\in E(\mathbb{Z}/p^2\mathbb{Z})$ 写像 $\pi(A) = P$ となる
+$(X_{p-1}, Y_{p-1}) := (p-1)A$
+
+$X_{p-1} \neq X_1$ なら
+
+$$
+\lambda_E(P) = \left(\frac{X_{p-1} - X_1}{p}\bmod p\right)(Y_{p-1} - Y_1\bmod p)^{-1}
+$$
+
+```python
+def hensel_lift(P):
+    x, y = map(ZZ, P.xy())
+    t = GF(p)((x ^ 3 + a * x + b - y ^ 2) // p) / (2 * y)
+    return (x, y + p * lift(t))
+
+
+def SSSA_attack(G, P):
+    E = G.curve()
+    gf = E.base_ring()
+    p = gf.order()
+    assert E.trace_of_frobenius() == 1, f"Curve should have trace of Frobenius = 1."
+    E = EllipticCurve(Qp(p), [int(a) + p * ZZ.random_element(1, p) for a in E.a_invariants()])
+
+    x1, y1 = hensel_lift(E, P)
+    x2, y2 = hensel_lift(E, Q)
+    A = Zmod(p^2)((y2^2 - y1^2) - (x2^3 - x1^3)) / (x2 - x1)
+    B = Zmod(p^2)(y1^2 - x1^3 - a * x1)
+    E = EllipticCurve(Zmod(p^2), A, B)
+    P = E(x1, y1)
+    Q = E(x2, y2)
+    U = (p - 1) * P
+    V = (p - 1) * Q
+    dx1 = Zmod(p^2)((U.x - x1) // p)
+    dy1 = Zmod(p^2)(U.y - y1)
+    dx2 = Zmod(p^2)((V.x - x2) // p)
+    dy2 = Zmod(p^2)(V.y - y2)
+    return (dy1 / dx1) / (dy2 / dx2)
+
+
+    E = EllipticCurve(Qp(p), [int(a) + p * ZZ.random_element(1, p) for a in E.a_invariants()])
+    G = p * _lift(E, G, gf)
+    P = p * _lift(E, P, gf)
+    Gx, Gy = G.xy()
+    Px, Py = P.xy()
+    return int(gf((Px / Py) / (Gx / Gy)))
+```
 
 ### Supersingular な曲線を用いてはならない (MOV/FR Reduction)
 Supersingular な楕円曲線のとき、ペアリングを用いて有限体上の DLP に帰着できるという方法です。
@@ -424,17 +721,6 @@ $$
 f_P(Q + S) = 103
 $$
 
-```python
-def weil_pairing(E, P, Q, m, S=None):
-    if S is None:
-        S = E.random_point()
-    fpqs = miller(E, P, Q + S, m)
-    fps = miller(E, P, S, m)
-    fqps = miller(E, Q, P - S, m)
-    fqs = miller(E, Q, -S, m)
-    return (fpqs / fps) / (fqps / fqs)
-```
-
 Weil pairing の計算は比較的遅くて、この上位互換として Tate-Lichtenbaum Pairing というペアリングがあります。
 
 > **Def. Tate-Lichtenbaum Pairing**
@@ -475,17 +761,27 @@ e_n(Q^\sigma - Q, T) = \frac{\sqrt[n]{\alpha}^\sigma}{\sqrt[n]{\alpha}} \qquad \
 $$
 
 ```python
+def weil_pairing(E, P, Q, m, S=None):
+    if S is None:
+        S = E.random_point()
+    fpqs = miller(E, P, Q + S, m)
+    fps = miller(E, P, S, m)
+    fqps = miller(E, Q, P - S, m)
+    fqs = miller(E, Q, -S, m)
+    return (fpqs / fps) / (fqps / fqs)
+
+
 def tate_pairing(E, P, Q, m, k=2):
     f = miller(E, P, Q, m)
     return f ^ ((p ^ k - 1) // m)
 ```
 
-$E(\mathbb{F}_{p^k}^\times)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
-
 > **埋め込み次数**
 > 必要となる最小の拡大次数 $d$ を埋め込み次数という。
+> $E(\mathbb{F}_{p^k}^\times)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
 
 $\mu_m$ の埋め込み次数が小さい楕円曲線ならば ECDLP より FFDLP の方が素早く計算できそうです。そのような楕円曲線というのが Supersingular な楕円曲線です。
+任意の楕円曲線も FFDLP に落とし込めますが、埋め込み次数が高いと ECDLP を解いた方が早いともなります。
 
 > **Prop.**
 > Supersingular な楕円曲線の埋め込み次数は $6$ 以下である。
@@ -516,183 +812,129 @@ $\Box$
 > - Weil pairing を用いるものを MOV (Menezes-Okamoto-Vanstone) Reduction という。
 > - Tate pairing を用いるものを FR (Frey-Rück) Reduction という。
 
-任意の楕円曲線も FFDLP に落とし込めますが、埋め込み次数が高いと ECDLP を解いた方が早いともなります。
+```python
+def MOV_reduction():
+    E = P.curve()
+    q = E.base_ring().order()
+    n = P.order()
+    assert gcd(n, q) == 1, "GCD of base point order and curve base ring order should be 1."
+
+    logging.info("Calculating embedding degree...")
+    k = get_embedding_degree(q, n, max_k)
+    if k is None:
+        return None
+
+    logging.info(f"Found embedding degree {k}")
+    Ek = E.base_extend(GF(q ** k))
+    Pk = Ek(P)
+    Rk = Ek(R)
+    for i in range(max_tries):
+        Q_ = Ek.random_point()
+        m = Q_.order()
+        d = gcd(m, n)
+        Q = (m // d) * Q_
+        if Q.order() != n:
+            continue
+
+        if (alpha := Pk.weil_pairing(Q, n)) == 1:
+            continue
+
+        beta = Rk.weil_pairing(Q, n)
+        logging.info(f"Computing {beta}.log({alpha})...")
+        l = beta.log(alpha)
+        return int(l)
+
+    return None
+
+def FR_reduction(P, R, max_k=6, max_tries=10):
+    E = P.curve()
+    q = E.base_ring().order()
+    n = P.order()
+    assert gcd(n, q) == 1, "GCD of base point order and curve base ring order should be 1."
+
+    logging.info("Calculating embedding degree...")
+    k = get_embedding_degree(q, n, max_k)
+    if k is None:
+        return None
+
+    logging.info(f"Found embedding degree {k}")
+    Ek = E.base_extend(GF(q ** k))
+    Pk = Ek(P)
+    Rk = Ek(R)
+    for _ in range(max_tries):
+        S = Ek.random_point()
+        T = Ek.random_point()
+        if (gamma := Pk.tate_pairing(S, n, k) / Pk.tate_pairing(T, n, k)) == 1:
+            continue
+
+        delta = Rk.tate_pairing(S, n, k) / Rk.tate_pairing(T, n, k)
+        logging.info(f"Computing {delta}.log({gamma})...")
+        l = delta.log(gamma)
+        return int(l)
+
+    return None
+```
+
 
 `tate_pairing(E, P, Q.distortion_map(), m)`
 
-### Anomalous な曲線を用いてはいけない
-Anomalous の楕円曲線では SSSA (Semaev-Smart-Satoh-Araki) Attack が有効です。
+## 同種写像暗号
 
-$$
-\lambda_E: E(\mathbb{F}_p)\xrightarrow{u}E(\mathbb{Q}_p)\xrightarrow{\times p}\ker\pi\xrightarrow{Formal \log}p\mathbb{Z}_p\xrightarrow{\bmod{p^2}} p\mathbb{Z}_p/p^2\mathbb{Z}_p\cong \mathbb{F}_p
-$$
+> **同種写像の計算困難性**
+> 楕円曲線 $E$ と同種写像 $\phi$ を生成し、公開情報 $(E, \phi(E))$ から秘密情報 $(E, \phi)$ を求めるのが計算量的に困難であるという仮定
 
-$\psi(x:y:z) := x/y$
+ねじれ点のとりやすさから同種写像暗号では超特異曲線を利用します。
+通常曲線を使った方式もあるがどれも非効率
+モントゴメリーモデル
 
-$$
-\log_E(t) := t - \frac{a_1}{2}t^2 + \frac{a_1^2 + a_2}{3}t^3 - \frac{a_1^3 + 2a_1a_2 + a_3}{4}t^4 + \cdots
-$$
+データサイズが小さい
+$\mathbb{F}_{p^2}$ 上の超特異楕円曲線 $E$
+$\#E_0(\mathbb{F}_{p^2}) = (p + 1)^2$
 
-$A := (X_1, Y_1)\in E(\mathbb{Z}/p^2\mathbb{Z})$ 写像 $\pi(A) = P$ となる
-$(X_{p-1}, Y_{p-1}) := (p-1)A$
+### 同種写像
 
-$X_{p-1} \neq X_1$ なら
+> **Def. 同種写像**
+> 楕円曲線 $E_1, E_2$ に対して有理多項式で表せる群準同型写像 $f: E_1 → E_2$ を同種写像とよぶ。
+> 有理多項式の次数が $l$ のとき $l$-同種写像という。
+> また有理多項式 $\hat{f}: E_2\to E_1$ 双対同種写像という。
 
-$$
-\lambda_E(P) = \left(\frac{X_{p-1} - X_1}{p}\bmod p\right)(Y_{p-1} - Y_1\bmod p)^{-1}
-$$
+同種写像の変換に対して位数が不変なのと同様に $j$-不変量も不変となります。
 
-```python
-def hensel_lift(P):
-    x, y = lift(P.x), lift(P.y)
-    t = GF(p)((x ^ 3 + a * x + b - y ^ 2) // p) / (2 * y)
-    return (x, y + p * lift(t))
+> **Thm. Tate の定理**
+> 楕円曲線 $E_1, E_2$ に対して同種と $\#E_1 = \#E_2$ は同値
 
-
-def SSSA_Attack(F, E, P, Q):
-    x1, y1 = hensel_lift(E, P)
-    x2, y2 = hensel_lift(E, Q)
-    A = Zmod(p^2)((y2^2 - y1^2) - (x2^3 - x1^3)) / (x2 - x1)
-    B = Zmod(p^2)(y1^2 - x1^3 - a * x1)
-    E = EllipticCurve(Zmod(p^2), A, B)
-    P = E(x1, y1)
-    Q = E(x2, y2)
-    U = (p - 1) * P
-    V = (p - 1) * Q
-    dx1 = Zmod(p^2)((U.x - x1) // p)
-    dy1 = Zmod(p^2)(U.y - y1)
-    dx2 = Zmod(p^2)((V.x - x2) // p)
-    dy2 = Zmod(p^2)(V.y - y2)
-    return (dy1 / dx1) / (dy2 / dx2)
-```
-
-### Singular な曲線を用いてはいけない
-
-Singular な楕円曲線のとき、特異点という特殊な点ができます。その点を軸に ECDLP は FFDLP へ変わってしまうやんね。
-
-> **Def. 特異点**
-> ある関数 $f(x, y) = 0$ の特異点とは次を満たす $(X, Y)$ である。
+> **Def. $j$-不変量**
 >
 > $$
-\left.\frac{\partial f}{\partial x}\right|_{(X, Y)} = \left.\frac{\partial f}{\partial y}\right|_{(X, Y)} = 0
+j_E = 1728\frac{4a^3}{4a^3 + 27b^2}
 $$
 
-このように微分値が不定となる点、グラフ上では関数の曲線が交差している点です。
+楕円曲線同士の同型写像の表現
 
-楕円曲線の曲線は高々 1 回交わることになるので 2 つのタイプに分けられます。1 つは普通に交わるノード、もう 1 つは自分自身と接しながら交わるカスプです。
-
-#### カスプ
-
-どんな尖っている楕円曲線も平行移動や線形変換により $y^2 = x^3$ の形になります。
-
-このとき $y = \lambda x$ との交点は $(\lambda^2, \lambda^3)$ 、接線は $y = 0$ となります。
-これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^+$ を次のように定義する。
-
+> **Thm. Vélu の公式**
+> 楕円曲線 $E$, $E'$ に $l$-同型写像 $\phi: E\to E'$ が張られているとき、の核が有限部分群 $F$ の分割 $F = \lbrace\mathcal{O}\rbrace\cup F^+ \cup F^-$
+>
+> $$
+E/F: y^2 = x^3 + (a - 5v)x + (b - 7w)
 $$
-f(x,y) = \frac{x}{y} \\
-f(\infty) = 0
+>
+> $$
+f_F(x, y) = \left(x + \sum_{P\in F^+}\frac{v_P}{x - x_P} - \frac{u_P}{(x - x_P)^2}, y - \sum_{P\in F^+}\frac{2u_Py}{(x - x_P)^3} - v_P\frac{y - y_P - g_P^xg_P^y}{(x - x_P)^2}\right)
 $$
-
-これは $\mathbb{F}_p^+$ の DLP となる。
-
-```python
-def SingularCusp(a, b, p):
-    PR.<x> = PolynomialRing(GF(p))
-    E = x^3 + a*x + b
-    roots = E.roots()
-    dx = next(filter(lambda x: x[1] == 3, roots))[0]
-    dy = 0
-
-    def f(P):
-        if P == 0:
-            return 0
-        x, y = P[0], P[1]
-        return x / y
-
-    g = f((gx - dx, gy - dy))
-    p = f((px - dx, py - dy))
-    return p / g
-```
-
-#### ノード
-
-$y = 0$ 上の特異点が原点 $O(0, 0)$ となるように平行移動させると $y^2 = x^3 + kx^2$ となる。
-
-$$
-\left(\frac{\partial F}{\partial x}, \frac{\partial F}{\partial y}\right) = ((3x + 2k)x, 2y)
-$$
-
-より特異点が原点しかないことがわかります。このとき $y = \lambda x$ との交点を考えます。$P = (\lambda^2 - k, \lambda(\lambda^2 - k))$ これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^\times$ を次のように定義する。
-
-$$
-\begin{aligned}
-f(x,y) & = \frac{y + \sqrt{k}x}{y - \sqrt{k}x} \\
-f(\infty) & = 1
-\end{aligned}
-$$
-
-これは $\mathbb{F}_p^\times$ の DLP となる。
-
-```python
-def SingularNode(a, b, p):
-    PR.<x> = PolynomialRing(GF(p))
-    E = x^3 + a*x + b
-    roots = E.roots()
-    dx = next(filter(lambda x: x[1] == 2, roots))[0]
-    dy = 0
-
-    E_ = E.subs(x = x + dx)
-    roots = E_.roots()
-    k = next(filter(lambda x: x[1] == 1, roots))[0]
-    k = (-k).square_root()
-
-    def f(P):
-        if P == 0:
-            return 1
-        x, y = P[0], P[1]
-        return (y + k * x) / (y - k * x)
-
-    g = f((gx - dx, gy - dy))
-    p = f((px - dx, py - dy))
-    return p.log(g)
-```
-
-### Invalid Curve Attack
-楕円曲線に乗らない点を乗っているように演算すると位数の小さい点となる。
-
-> **Prop.**
-> 位数が小さくなりがち
 
 **Proof.**
-
 $\Box$
 
-これを用いて中国剰余定理で ECDLP が解ける。
+モントゴメリーモデルでは Costello-Hisil の公式
 
-:::message
-**練習問題**
-- tiramisu (Google CTF)
-:::
+超特異同種写像 Diffie-Hellman 鍵共有
+SIDH (Supersingular Isogeny Diffie-Hellman key exchange)
+$p = l_A^{e_A}l_B^{e_B} - 1$
+CSIDH (Commutative Supersingular Isogeny Diffie-Hellman)
+$p = l_1l_2\cdots l_n - 1$
+$n$-同種写像の計算量は $\mathcal{O}(n)$ 掛かります。次数 $2^{256}$ 程度の同種写像計算をする
 
-## 同種写像暗号
-超特異同種写像ディフィー・ヘルマン鍵共有 (SIDH / SIKE)
-CSIDH
-現在 SIKE しかありませんが攻撃が見つかっている為選考に残るのは難しいです。
-
-### 暗号の構成
-**SIKE**
-$p = w_A^{e_A}w_b^{e_B}f \pm 1$
-$\mathbb{F}_{p^2}$ 上の超特異楕円曲線 $E$
-位数 $w_A^{e_A}$ である点 $P_A, Q_A$ と位数 $w_B^{e_B}$ である点 $P_B, Q_B$
-
-$2^a\approx 3^b$ となるような素数 $p = 2^a3^bf - 1$ を用いて超特異楕円曲線 $E_0/\mathbb{F}_{p^2}$、つまり位数が $\#E_0(\mathbb{F}_{p^2}) = (p + 1)^2$ となる楕円曲線を生成する。
-$P_0, Q_0 \in E_0[2^a]$ $E_0[3^{e_3}]$
-$3^b$ 同種写像 $\varphi: E_0\to E$
-
-暗号としてそこまで重要ではないので $j$-不変量話すのやめてましたがこれに関しては必要ですね。
-
-> **$j$-不変量**
->
+SIKE (Supersingular Isogeny Key Encapsulation)
 
 $$
 y^2 = x^3 + x \qquad y^2 = x^3 + 6x^2 + x
@@ -712,9 +954,6 @@ R<x> = PolynomialRing(Fp2)
 E = EllipticCurve(x^3 + x)
 E = EllipticCurve(x^3 + 6*x^2 + x)
 ```
-
-### 攻撃
-SIKE
 
 > **Thm. Kani's theorem**
 
