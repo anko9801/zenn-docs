@@ -183,7 +183,7 @@ $\Box$
 有限体上の楕円曲線について位数の範囲がわかって群として少しわかってきたんじゃないでしょうか。ただこれ、範囲は比較的簡単にわかるのですが、楕円曲線のパラメータを用いた一般的な位数の表式については **大変難しい未解決問題** となっています。これを解決できたら僕にこっそり教えてください。
 
 > **Def. ねじれ群**
-> 楕円曲線 $E$ の点 $P$ について $n$ 倍したら単位元 $\mathcal{O}$ となるとき $P$ を $n$-ねじれ点といい、$n$-ねじれ点を集めた群を $n$-ねじれ群 $E[n]$ という。
+> 楕円曲線 $E$ の点 $P$ について $n$ 倍したら単位元 $\mathcal{O}$ となるとき $P$ を $n$-等分点といい、$n$-等分点の集合を $n$-ねじれ群 $E[n]$ という。
 >
 > $$
 E[n] = \lbrace P\in E(\overline{\mathbb{F}_q}) \mid nP = \mathcal{O}\rbrace
@@ -459,6 +459,10 @@ GHS (Gaudry Hess Smart)
 楕円曲線に乗らない点を乗っているように演算すると位数の小さい点となる。
 
 > **Prop.**
+> $b$ は点で与えられる情報で
+$b$ がずれた状態で計算しているのと同じ
+
+TODO: 図
 
 **Proof.**
 
@@ -936,6 +940,7 @@ $p = l_A^{e_A}l_B^{e_B} - 1$
 CSIDH (Commutative Supersingular Isogeny Diffie-Hellman)
 $p = l_1l_2\cdots l_n - 1$
 $n$-同種写像の計算量は $\mathcal{O}(n)$ 掛かります。次数 $2^{256}$ 程度の同種写像計算をする
+この楕円曲線を生成するのに 1700 CPU時間使ったらしいです。
 
 SIKE (Supersingular Isogeny Key Encapsulation)
 
@@ -1007,20 +1012,10 @@ $$
 (\sqrt{p}-1)^{2g} \leq \#\mathcal{J}_C(\mathbb{F}_p) \leq (\sqrt{p}+1)^{2g}
 $$
 
-> **フロベニウス写像の特性多項式**
-> 種数 2 の超楕円曲線のフロベニウス写像 $\phi$ の特性多項式は次のようになる。
->
-> $$
-\begin{aligned}
-\chi(x) := x^4 & - s_1x^3 + s_2x^2 - s_1px + p^2 \\
--4\sqrt{p} & \leq s_1 \leq 4\sqrt{p} \\
-2\sqrt{p}|s_1| - 2p & \leq s_2 \leq \frac{1}{4}s_1^2 + 2p
-\end{aligned}
-$$
->
-> このとき $\chi(1) = \#\mathcal{J}_C(\mathbb{F}_p)$ となるので $s_1, s_2$ を求められれば位数がわかる。
-
 $\#\mathcal{J}_C(\mathbb{F}_p) \approx p^g$
+
+同様に超楕円曲線にもその位数に関係するフロベニウス写像の特性多項式があり、$l$ 等分多項式を用いて $l$ 等分点を生成して Schoof のアルゴリズムを適用すれば位数が求まります。
+
 
 被約因子
 
@@ -1037,10 +1032,14 @@ P_1 + P_2 - 2P_\infty
 \end{cases}
 $$
 
+## まとめ
+
 ## 参考文献
 - [Imaginary hyperelliptic curve - Wikipedia](https://en.wikipedia.org/wiki/Imaginary_hyperelliptic_curve)
 - https://blog.z.cash/new-snark-curve/ : BLS12-381: New zk-SNARK Elliptic Curve Construction
 - Python での高速な実装 fastecdsa
+- https://www.iisec.ac.jp/proc/vol0002/iisec_proc_002_p043.pdf
+- http://www.ipc.tohoku-gakuin.ac.jp/atsushi/article/velu.pdf
 
 この資料は CC0 ライセンスです。
 
