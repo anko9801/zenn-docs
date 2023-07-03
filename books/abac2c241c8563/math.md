@@ -618,6 +618,69 @@ $$
 ### 数体ふるい法
 
 
+## 多項式の解
+さて多変数連立 $n$ 次方程式の場合はどうでしょう。Coppersmith Method も使うこともできますが、私の体感的には精度が出にくいです。これに対して使われる道具は多項式 GCD, 終結式, Gröbner 基底があります。
+
+### 多項式 GCD
+
+まずは多項式 GCD です。
+例えば $x$ について同じ解を持つ次のような方程式を考えてみましょう。
+
+> **Half GCD**
+> 2 つの多項式の最大公約式を $\mathcal{O}(N(\log{N})^2)$ で求められる。(N is 何)
+
+$a = qb + r$
+
+$$
+\begin{pmatrix}
+  0 & 1 \\
+  1 & -q
+\end{pmatrix}
+\begin{pmatrix}
+  a \\
+  b
+\end{pmatrix}
+= \begin{pmatrix}
+  b \\
+  a - qb
+\end{pmatrix}
+$$
+
+
+
+### 終結式
+式増やしてgcd
+合成数 mod でも使える
+グレブナー基底は mod p のみ
+
+### Gröbner 基底
+
+Gröbner 基底のお気持ちは多項式を基底簡約するものです。
+
+$$
+T = \lbrace x_1^{e_1}x_2^{e_2}\cdots x_l^{e_l}\mid e_1,e_2,\cdots,e_l\in\mathbb{Z}_{\geq 0}\rbrace
+$$
+
+- $\mathrm{lt}(f)$: 先頭項 (leading term)
+- $\mathrm{lc}(f)$: 先頭係数 (leading coefficient)
+- $\mathrm{lm}(f)$: 先頭単項式 (leading monomial)
+
+$f = 5x_1^2x_3 - 2x_1x_3 + 3x_2x_3 \in \mathbb{Q}[x_1, x_2, x_3]$ のとき $\mathrm{lt}(f) = x_1^2x_3$, $\mathrm{lc}(f) = 5$, $\mathrm{lm}(f) = 5x_1^2x_3$ となる。
+
+
+Buchberger の業績を Gröbner 教授が奪って発表した
+
+> **Buchberger's Algorithm**
+> 1. $G = F$
+> 2.
+> 3.
+
+表に解き方をまとめるとこんな感じです。
+
+|            |           1変数          |               多変数              |
+|:----------:|:------------------------:|:---------------------------------:|
+| 1次方程式 | 拡張ユークリッドの互除法 |                LLL                |
+|  n次方程式 |    Coppersmith Method    | 多項式GCD, 終結式, Gröbner基底 |
 
 ## 計算可能性
 今までの暗号がこんなに攻撃できそうなのになぜ安全だと言えるのか？それは計算可能性が証明できるからです。
@@ -664,7 +727,6 @@ $$
 	- 暗号文が与えられた時、ある関係性を持った別の暗号文の生成が不可
 	- stream cipher
 	- RSA暗号 $Enc(m)\cdot t^e \bmod n = Enc(mt)$ padding(OAEP, PKCS 1)
-
 
 ## まとめ
 
