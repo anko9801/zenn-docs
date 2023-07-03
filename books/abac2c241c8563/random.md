@@ -54,22 +54,32 @@ ex.) XorShift、線形合同法、メルセンヌ・ツイスタ、LFSR
 
 私は TRNG の仕組みをあまり知らないので DRBG だけを紹介していこうと思います。
 
-DRBG は競プロのテストは XorShift を用います。今回はメルセンヌ・ツイスタを紹介します。線形合同法の攻撃については多くの解説記事があるのでここでは割愛します。良記事としては次のものがあります。
+簡易的で代表的な DRBG は次のようなものがあります。
 
-https://www.youtube.com/watch?v=WaAErTq7hWA
+- 線形合同法
+- XorShift
+- LFSR
+- メルセンヌ・ツイスタ
 
-DRBG に対する全ての攻撃は内部状態をいかに復元するかが鍵となっています。
+これらは高速に生成できるので安全性が求められない疑似乱数としては優秀です。XorShift やメルセンヌ・ツイスタは競プロのテスト生成でよく使われますね。
 
-### LFSR (Linear Feedback Shift Register)
+このような DRBG に対する攻撃の本質はすべて内部状態をいかに復元するかです。
+CTF では基本逆操作を行うことで攻撃が成功します。また高難易度典型としてCrypto ツールで紹介する SMT を使ったり、論理演算の線形近似 (Walsh-Hadamard 変換など) を行うなどの手法もあります。
 
-$\boldsymbol{a}_k^n = (a_k, a_{k+1}, \ldots, a_{k+n-1})\in\mathbb{F}_2^n$
+> **線形合同法**
 
-$$
+> **XorShift**
+
+> **LFSR (Linear Feedback Shift Register)**
+> $\bm{a}_k^n = (a_k, a_{k+1}, \ldots, a_{k+n-1})\in\mathbb{F}_2^n$
+>
+> $$
 \begin{aligned}
-a_{k+n} & = \boldsymbol{s}\cdot\boldsymbol{a}_k^{n} = \sum_{i=0}^{n-1} s_ia_{k+i} \\
-x_k & = \boldsymbol{c}\cdot\boldsymbol{a}_k^{n} = \sum_{i=0}^{n-1} c_ia_{k+i}
+a_{k+n} & = \bm{s}\cdot\bm{a}_k^{n} = \sum_{i=0}^{n-1} s_ia_{k+i} \\
+x_k & = \bm{c}\cdot\bm{a}_k^{n} = \sum_{i=0}^{n-1} c_ia_{k+i}
 \end{aligned}
 $$
+
 
 ```python
 class LFSR():
@@ -77,7 +87,7 @@ class LFSR():
     self.state = [getRandBit(1) for _ in range(n)]
     self.taps = [getRandBit(1) for _ in range(n)]
   def next(self):
-    output = reduce(xor, [bit&tap for bit,tap in zip(self.state, self.taps)])
+    output = reduce(xor, [bit & tap for bit, tap in zip(self.state, self.taps)])
     self.state = self.state[1:] + [output]
     return output
 
@@ -111,38 +121,28 @@ def generate_bit_sequence(initial_state):
 zer0lfsr, zer0lfsr+, zer0lfsr++ を解こう
 :::
 
-#### NLSR
-非線形化を施すと行列形式で書くことができないので逆変換が難しくなる。
-
-攻撃手法
-1. 高次項は無視や線形近似をする (Walsh-Hadamard 変換)
-2. 低次項は状態として定義する
-3. annihilator
-4. Correlation Attack
-5. Z3
-
 ### メルセンヌ・ツイスタ (MT19937)
 統計的に十分に分散していて長い周期を持つ高速な疑似乱数生成器の一種です。周期の長さは $2^{19937}-1$ とメルセンヌ数であり名前の由来になっています。実は日本人が作っています。
 
-中身では 32 ビットのビットベクタで計算されていて初期状態 $\boldsymbol{x}_i$ $(i = 0,\cdots,n)$ を入力して漸化式から $\boldsymbol{x}_k$ を生成し、それぞれの $\boldsymbol{x}_k$ について後処理をした $\boldsymbol{y}$ を出力とします。
+中身では 32 ビットのビットベクタで計算されていて初期状態 $\bm{x}_i$ $(i = 0,\cdots,n)$ を入力して漸化式から $\bm{x}_k$ を生成し、それぞれの $\bm{x}_k$ について後処理をした $\bm{y}$ を出力とします。
 
 $$
 \begin{aligned}
-  \boldsymbol{x}_{k+n} & = \boldsymbol{x}_{k+m}\oplus((\boldsymbol{x}_k\mid\boldsymbol{x}_{k+1})\gg 1)\oplus(\mathrm{LSB}(\boldsymbol{x}_{k+1})\mathop{\mathrm{AND}}\boldsymbol{a}) \\
-  \boldsymbol{y} & \leftarrow \boldsymbol{x}_k \\
-  \boldsymbol{y} & \leftarrow \boldsymbol{y} \oplus\ \,(\boldsymbol{y}\gg 11) \\
-  \boldsymbol{y} & \leftarrow \boldsymbol{y} \oplus((\boldsymbol{y}\ll\ \ 7) \mathop{\mathrm{AND}} \boldsymbol{b}) \\
-  \boldsymbol{y} & \leftarrow \boldsymbol{y} \oplus((\boldsymbol{y}\ll 15) \mathop{\mathrm{AND}} \boldsymbol{c}) \\
-  \boldsymbol{y} & \leftarrow \boldsymbol{y} \oplus\ \,(\boldsymbol{y}\gg 18) \\
+  \bm{x}_{k+n} & = \bm{x}_{k+m}\oplus((\bm{x}_k\mid\bm{x}_{k+1})\gg 1)\oplus(\mathrm{LSB}(\bm{x}_{k+1})\mathop{\mathrm{AND}}\bm{a}) \\
+  \bm{y} & \leftarrow \bm{x}_k \\
+  \bm{y} & \leftarrow \bm{y} \oplus\ \,(\bm{y}\gg 11) \\
+  \bm{y} & \leftarrow \bm{y} \oplus((\bm{y}\ll\ \ 7) \mathop{\mathrm{AND}} \bm{b}) \\
+  \bm{y} & \leftarrow \bm{y} \oplus((\bm{y}\ll 15) \mathop{\mathrm{AND}} \bm{c}) \\
+  \bm{y} & \leftarrow \bm{y} \oplus\ \,(\bm{y}\gg 18) \\
 \end{aligned}
 $$
 
-ただし、$\boldsymbol{x}_k\mid\boldsymbol{x}_{k+1}$ は $\boldsymbol{x}_k$ の最上位ビットと $\boldsymbol{x}_{k+1}$ の下位 31 ビットを結合する演算、$\mathrm{LSB}(\boldsymbol{x}_{k+1})$ は $\boldsymbol{x}_{k+1}$ の最下位ビットを 32 ビットに展開する演算です。パラメータと初期シード $x_0$ を元に初期状態を生成する漸化式は次のようにします。
+ただし、$\bm{x}_k\mid\bm{x}_{k+1}$ は $\bm{x}_k$ の最上位ビットと $\bm{x}_{k+1}$ の下位 31 ビットを結合する演算、$\mathrm{LSB}(\bm{x}_{k+1})$ は $\bm{x}_{k+1}$ の最下位ビットを 32 ビットに展開する演算です。パラメータと初期シード $x_0$ を元に初期状態を生成する漸化式は次のようにします。
 
 $$
 \begin{aligned}
   n & = 624 \quad m = 397 \\
-  \boldsymbol{a} & = \mathrm{0x9908B0DF} \quad \boldsymbol{b} = \mathrm{0x9D2C5680} \quad \boldsymbol{c} = \mathrm{0xEFC60000} \\
+  \bm{a} & = \mathrm{0x9908B0DF} \quad \bm{b} = \mathrm{0x9D2C5680} \quad \bm{c} = \mathrm{0xEFC60000} \\
   x_i & = (x_{i-1} \oplus (x_{i-1}\gg 30))\times 1812433253 + i \pmod{2^{32}}
 \end{aligned}
 $$

@@ -213,21 +213,21 @@ $\mathbb{Z}_N[X] := \mathbb{Z}[X]/(X^N + 1)$
 $\mathbb{T}_N[X] := \mathbb{R}[X]/(X^N + 1)\bmod 1$
 
 > **Gadget Decomposition function**
-> $\|d - \boldsymbol{v}\cdot H\|$ を最小化する $\boldsymbol{v}$ を求めるアルゴリズム
+> $\|d - \bm{v}\cdot H\|$ を最小化する $\bm{v}$ を求めるアルゴリズム
 approximate decomposition
 
 LWE は次のようなものだった。
 
-$\boldsymbol{a}$: $U_{\mathbb{T}^n}$
+$\bm{a}$: $U_{\mathbb{T}^n}$
 $e$: $\mathcal{D}_{\mathbb{T},\alpha}$
-$\boldsymbol{s}$: $U_{\mathbb{B}^n}$
+$\bm{s}$: $U_{\mathbb{B}^n}$
 
 $$
 \begin{aligned}
-b & = \boldsymbol{a}\cdot\boldsymbol{s} + m + e \\
+b & = \bm{a}\cdot\bm{s} + m + e \\
 m & \in\mathbb{B}, \mu = \frac{1}{8}\in\mathbb{T} \\
-b & = \boldsymbol{a}\cdot\boldsymbol{s} + \mu(2\cdot m - 1) + e \\
-m & = \frac{sgn(b - \boldsymbol{a}\cdot\boldsymbol{s}) + 1}{2}
+b & = \bm{a}\cdot\bm{s} + \mu(2\cdot m - 1) + e \\
+m & = \frac{sgn(b - \bm{a}\cdot\bm{s}) + 1}{2}
 \end{aligned}
 $$
 
@@ -237,7 +237,7 @@ SampleExtractIndex
 $$
 \begin{aligned}
 \lceil Bg\cdot(a_0, a_1, b)\rfloor\cdot\frac{\mu}{Bg} & = (a_0^r, a_1^r, b^r) \approx \mu\cdot(a_0, a_1, b) \\
-b^r - \boldsymbol{a}^r\cdot\boldsymbol{s} & = \mu(b - \boldsymbol{a}\cdot\boldsymbol{s} + e_r)
+b^r - \bm{a}^r\cdot\bm{s} & = \mu(b - \bm{a}\cdot\bm{s} + e_r)
 \end{aligned}
 $$
 
