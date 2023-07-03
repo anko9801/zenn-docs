@@ -379,7 +379,10 @@ flowchart LR
 
 中国剰余定理を用いて大きな群を複数の小さな群の直積に分けます。楕円曲線暗号の楕円曲線の位数は細かく素因数分解できることが多いので RSA とかと違って実用的な手法になります。
 
-楕円曲線の位数 $\#E = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ と素因数分解して $Q = dP$ となるとき次のように $d_i$ を定義する。
+> **Pohlig-Hellman**
+> 楕円曲線の位数が $\#E = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ と素因数分解できるとき $\mathcal{O}(\sum_ie_i\sqrt{p_i})$ で ECDLP が解ける。
+
+$Q = dP$ に対して次のように $d_i$ を定義する。
 
 $$
 d = d_0+d_1p_i+d_2p_i^2+\ldots+d_{e_i−1}p_i^{e_i−1} \quad \pmod{p_i^{e_i}} \\
@@ -416,7 +419,48 @@ def pohlig_hellman(G):
     return crt(dlogs, primes)
 ```
 
-### Index Calculus Algorithm
+### 指数計算法 (Index Calculus Algorithm)
+Index Calculus Algorithm は次のように抽象化されます。
+
+> **Index Calculus Algorithm**
+> 巡回群 $G\subseteq \langle P\rangle\subseteq E$ $Q = dP$
+> 1. 因子基底 (Factor Base) $\mathcal{F}\subseteq G$ を決定する。
+> 2. $R_j = a_jP + b_jQ$ 分解する。
+>
+> $$
+R_j = a_jP + b_jQ = \sum_{P_i\in\mathcal{F}}e_{ij}P_i
+$$
+
+有限体上の
+
+因子基底 $p_j$
+1. 小さな素因数 $p_j$ を用いて $yg^k = \prod_{j = 1}^m p_j^{e_{j}} \pmod p$ と書けるような $k$ を見つける。
+2. $g^{k_i} = \prod_{j = 1}^m p_j^{e_{ij}} \pmod{p}$ と素因数分解できるような $k_i$ を $n$ 個以上見つける。
+
+すると次のように書ける。
+
+$$
+\begin{aligned}
+  g^{k_i} & = \prod_{j = 1}^m p_j^{e_{ij}} & \pmod p \\
+  k_i & = \sum_{j = 1}^m e_{ij}\log_g{p_j} & \pmod{p-1} \\
+\begin{pmatrix}
+  k_1 \\
+  \vdots \\
+  k_n \\
+\end{pmatrix} & =
+\begin{pmatrix}
+  e_{11} & \cdots & e_{m1} \\
+  \vdots & \ddots & \vdots \\
+  e_{1n} & \cdots & e_{mn}\\
+\end{pmatrix}
+\begin{pmatrix}
+  \log_g p_1 \\
+  \vdots \\
+  \log_g p_m \\
+\end{pmatrix} & \pmod{p-1}
+\end{aligned}
+$$
+
 種数が大きい超楕円曲線上の ECDLP では Index Calculus Algorithm を応用することができます。超楕円曲線は後で解説しますが、楕円曲線の $x$ に関する式が 3 次方程式だったのに対し、一般の奇数次数の方程式となるものです。
 
 $B$ 以下の素数に代えて、
