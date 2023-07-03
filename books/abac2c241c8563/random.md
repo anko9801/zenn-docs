@@ -322,6 +322,7 @@ https://github.com/cr-marcstevens/hashclash
 
 ### Differenctial Cryptoanalysis
 暗号を解析しながら SMT を用いて解く
+https://github.com/aappleby/smhasher/wiki/MurmurHash2Flaw
 
 ランダムオラクルモデル
 スタンダードモデル

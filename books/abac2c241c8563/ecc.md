@@ -877,6 +877,11 @@ $\Box$
 > **MOV/FR Reduction**
 > ペアリング $f$ について
 > $e_m(P, Q)$
+> Weil pairing $e_n: E[n]\times E[n]\to \mu_n\subseteq \mathbb{F}_{p^k}^*$
+> 1. $E[n]\subseteq E(\mathbb{F}_{p^k})$ となる最小の $k$ を持ってくる
+> 2. 位数 $n$ の $\alpha=e_n(P, Q)$ となるように $Q \in E[n]$ を取ってくる
+> 3. $\beta = e_n(dP, Q)$
+> 4. $\mathbb{F}_{p^k}^*$ 上のDLPを $\alpha, \beta$ を用いて解く
 >
 > - Weil pairing を用いるものを MOV (Menezes-Okamoto-Vanstone) Reduction という。
 > - Tate pairing を用いるものを FR (Frey-Rück) Reduction という。
@@ -1034,6 +1039,9 @@ E = EllipticCurve(x^3 + 6*x^2 + x)
 
 https://eprint.iacr.org/2022/975
 
+https://ellipticnews.wordpress.com/2022/08/12/attacks-on-sidh-sike/
+https://github.com/GiacomoPope/Castryck-Decru-SageMath
+
 ## 超楕円曲線
 ヤコビ多様体
 Mumford 表現
@@ -1111,6 +1119,8 @@ $$
 - [Mathematics of Isogeny Based Cryptography](https://arxiv.org/pdf/1711.04062.pdf)
 - [Isogenies of Elliptic Curves](https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch25.pdf)
 - [楕円曲線上の離散対数問題に関する指数計算法](https://www.cryptrec.go.jp/exreport/cryptrec-ex-2602-2016.pdf)
+- [Fermat Quotient と Anomalous 楕円曲線の離散対数の多項式時間解法アルゴリズムについて(代数的整数論とその周辺)](https://repository.kulib.kyoto-u.ac.jp/dspace/bitstream/2433/61761/1/1026-15.pdf)
+- [ECFFT1.pdf (toronto.edu)](https://www.math.toronto.edu/swastik/ECFFT1.pdf)
 
 この資料は CC0 ライセンスです。
 

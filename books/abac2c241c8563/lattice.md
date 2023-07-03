@@ -27,7 +27,7 @@ $$
 
 素朴に考えると最短ベクトルを見つける為には色んな係数を試して探索すれば良さそうです。この方法だとベクトルの数に対して指数的に探索空間が広がるので自然と指数時間掛かります。そしてこの問題は NP 困難と知られていて、オーダーレベルで改善する方法は今のところ見つかっていません。
 
-ただ探索する順番を効率化したり、最短ではないが最短に近いベクトルを見つける問題 (μSVP) を解くことはできます。それを担うのが基底簡約アルゴリズムです。
+ただ探索する順番を効率化したり、最短ではないが最短に近いベクトルを見つける問題 (μSVP) を解くことはできます。それを担うのが基底簡約アルゴリズムです。一応断っておきますが現代の格子暗号は基底簡約アルゴリズムでは解けません(解けたら困る)。
 
 格子の基底は変形できます。
 
@@ -118,6 +118,8 @@ $$
 $$
 
 と定義を拡大して $\bm{U} = (\mu_{ij})$
+
+$O(N^3)$
 
 > **Prop. GSO ベクトルの基本性質**
 > 1. 任意の $1\leq i<j\leq n$ に対して $\langle\bm{b}_i^*, \bm{b}_j^*\rangle = 0$ が成り立つ。
@@ -875,9 +877,14 @@ _m = enc.decrypt(c)
 assert m == _m
 ```
 
+TODO: どのくらいの情報があれば破れるのかを具体的に話したい
+https://eprint.iacr.org/2023/777.pdf
+
 ## まとめ
 格子の基底簡約アルゴリズムは重要な技術で格子暗号だけではなく様々な暗号の攻撃に応用でき
 
 ## 参考文献
 - https://www.cryptrec.go.jp/exreport/cryptrec-ex-2404-2014.pdf
 - https://joint.imi.kyushu-u.ac.jp/wp-content/uploads/2022/08/220801_03hiromasa.pdf
+- [元論文](https://static.aminer.org/pdf/PDF/000/192/854/finding_a_small_root_of_a_univariate_modular_equation.pdf)
+- [katagaitai workshop 2018 winter](http://elliptic-shiho.github.io/slide/katagaitai_winter_2018.pdf)

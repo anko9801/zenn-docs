@@ -660,8 +660,8 @@ $$
 
 $$
 \begin{aligned}
-c_1 &≡ m^{e_1} \pmod N \\
-c_2 &≡ m^{e_2} \pmod N \\
+c_1 & = m^{e_1} \pmod N \\
+c_2 & = m^{e_2} \pmod N
 \end{aligned}
 $$
 
@@ -670,7 +670,7 @@ $e_1, e_2$ について拡張ユークリッドの互除法を用いて $g = \gc
 $$
 \begin{aligned}
 g & = \gcd(e_1, e_2) = s_1e_1 + s_2e_2 \\
-m^g & = m^{s_1e_1 + s_2e_2} = c_1^{s_1} c_2^{s_2} \pmod N \\
+m^g & = m^{s_1e_1 + s_2e_2} = c_1^{s_1} c_2^{s_2} \pmod N
 \end{aligned}
 $$
 
@@ -693,6 +693,8 @@ $$
 ### パディングによるエラー内容を知られてはいけない (Bleichenbacher's Attack)
 
 これについてパディングが合っているかどうかを相手に送ってしまうと Padding Oracle Attack で攻撃でき、PKCS #1 v1.5では200万程度送ると平文が読めてしまいます。
+
+対して Padding Oracle Attack で破られないようなパディング形式はInD-CCA2と呼び、OAEP (Optimal Asymmetric Encryption Padding) はそうです。
 
 :::message
 **練習問題**
@@ -994,5 +996,8 @@ $$
 - [SageMathを使ってCoppersmith's Attackをやってみる](https://inaz2.hatenablog.com/entry/2016/01/20/022936)
 - [RTACTF](https://xagawa.hatenablog.com/entry/2021/12/20/232133)
 - [Crypto Challenge](https://mystiz.hk)
+- [They Were Eleven - BSides Ahmedabad CTF 2021 author's writeup](https://furutsuki.hatenablog.com/entry/2021/12/07/020611)
+- [The Return of Coppersmith's Attack:Practical Factorization of Widely Used RSA Moduli (acmccs.github.io)](https://acmccs.github.io/papers/p1631-nemecA.pdf)
+- [RSAに対する適応的選択暗号文攻撃とパディング方式](https://inaz2.hatenablog.com/entry/2016/01/26/222303)
 
 この資料は CC0 ライセンスです。
