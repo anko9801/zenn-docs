@@ -4,7 +4,7 @@ title: "耐量子暗号"
 
 量子コンピュータにより DLP や素因数分解問題は Shor のアルゴリズムを用いて多項式時間で計算出来ることがわかりました。これにより従来多く用いられてきた公開鍵暗号である RSA 暗号や楕円曲線暗号は量子コンピュータによって解かれてしまいます。その為量子コンピュータに解かれないような暗号: 耐量子暗号を開発する必要が出てきました。
 
-OpenSSH や [AWS Key Management Service](https://aws.amazon.com/jp/blogs/news/round-2-post-quantum-tls-is-now-supported-in-aws-kms/) でも耐量子暗号をサポートし普及しています。
+[OpenSSH 9.0](https://www.zdnet.com/article/openssh-now-defaults-to-protecting-against-quantum-computer-attacks/) や [AWS Key Management Service](https://aws.amazon.com/jp/blogs/news/round-2-post-quantum-tls-is-now-supported-in-aws-kms/) でも耐量子暗号をサポートし普及しています。
 
 耐量子暗号の仕組みや攻撃について紹介します。ただなぜ量子コンピュータで解かれないのかについてはよく分かっていないのでお答え出来ません。ここらへんについて詳しい方がいたらご教授頂きたいです。
 
@@ -37,8 +37,8 @@ https://csrc.nist.gov/Projects/post-quantum-cryptography/post-quantum-cryptograp
 
 ## 格子暗号
 
-### NTRU
-CRYSTALS と引き合いとして出されるのが NTT が開発した NTRU 暗号です。
+CRYSTALS-KYBER と引き合いとして出されるのが NTT が開発した NTRU 暗号です。
+OpenSSH 9.0 格子暗号系の「Streamlined NTRU Prime」と、楕円曲線暗号系の「x25519」からなるハイブリッド手法がデフォルトとなる。
 
 > **Def. Ternary Polynomials**
 > 係数が $\pm 1$ の多項式の集合である。具体的には $\mathcal{T}(d_{+1}, d_{-1})$ を $d_{+1}$ 個の $+1$ 係数と $d_{-1}$ 個の $-1$ 係数のある多項式の集合とする。
@@ -124,16 +124,11 @@ randomized tree-based stateless signature
 > 松本勉と今井秀樹は隠れ単項式暗号系というエレガントな方法を 1988 年開催の国際会議 EUROCRYPT で発表した。これは現在、松本-今井暗号と呼ばれている。1996年、パタリン (J. Patarin) は松本-今井暗号を解読し、翌 97 年、松本-今井暗号を拡張した HFE (Hidden Field Equation) を提案した。この HFE は 2003 年に J.-C. Fauge`re と A. Joux により、グレブナー基底という一見直截的な攻撃法によって破られている。
 > 暗号理論と楕円曲線より
 
-### 暗号の構成
 > **MQ 問題**
 > 有限体 $\mathbb{F}_q$ 上を係数とする $m$ 個の $n$ 変数の $2$ 次多項式の共通解をひとつ求めよ
 
 > **Def. 松本-今井暗号**
 > $v$
-
-
-
-### 攻撃
 
 グレブナー基底
 

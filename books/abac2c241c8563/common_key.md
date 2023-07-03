@@ -367,5 +367,8 @@ https://tex2e.github.io/blog/crypto/chacha20poly1305
 - https://www.scutum.jp/information/waf_tech_blog/2011/10/waf-blog-008.html
 - https://gist.github.com/theoremoon/8bcb9b87dcb1289cf13c9db4431db324
 - Al Fardan, N.J. and K.G. Paterson, "Lucky Thirteen: Breaking the TLS and DTLS record protocols", n.d., <https://ieeexplore.ieee.org/iel7/6547086/6547088/06547131.pdf>.
+- [GoogleがTLSでの採用を提唱している共通鍵暗号方式「ChaCha」についてまとめた](https://sonickun.hatenablog.com/entry/2016/04/03/183220)
+- [ChaCha, a variant of Salsa20](https://cr.yp.to/chacha/chacha-20080128.pdf)
+- [RFC 7539 : ChaCha20 and Poly1305 for IETF Protocols](https://tools.ietf.org/html/rfc7539)
 
 この資料は CC0 ライセンスです。

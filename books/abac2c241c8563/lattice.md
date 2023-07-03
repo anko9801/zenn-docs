@@ -211,7 +211,34 @@ $$
 >
 > を繰り返し $m = 0$ となるとき $\bm{v}_1$, $\bm{v}_2$ は最も簡約された基底となる。
 
-最も簡約化されているかを証明する。
+**Definition 1** (Lagrange 簡約)
+任意の $q \in \mathbb{Z}$ に対して $\|\mathbf{b}_1\| \leq \|\mathbf{b}_2\| \leq \|\mathbf{b}_1 + q\mathbf{b}_2\|$ を満たすとき, 2次元格子の基底 $\{\mathbf{b}_1, \mathbf{b}_2\}$ は Lagrange 簡約されているという.
+
+**Theorem 2** (Lagrange 簡約によって逐次最小基底)
+2次元格子の基底 $\{\mathbf{b}_1, \mathbf{b}_2\}$ について次の2つは同値である.
+1. 基底 $\{\mathbf{b}_1, \mathbf{b}_2\}$ は Lagrange 簡約されている.
+2. 基底 $\{\mathbf{b}_1, \mathbf{b}_2\}$ は格子 $L$ の逐次最小基底である.
+
+**Proof.**
+($\implies$)
+任意の非零ベクトル $\mathbf{v} = x _ 1\mathbf{b} _ 1 + x _ 2\mathbf{b} _ 2 \in L$ について $x _ 2 = 0$ のとき $\|\mathbf{v}\| = |x _ 1|\|\mathbf{b} _ 1\| \geq \|\mathbf{b} _ 1\|$, $x _ 2 \neq 0$ のとき $\|\mathbf{v}\| \geq \|\mathbf{b} _ 2\| \geq \|\mathbf{b} _ 1\|$ を示す.
+
+$$
+\begin{aligned}
+\|\mathbf{v}\| &= \|x _ 1\mathbf{b} _ 1 + x _ 2\mathbf{b} _ 2\| \\
+&= \|r\mathbf{b} _ 1 + x _ 2(\mathbf{b} _ 2 + q\mathbf{b} _ 1)\| \\
+&\geq x _ 2\|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| - r\|\mathbf{b} _ 1\| \\
+&= (x _ 2 - r)\|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| + r(\|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| - \|\mathbf{b} _ 1\|) \\
+&\geq \|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| \\
+&\geq \|\mathbf{b} _ 2\| \geq \|\mathbf{b} _ 1\|
+\end{aligned}
+$$
+
+Euclidの互除法を2次元格子に対して行うことで Lagrange 簡約されているような基底を生み出せる。
+
+
+
+最も簡約化されているかを証明する。$O(\log N)$
 
 ```python
 def gaussian_reduction(v1, v2):
@@ -279,6 +306,23 @@ $$
 >
 > 特に任意の $1\leq i\leq n$ について $\|\bm{b}_i\| = \lambda_i(L)$ を満たすとき逐次最小ベクトルと呼び、それらが基底となっているとき逐次最小基底と呼ぶ。
 
+$n$ 次元格子 $L$ の基底 $\lbrace\mathbf{b_1},\ldots,\mathbf{b_n}\rbrace$ について以下の条件を満たすとき、その基底は LLL 簡約されている (Lenstra-Lenstra-Lovasz(LLL)-reduced)と呼ぶ。
+
+1. 基底 $\lbrace\mathbf{b_1},\ldots,\mathbf{b_n}\rbrace$ がサイズ簡約されている。
+2. Lovasz条件: 任意の $2 \leq k \leq n$ に対して $\delta\|\mathbf{b}_{k-1}^*\| \leq \|\pi_{k-1}(\mathbf{b}_{k-1})\|$ を満たす。ただし、各 $1 \leq l \leq n$ に対して、$\pi_l$ は $\mathbb{R}$-ベクトル空間 $\langle\mathbf{b} _1,\ldots,\mathbf{b} _{l-1}\rangle _\mathbb{R}$ の直交補空間への直交射影とする。
+
+これに対し、LLL 基底簡約アルゴリズムは次のように行う。
+
+1. サイズ簡約する。
+2. Lovasz条件を満たすように隣り合う基底ベクトルを交換する。
+
+基底ベクトルを交換した際に GSO ベクトルも更新しなければならない。高速化出来る。
+
+さらに LLL について精度を上げたり、機能を拡張することができ、DeepLLLやMLLLなどの手法がある。
+
+- LLL は隣り合う基底ベクトルのみを比較するが、DeepLLL は全ての基底ベクトルを比較する。
+- MLLL は一次従属なベクトルでも適用できる。
+
 > **LLL (Lenstra-Lenstra-Lovasz) 基底簡約**
 > Lovasz 条件を $1/4 < \delta < 1$ としたときに任意の $2\leq k\leq n$ に対して次を満たすこととする。
 >
@@ -317,6 +361,47 @@ def LLL(B, delta=0.99):
             BB, mu = B.gram_schmidt()
             i = max(i - 1, 1)
     return B
+
+def LLL(B, delta):
+    n = len(B)
+    assert 1 / 4 < delta < 1
+    B = matrix(B)
+    i = 1
+    G, mu = B.gram_schmidt()
+    while i < n:
+        for j in range(i - 1, -1, -1):
+            print(i, j)
+            if mu[i][j].abs() > 1 / 2:
+                q = mu[i][j].round()
+                B[i] -= q * B[j]
+                mu[i] -= q * mu[j]
+        if B[i].norm() >= (delta - mu[i][i - 1] ^ 2) * B[i - 1].norm():
+            i += 1
+        else:
+            B[i - 1], B[i] = B[i], B[i - 1]
+            mu = GSOUpdate(B, mu, i)
+            i = max(i - 1, 1)
+    return B
+
+
+def GSOUpdate(B, mu, i):
+    n = B.nrows()
+    nu = mu[i][i - 1]
+    b = B[i] + nu ^ 2 * B[i - 1]
+    print(nu, B[i - 1], b)
+    mu[i][i - 1] = nu * B[i - 1] / b
+    B[i] = B[i] * B[i - 1] / b
+    B[i - 1] = b
+    for j in range(i - 1):
+        mu[i - 1][j], mu[i][j] = mu[i][j], mu[i - 1][j]
+    for k in range(i + 1, n):
+        t = mu[k][i]
+        mu[k][i] = mu[k][i - 1] - nu * t
+        mu[k][i - 1] = t + mu[i][i - 1] * mu[k][i]
+    return mu
+
+B = [vector([5, -3, -7]), vector([2, -7, -7]), vector([3, -10, 0])]
+print(LLL(B, 0.8))
 ```
 
 実際は LLL 簡約されていることを定義して、簡約されたときの上限などを示し、LLL 簡約された基底を返すアルゴリズムの well-defined 性や高速化を考えますが、前提知識などが不足していたり長くなるのでアルゴリズムとその特徴を天下り的に書いて終わらせます。
