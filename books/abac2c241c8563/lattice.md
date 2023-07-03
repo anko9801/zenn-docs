@@ -329,7 +329,7 @@ def LLL(B, delta=0.99):
 > 1. サイズ基底簡約
 > 2. すべての $1\leq k\leq n-\beta+1$ に対して $\beta$ 次元の格子 $L_{[k,k+\beta-1]} = \lbrace\pi_k(\bm{b}_k), \pi_k(\bm{b}_{k+1}), \ldots, \pi_k(\bm{b}_{k+\beta-1})\rbrace$ の基底が HKZ 基底簡約
 
-## 応用
+## 基底簡約アルゴリズムの応用
 
 ### 多変数不定一次方程式の解
 多変数不定一次方程式と言われてもパッと分からないと思いますが、こんな感じの方程式のことです。
@@ -757,8 +757,7 @@ print(s)
 ### CRYSTALS-KYBER
 CRYSTALS-KYBER とは NIST が選考している耐量子暗号の一種で Module-LWE を用いた暗号です。
 
-まず Module-LWE は多項式上の演算です。$R_q = \mathbb{F}_q[x]/(x^n+1)$, $R = \mathbb{Z}[x]/(x^n+1)$ 多項式同士の積は数論変換 (NTT; Number Theoretic Transform) を用いて高速に計算できます。
-注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体となります。
+Module-LWE は多項式 $\mathbb{F}_q[x]/(x^n + 1)$ 上の演算でした。注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体となります。簡単の為、$R_q = \mathbb{F}_q[x]/(x^n+1)$, $R = \mathbb{Z}[x]/(x^n+1)$ と書くことにします。多項式同士の積は数論変換 (NTT; Number Theoretic Transform) を用いて高速に計算できます。
 
 > **Def. 多項式の圧縮**
 > また $R_q$ であれば各要素に対して圧縮を行う。
@@ -785,12 +784,12 @@ $$
 
 > **CRYSTALS-KYBER**
 > - 鍵生成
->   1. 疑似乱数で $\bm{A}\in R_q^{k\times k}$ と二項分布で $\bm{s}, \bm{e}\in R^{k}$ を生成し、$\bm{t} = \bm{A}\bm{s} + \bm{e}$ を計算する
->   2. $(\bm{t}, \bm{A})$ を圧縮したものを公開鍵、$\bm{s}$ を秘密鍵とする
+>   1. 疑似乱数で $\bm{A}\in R_q^{k\times k}$ と二項分布で $\bm{s}, \bm{e}\in R^{k}$ を生成し、$\bm{b} = \bm{A}\bm{s} + \bm{e}$ を計算する
+>   2. $(\bm{b}, \bm{A})$ を圧縮したものを公開鍵、$\bm{s}$ を秘密鍵とする
 > - 暗号化
 >   平文 $m$ を用いて
 >   1. 二項分布で $\bm{r}, \bm{e}_1\in R^k, e_2\in R$ を生成する
->   2. $\bm{t}$ を解凍して $(\bm{u}, v) = (\bm{A}^T\bm{r} + \bm{e}_1, \bm{t}^T\bm{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m)$ を圧縮したものを暗号文として返す
+>   2. $\bm{b}$ を解凍して $(\bm{u}, v) = (\bm{A}^T\bm{r} + \bm{e}_1, \bm{b}^T\bm{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m)$ を圧縮したものを暗号文として返す
 > - 復号
 >   $\bm{u}, v$ を解凍して $\mathrm{Compress}_q(v - \bm{s}^T\bm{u}, 1)$ つまり $q / 2$ に近い値は $1$ 、$0$ に近い値は $0$ として返す
 
@@ -839,14 +838,14 @@ class CrystalsKyber:
         A = matrix([[self.random_poly() for _ in range(k)] for _ in range(k)])
         s = vector([self.binomial_poly() for _ in range(k)])
         e = vector([self.binomial_poly() for _ in range(k)])
-        t = A * s + e
+        b = A * s + e
 
-        self.pub = (t, A)
+        self.pub = (b, A)
         self.priv = s
 
     def encrypt(self, m):
         Rq.<x> = self.Rq
-        (t, A) = self.pub
+        (b, A) = self.pub
 
         m = Rq(num2bins(m))
         r = vector([self.binomial_poly() for _ in range(self.k)])
@@ -854,7 +853,7 @@ class CrystalsKyber:
         e2 = self.binomial_poly()
 
         u = A.transpose() * r + e1
-        v = t * r + e2 + (q / 2).round() * m
+        v = b * r + e2 + (q / 2).round() * m
         return (u, v)
 
     def decrypt(self, c):
