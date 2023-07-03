@@ -2,23 +2,75 @@
 title: "格子暗号"
 ---
 
-## 格子の基礎
 
-図でイメージ掴むのが速いので図がほしい！冗長になりがちなので厳密性を落とします。
+## 格子
+
 
 > **Def. 格子**
->  $n$ 個の線形独立なベクトル $\boldsymbol{b}_1,\ldots,\boldsymbol{b}_n\in\mathbb{R}^m$ について整数係数の線形結合によって生成されるベクトルの集合を格子 $\mathcal{L}$ と定義します。
+>  $n$ 個の線形独立なベクトル $\bm{b}_1,\ldots,\bm{b}_n\in\mathbb{R}^m$ について整数係数の線形結合によって生成されるベクトルの集合を格子 $\mathcal{L}$ と定義します。
 >
 > $$
-\mathcal{L}(\boldsymbol{b}_1,\ldots, \boldsymbol{b}_n) := \left\{ \sum_{i=1}^{n} a_i\boldsymbol{b}_i\in\mathbb{R}^m\ \middle|\ a_i \in \mathbb{Z} \right\}
+\mathcal{L}(\bm{b}_1,\ldots, \bm{b}_n) := \left\lbrace\sum_{i=1}^{n} a_i\bm{b}_i\in\mathbb{R}^m\ \middle|\ a_i \in \mathbb{Z} \right\rbrace
 $$
 
+図でイメージ掴むのが速いので図がほしい！
+
+### 格子の問題
+暗号で使われる格子の NP 困難な問題はたくさんありますが、次の SVP と呼ばれる問題が全ての問題の基礎となります。
+
+> **SVP; Shortest Vector Problem**
+> 一般の次元の格子上の非零なベクトルの中で最もノルムが小さなベクトルを見つけ出す問題である。そのベクトルを $\bm{v}$ とおくと次のように表せられる。
+>
+> $$
+\bm{v} = v_1\bm{b}_1 + \ldots + v_n\bm{b}_n \qquad (v_1, \ldots , v_n \in \mathbb{Z}) \\
+$$
+
+素朴に考えると最短ベクトルを見つける為には色んな係数を試して探索すれば良さそうです。この方法だとベクトルの数に対して指数的に探索空間が広がるので自然と指数時間掛かります。そしてこの問題は NP 困難と知られていて、オーダーレベルで改善する方法は今のところ見つかっていません。
+
+ただ探索する順番を効率化したり、最短ではないが最短に近いベクトルを見つける問題 (μSVP) を解くことはできます。それを担うのが基底簡約アルゴリズムです。
+
+格子の基底は変形できます。
+
+> **Prop.**
+> 格子基底の基本変形に対し、格子は不変である。
+
+**Proof.**
+
+基底簡約アルゴリズムとは基底を簡約するものです
+- それぞれの基底ベクトルが直交に近い状態
+- 基底ベクトルの長さが短い
+
+```mermaid
+flowchart LR
+    id0(基底の直交化) --> id2(サイズ基底簡約) --> id3(LLL 基底簡約) --> id4(HKZ 基底簡約) --> id5(BKZ 基底簡約) --> id6(BKZ2.0)
+    id1(Lagrange 基底簡約) --> id2
+    id5 --> id7(RSR)
+    id5 --> id8(G6K)
+```
+
+今回は LLL 基底簡約アルゴリズムまでを扱います。それ以降は参考文献であるなど。。。
+
+LWE 問題の基礎である CVP を解く為にはより強い基底簡約が必要です。まずはそれらを紹介し CVP の解き方、LWE 格子暗号とその派生について学びます。
+
+> **Def. 逐次最小**
+> $n$ 次元格子 $L$ に対して、一次独立な格子ベクトル $\bm{b}_1,\ldots,\bm{b}_i\in L$ を用いて各 $1\leq i\leq n$ における逐次最小を次のように定義する。
+>
+> $$
+\lambda_i(L) := \min_{\bm{b}_1,\ldots,\bm{b}_i\in L}\max\lbrace\|\bm{b}_1\|,\ldots,\|\bm{b}_i\|\rbrace
+$$
+>
+> 特に任意の $1\leq i\leq n$ について $\|\bm{b}_i\| = \lambda_i(L)$ を満たすとき逐次最小ベクトルと呼び、それらが基底となっているとき逐次最小基底と呼ぶ。
+
+## LLL 基底簡約アルゴリズム
+### Gram-Schmidt の直交化
+
+Gram-Schmidt 直交化 (GSO; Gram-Schmidt Orthonormalization) とはベクトル空間 $\mathbb{R}^m$ の基底を直交基底に変換する方法です。 $\bm{b}_n$ の直交化は $\bm{b}_{1},\ldots, \bm{b}_{n-1}$ すべてと直交するように元の高さのまま移動させます。 GSO の Wikipedia の gif がわかりやすいです。
 
 $$
-\boldsymbol{B} = \begin{pmatrix}
-  \boldsymbol{b}_1 \\
+\bm{B} = \begin{pmatrix}
+  \bm{b}_1 \\
   \vdots \\
-  \boldsymbol{b}_n \\
+  \bm{b}_n \\
 \end{pmatrix} = \begin{pmatrix}
   b_{11} & \cdots & b_{1m} \\
   \vdots & \ddots & \vdots \\
@@ -26,45 +78,16 @@ $$
 \end{pmatrix}
 $$
 
-> **Prop.**
-> 格子基底の基本変形に対し、格子は不変である。
-
-化学の格子っぽいもの
-
-### SVP; Shortest Vector Problem
-
-一般の次元の格子上の非零なベクトルの中で最もノルムが小さなベクトルを見つけ出す問題です。
-そのベクトルを $\boldsymbol{v}$ とおくと次のように表せられます。
-
-$$
-\boldsymbol{v} = v_1\boldsymbol{b}_1 + \ldots + v_n\boldsymbol{b}_n \qquad (v_1, \ldots , v_n \in \mathbb{Z}) \\
-$$
-
-この問題はNP困難
-
-> **Def. 逐次最小**
-> $n$ 次元格子 $L$ に対して、一次独立な格子ベクトル $\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\in L$ を用いて各 $1\leq i\leq n$ における逐次最小を次のように定義する。
->
-> $$
-\lambda_i(L) := \min_{\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\in L}\max\lbrace\|\boldsymbol{b}_1\|,\ldots,\|\boldsymbol{b}_i\|\rbrace
-$$
->
-> 特に任意の $1\leq i\leq n$ について $\|\boldsymbol{b}_i\| = \lambda_i(L)$ を満たすとき逐次最小ベクトルと呼び、それらが基底となっているとき逐次最小基底と呼ぶ。
-
-### Gram-Schmidt の直交化 (GSO; Gram-Schmidt Orthonormalization)
-
-Gram-Schmidt 直交化 (GSO; Gram-Schmidt Orthonormalization) とはベクトル空間 $\mathbb{R}^m$ の基底を直交基底に変換する方法です。 $\boldsymbol{b}_n$ の直交化は $\boldsymbol{b}_{1},\ldots, \boldsymbol{b}_{n-1}$ すべてと直交するように元の高さのまま移動させます。 GSO の Wikipedia の gif がわかりやすいです。
-
 > **Def. GSO ベクトル**
-> $n$ 次元格子 $L\subseteq \mathbb{R}^m$ の順序付き基底 $\{\boldsymbol{b}_{1},\ldots, \boldsymbol{b}_{n}\}$ に対する GSO ベクトル $\boldsymbol{b}_{1}^* ,\ldots, \boldsymbol{b}_{n}^ *\in\mathbb{R}^m$ を GSO 係数 $\mu_{i,j}$ を用いて次のように定義する。
+> $n$ 次元格子 $L\subseteq \mathbb{R}^m$ の順序付き基底 $\{\bm{b}_{1},\ldots, \bm{b}_{n}\}$ に対する GSO ベクトル $\bm{b}_{1}^* ,\ldots, \bm{b}_{n}^ *\in\mathbb{R}^m$ を GSO 係数 $\mu_{i,j}$ を用いて次のように定義する。
 >
 > $$
 \begin{aligned}
 &\begin{dcases}
-\boldsymbol{b}_1^* := \boldsymbol{b}_1 \\
-\boldsymbol{b}_i^* := \boldsymbol{b}_i - \sum_{j=1}^{i-1} \mu_{ij} \boldsymbol{b}_j^* & (2\leq i\leq n) \\
+\bm{b}_1^* := \bm{b}_1 \\
+\bm{b}_i^* := \bm{b}_i - \sum_{j=1}^{i-1} \mu_{ij} \bm{b}_j^* & (2\leq i\leq n) \\
 \end{dcases} \\
-&\quad \mu_{ij} := \frac{\langle \boldsymbol{b}_i, \boldsymbol{b}_j^* \rangle}{\| \boldsymbol{b}_j^*\|^2} \qquad (1\leq j<i\leq n)
+&\quad \mu_{ij} := \frac{\langle \bm{b}_i, \bm{b}_j^* \rangle}{\| \bm{b}_j^*\|^2} \qquad (1\leq j<i\leq n)
 \end{aligned}
 $$
 
@@ -73,9 +96,9 @@ $$
 $$
 \begin{aligned}
 \begin{pmatrix}
-\boldsymbol{b}_1 \\
+\bm{b}_1 \\
 \vdots \\
-\boldsymbol{b}_n \\
+\bm{b}_n \\
 \end{pmatrix}
 & =
 \begin{pmatrix}
@@ -86,42 +109,42 @@ $$
 \mu_{n1} & \mu_{n2} & \mu_{n3} & \cdots & 1 \\
 \end{pmatrix}
 \begin{pmatrix}
-\boldsymbol{b}_1^ * \\
+\bm{b}_1^ * \\
 \vdots \\
-\boldsymbol{b}_n^ * \\
+\bm{b}_n^ * \\
 \end{pmatrix} \\
 \\
-\boldsymbol{B} & = \boldsymbol{U}\boldsymbol{B}^*
+\bm{B} & = \bm{U}\bm{B}^*
 \end{aligned}
 $$
 
-この $\boldsymbol{B}$、$\boldsymbol{B}^*$、$\boldsymbol{U}$ をそれぞれ **基底行列**、**GSO ベクトル行列**、**GSO 係数行列** と呼ぶことにします。また GSO 係数について
+この $\bm{B}$、$\bm{B}^*$、$\bm{U}$ をそれぞれ **基底行列**、**GSO ベクトル行列**、**GSO 係数行列** と呼ぶことにします。また GSO 係数について
 
 $$
 \mu_{ij} = \begin{dcases}
   0 & (1\leq i<j\leq n)\\
   1 & (1\leq i=j\leq n) \\
-  \frac{\langle \boldsymbol{b} _ i, \boldsymbol{b}_j^ * \rangle}{\| \boldsymbol{b}_j^*\|^2} & (1\leq j<i\leq n)
+  \frac{\langle \bm{b} _ i, \bm{b}_j^ * \rangle}{\| \bm{b}_j^*\|^2} & (1\leq j<i\leq n)
 \end{dcases}
 $$
 
-と定義を拡大して $\boldsymbol{U} = (\mu_{ij})$
+と定義を拡大して $\bm{U} = (\mu_{ij})$
 
 > **Prop. GSO ベクトルの基本性質**
-> 1. 任意の $1\leq i<j\leq n$ に対して $\langle\boldsymbol{b}_i^*, \boldsymbol{b}_j^*\rangle = 0$ が成り立つ。
-> 2. 任意の $1\leq i\leq n$ に対して $\|\boldsymbol{b}_i^*\|\leq\|\boldsymbol{b}_i\|$ が成り立つ。
-> 3. 任意の $1\leq i\leq n$ に対して $\langle\boldsymbol{b}_1^* ,\ldots,\boldsymbol{b}_i^*\rangle_{\mathbb{R}} = \langle\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\rangle_{\mathbb{R}}$ が成り立つ。
-> 4. $\mathrm{vol}(L) = \prod_{i=1}^n\|\boldsymbol{b}_i^*\|$ が成り立つ。
+> 1. 任意の $1\leq i<j\leq n$ に対して $\langle\bm{b}_i^*, \bm{b}_j^*\rangle = 0$ が成り立つ。
+> 2. 任意の $1\leq i\leq n$ に対して $\|\bm{b}_i^*\|\leq\|\bm{b}_i\|$ が成り立つ。
+> 3. 任意の $1\leq i\leq n$ に対して $\langle\bm{b}_1^* ,\ldots,\bm{b}_i^*\rangle_{\mathbb{R}} = \langle\bm{b}_1,\ldots,\bm{b}_i\rangle_{\mathbb{R}}$ が成り立つ。
+> 4. $\mathrm{vol}(L) = \prod_{i=1}^n\|\bm{b}_i^*\|$ が成り立つ。
 
 **Proof.**
-まず 1 について $j = 1$ のとき証明せずとも成り立つ。$1\leq j\leq k$ のとき $\langle\boldsymbol{b}_i^*, \boldsymbol{b}_j^*\rangle = 0$ が成り立つと仮定して、$j = k+1$ のとき
+まず 1 について $j = 1$ のとき証明せずとも成り立つ。$1\leq j\leq k$ のとき $\langle\bm{b}_i^*, \bm{b}_j^*\rangle = 0$ が成り立つと仮定して、$j = k+1$ のとき
 
 $$
 \begin{aligned}
-  \langle\boldsymbol{b}_i^*,\boldsymbol{b}_{k+1}^*\rangle &
-  = \left\langle\boldsymbol{b}_i^*,\boldsymbol{b}_{k+1} - \sum_{n=1}^k\mu_{k+1 n}\boldsymbol{b}_{n}^*\right\rangle \\
-  & = \langle\boldsymbol{b}_i^*,\boldsymbol{b}_{k+1}\rangle-\mu_{
-  k+1 i}\|\boldsymbol{b}_i^*\|^2\\
+  \langle\bm{b}_i^*,\bm{b}_{k+1}^*\rangle &
+  = \left\langle\bm{b}_i^*,\bm{b}_{k+1} - \sum_{n=1}^k\mu_{k+1 n}\bm{b}_{n}^*\right\rangle \\
+  & = \langle\bm{b}_i^*,\bm{b}_{k+1}\rangle-\mu_{
+  k+1 i}\|\bm{b}_i^*\|^2\\
   & = 0
 \end{aligned}
 $$
@@ -131,33 +154,33 @@ $$
 
 $$
 \begin{aligned}
-  \|\boldsymbol{b} _ 1^*\|^2 & = \|\boldsymbol{b}_1\|^2 \\
-  \|\boldsymbol{b}_ i\|^2 & = \|\boldsymbol{b} _ i^ * \|^2 + \sum_{j=1}^{i-1}\mu _ {i,j}^2\|\boldsymbol{b}_j^ * \|^2\geq\|\boldsymbol{b} _ i^ * \|^2
+  \|\bm{b} _ 1^*\|^2 & = \|\bm{b}_1\|^2 \\
+  \|\bm{b}_ i\|^2 & = \|\bm{b} _ i^ * \|^2 + \sum_{j=1}^{i-1}\mu _ {i,j}^2\|\bm{b}_j^ * \|^2\geq\|\bm{b} _ i^ * \|^2
 \end{aligned}
 $$
 
-3 についてはまず $\langle\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\rangle_{\mathbb{R}}\subseteq\langle\boldsymbol{b}_1^*,\ldots,\boldsymbol{b}_i^*\rangle_{\mathbb{R}}$ について $i = 1$ は成り立ち、$1\leq i\leq k$ について成り立つとして以下より数学的帰納法から成り立つ。
+3 についてはまず $\langle\bm{b}_1,\ldots,\bm{b}_i\rangle_{\mathbb{R}}\subseteq\langle\bm{b}_1^*,\ldots,\bm{b}_i^*\rangle_{\mathbb{R}}$ について $i = 1$ は成り立ち、$1\leq i\leq k$ について成り立つとして以下より数学的帰納法から成り立つ。
 
 $$
-\boldsymbol{b}_k = \boldsymbol{b}_k^* + \sum_{j=1}^{k-1} \mu_{kj}\boldsymbol{b}_j^* \in\langle\boldsymbol{b}_1^*,\ldots,\boldsymbol{b}_i^*\rangle_{\mathbb{R}}
+\bm{b}_k = \bm{b}_k^* + \sum_{j=1}^{k-1} \mu_{kj}\bm{b}_j^* \in\langle\bm{b}_1^*,\ldots,\bm{b}_i^*\rangle_{\mathbb{R}}
 $$
 
-同様に $\langle\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\rangle_{\mathbb{R}}\supseteq\langle\boldsymbol{b}_1^*,\ldots,\boldsymbol{b}_i^*\rangle_{\mathbb{R}}$ も数学的帰納法より成り立つ。
+同様に $\langle\bm{b}_1,\ldots,\bm{b}_i\rangle_{\mathbb{R}}\supseteq\langle\bm{b}_1^*,\ldots,\bm{b}_i^*\rangle_{\mathbb{R}}$ も数学的帰納法より成り立つ。
 
 $$
-\boldsymbol{b}_k^* = \boldsymbol{b}_k - \sum_{j=1}^{k-1} \mu_{kj}\boldsymbol{b}_j^* \in\langle\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\rangle_{\mathbb{R}}
+\bm{b}_k^* = \bm{b}_k - \sum_{j=1}^{k-1} \mu_{kj}\bm{b}_j^* \in\langle\bm{b}_1,\ldots,\bm{b}_i\rangle_{\mathbb{R}}
 $$
 
-よって $\langle\boldsymbol{b}_1^*,\ldots,\boldsymbol{b}_i^*\rangle_{\mathbb{R}}=\langle\boldsymbol{b}_1,\ldots,\boldsymbol{b}_i\rangle_{\mathbb{R}}$ となる。
+よって $\langle\bm{b}_1^*,\ldots,\bm{b}_i^*\rangle_{\mathbb{R}}=\langle\bm{b}_1,\ldots,\bm{b}_i\rangle_{\mathbb{R}}$ となる。
 
-4 については $\boldsymbol{B}=\boldsymbol{U}\boldsymbol{B}^*$ と $\det(\boldsymbol{U}) = 1$、GSO ベクトルの直交性より
+4 については $\bm{B}=\bm{U}\bm{B}^*$ と $\det(\bm{U}) = 1$、GSO ベクトルの直交性より
 
 $$
 \begin{aligned}
-\mathrm{vol}(\mathcal{L})^2 &= \det(\boldsymbol{B}\boldsymbol{B}^\top) \\
-& = \det(\boldsymbol{U}\boldsymbol{B}^*(\boldsymbol{B}^*)^\top \boldsymbol{U}^\top) \\
-& = \det(\boldsymbol{B}^*(\boldsymbol{B}^*)^\top) \\
-& = \prod_{i=1}^n\|\boldsymbol{b}_i^*\|^2
+\mathrm{vol}(\mathcal{L})^2 &= \det(\bm{B}\bm{B}^\top) \\
+& = \det(\bm{U}\bm{B}^*(\bm{B}^*)^\top \bm{U}^\top) \\
+& = \det(\bm{B}^*(\bm{B}^*)^\top) \\
+& = \prod_{i=1}^n\|\bm{b}_i^*\|^2
 \end{aligned}
 $$
 
@@ -167,43 +190,35 @@ GSO ベクトルの基本性質 2, 4 より次のことが分かる。
 > **Thm. Hadamardの不等式**
 >
 > $$
-\mathrm{vol}(L)\leq\prod_{i=1}^n\|\boldsymbol{b}_i\|
+\mathrm{vol}(L)\leq\prod_{i=1}^n\|\bm{b}_i\|
 $$
 >
-> 特に $\{\boldsymbol{b}_{1},\ldots, \boldsymbol{b}_{n}\}$ が直交基底$\iff\mathrm{vol}(L)=\prod_{i=1}^n\|\boldsymbol{b}_i\|$ である。
+> 特に $\{\bm{b}_{1},\ldots, \bm{b}_{n}\}$ が直交基底$\iff\mathrm{vol}(L)=\prod_{i=1}^n\|\bm{b}_i\|$ である。
 
 > **Def. 射影格子**
-> $n$ 次元格子 $L\subseteq\mathbb{R}^m$ の基底 $\lbrace\boldsymbol{b}_1,\ldots, \boldsymbol{b}_n\rbrace$ に対し, 各 $1\leq l\leq n$ に対して $\langle\boldsymbol{b}_1,\ldots, \boldsymbol{b}_{l-1}\rangle_\mathbb{R}$ の直交補空間への直交射影を $\pi_l:\mathbb{R}^m\to\langle\boldsymbol{b}_1,\ldots, \boldsymbol{b}_{l-1}\rangle_\mathbb{R}^\bot$ とする。 定理 2 の 1,3 より
+> $n$ 次元格子 $L\subseteq\mathbb{R}^m$ の基底 $\lbrace\bm{b}_1,\ldots, \bm{b}_n\rbrace$ に対し, 各 $1\leq l\leq n$ に対して $\langle\bm{b}_1,\ldots, \bm{b}_{l-1}\rangle_\mathbb{R}$ の直交補空間への直交射影を $\pi_l:\mathbb{R}^m\to\langle\bm{b}_1,\ldots, \bm{b}_{l-1}\rangle_\mathbb{R}^\bot$ とする。 定理 2 の 1,3 より
 >
 > $$
 \begin{aligned}
-\langle\boldsymbol{b}_1, \ldots, \boldsymbol{b}_{l-1}\rangle_\mathbb{R}^\bot &= \langle\boldsymbol{b}_1^*, \ldots, \boldsymbol{b}_{l-1}^* \rangle_\mathbb{R}^\bot = \langle\boldsymbol{b}_l^*, \ldots, \boldsymbol{b}_n^* \rangle_\mathbb{R} \\
-\pi_l(\boldsymbol{b}_i) &= \sum_{j=l}^i \mu_{i,j}\boldsymbol{b}_j^* \\
+\langle\bm{b}_1, \ldots, \bm{b}_{l-1}\rangle_\mathbb{R}^\bot &= \langle\bm{b}_1^*, \ldots, \bm{b}_{l-1}^* \rangle_\mathbb{R}^\bot = \langle\bm{b}_l^*, \ldots, \bm{b}_n^* \rangle_\mathbb{R} \\
+\pi_l(\bm{b}_i) &= \sum_{j=l}^i \mu_{i,j}\bm{b}_j^* \\
 \end{aligned}
 $$
 >
-> となる。 すると集合 $\pi_l(L)$ は $\lbrace\pi_l(\boldsymbol{b}_l), \ldots, \pi_l(\boldsymbol{b}_n)\rbrace$ を基底に持つ $n-l+1$ 次元の格子であり, $\pi_l(L)$ を射影格子 (projected lattice) と呼ぶ。
-
-### 最短ベクトルの数え上げ
-
-まずは全探索してみます。
-考えてみると帰納的に求めるのでは正確な最短ベクトルは求められないでしょう。
-考えてみるとある基底 $\boldsymbol{b}_i$ に対し、それ以下の基底 $\boldsymbol{b}_1, \ldots \boldsymbol{b}_{i-1}$ で組み立てられたベクトル $\boldsymbol{v}$ に対し、$\boldsymbol{b}_i$ を用いて短くする
-
-効率的に数え上げる為には基底簡約すると良いということが知られています。
+> となる。 すると集合 $\pi_l(L)$ は $\lbrace\pi_l(\bm{b}_l), \ldots, \pi_l(\bm{b}_n)\rbrace$ を基底に持つ $n-l+1$ 次元の格子であり, $\pi_l(L)$ を射影格子 (projected lattice) と呼ぶ。
 
 > **Lagrange 基底簡約 (Gaussian Reduction)**
 > 2 次元格子の厳密解については古くから知られている。ユークリッドの互除法を用いることで最も簡約された基底を得られる。
-> $\|\boldsymbol{v}_1\| < \|\boldsymbol{v}_2\|$ となるように交換して
+> $\|\bm{v}_1\| < \|\bm{v}_2\|$ となるように交換して
 >
 > $$
 \begin{aligned}
-  m & = \left\lfloor\frac{\boldsymbol{v}_1\cdot \boldsymbol{v}_2}{\|\boldsymbol{v}_1\|^2}\right\rceil \\
-  \boldsymbol{v}_2 & \leftarrow \boldsymbol{v}_2 - m\boldsymbol{v}_1
+  m & = \left\lfloor\frac{\bm{v}_1\cdot \bm{v}_2}{\|\bm{v}_1\|^2}\right\rceil \\
+  \bm{v}_2 & \leftarrow \bm{v}_2 - m\bm{v}_1
 \end{aligned}
 $$
 >
-> を繰り返し $m = 0$ となるとき $\boldsymbol{v}_1$, $\boldsymbol{v}_2$ は最も簡約された基底となる。
+> を繰り返し $m = 0$ となるとき $\bm{v}_1$, $\bm{v}_2$ は最も簡約された基底となる。
 
 最も簡約化されているかを証明する。
 
@@ -223,23 +238,16 @@ v1 = vector([846835985, 9834798552])
 v2 = vector([87502093, 123094980])
 ```
 
-
-
-:::message
-**練習問題**
-CryptoHack
-:::
-
 > **サイズ基底簡約**
-> $n$ 次元格子 $L$ の基底 $\\{\boldsymbol{b_1},\ldots,\boldsymbol{b_n}\\}$ を GSO 係数 $\mu_{i,j}$ が
+> $n$ 次元格子 $L$ の基底 $\\{\bm{b_1},\ldots,\bm{b_n}\\}$ を GSO 係数 $\mu_{i,j}$ が
 >
 > $$
 |\mu_{i,j}| \leq \frac{1}{2} \quad (1 \leq \forall j < \forall i \leq n)
 $$
 >
-> を満たすとき、基底 $\\{\boldsymbol{b_1},\ldots,\boldsymbol{b_n}\\}$ はサイズ簡約されているという。
+> を満たすとき、基底 $\\{\bm{b_1},\ldots,\bm{b_n}\\}$ はサイズ簡約されているという。
 > GSO ベクトルを簡約 -> 基底ベクトルを簡約
-> 1. $q = \lfloor\mu_{ij}\rceil$ として $\boldsymbol{b}_i\leftarrow\boldsymbol{b}_i - q\boldsymbol{b}_j$ と更新する。
+> 1. $q = \lfloor\mu_{ij}\rceil$ として $\bm{b}_i\leftarrow\bm{b}_i - q\bm{b}_j$ と更新する。
 > 2. GSO 係数について $\mu_{il}\leftarrow \mu_{il} - q\mu_{jl}$ と更新する。
 
 ```python
@@ -275,7 +283,7 @@ $$
 > Lovasz 条件を $1/4 < \delta < 1$ としたときに任意の $2\leq k\leq n$ に対して次を満たすこととする。
 >
 > $$
-\delta \|\boldsymbol{b}_{k-1}^*\|^2 \leq \|\pi_{k-1}(\boldsymbol{b}_k)\|^2
+\delta \|\bm{b}_{k-1}^*\|^2 \leq \|\pi_{k-1}(\bm{b}_k)\|^2
 $$
 >
 > このとき次の 2 ステップを行えるまで繰り返す。
@@ -313,6 +321,16 @@ def LLL(B, delta=0.99):
 
 実際は LLL 簡約されていることを定義して、簡約されたときの上限などを示し、LLL 簡約された基底を返すアルゴリズムの well-defined 性や高速化を考えますが、前提知識などが不足していたり長くなるのでアルゴリズムとその特徴を天下り的に書いて終わらせます。
 
+> **HKZ (Hermite-Korkine-Zolotareff) 基底簡約**
+> 1. サイズ基底簡約
+> 2. すべての $1\leq i\leq n$ に対して $\|\bm{b}_i^*\| = \lambda_1(\pi_i(L))$ を満たすように基底ベクトルの交換
+
+> **BKZ (Block Korkine-Zolotareff) 基底簡約**
+> 1. サイズ基底簡約
+> 2. すべての $1\leq k\leq n-\beta+1$ に対して $\beta$ 次元の格子 $L_{[k,k+\beta-1]} = \lbrace\pi_k(\bm{b}_k), \pi_k(\bm{b}_{k+1}), \ldots, \pi_k(\bm{b}_{k+\beta-1})\rbrace$ の基底が HKZ 基底簡約
+
+## 応用
+
 ### ナップサック暗号 (Markle-Hellman Knapsack encryption)
 一般の数列 $b_i$ に対して $c = \sum_i m_ib_i$ となる $c$ から $m_i$ を求めるのは難しいが $b_i$ が超増加列という性質を持つとき簡単になることを利用した暗号。
 
@@ -323,23 +341,22 @@ def LLL(B, delta=0.99):
 \sum_{i=1}^n w_i < w_{n+1}
 $$
 
-鍵生成
-1. 超増加列 $\lbrace w_i\rbrace$ を生成する。
-2. 整数 $q, r$ について $q > \sum_i w_i$, $\gcd(r, q) = 1$ なるように生成する。
-3. $b_i = rw_i \pmod q$ を計算し、$\lbrace b_i\rbrace, q$ を公開鍵、$\lbrace w_i\rbrace, r$ を秘密鍵とする。
-
-暗号化
-1. 平文 $m_i\in\lbrace 0, 1\rbrace$ を用いて次のように暗号文 $c$ を得る。
-
-$$
+> **ナップサック暗号 (Markle-Hellman Knapsack encryption)**
+> - 鍵生成
+>   1. 超増加列 $\lbrace w_i\rbrace$ を生成する。
+>   2. 整数 $q, r$ について $q > \sum_i w_i$, $\gcd(r, q) = 1$ なるように生成する。
+>   3. $b_i = rw_i \pmod q$ を計算し、$\lbrace b_i\rbrace, q$ を公開鍵、$\lbrace w_i\rbrace, r$ を秘密鍵とする。
+> - 暗号化
+>   平文 $m_i\in\lbrace 0, 1\rbrace$ を用いて次のように暗号文 $c$ を得る。
+>
+>   $$
 c = \sum_i m_ib_i \pmod q
 $$
-
-復号
-1. 暗号文 $c$ に対して秘密鍵 $r$ を用いて $c' = cr^{-1} \bmod q = \sum_i m_iw_i$ を計算する。
-2. $i$ を降順に次のアルゴリズムを実行する。
-
-$$
+> - 復号
+>   1. 暗号文 $c$ に対して秘密鍵 $r$ を用いて $c' = cr^{-1} \bmod q = \sum_i m_iw_i$ を計算する。
+>   2. $i$ を降順に次のアルゴリズムを実行する。
+>
+>   $$
 \begin{aligned}
 m_i & \leftarrow \begin{cases}
 0 & (c' \leq w_i) \\
@@ -355,8 +372,8 @@ LO 法は次の行列を LLL 簡約して左端が $0$, それ以外が $0, 1$ �
 
 $$
 \begin{pmatrix}
-\boldsymbol{b} & I \\
--c & \boldsymbol{0}
+\bm{b} & I \\
+-c & \bm{0}
 \end{pmatrix} =
 \begin{pmatrix}
 b_1 & 1 &&& \\
@@ -371,8 +388,8 @@ CLOS 法は基底行列をちょっと変更して精度を向上させた方法
 
 $$
 \begin{pmatrix}
-K\boldsymbol{b} & 2I \\
--Kc & -\boldsymbol{1}
+K\bm{b} & 2I \\
+-Kc & -\bm{1}
 \end{pmatrix} =
 \begin{pmatrix}
 Kb_1 & 2 &&& \\
@@ -400,15 +417,15 @@ $$
 \end{pmatrix}
 $$
 
-## 多項式
+## Coppersmith's Method
 ここでは剰余上の方程式 $\mathbb{Z}/N\mathbb{Z}[x]$ の解を求める方法について解説します。
 
 まず多変数連立 $1$ 次方程式のときは行列の $\mathrm{rank}$ と変数の数が一致するときガウスの消去法を用いて逆行列を計算できます。
 
 $$
 \begin{aligned}
-A\boldsymbol{x} &= \boldsymbol{b} & \pmod N \\
-\boldsymbol{x} &= A^{-1}\boldsymbol{b} & \pmod N
+A\bm{x} &= \bm{b} & \pmod N \\
+\bm{x} &= A^{-1}\bm{b} & \pmod N
 \end{aligned}
 $$
 
@@ -549,7 +566,7 @@ $$
 - 多変数の方程式も解ける
   - 変数の数が多いほど方程式に対する制約がキツくなります。
 
-これらは Howgrave-Graham の補題 などを見直すことで簡単に拡張できます。興味ある方は考えてみてください。
+これらは Howgrave-Graham の補題 などを見直すことで簡単に拡張できます。詳細は参考文献とかにあると思います。
 
 これらをまとめて Coppersmith Method と呼びます。
 
@@ -559,78 +576,8 @@ Berlekamp-Zassenhause 法
 
 解きたい方程式の法の数の下限 $\beta$ と解が存在しうる上限 $X$ を決めて関数を与えると解が返ってきます。
 
-:::message
-**練習問題**
+https://doc.sagemath.org/html/en/reference/polynomial_rings/sage/rings/polynomial/polynomial_modn_dense_ntl.html#sage.rings.polynomial.polynomial_modn_dense_ntl.small_roots
 
-:::
-
-さて多変数連立 $n$ 次方程式の場合はどうでしょう。Coppersmith Method も使うこともできますが、私の体感的には精度が出にくいです。これに対して使われる道具は多項式 GCD, 終結式, Gröbner 基底があります。
-
-### 多項式 GCD
-
-まずは多項式 GCD です。
-例えば $x$ について同じ解を持つ次のような方程式を考えてみましょう。
-
-> **Half GCD**
-> 2 つの多項式の最大公約式を $\mathcal{O}(N(\log{N})^2)$ で求められる。(N is 何)
-
-$a = qb + r$
-
-$$
-\begin{pmatrix}
-  0 & 1 \\
-  1 & -q
-\end{pmatrix}
-\begin{pmatrix}
-  a \\
-  b
-\end{pmatrix}
-= \begin{pmatrix}
-  b \\
-  a - qb
-\end{pmatrix}
-$$
-
-
-
-### 終結式
-式増やしてgcd
-合成数 mod でも使える
-グレブナー基底は mod p のみ
-
-### Gröbner 基底
-
-Gröbner 基底のお気持ちは多項式を基底簡約するものです。
-
-$$
-T = \lbrace x_1^{e_1}x_2^{e_2}\cdots x_l^{e_l}\mid e_1,e_2,\cdots,e_l\in\mathbb{Z}_{\geq 0}\rbrace
-$$
-
-- $\mathrm{lt}(f)$: 先頭項 (leading term)
-- $\mathrm{lc}(f)$: 先頭係数 (leading coefficient)
-- $\mathrm{lm}(f)$: 先頭単項式 (leading monomial)
-
-$f = 5x_1^2x_3 - 2x_1x_3 + 3x_2x_3 \in \mathbb{Q}[x_1, x_2, x_3]$ のとき $\mathrm{lt}(f) = x_1^2x_3$, $\mathrm{lc}(f) = 5$, $\mathrm{lm}(f) = 5x_1^2x_3$ となる。
-
-
-Buchberger の業績を Gröbner 教授が奪って発表した
-
-> **Buchberger's Algorithm**
-> 1. $G = F$
-> 2.
-> 3.
-
-表に解き方をまとめるとこんな感じです。
-
-|            |           1変数          |               多変数              |
-|:----------:|:------------------------:|:---------------------------------:|
-| 1次方程式 | 拡張ユークリッドの互除法 |                LLL                |
-|  n次方程式 |    Coppersmith Method    | 多項式GCD, 終結式, Gröbner基底 |
-
-:::message
-**練習問題**
-
-:::
 
 ## 格子暗号
 
@@ -638,27 +585,11 @@ Buchberger の業績を Gröbner 教授が奪って発表した
 
 SVP, GapSVP, SIVP, CVP, SIS, LWE, LWR, Approx-GCD, BGV, GSW などなど実にさまざまな計算困難な問題があり、それに対応する暗号がありますが、今回は耐量子暗号や完全準同型暗号でよく使われる LWE 問題に絞って紹介します。
 
-### LLL 基底簡約のその先へ
-
-第三章で基底簡約することにより SVP が解き易くなるということで LLL 基底簡約アルゴリズムまでやりましたが、LWE 問題の基礎である CVP を解く為にはより強い基底簡約が必要です。まずはそれらを紹介し CVP の解き方、LWE 格子暗号とその派生について学びます。
-
-LLL 基底簡約は
-
-> **HKZ (Hermite-Korkine-Zolotareff) 基底簡約**
-> 1. サイズ基底簡約
-> 2. すべての $1\leq i\leq n$ に対して $\|\boldsymbol{b}_i^*\| = \lambda_1(\pi_i(L))$ を満たすように基底ベクトルの交換
-
-> **BKZ (Block Korkine-Zolotareff) 基底簡約**
-> 1. サイズ基底簡約
-> 2. すべての $1\leq k\leq n-\beta+1$ に対して $\beta$ 次元の格子 $L_{[k,k+\beta-1]} = \lbrace\pi_k(\boldsymbol{b}_k), \pi_k(\boldsymbol{b}_{k+1}), \ldots, \pi_k(\boldsymbol{b}_{k+\beta-1})\rbrace$ の基底が HKZ 基底簡約
-
-BKZ を応用したさらなる基底簡約アルゴリズムは BKZ2.0, RSR, G6K などがあります。参考に元論文を置いておきます。
-
-### 最近ベクトル問題 (Closest Vector Problem)
+### 最近ベクトル問題
 SVP は原点に最も近い格子点を求める問題でしたが CVP はある点に最も近い格子点を求める問題です。
 
 > **CVP; Closest Vector Problem**
-> CVP とは目標ベクトル $\boldsymbol{w}$ (格子点である必要はない) に対して格子上の最近ベクトル $\boldsymbol{v}$ を求める問題である。
+> CVP とは目標ベクトル $\bm{w}$ (格子点である必要はない) に対して格子上の最近ベクトル $\bm{v}$ を求める問題である。
 
 厳密解を求めるのは難しいので近似解を求めて偶然厳密解となることを祈ります。
 
@@ -671,8 +602,8 @@ $n$ 次元の格子を $n-1$ 次の $W\subset \Lambda$ とその直交補空間 
 
 $$
 \begin{aligned}
-  \boldsymbol{w} & = \sum a_i\boldsymbol{b}_i \\
-  U + \boldsymbol{y} & = \lbrace \boldsymbol{u} + \boldsymbol{y}\mid \boldsymbol{u}\in U\rbrace
+  \bm{w} & = \sum a_i\bm{b}_i \\
+  U + \bm{y} & = \lbrace \bm{u} + \bm{y}\mid \bm{u}\in U\rbrace
 \end{aligned}
 $$
 
@@ -700,8 +631,8 @@ print(v)
 
 $$
 \begin{pmatrix}
-  \boldsymbol{B} & \boldsymbol{0}^\top \\
-  \boldsymbol{w} & M
+  \bm{B} & \bm{0}^\top \\
+  \bm{w} & M
 \end{pmatrix}
 =
 \begin{pmatrix}
@@ -733,22 +664,19 @@ print(v)
 ### LWE格子暗号
 
 機械学習理論から派生した求解困難な問題で
-
-> **LWE 問題**
-> $K$ を体とする。$\boldsymbol{A}\in K^{m\times n}, \boldsymbol{s}\in K^m$ を掛けて誤差ベクトル $\boldsymbol{e}\in K^n$ を与えた $\boldsymbol{b}\in K^n$ に対し $(\boldsymbol{A}, \boldsymbol{b})$ が与えられたときに $\boldsymbol{s}$ を求める問題を LWE 問題と呼ぶ。
->
-> $$
-\boldsymbol{A}\boldsymbol{s} + \boldsymbol{e} = \boldsymbol{b}
-$$
-
 この誤差がなければ逆行列を掛ければすぐに求まるのですが、誤差があることで問題が難しくなります。
 
-$s$ や $e$ は $0$ から離れ過ぎると他の解と混ざってしまうので $0$ に近い乱数値が選ばれます。この乱数の分布は正規分布や二項分布などが用いられます。
+> **LWE 問題**
+> $K$ を体とする。$\bm{A}\in K^{m\times n}, \bm{s}\in K^m$ を掛けて誤差ベクトル $\bm{e}\in K^n$ を与えた $\bm{b}\in K^n$ に対し $(\bm{A}, \bm{b})$ が与えられたときに $\bm{s}$ を求める問題を一般に LWE 問題と呼ぶ。
+>
+> $$
+\bm{A}\bm{s} + \bm{e} = \bm{b}
+$$
+>
+> 特に $q$ を素数として $K = \mathbb{F}_q$ のとき LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ かつ $m = 1$ のとき Ring-LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ のとき Module-LWE 問題といいます。
 
-$q$ を素数として $K = \mathbb{F}_q$ のとき LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ かつ $m = 1$ のとき Ring-LWE 問題、 $K = \mathbb{F}_q[x]/(x^n + 1)$ のとき Module-LWE 問題といいます。注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体となります。
-
+$\bm{s}$ や $\bm{e}$ はゼロから離れ過ぎると他の解と混ざってしまうので次のような形となる二項分布やその極限である正規分布などの分布の乱数が用いられます。
 これが $B \geq 2\sqrt{n}$ のとき計算困難な問題であることが知られています。
-
 
 近似解は LLL して CVP 解く感じです。
 
@@ -785,50 +713,45 @@ s = solve_LWE(A, b)
 print(s)
 ```
 
-### Module-LWE
+### CRYSTALS-KYBER
+CRYSTALS-KYBER とは NIST が選考している耐量子暗号の一種で Module-LWE を用いた暗号です。
 
-今後簡単の為に $R_q = \mathbb{F}_q[x]/(x^n+1)$, $R = \mathbb{Z}[x]/(x^n+1)$ とおきます。
+まず Module-LWE は多項式上の演算です。$R_q = \mathbb{F}_q[x]/(x^n+1)$, $R = \mathbb{Z}[x]/(x^n+1)$ 多項式同士の積は数論変換 (NTT; Number Theoretic Transform) を用いて高速に計算できます。
+注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体となります。
 
-多項式同士の積で畳み込みを計算するので数論変換 NTT; Number Theoretic Transform を用いると次数 $n$ として $\mathcal{O}(n\log n)$ と高速に計算できる。
-
-また LWE ではデータ圧縮をよく行う。$d < \lceil\log_2(q)\rceil$ として $\mathbb{F}_q\to\lbrace 0,\ldots,2^d-1\rbrace$ と圧縮し、次のような性質を満たす。
-
-$$
-\begin{aligned}
-& x' = \mathrm{Decompress}_q(\mathrm{Compress}_q(x, d), d) \\
-& |x' - x\bmod q|\leq\lceil q/2^{d+1}\rfloor
-\end{aligned}
-$$
-
-つまり圧縮解凍をしたときの誤差が小さければ LWE の誤差に乗せることができるという意味です。
-次のように定義すると上記性質を満たす。
-
-$$
+> **Def. 多項式の圧縮**
+> また $R_q$ であれば各要素に対して圧縮を行う。
+> シード値 $\rho$ から多項式を生成する関数 $Sam(\rho)$ を用いる。
+>
+> $$
 \begin{aligned}
 \mathrm{Compress}_q(x, d) & = \lceil(2^d/q)x\rfloor \bmod q \\
 \mathrm{Decompress}_q(x, d) & = \lceil(q/2^d)x\rfloor
 \end{aligned}
 $$
 
-また $R_q$ であれば各要素に対して圧縮を行う。
-圧縮 $\mathrm{Compress}_q(x, d)$
+> **Prop. 圧縮解凍をしても誤差が小さい**
+> $d < \lceil\log_2(q)\rceil$ として $\mathbb{F}_q\to\lbrace 0,\ldots,2^d-1\rbrace$ と圧縮し、次のような性質を満たす。
+>
+> $$
+\begin{aligned}
+& x' = \mathrm{Decompress}_q(\mathrm{Compress}_q(x, d), d) \\
+& |x' - x\bmod q|\leq\lceil q/2^{d+1}\rfloor
+\end{aligned}
+$$
 
-### CRYSTALS-KYBER
-行列の圧縮には
-シード値 $\rho$ から多項式を生成する関数 $Sam(\rho)$ を用いる。
-$n = 256$ ビットの
+これより圧縮解凍の誤差を LWE の誤差に乗せることができます。
 
-鍵生成
-1. 疑似乱数で $\boldsymbol{A}\in R_q^{k\times k}$ と二項分布で $\boldsymbol{s}, \boldsymbol{e}\in R^{k}$ を生成し、$\boldsymbol{t} = \boldsymbol{A}\boldsymbol{s} + \boldsymbol{e}$ を計算する
-2. $(\boldsymbol{t}, \boldsymbol{A})$ を圧縮したものを公開鍵、$\boldsymbol{s}$ を秘密鍵とする
-
-暗号化
-平文 $m$ を用いて
-1. 二項分布で $\boldsymbol{r}, \boldsymbol{e}_1\in R^k, e_2\in R$ を生成する
-2. $\boldsymbol{t}$ を解凍して $(\boldsymbol{u}, v) = (\boldsymbol{A}^T\boldsymbol{r} + \boldsymbol{e}_1, \boldsymbol{t}^T\boldsymbol{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m)$ を圧縮したものを暗号文として返す
-
-復号
-1. $\boldsymbol{u}, v$ を解凍して $\mathrm{Compress}_q(v - \boldsymbol{s}^T\boldsymbol{u}, 1)$ つまり $q / 2$ に近い値は $1$ 、$0$ に近い値は $0$ として返す
+> **CRYSTALS-KYBER**
+> - 鍵生成
+>   1. 疑似乱数で $\bm{A}\in R_q^{k\times k}$ と二項分布で $\bm{s}, \bm{e}\in R^{k}$ を生成し、$\bm{t} = \bm{A}\bm{s} + \bm{e}$ を計算する
+>   2. $(\bm{t}, \bm{A})$ を圧縮したものを公開鍵、$\bm{s}$ を秘密鍵とする
+> - 暗号化
+>   平文 $m$ を用いて
+>   1. 二項分布で $\bm{r}, \bm{e}_1\in R^k, e_2\in R$ を生成する
+>   2. $\bm{t}$ を解凍して $(\bm{u}, v) = (\bm{A}^T\bm{r} + \bm{e}_1, \bm{t}^T\bm{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m)$ を圧縮したものを暗号文として返す
+> - 復号
+>   $\bm{u}, v$ を解凍して $\mathrm{Compress}_q(v - \bm{s}^T\bm{u}, 1)$ つまり $q / 2$ に近い値は $1$ 、$0$ に近い値は $0$ として返す
 
 ```python
 from Crypto.Util.number import bytes_to_long
@@ -847,7 +770,7 @@ def bins2num(x):
         y += x[i] * (1 << i)
     return y
 
-class Crystals_Cyber:
+class CrystalsKyber:
     def binomial_poly(self):
         res = []
         for i in range(self.N):
@@ -907,7 +830,7 @@ class Crystals_Cyber:
         return bins2num(ms)
 
 q, k, eta, N = 7681, 3, 4, 256
-enc = Crystals_Cyber(q, k, eta, N)
+enc = CrystalsKyber(q, k, eta, N)
 m = 11
 assert m < 2^N
 c = enc.encrypt(m)
