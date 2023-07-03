@@ -50,16 +50,15 @@ f & = 1+3x+4x^2+5x^3+2x^5 \in R_p \\
 \end{aligned}
 $$
 
-鍵生成
-1. $f\in\mathcal{T}(d+1, d)$, $g\in\mathcal{T}(d, d)$ として $h = (f^{-1} \bmod q)g$
-
-暗号化
-1. $m \in R_p$ を Center lift する
-2. $r\in\mathcal{T}(d, d)$ として $e = prh + m \pmod q$ を返す
-
-復号
-1. $a = fe\pmod q$ の Center lift をする
-2. $m = a(f^{-1}\bmod p)\pmod p$
+> **NTRU**
+> - 鍵生成
+>   1. $f\in\mathcal{T}(d+1, d)$, $g\in\mathcal{T}(d, d)$ として $h = (f^{-1} \bmod q)g$
+> - 暗号化
+>   1. $m \in R_p$ を Center lift する
+>   2. $r\in\mathcal{T}(d, d)$ として $e = prh + m \pmod q$ を返す
+> - 復号
+>   1. $a = fe\pmod q$ の Center lift をする
+>   2. $m = a(f^{-1}\bmod p)\pmod p$
 
 環とイデアルで割った部分環について何らかの方法で持ち上げることができるとき暗号を構成できる
 
@@ -67,13 +66,9 @@ $$
 符号理論にも様々な計算困難な問題がありますが、候補は誤り訂正符号の復号問題の計算困難性を利用した暗号が主要です。計算問題として SDP や DSDP の困難性を仮定しています。
 
 > **SDP; Syndrome Decoding Problem**
-> SDP とは符号長 $n$ として次元 $k$ をパリティ検査行列 $\boldsymbol{H}\in\mathbb{F}_2^{(n-k)\times n}$ とシンドローム $\boldsymbol{s}\in\mathbb{F}_2^{n-k}$ に対して $\boldsymbol{eH}^T = \boldsymbol{s}$ となるハミング重みが $w$ の $\boldsymbol{e}\in\mathbb{F}_2^n$ を求める問題である。
+> SDP とは符号長 $n$ として次元 $k$ をパリティ検査行列 $\bm{H}\in\mathbb{F}_2^{(n-k)\times n}$ とシンドローム $\bm{s}\in\mathbb{F}_2^{n-k}$ に対して $\bm{eH}^T = \bm{s}$ となるハミング重みが $w$ の $\bm{e}\in\mathbb{F}_2^n$ を求める問題である。
 
-つまり $w$ 個の 1 があるビット列 $\boldsymbol{e}$ に行列を作用させると $\boldsymbol{s}$ となるような $\boldsymbol{e}$ を求める問題です。
-
-これは LWE 問題の派生と見ることができます。
-
-TODO: これがなぜ暗号となるのか？
+つまり $w$ 個の 1 があるビット列 $\bm{e}$ に行列を作用させると $\bm{s}$ となるような $\bm{e}$ を求める問題です。これは LWE 問題の派生と見ることができます。
 
 それぞれの暗号は使う符号が異なります。逆に言えばそれぞれの暗号の違いはほぼそれくらいです。
 
@@ -83,50 +78,12 @@ TODO: これがなぜ暗号となるのか？
 | Classic McElience | Goppa 符号 | IND-CCA | TU Eindhoven |
 | HQC | Quasi-Cyclic 符号 | IND-CCA | University of Limoges |
 
+解くのは
+
 > **Information Set Decoding**
 
 ## 同種写像暗号
-超特異同種写像ディフィー・ヘルマン鍵共有 (SIDH / SIKE)
-CSIDH
-現在 SIKE しかありませんが攻撃が見つかっている為選考に残るのは難しいです。
-
-### 暗号の構成
-**SIKE**
-$p = w_A^{e_A}w_b^{e_B}f \pm 1$
-$\mathbb{F}_{p^2}$ 上の超特異楕円曲線 $E$
-位数 $w_A^{e_A}$ である点 $P_A, Q_A$ と位数 $w_B^{e_B}$ である点 $P_B, Q_B$
-
-$2^a\approx 3^b$ となるような素数 $p = 2^a3^bf - 1$ を用いて超特異楕円曲線 $E_0/\mathbb{F}_{p^2}$、つまり位数が $\#E_0(\mathbb{F}_{p^2}) = (p + 1)^2$ となる楕円曲線を生成する。
-$P_0, Q_0 \in E_0[2^a]$ $E_0[3^{e_3}]$
-$3^b$ 同種写像 $\varphi: E_0\to E$
-$j$-不変量
-
-$$
-y^2 = x^3 + x \qquad y^2 = x^3 + 6x^2 + x
-$$
-
-```python
-# SIKEp377
-p = 2^191 * 3^117 - 1
-# SIKEp546
-p = 2^273 * 3^172 - 1
-# SIKEp697
-p = 2^356 * 3^215 - 1
-
-Fp2<I> = GF(p, 2)
-assert I^2 == -1
-R<x> = PolynomialRing(Fp2)
-E = EllipticCurve(x^3 + x)
-E = EllipticCurve(x^3 + 6*x^2 + x)
-```
-
-### 攻撃
-SIKE
-
-> **Thm. Kani's theorem**
-
-
-https://eprint.iacr.org/2022/975
+楕円曲線の章で超特異同種写像ディフィー・ヘルマン鍵共有 (SIDH / SIKE) を扱いましたが、ここでは CSIDH を扱います。
 
 ## ハッシュ関数署名 (Hash-based signature)
 ハッシュ値を用いるだけの退屈な署名です。
