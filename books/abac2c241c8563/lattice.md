@@ -48,18 +48,7 @@ flowchart LR
     id5 --> id8(G6K)
 ```
 
-今回は LLL 基底簡約アルゴリズムまでを扱います。それ以降は参考文献であるなど。。。
-
-LWE 問題の基礎である CVP を解く為にはより強い基底簡約が必要です。まずはそれらを紹介し CVP の解き方、LWE 格子暗号とその派生について学びます。
-
-> **Def. 逐次最小**
-> $n$ 次元格子 $L$ に対して、一次独立な格子ベクトル $\bm{b}_1,\ldots,\bm{b}_i\in L$ を用いて各 $1\leq i\leq n$ における逐次最小を次のように定義する。
->
-> $$
-\lambda_i(L) := \min_{\bm{b}_1,\ldots,\bm{b}_i\in L}\max\lbrace\|\bm{b}_1\|,\ldots,\|\bm{b}_i\|\rbrace
-$$
->
-> 特に任意の $1\leq i\leq n$ について $\|\bm{b}_i\| = \lambda_i(L)$ を満たすとき逐次最小ベクトルと呼び、それらが基底となっているとき逐次最小基底と呼ぶ。
+今回は LLL 基底簡約アルゴリズムまでを扱います。それ以降のアルゴリズムは紹介しませんが、SageMath で使いはするので理解したければ参考文献を参考にしてください。
 
 ## 基底簡約アルゴリズム
 ### グラム・シュミット直交化
@@ -278,6 +267,15 @@ $$
  1 & -3 & 7
 \end{pmatrix}
 $$
+
+> **Def. 逐次最小**
+> $n$ 次元格子 $L$ に対して、一次独立な格子ベクトル $\bm{b}_1,\ldots,\bm{b}_i\in L$ を用いて各 $1\leq i\leq n$ における逐次最小を次のように定義する。
+>
+> $$
+\lambda_i(L) := \min_{\bm{b}_1,\ldots,\bm{b}_i\in L}\max\lbrace\|\bm{b}_1\|,\ldots,\|\bm{b}_i\|\rbrace
+$$
+>
+> 特に任意の $1\leq i\leq n$ について $\|\bm{b}_i\| = \lambda_i(L)$ を満たすとき逐次最小ベクトルと呼び、それらが基底となっているとき逐次最小基底と呼ぶ。
 
 > **LLL (Lenstra-Lenstra-Lovasz) 基底簡約**
 > Lovasz 条件を $1/4 < \delta < 1$ としたときに任意の $2\leq k\leq n$ に対して次を満たすこととする。
@@ -784,14 +782,13 @@ $$
 
 > **CRYSTALS-KYBER**
 > - 鍵生成
->   1. 疑似乱数で $\bm{A}\in R_q^{k\times k}$ と二項分布で $\bm{s}, \bm{e}\in R^{k}$ を生成し、$\bm{b} = \bm{A}\bm{s} + \bm{e}$ を計算する
->   2. $(\bm{b}, \bm{A})$ を圧縮したものを公開鍵、$\bm{s}$ を秘密鍵とする
+>   1. 一様分布で $\bm{A}\in R_q^{k\times k}$ と二項分布で $\bm{s}, \bm{e}\in R^{k}$ を生成し、$\bm{b} = \bm{A}\bm{s} + \bm{e}$ を計算する。
+>   2. $(\bm{b}, \bm{A})$ を圧縮したものを公開鍵、$\bm{s}$ を秘密鍵とする。
 > - 暗号化
->   平文 $m$ を用いて
->   1. 二項分布で $\bm{r}, \bm{e}_1\in R^k, e_2\in R$ を生成する
->   2. $\bm{b}$ を解凍して $(\bm{u}, v) = (\bm{A}^T\bm{r} + \bm{e}_1, \bm{b}^T\bm{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m)$ を圧縮したものを暗号文として返す
+>   1. 二項分布で $\bm{r}, \bm{e}_1\in R^k, e_2\in R$ を生成する。
+>   2. $\bm{b}$ を解凍して平文 $m$ を用いて $(\bm{u}, v) = (\bm{A}^T\bm{r} + \bm{e}_1, \bm{b}^T\bm{r} + e_2 + \lceil\frac{q}{2}\rfloor \cdot m)$ を圧縮したものを暗号文として返す。
 > - 復号
->   $\bm{u}, v$ を解凍して $\mathrm{Compress}_q(v - \bm{s}^T\bm{u}, 1)$ つまり $q / 2$ に近い値は $1$ 、$0$ に近い値は $0$ として返す
+>   暗号文 $(\bm{u}, v)$ を解凍して $\mathrm{Compress}_q(v - \bm{s}^T\bm{u}, 1)$、つまり $q / 2$ に近い値は $1$ 、$0$ に近い値は $0$ として返す。
 
 ```python
 from Crypto.Util.number import bytes_to_long
