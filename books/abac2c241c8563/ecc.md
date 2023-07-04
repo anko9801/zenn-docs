@@ -645,17 +645,76 @@ def SingularNode(a, b, p):
 ### Anomalous な曲線を用いてはいけない (SSSA Attack)
 SSSA (Semaev-Smart-Satoh-Araki) Attack
 
-https://repository.kulib.kyoto-u.ac.jp/dspace/bitstream/2433/61761/1/1026-15.pdf
+$\pi: \mathbb{P}^2(\mathbb{Q}_p)\to\mathbb{P}^2(\mathbb{F}_p)$ を還元写像 (reduction map) は $E(\mathbb{Q}_p)\to E(\mathbb{F}_p)$ の群準同型写像となる。 $E$ の形式群 $\mathcal{E}$ として $\log_{\mathcal{E}}$ を形式対数
 
 $$
-\lambda_E: E(\mathbb{F}_p)\xrightarrow{u}E(\mathbb{Q}_p)\xrightarrow{\times p}\ker\pi\xrightarrow{Formal \log}p\mathbb{Z}_p\xrightarrow{\bmod{p^2}} p\mathbb{Z}_p/p^2\mathbb{Z}_p\cong \mathbb{F}_p
+\begin{aligned}
+\pi &: \mathbb{P}^2(\mathbb{Q}_p)\to\mathbb{P}^2(\mathbb{F}_p) \\
+u &: E(\mathbb{F}_p)\to E(\mathbb{Q}_p) \\
+\psi &: (x:y:z) \mapsto \frac{x}{y} \\
+\log_{\mathcal{E}} &: t\mapsto t - \frac{a_1}{2}t^2 + \frac{a_1^2 + a_2}{3}t^3 - \frac{a_1^3 + 2a_1a_2 + a_3}{4}t^4 + \cdots
+\end{aligned}
 $$
 
-$\psi(x:y:z) := x/y$
+$$
+\lambda_E: E(\mathbb{F}_p)\xrightarrow{u}E(\mathbb{Q}_p)\xrightarrow{\times p}\ker\pi\xrightarrow{\log_{\mathcal{E}}}p\mathbb{Z}_p\xrightarrow{\bmod{p^2}} p\mathbb{Z}_p/p^2\mathbb{Z}_p\cong \mathbb{F}_p
+$$
+
+> **Prop.**
+> $\alpha\in E(\mathbb{F}_p)\setminus\mathcal{O}$ として $\pi(A) = \alpha$ を満たす点 $A\in E(\mathbb{Z}_p)$ とする。 $nA \neq \mathcal{O}$ となる $n\in\mathbb{N}$ に対して $nA = (x_n, y_n)$ とする。
+> 1. $1\leq n<p \implies nA\in E(\mathbb{Z}_p)\setminus\mathcal{O}$
+> 2. $1\leq n<m<p$ かつ $n + m \neq p\implies x_n \neq x_m \pmod{p}$
+> 3. $\lambda_E$ が零写像でなければ
+>
+> $$
+y_{p-1} - y_1, \frac{x_{p-1} - x_1}{p}\in\mathbb{Z}_p^\times \\
+\lambda_E(\alpha) = - \frac{x_{p-1} - x_1}{p(y_{p-1} - y_1)} \pmod{p}
+$$
+
+1. 楕円曲線 $E(\mathbb{F}_p)$ が anomalous であるから $nA \neq \mathcal{O}$ である。次に $nA\in E(\mathbb{Z}_p)$ を数学的帰納法で示す。
+$n = 1$ のとき仮定の一部である。
+$n = 2$ のとき $y_1 \neq 0 \pmod{p}$ より $y_1\in\mathbb{Z}_p^\times$ であるから $2A\in E(\mathbb{Z}_p)$ である。
 
 $$
-\log_E(t) := t - \frac{a_1}{2}t^2 + \frac{a_1^2 + a_2}{3}t^3 - \frac{a_1^3 + 2a_1a_2 + a_3}{4}t^4 + \cdots
+\begin{aligned}
+  2A & = (x_2, y_2) = (c_2^2 - 2x_1, -c_2x_2 - d_2) \\
+  c_2 & = \frac{3x_1^2 + a_4}{2y_1}, d_2 = \frac{-x_1^3 + a_4x_1 + 2a_6}{2y_1}
+\end{aligned}
 $$
+
+$2<n<p$ のとき $x_{n-1} = x_1 \pmod{p}$ を仮定すると
+
+$$
+\begin{aligned}
+& \pi(A) = \pm\pi((n-1)A) \\
+\iff & (n - 1 \pm 1)\alpha = \mathcal{O} \\
+\implies & \alpha = \mathcal{O}
+\end{aligned}
+$$
+
+より矛盾する。$x_{n-1} \neq x_1 \pmod{p}$ より $x_{n-1} - x_1 \in\mathbb{Z}_p^\times$ であるから $nA\in E(\mathbb{Z}_p)$ である。
+
+$$
+\begin{aligned}
+  nA & = (x_n, y_n) = (c_n^2 - x_1 - x_{n-1}, -c_n^3 + c_n(x_1 + x_{n-1}) - d_n) \\
+  c_n & = \frac{y_{n-1} - y_1}{x_{n-1} - x_1}, d_n = y_1 - x_1c_n
+\end{aligned}
+$$
+$\Box$
+
+2. $x_n = x_m \pmod{p}$ と仮定すると 1 より $nA, mA\in E(\mathbb{Z}_p)\setminus\mathcal{O}$ であるから
+
+$$
+\begin{aligned}
+& \pi(nA) = \pm\pi(mA) \\
+\iff & (m\pm n)\alpha = \mathcal{O} \\
+\implies & \alpha = \mathcal{O}
+\end{aligned}
+$$
+
+より矛盾。
+
+3.
 
 $A := (X_1, Y_1)\in E(\mathbb{Z}/p^2\mathbb{Z})$ 写像 $\pi(A) = P$ となる
 $(X_{p-1}, Y_{p-1}) := (p-1)A$
@@ -1038,6 +1097,8 @@ E = EllipticCurve(x^3 + 6*x^2 + x)
 > **Thm. Kani's theorem**
 
 https://eprint.iacr.org/2022/975
+
+[Kani for begginers](https://www.math.auckland.ac.nz/~sgal018/kani.pdf)
 
 https://ellipticnews.wordpress.com/2022/08/12/attacks-on-sidh-sike/
 https://github.com/GiacomoPope/Castryck-Decru-SageMath
