@@ -198,6 +198,16 @@ $$
 >
 > となる。 すると集合 $\pi_l(L)$ は $\lbrace\pi_l(\bm{b}_l), \ldots, \pi_l(\bm{b}_n)\rbrace$ を基底に持つ $n-l+1$ 次元の格子であり, $\pi_l(L)$ を射影格子 (projected lattice) と呼ぶ。
 
+> **Def. 逐次最小**
+> $n$ 次元格子 $L$ に対して、一次独立な格子ベクトル $\bm{b}_1,\ldots,\bm{b}_i\in L$ を用いて各 $1\leq i\leq n$ における逐次最小を次のように定義する。
+>
+> $$
+\lambda_i(L) := \min_{\bm{b}_1,\ldots,\bm{b}_i\in L}\max\lbrace\|\bm{b}_1\|,\ldots,\|\bm{b}_i\|\rbrace
+$$
+>
+> 特に任意の $1\leq i\leq n$ について $\|\bm{b}_i\| = \lambda_i(L)$ を満たすとき逐次最小ベクトルと呼び、それらが基底となっているとき逐次最小基底と呼ぶ。
+### Lagrange 基底簡約
+
 > **Lagrange 基底簡約 (Gaussian Reduction)**
 > 2 次元格子の厳密解については古くから知られている。ユークリッドの互除法を用いることで最も簡約された基底を得られる。
 > $\|\bm{v}_1\| < \|\bm{v}_2\|$ となるように交換して
@@ -256,6 +266,8 @@ v1 = vector([846835985, 9834798552])
 v2 = vector([87502093, 123094980])
 ```
 
+### サイズ基底簡約
+
 > **サイズ基底簡約**
 > $n$ 次元格子 $L$ の基底 $\\{\bm{b_1},\ldots,\bm{b_n}\\}$ を GSO 係数 $\mu_{i,j}$ が
 >
@@ -297,14 +309,7 @@ $$
 \end{pmatrix}
 $$
 
-> **Def. 逐次最小**
-> $n$ 次元格子 $L$ に対して、一次独立な格子ベクトル $\bm{b}_1,\ldots,\bm{b}_i\in L$ を用いて各 $1\leq i\leq n$ における逐次最小を次のように定義する。
->
-> $$
-\lambda_i(L) := \min_{\bm{b}_1,\ldots,\bm{b}_i\in L}\max\lbrace\|\bm{b}_1\|,\ldots,\|\bm{b}_i\|\rbrace
-$$
->
-> 特に任意の $1\leq i\leq n$ について $\|\bm{b}_i\| = \lambda_i(L)$ を満たすとき逐次最小ベクトルと呼び、それらが基底となっているとき逐次最小基底と呼ぶ。
+### LLL 基底簡約
 
 $n$ 次元格子 $L$ の基底 $\lbrace\mathbf{b_1},\ldots,\mathbf{b_n}\rbrace$ について以下の条件を満たすとき、その基底は LLL 簡約されている (Lenstra-Lenstra-Lovasz(LLL)-reduced)と呼ぶ。
 
@@ -405,6 +410,8 @@ print(LLL(B, 0.8))
 ```
 
 実際は LLL 簡約されていることを定義して、簡約されたときの上限などを示し、LLL 簡約された基底を返すアルゴリズムの well-defined 性や高速化を考えますが、前提知識などが不足していたり長くなるのでアルゴリズムとその特徴を天下り的に書いて終わらせます。
+
+### より強い基底簡約アルゴリズム
 
 > **HKZ (Hermite-Korkine-Zolotareff) 基底簡約**
 > 1. サイズ基底簡約
@@ -589,8 +596,7 @@ ax = b \pmod n
 $$
 :::
 
-
-## Coppersmith's Method
+### Coppersmith's Method
 先ほど多変数不定一次方程式を考えましたが次に剰余上の $n$ 次方程式の解を格子問題に帰着する方法を考えます。
 
 $$
