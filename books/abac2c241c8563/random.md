@@ -35,7 +35,7 @@ title: "ハッシュと乱数生成"
 
 ### 決定論的乱数生成器 (DRBG)
 TRNG だと乱数を生成するのに熱が揺らいでいるのを取らないといけないので時間がかかります。高速化するにはアルゴリズムで疑似的に乱数を生成することが必要です。これを決定論的乱数生成器 (DRBG; Deterministic Random Bit Generator) と呼びます。
-ex.) XorShift、線形合同法、メルセンヌ・ツイスタ、LFSR
+ex.) Xorshift、線形合同法、メルセンヌ・ツイスタ、LFSR
 
 メリット
 - 高速に生成できる
@@ -57,21 +57,34 @@ ex.) XorShift、線形合同法、メルセンヌ・ツイスタ、LFSR
 簡易的で代表的な DRBG は次のようなものがあります。
 
 - 線形合同法
-- XorShift
+- Xorshift
 - LFSR
 - メルセンヌ・ツイスタ
 
 これらは高速に生成できるので安全性が求められない疑似乱数としては優秀です。XorShift やメルセンヌ・ツイスタは競プロのテスト生成でよく使われますね。
 
 このような DRBG に対する攻撃の本質はすべて内部状態をいかに復元するかです。
-CTF では基本逆操作を行うことで攻撃が成功します。また高難易度典型としてCrypto ツールで紹介する SMT を使ったり、論理演算の線形近似 (Walsh-Hadamard 変換など) を行うなどの手法もあります。
+CTF では基本逆操作を行うことで攻撃が成功します。また高度典型として Crypto ツールで紹介する SMT を使ったり、論理演算の線形近似 (Walsh-Hadamard 変換など) を行うなどの手法もあります。
 
 > **線形合同法**
+> 剰余 $M$ と定数 $a, b$ を決めて次の数列 $\lbrace x_i\rbrace$ を乱数列とする方法を 線形合同法 (LCGs; Linear congruential generators) という。
+>
+> $$
+x_{n+1} = ax_n + b \pmod{M}
+$$
 
-> **XorShift**
+> **Xorshift**
+> 初期値 $x$ に対して次の計算を繰り返すことで生成される数列を乱数列とする方法を Xorshift という。
+> ```
+> x ^= x << 13;
+> x ^= x >> 7;
+> x ^= x << 17;
+> ```
 
-> **LFSR (Linear Feedback Shift Register)**
+> **LFSR**
 > $\bm{a}_k^n = (a_k, a_{k+1}, \ldots, a_{k+n-1})\in\mathbb{F}_2^n$
+> LFSR (Linear Feedback Shift Register)
+> また
 >
 > $$
 \begin{aligned}
@@ -80,6 +93,7 @@ x_k & = \bm{c}\cdot\bm{a}_k^{n} = \sum_{i=0}^{n-1} c_ia_{k+i}
 \end{aligned}
 $$
 
+線形合同法や Xorshift は 1 つでも値が分かれば乱数予測できます。
 
 ```python
 class LFSR():
