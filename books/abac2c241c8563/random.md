@@ -250,7 +250,7 @@ CRC
 
 MD5 や SHA-1 などよく使われるハッシュ関数はこれです。このときに成立する攻撃というのが伸長攻撃です。伸長攻撃には慎重につってね！フゥーワッ！
 
-## ハッシュの応用
+## ハッシュ関数の応用
 ### HMAC
 まず SHA-256 などの暗号学的ハッシュ関数を使う一番の例としては改ざん検知です。SHA-256 をそのまま貼り付けるのと HMAC
 HMAC はハッシュを用いるメッセージ認証コード (Message Authentication Codes; MAC) で改ざん検知を行います。
@@ -260,9 +260,9 @@ HMAC はハッシュを用いるメッセージ認証コード (Message Authenti
 >
 > $$
 \begin{aligned}
-pad_{in} & := \overbrace{\mathrm{0x36}\|\cdots\|\mathrm{0x36}}^B \\
-pad_{out} & := \overbrace{\mathrm{0x5C}\|\cdots\|\mathrm{0x5C}}^B \\
-\mathrm{HMAC}(K, V) & := H(K \oplus pad_{out} \| H(K \oplus pad_{in} \| V))
+\mathrm{pad}_{in} & := \overbrace{\mathrm{0x36}\|\cdots\|\mathrm{0x36}}^B \\
+\mathrm{pad}_{out} & := \overbrace{\mathrm{0x5C}\|\cdots\|\mathrm{0x5C}}^B \\
+\mathrm{HMAC}(K, V) & := H(K \oplus \mathrm{pad}_{out} \| H(K \oplus \mathrm{pad}_{in} \| V))
 \end{aligned}
 $$
 
@@ -291,7 +291,7 @@ $$
 
 > **ブロックチェーン**
 
-## ハッシュへの攻撃
+## ハッシュ関数への攻撃
 原像計算が攻撃
 
 ### データベース
@@ -306,7 +306,7 @@ https://pypi.org/project/hashpumpy/1.0/
 ### 誕生日攻撃 (Birthday Attack)
 誕生日のパラドックスを用いた攻撃です。
 
-> **Def. ハッシュ値の衝突**
+> **ハッシュ値の衝突**
 > $H(m_1) = H(m_2)$ となる異なる $m_1, m_2$ が発見された状態
 
 この衝突を恣意的に起こせるとハッシュ値で改ざんを検知してるシステムを騙すことが出来てしまいます。これは誕生日攻撃を用いて恣意的に起こすことができます。
