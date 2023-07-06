@@ -715,14 +715,20 @@ $$
 より矛盾。
 
 3.
+もし $pA = \mathcal{O}$ であれば
 
-$A := (X_1, Y_1)\in E(\mathbb{Z}/p^2\mathbb{Z})$ 写像 $\pi(A) = P$ となる
-$(X_{p-1}, Y_{p-1}) := (p-1)A$
+$$
+\lambda_E(\alpha) = (\bmod{p^2})\circ\log_{\mathcal{E}}\circ\psi(\mathcal{O}) = 0
+$$
 
+より $\lambda_E$ が零写像でないことに矛盾するので $pA \neq \mathcal{O}$ である。
+$\pi(pA) = \mathcal{O}$
+
+$A\in E(\mathbb{Z}/p^2\mathbb{Z})$ 写像 $\pi(A) = P$ となる
 $X_{p-1} \neq X_1$ なら
 
 $$
-\lambda_E(P) = \left(\frac{X_{p-1} - X_1}{p}\bmod p\right)(Y_{p-1} - Y_1\bmod p)^{-1}
+\lambda_E(P) = \frac{X_{p-1} - X_1}{p(Y_{p-1} - Y_1)}\pmod p
 $$
 
 ```python

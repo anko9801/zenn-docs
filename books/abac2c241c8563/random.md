@@ -122,13 +122,6 @@ class lfsr():
     self.init = nextdata
     return output
 
-def generate_bit_sequence(initial_state):
-  state = initial_state
-  while True:
-    last_bit = state & 1
-    yield last_bit
-    middle_bit = state >> 3 & 1
-    state = (state >> 1) | ((last_bit ^ middle_bit) << 4)
 ```
 
 :::message
@@ -195,7 +188,7 @@ https://github.com/python/cpython/blob/main/Lib/random.py
 - Real Mersenne (Zh3r0 CTF V2)
 :::
 
-## CSPRNG
+### CSPRNG
 暗号でも使えるような PRNG を暗号論的擬似乱数生成器 (CSPRNG; Cryptographically Secure Pseudo Random Number Generator) と呼びます。現在、標準化されている CSPRNG は [NIST SP 800-90A (Recommendation for Random Number Generation Using Deterministic Random Bit Generators)](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-90a.pdf) に書かれてあります。
 
 - Hash_DRBG
@@ -211,36 +204,24 @@ AES-CTR の暗号化関数 $E_K$ とシード値 $V_0$ を用いて $V_{i+1} = E
 
 攻撃する方法としては今までと同様に内部状態を復元することで乱数予測することができます。
 
-#### Dual_EC_DRBG
-
-NIST-p256, NIST-p384, NIST-p521 において点 $P, Q$ と初期シード $s_0$ を用いて乱数を生成します。
-
-$$
+> **Dual_EC_DRBG**
+> NIST-p256, NIST-p384, NIST-p521 において点 $P, Q$ と初期シード $s_0$ を用いて乱数を生成する。
+>
+> $$
 \begin{aligned}
   s_{i+1} & = (s_iP)_x \\
   r_{i+1} & = (s_{i+1}Q)_x
 \end{aligned}
 $$
-
-$r_i$ は剰余未満の数であり、その上位 2 バイト程を削除した数を連結させて出力します。P-256 なら 32 バイトの数なので下位 30 バイトを出力します。
+>
+> $r_i$ は剰余未満の数であり、その上位 2 バイト程を削除した数を連結させて出力する。P-256 なら 32 バイトの数なので下位 30 バイトを出力する。
 
 しかし、もし NSA がこの点について ECDLP が解けている場合、内部状態を復元できる為、バックドアとなります。この為、2006 年に NIST SP800-90A に組み込まれましたが、2013 年に利用すべきではないと勧告されています。
 
 ### コラム
 乱数調整
 
-## 安全性
-このように疑似乱数や公開鍵暗号などは無限の計算能力を持つ攻撃者の前では SMT を用いて内部情報を取り出したり、公開鍵から秘密鍵を求めたりと攻撃できてしまうので、現代暗号の標準モデルでは限られた計算能力を持つ攻撃者 (確率的多項式時間チューリングマシン) を仮定します。
 
-そして限られた計算能力しか持たない攻撃者にとって疑似乱数と本物の乱数を区別することができないなら、その疑似乱数は安全であるとします。これをより厳密に言うと次のようになります。
-
-> **識別不可能性 (Indistinguishability)**
-> 与えられた 2 つの確率分布 $A$ と $B$ がどのような確率的多項式時間アルゴリズムの識別器でも十分に近ければ (確率の対数の差が極限で 0 となるならば) 計算量的識別不可能であるという。
-
-> **疑似乱数性**
-> ある確率分布 $G$ と一様分布が計算量的識別不可能なら $G$ は疑似乱数性を持つという。
-
-疑似乱数性を満たすなら安全な疑似乱数であるとすればよさそうです。
 
 ## ハッシュ関数
 信頼できないソースの正当性を証明するものというのは世界中で必要とされています。
