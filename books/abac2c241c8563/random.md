@@ -171,6 +171,8 @@ https://www.ambionics.io/blog/php-mt-rand-prediction
 こういうときには SMT で解けます！
 全探索より速いアルゴリズムがないときは SMT が強い
 
+https://github.com/deut-erium/RNGeesus
+
 これでは乱数を予測されてしまうので暗号には使えません。暗号で使えるような DRBG はあるのでしょうか？それらを次節で紹介します。
 
 :::message
