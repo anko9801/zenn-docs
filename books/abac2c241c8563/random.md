@@ -223,18 +223,12 @@ $$
 ### コラム
 乱数調整
 
-
-
 ## ハッシュ関数
 信頼できないソースの正当性を証明するものというのは世界中で必要とされています。
 
 > **ハッシュ関数**
->
-
-CRC
 
 > **暗号学的ハッシュ関数**
->
 
 - MD5
 - [SHA; Secure Hash Algorithm](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf)
@@ -242,31 +236,7 @@ CRC
 
 暗号ではパスワードの保存や HMAC, 署名などに使われていたりします。ただ暗号で使うためには攻撃者がハッシュ値に対する元の入力に関する情報を得られないようにしないといけません。これを原像計算困難性といいます。
 
-![](/images/hash.png)
-
 これを満たしたハッシュというのは実際にあります。MD5 や SHA1, SHA-256 などなど、まぁそれぞれのハッシュの実装は結構荒っぽく作られてるので詳細は省きます。ただし攻撃するときの重要な性質として Merkle-Damgård construction というものがあるのでそれだけ知っておきましょう。
-
-### Merkle-Damgård construction
-ハッシュ関数は任意長のメッセージを固定長の出力に変換しないといけません。その為に入力を固定長のブロックに分割し、1つずつ内部状態に適用させます。
-![](/images/length_extension.png)
-
-MD5 や SHA-1 などよく使われるハッシュ関数はこれです。このときに成立する攻撃というのが伸長攻撃です。伸長攻撃には慎重につってね！フゥーワッ！
-
-## ハッシュ関数の応用
-### HMAC
-まず SHA-256 などの暗号学的ハッシュ関数を使う一番の例としては改ざん検知です。SHA-256 をそのまま貼り付けるのと HMAC
-HMAC はハッシュを用いるメッセージ認証コード (Message Authentication Codes; MAC) で改ざん検知を行います。
-
-> **HMAC; Hash-based MAC**
-> 秘密鍵 $K$ とハッシュ値長 $B$ として次のように定義します。
->
-> $$
-\begin{aligned}
-\mathrm{pad}_{in} & := \overbrace{\mathrm{0x36}\|\cdots\|\mathrm{0x36}}^B \\
-\mathrm{pad}_{out} & := \overbrace{\mathrm{0x5C}\|\cdots\|\mathrm{0x5C}}^B \\
-\mathrm{HMAC}(K, V) & := H(K \oplus \mathrm{pad}_{out} \| H(K \oplus \mathrm{pad}_{in} \| V))
-\end{aligned}
-$$
 
 ### CRC
 CRC とはビット列を有限体を用いて短いビット列に変換するハッシュ関数です。CRC はデータ転送時の誤り検出に用いられています。ただ CRC は暗号学的ハッシュ関数ではないので改ざんには弱いです。
@@ -291,10 +261,32 @@ $$
 
 実装では多項式を反転させてビット演算に落とし込むことで高速化できます。
 
+### HMAC
+まず SHA-256 などの暗号学的ハッシュ関数を使う一番の例としては改ざん検知です。SHA-256 をそのまま貼り付けるのと HMAC
+HMAC はハッシュを用いるメッセージ認証コード (Message Authentication Codes; MAC) で改ざん検知を行います。
+
+> **HMAC; Hash-based MAC**
+> 秘密鍵 $K$ とハッシュ値長 $B$ として次のように定義します。
+>
+> $$
+\begin{aligned}
+\mathrm{pad}_{in} & := \overbrace{\mathrm{0x36}\|\cdots\|\mathrm{0x36}}^B \\
+\mathrm{pad}_{out} & := \overbrace{\mathrm{0x5C}\|\cdots\|\mathrm{0x5C}}^B \\
+\mathrm{HMAC}(K, V) & := H(K \oplus \mathrm{pad}_{out} \| H(K \oplus \mathrm{pad}_{in} \| V))
+\end{aligned}
+$$
+
 > **ブロックチェーン**
+
+### Merkle-Damgård construction
+ハッシュ関数は任意長のメッセージを固定長の出力に変換しないといけません。その為に入力を固定長のブロックに分割し、1つずつ内部状態に適用させます。
+![](/images/length_extension.png)
+
+MD5 や SHA-1 などよく使われるハッシュ関数はこれです。このときに成立する攻撃というのが伸長攻撃です。
 
 ## ハッシュ関数への攻撃
 原像計算が攻撃
+![](/images/hash.png)
 
 ### データベース
 大量の種類の平文とそのハッシュ値をデータベースに入れてハッシュ値から平文を出力するようなシステムを構成でき、それを逆ハッシュと言います。
