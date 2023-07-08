@@ -126,12 +126,48 @@ randomized tree-based stateless signature
 > 暗号理論と楕円曲線より
 
 > **MQ 問題**
-> 有限体 $\mathbb{F}_q$ 上を係数とする $m$ 個の $n$ 変数の $2$ 次多項式の共通解をひとつ求めよ
+> 有限体上の $n$ 変数 2 次多項式 $f_1,\ldots,f_m\in\mathbb{F}_q[x_1,\ldots,x_n]$ が与えられたときに共通解をひとつ求めよ。
 
-> **Def. 松本-今井暗号**
-> $v$
+これは NP 困難 [Garay and Johnson, 79]() であることは示されている。
+
+3 次以上の方程式はどうなの？
+- 2 次よりデータサイズが増える (${}_{n+2}C_2 < {}_{n+3}C_3$)
+- 2 次方程式のときのアルゴリズムがそのまま適用できる
+- いくつか提案されている (Cubic UOV, Cubic ABC, Cubic MFE)
+
+> **松本-今井暗号**
+> - 鍵生成
+>   $q = 2^r$, $\theta < n$ となる $\theta, n\in\mathbb{Z}_{>0}$ を定める
+> - 暗号化
+>   平文を係数とした $X\in\mathbb{F}_q[t]/(f(t))\cong\mathbb{F}_{q^n}$ について $Y = \mathcal{F}(X)$ を暗号文とする。
+>
+>   $$
+\mathcal{F}(X) = X^{q^\theta + 1}
+$$
+>
+> - 復号
+>   暗号文 $Y$ に対して $h$ 乗することで $Y^h = X^{h(q^\theta + 1)} = X^{k(q^n - 1) + 1} = X$ 復号される。
+
+> **HFE**
+> 松本-今井暗号における $\mathcal{F}$ を次のように変更した暗号
+>
+>   $$
+\mathcal{F}(X) = \sum_{i,j=0,q^i+q^j\leq D}\alpha_{ij}X^{q^i + q^j} + \sum_{i=0,q^i\leq D}\beta_{i}X^{q^i} + \gamma
+$$
+>
+> 多項式時間で逆像を計算可能 (Berlekamp's algorithm, Cantor-Zassenhaus algorithm)
 
 グレブナー基底
+
+Unbalanced Oil and Vinegar
+Oil and Vinegar からパラメータを修正する Kipnis ら 1999年
+
+> **UOV**
+
+> **Rainbow**
+
+> **QR-UOV**
+
 
 ## まとめ
 
