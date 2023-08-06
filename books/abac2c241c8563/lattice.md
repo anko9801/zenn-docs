@@ -36,6 +36,10 @@ $$
 
 **Proof.**
 
+
+
+## 基底簡約アルゴリズム
+
 基底簡約アルゴリズムとは基底を簡約するものです
 - それぞれの基底ベクトルが直交に近い状態
 - 基底ベクトルの長さが短い
@@ -50,7 +54,69 @@ flowchart LR
 
 今回は LLL 基底簡約アルゴリズムまでを扱います。それ以降のアルゴリズムは紹介しませんが、SageMath で使いはするので理解したければ参考文献を参考にしてください。
 
-## 基底簡約アルゴリズム
+### 1 次元の格子 (ユークリッドの互除法)
+
+2 つの整数を足し引きして最小となる値を求める。
+
+390 と 273 についてユークリッドの互除法を考えると
+
+$$
+\begin{aligned}
+  390 & = 273 \times 1 + 117 \\
+  273 & = 117 \times 2 + 39 \\
+  117 & = 39 \times 3
+\end{aligned}
+$$
+
+より並べると 39 ずつ飛んだ点列となる。
+
+### 2 次元の格子 (Lagrange 基底簡約)
+
+ユークリッドの互除法を 2 次元格子に対して行ってみよう。
+
+> **Lagrange 基底簡約 (Gaussian Reduction)**
+> $\|\bm{v}_1\| < \|\bm{v}_2\|$ となるように交換して
+>
+> $$
+  \bm{v}_2 \to \bm{v}_2 - \left\lfloor\frac{\bm{v}_1\cdot \bm{v}_2}{\|\bm{v}_1\|^2}\right\rceil\bm{v}_1
+$$
+>
+> を繰り返し $m = 0$ となるとき $\bm{v}_1$, $\bm{v}_2$ は最も簡約された基底となる。
+
+> **Theorem**
+> Lagrange 簡約された基底は逐次最小基底である。
+
+**Proof.**
+任意の非零ベクトル $\mathbf{v} = x _ 1\mathbf{b} _ 1 + x _ 2\mathbf{b} _ 2 \in L$ について $x _ 2 = 0$ のとき $\|\mathbf{v}\| = |x _ 1|\|\mathbf{b} _ 1\| \geq \|\mathbf{b} _ 1\|$, $x _ 2 \neq 0$ のとき $\|\mathbf{v}\| \geq \|\mathbf{b} _ 2\| \geq \|\mathbf{b} _ 1\|$ を示す.
+
+$$
+\begin{aligned}
+\|\mathbf{v}\| &= \|x _ 1\mathbf{b} _ 1 + x _ 2\mathbf{b} _ 2\| \\
+&= \|r\mathbf{b} _ 1 + x _ 2(\mathbf{b} _ 2 + q\mathbf{b} _ 1)\| \\
+&\geq x _ 2\|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| - r\|\mathbf{b} _ 1\| \\
+&= (x _ 2 - r)\|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| + r(\|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| - \|\mathbf{b} _ 1\|) \\
+&\geq \|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| \\
+&\geq \|\mathbf{b} _ 2\| \geq \|\mathbf{b} _ 1\|
+\end{aligned}
+$$
+
+```python
+def gaussian_reduction(v1, v2):
+    while True:
+        if v2.norm() < v1.norm():
+            v1, v2 = v2, v1
+        m = floor(v1.dot_product(v2) / v1.dot_product(v1))
+        if m == 0:
+            break
+        v2 = v2 - m*v1
+    return v1, v2
+
+
+v1 = vector([846835985, 9834798552])
+v2 = vector([87502093, 123094980])
+```
+
+
 ### グラム・シュミット直交化
 
 グラム・シュミット直交化 (GSO; Gram-Schmidt Orthonormalization) とはベクトル空間 $\mathbb{R}^m$ の基底を直交基底に変換する方法です。 $\bm{b}_n$ の直交化は $\bm{b}_{1},\ldots, \bm{b}_{n-1}$ すべてと直交するように元の高さのまま移動させます。 GSO の Wikipedia の gif がわかりやすいです。
@@ -206,65 +272,6 @@ $$
 $$
 >
 > 特に任意の $1\leq i\leq n$ について $\|\bm{b}_i\| = \lambda_i(L)$ を満たすとき逐次最小ベクトルと呼び、それらが基底となっているとき逐次最小基底と呼ぶ。
-### Lagrange 基底簡約
-
-> **Lagrange 基底簡約 (Gaussian Reduction)**
-> 2 次元格子の厳密解については古くから知られている。ユークリッドの互除法を用いることで最も簡約された基底を得られる。
-> $\|\bm{v}_1\| < \|\bm{v}_2\|$ となるように交換して
->
-> $$
-\begin{aligned}
-  m & = \left\lfloor\frac{\bm{v}_1\cdot \bm{v}_2}{\|\bm{v}_1\|^2}\right\rceil \\
-  \bm{v}_2 & \leftarrow \bm{v}_2 - m\bm{v}_1
-\end{aligned}
-$$
->
-> を繰り返し $m = 0$ となるとき $\bm{v}_1$, $\bm{v}_2$ は最も簡約された基底となる。
-
-**Definition 1** (Lagrange 簡約)
-任意の $q \in \mathbb{Z}$ に対して $\|\mathbf{b}_1\| \leq \|\mathbf{b}_2\| \leq \|\mathbf{b}_1 + q\mathbf{b}_2\|$ を満たすとき, 2次元格子の基底 $\{\mathbf{b}_1, \mathbf{b}_2\}$ は Lagrange 簡約されているという.
-
-**Theorem 2** (Lagrange 簡約によって逐次最小基底)
-2次元格子の基底 $\{\mathbf{b}_1, \mathbf{b}_2\}$ について次の2つは同値である.
-1. 基底 $\{\mathbf{b}_1, \mathbf{b}_2\}$ は Lagrange 簡約されている.
-2. 基底 $\{\mathbf{b}_1, \mathbf{b}_2\}$ は格子 $L$ の逐次最小基底である.
-
-**Proof.**
-($\implies$)
-任意の非零ベクトル $\mathbf{v} = x _ 1\mathbf{b} _ 1 + x _ 2\mathbf{b} _ 2 \in L$ について $x _ 2 = 0$ のとき $\|\mathbf{v}\| = |x _ 1|\|\mathbf{b} _ 1\| \geq \|\mathbf{b} _ 1\|$, $x _ 2 \neq 0$ のとき $\|\mathbf{v}\| \geq \|\mathbf{b} _ 2\| \geq \|\mathbf{b} _ 1\|$ を示す.
-
-$$
-\begin{aligned}
-\|\mathbf{v}\| &= \|x _ 1\mathbf{b} _ 1 + x _ 2\mathbf{b} _ 2\| \\
-&= \|r\mathbf{b} _ 1 + x _ 2(\mathbf{b} _ 2 + q\mathbf{b} _ 1)\| \\
-&\geq x _ 2\|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| - r\|\mathbf{b} _ 1\| \\
-&= (x _ 2 - r)\|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| + r(\|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| - \|\mathbf{b} _ 1\|) \\
-&\geq \|\mathbf{b} _ 2 + q\mathbf{b} _ 1\| \\
-&\geq \|\mathbf{b} _ 2\| \geq \|\mathbf{b} _ 1\|
-\end{aligned}
-$$
-
-Euclidの互除法を2次元格子に対して行うことで Lagrange 簡約されているような基底を生み出せる。
-
-
-
-最も簡約化されているかを証明する。$O(\log N)$
-
-```python
-def gaussian_reduction(v1, v2):
-    while True:
-        if v2.norm() < v1.norm():
-            v1, v2 = v2, v1
-        m = floor(v1.dot_product(v2) / v1.dot_product(v1))
-        if m == 0:
-            break
-        v2 = v2 - m*v1
-    return v1, v2
-
-
-v1 = vector([846835985, 9834798552])
-v2 = vector([87502093, 123094980])
-```
 
 ### サイズ基底簡約
 
