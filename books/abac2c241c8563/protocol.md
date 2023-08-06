@@ -279,6 +279,115 @@ Intel HEXL
 > TEE Intel SGX
 > Controlled-Channel Attacks、Sealing Replay Attack、Foreshadow、Plundervolt、LVI、ÆPIC Leakなど
 
+### ゼロ知識証明と電子署名
+ゼロ知識証明はシミュレーションパラダイムの話で公開鍵とは関係ないとかは知らねぇ！面白そうだからしゃべるんだよ！
+
+対話型ゼロ知識証明は証明者と検証者がやりとりを繰り返し、証明者が本当に正しい情報を持っているかを確率的に検証する方式です。
+
+> **ゼロ知識証明**
+> 秘密を知っていることは分かるが秘密自体を知ることができない。
+> 1. 証明者は乱数や公開鍵などのコミットメントを送る。
+> 2. 検証者はチャレンジを送る。
+> 3. 証明者はチャレンジとコミットメント、秘密を用いて証明を作成して送る。
+> 4. 検証者は証明を検証する。
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant 証明者
+    participant 検証者
+    証明者 ->> 検証者: コミットメント
+    検証者 ->> 証明者: チャレンジ
+    証明者 ->> 検証者: 証明
+    Note right of 検証者: 検証
+```
+
+> **ゼロ知識証明の例 1**
+> $y$ に対して $y = x^2 \pmod n$ となる秘密 $x$ があることをゼロ知識証明する。
+> 1. コミットメント: 乱数 $r\in\mathbb{Z}/n\mathbb{Z}$ と $u = r^2 \bmod n$
+> 2. チャレンジ: $c\in\lbrace 0, 1\rbrace$
+> 3. 証明: $z = rx^c\bmod n$
+> 4. 検証: $z^2 \equiv uy^c\bmod n$
+
+> **ゼロ知識証明の例 2**
+> 生成元 $g$ に対して DLP $g^x$ を用いて秘密 $x$ をゼロ知識証明する。
+> 1. コミットメント: 乱数 $r\in\mathbb{F}_p$ と $u = g^r \bmod p$
+> 2. チャレンジ: 乱数 $c\in\mathbb{F}_p$
+> 3. 証明: $z = r + xc\bmod q$
+> 4. 検証: $g^z \equiv uy^c\bmod p$
+
+これだけだと証明者と検証者はやりとりをしないといけません。
+非対話型ゼロ知識証明は証明者と検証者はやりとりをせずに証明することが可能です。対話を行う代わりに証明者と検証者の間に信頼された第三者を置き、CRS; Common Reference String と呼ばれる事前に公開される情報を証明者と検証者に送ります。証明者はその CRS をコミットメントとし、証明を生成し、検証者に送ります。受け取った検証者はそれを検証するだけで非対話なゼロ知識証明が実現できます。
+
+> **非対話型ゼロ知識証明**
+> 秘密を知っていることは分かるが秘密自体を知ることができない。
+> 1. 信頼できる第三者 (鍵生成者) は証明者と検証者にコミットメントを送る。
+> 2. 証明者はコミットメントからチャレンジを生成し、それに秘密を用いて作った証明を送る。
+> 3. 検証者は証明を検証する。
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant 信頼できる第三者
+    participant 証明者
+    participant 検証者
+    信頼できる第三者 ->> 検証者: CRS
+    信頼できる第三者 ->> 証明者: CRS
+    証明者 ->> 検証者: 証明
+    Note right of 検証者: 検証
+```
+
+> **非対話型ゼロ知識証明の例**
+> 1. 信頼できる第三者から証明者と検証者に CRS (コミットメント) $r$ $q$? を送られる。
+> 2. 証明者は $u = g^r$、チャレンジ $c = H(g, q, h, u)$、証明 $z = r + xc$ を作成して送る。
+> 3. 検証者は $c \equiv H(g, q, h, u)$、$g^z \equiv uh^c$ を検証する。
+
+対話型のゼロ知識証明を非対話化させる為にはコミットメントをハッシュ関数に通したものをチャレンジとすることで非対話型となります。これはチャレンジが乱数であること、つまりハッシュ関数がランダムオラクルモデル (決定論的な乱数生成) であることを仮定しています。
+
+非対話化する方法としては [Fiat-Shamir 変換](https://link.springer.com/content/pdf/10.1007/3-540-47721-7_12.pdf) や [Gennaro らによる zk-SNARK](https://eprint.iacr.org/2012/215.pdf) などがあります。私は Fiat-Shamir 変換しか知らないのでそれだけ載せます。
+
+> **Fiat-Shamir 変換**
+> 1. 証明者は乱数や公開鍵などの公開情報をハッシュ化した $e = H(x)$ と $s = r - xe$ を送る。
+> 2. 証明者はチャレンジと秘密を用いて一方向性の生成して送る。
+> 3. 検証者は $x' = g^yp^{H(x)}$ $b := H(com)$
+
+ただしチャレンジにすべての公開値を含めないと脆弱性 (Frozen Heart) となります。[Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
+
+
+> **Def. 電子署名**
+> 本人が署名していること、内容が改ざんされていないことを証明する
+
+> **署名の例 1 (DSA; Digital Signature Algorithm)**
+> DLP ベースの署名
+> - 鍵生成
+>   1. 素数 $q$ を用いて $p = 2q + 1$ と表される素数 $p$ を生成する。
+>   2. $g\in\mathbb{F}_p$ と $x\in\mathbb{F}_q$ を生成して $y = g^x \bmod p$ を計算する。
+> - 署名
+>   乱数 $k$ を生成し、署名したいメッセージ $m$ を用いて $r = (g^k\bmod p)\bmod q$ と $s = k^{-1}(H(m) + xr) \bmod q$ を署名として公開する。
+> - 検証
+>   $v = (g^{s^{-1}H(m)}y^{s^{-1}r} \bmod p)\bmod q$ を計算して $r = v$ なら正当な署名となる。
+
+> **署名の例 2 (Schnorr Signature)**
+> 非対話型ゼロ知識証明な署名の一種。一般に非対話型ゼロ知識証明を用いて電子署名を作り出すことができます。
+> - 鍵生成
+>   巡回群 $G$ 上で生成元 $g\in G$ と秘密鍵 $x\in\mathbb{N}$ を用いて公開鍵 $y = g^x$ を生成する。
+> - 署名
+>   乱数 $k$ を生成し、署名したいメッセージ $m$ を用いて $e = H(g^k \| m), s = k - xe$ を計算して $(s, e)$ を署名値として公開する。
+> - 検証
+>   $e' = H(g^sy^e \| M)$ を計算し、 $e = e'$ となれば署名が有効であると検証されたことになる。
+
+> **署名の例 3 (BLS 署名)**
+> - 鍵生成
+>   乱数 $s\in\mathbb{Z}/r\mathbb{Z}$ を秘密鍵、$sQ$ を公開鍵とする。
+> - 署名
+>   メッセージ $m$ に対してそのハッシュ値 $H(m)$ をとり、秘密鍵 $s$ 倍して署名 $sH(m)$ を作る。
+> - 検証
+>   メッセージ $m$ と署名 $σ$ をもらった人は自分でハッシュ値 $H(m)$ を計算し公開鍵 $sQ$ を使って
+
+ゼロ知識証明について詳しくは次の資料を読むといいかも。
+
+https://zenn.dev/kyosuke/articles/a1854b9be26c01df13eb
+
 ## プロトコル
 ### SSH
 
