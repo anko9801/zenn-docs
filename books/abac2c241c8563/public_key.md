@@ -289,11 +289,10 @@ Pollard-$\rho$ 法の $\rho$ は文字 $\rho$ の形が $a_i$ の由来となっ
 
 ### Pohlig-Hellman
 
-> **Prop.**
+> **Theorem. アーベルの構造定理**
 > 巡回群の位数が $|G| = \prod_{i = 1}^n p_i^{e_{i}}$ と素因数分解できるとき $G \cong \prod_{i = 1}^n \mathbb{Z}/p_i^{e_{i}}\mathbb{Z}$ となる。
 
-アーベルの構造定理により証明できる。詳細は群論を学んでほしい。
-これより中国剰余定理から $\mathcal{O}(\max{p_i^{e_i}})$ に落ちる。
+詳細は群論を学んでほしい。これより中国剰余定理から $\mathcal{O}(\max{p_i^{e_i}})$ に落ちる。
 
 ### 指数計算法 (Index Calculus Algorithm)
 
@@ -346,18 +345,3 @@ $$
 ## 参考文献
 - https://www.zkdocs.com/
 - [ZenGo-X/zk-paillier: A collection of Paillier cryptosystem zero knowledge proofs (github.com)](https://github.com/ZenGo-X/zk-paillier)
-
-### Pollard's Kangaroo 法 ($\lambda$ 法)
-$\rho$ 法は動く点が1つの値だったのに対し、 $\lambda$ 法は2つの値がランダムに動いていき、一方がもう一方の点に衝突したとき DLP が解ける。
-
-$$
-\begin{aligned}
-x_0 & = g^\alpha & y_0 & = y \\
-x_{i+1} & = x_ig^{f(x_i)} & y_{i+1} & = y_ia^{f(y_i)} \\
-\end{aligned}
-$$
-
-$x_i = y_j$ となるとき $x = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j} f(y_k)$ となる。
-見つからなければ $N$ や $f$ を取り替えて繰り返す。
-
-同じく期待計算量は $\mathcal{O}(N^{1/4})$ です。
