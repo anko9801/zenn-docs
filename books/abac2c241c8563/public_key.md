@@ -199,6 +199,9 @@ Hard: IP 偽装を署名を用いて防ぐことはできるでしょうか？
 :::
 
 ## 離散対数問題
+やっぱり実際に解こうとしてみないと何故難しい問題なのか直観的に分からないと思います。
+
+
 計算機で解くことの難しい部類 NP 完全の問題です。
 
 > **離散対数問題 (DLP: Discrete Logarithm Problem)**
@@ -209,17 +212,20 @@ Hard: IP 偽装を署名を用いて防ぐことはできるでしょうか？
 
 ### Baby-step Giant-step
 
-半分全列挙を用いる方法。
+競プロでいう半分全列挙で解きます。
 
-$m = \lceil\sqrt{N}\rceil$ とおく。DLP の解 $n$ を $m$ で割って $n = qm + r$ とおく。
-
-$$
+> **Baby-step Giant-step**
+> $m = \lceil\sqrt{N}\rceil$ とし、DLP の解 $n$ を $m$ で割って $n = qm + r$ とおく。
+>
+> $$
 \begin{aligned}
 y & = g^{qm + r} & (q, r\in[0, m-1])
 \end{aligned}
 $$
+>
+> このとき $yg^{-r}$, $g^{qm}$ を全列挙し、どちらかのリストの要素をもう 1 つのリストで検索して $yg^{-r} = g^{qm}$ となる組を探索し、$n = qm + r$ を求める。
 
-このとき $yg^{-r}$, $g^{qm}$ を全列挙し、どちらかのリストの要素をもう1つのリストで検索して $yg^{-r} = g^{qm}$ となる組を探索し、解を得る。この計算量は $O(\sqrt{N}\log N)$ でメモリも $O(\sqrt{N})$ だけ必要となります。つまり 64 ビット素数の DLP を解くには 2.2TB 必要となります。
+この計算量は $O(\sqrt{N}\log N)$ で、メモリも $O(\sqrt{N})$ ほど必要となります。つまり 64 ビット素数の DLP を解くには 2.2TB 必要となります。
 
 ### Pollard's $\rho$ 法
 
@@ -254,9 +260,10 @@ $$
 
 ![](/images/rho.png)
 
-巡回群 $G$ 上の $y = g^x$ のもとで初期値 $a_0 = g$ とし、関数 $f$ については $G$ を $G_1, G_2, G_3$ に振り分けて次のように定義する。
-
-$$
+> **Pollard's $\rho$ 法**
+> 巡回群 $G$ 上の $y = g^x$ のもとで初期値 $a_0 = g$ とし、関数 $f$ については $G$ を $G_1, G_2, G_3$ に振り分けて次のように定義する。
+>
+> $$
 f(a)=
 \begin{cases}
 ya & (a \in G_1) \\
@@ -264,34 +271,21 @@ a^2 & (a \in G_2) \\
 ga & (a \in G_3)
 \end{cases}
 $$
-
-すると任意の生成元は $a_i = g^{s_i}y^{t_i} = g^{s_i + xt_i}\ (s_i, t_i \in \mathbb{N})$ と表される。ここで $a_i = a_j$ のとき
-
-$$
+>
+> すると任意の生成元は $a_i = g^{s_i}y^{t_i} = g^{s_i + xt_i}\ (s_i, t_i \in \mathbb{N})$ と表される。ここで $a_i = a_j$ のとき
+>
+> $$
 \begin{aligned}
 a_ia_j^{-1} & = g^{(s_i + xt_i) - (s_j + xt_j)} = 1 \\
 x &= \frac{s_i - s_j}{t_j - t_i} & \pmod N
 \end{aligned}
 $$
-
-となり $x$ が分かる。期待計算量は $\mathcal{O}(N^{1/4})$ です。
+>
+> となり $x$ が分かる。
 
 Pollard-$\rho$ 法の $\rho$ は文字 $\rho$ の形が $a_i$ の由来となっています。
 
-### Pollard's Kangaroo 法 ($\lambda$ 法)
-$\rho$ 法は動く点が1つの値だったのに対し、 $\lambda$ 法は2つの値がランダムに動いていき、一方がもう一方の点に衝突したとき DLP が解ける。
-
-$$
-\begin{aligned}
-x_0 & = g^\alpha & y_0 & = y \\
-x_{i+1} & = x_ig^{f(x_i)} & y_{i+1} & = y_ia^{f(y_i)} \\
-\end{aligned}
-$$
-
-$x_i = y_j$ となるとき $x = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j} f(y_k)$ となる。
-見つからなければ $N$ や $f$ を取り替えて繰り返す。
-
-同じく期待計算量は $\mathcal{O}(N^{1/4})$ です。
+この派生形として 2 つの数列を作って衝突させる Pollard's Kangaroo 法 ($\lambda$ 法) もあります。
 
 ### Pohlig-Hellman
 
@@ -352,3 +346,18 @@ $$
 ## 参考文献
 - https://www.zkdocs.com/
 - [ZenGo-X/zk-paillier: A collection of Paillier cryptosystem zero knowledge proofs (github.com)](https://github.com/ZenGo-X/zk-paillier)
+
+### Pollard's Kangaroo 法 ($\lambda$ 法)
+$\rho$ 法は動く点が1つの値だったのに対し、 $\lambda$ 法は2つの値がランダムに動いていき、一方がもう一方の点に衝突したとき DLP が解ける。
+
+$$
+\begin{aligned}
+x_0 & = g^\alpha & y_0 & = y \\
+x_{i+1} & = x_ig^{f(x_i)} & y_{i+1} & = y_ia^{f(y_i)} \\
+\end{aligned}
+$$
+
+$x_i = y_j$ となるとき $x = \alpha + \sum_{k=1}^{i} f(x_k) - \sum_{k=1}^{j} f(y_k)$ となる。
+見つからなければ $N$ や $f$ を取り替えて繰り返す。
+
+同じく期待計算量は $\mathcal{O}(N^{1/4})$ です。
