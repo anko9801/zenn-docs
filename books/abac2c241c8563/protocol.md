@@ -354,19 +354,6 @@ sequenceDiagram
 ただしチャレンジにすべての公開値を含めないと脆弱性 (Frozen Heart) となります。[Coordinated disclosure of vulnerabilities affecting Girault, Bulletproofs, and PlonK | Trail of Bits Blog](https://blog.trailofbits.com/2022/04/13/part-1-coordinated-disclosure-of-vulnerabilities-affecting-girault-bulletproofs-and-plonk/)
 
 
-> **Def. 電子署名**
-> 本人が署名していること、内容が改ざんされていないことを証明する
-
-> **署名の例 1 (DSA; Digital Signature Algorithm)**
-> DLP ベースの署名
-> - 鍵生成
->   1. 素数 $q$ を用いて $p = 2q + 1$ と表される素数 $p$ を生成する。
->   2. $g\in\mathbb{F}_p$ と $x\in\mathbb{F}_q$ を生成して $y = g^x \bmod p$ を計算する。
-> - 署名
->   乱数 $k$ を生成し、署名したいメッセージ $m$ を用いて $r = (g^k\bmod p)\bmod q$ と $s = k^{-1}(H(m) + xr) \bmod q$ を署名として公開する。
-> - 検証
->   $v = (g^{s^{-1}H(m)}y^{s^{-1}r} \bmod p)\bmod q$ を計算して $r = v$ なら正当な署名となる。
-
 > **署名の例 2 (Schnorr Signature)**
 > 非対話型ゼロ知識証明な署名の一種。一般に非対話型ゼロ知識証明を用いて電子署名を作り出すことができます。
 > - 鍵生成
