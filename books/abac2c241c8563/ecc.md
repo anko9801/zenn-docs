@@ -360,9 +360,6 @@ Alice と Bob は AES などの共通鍵暗号を用いて暗号通信しよう�
 
 このように攻撃者は $(P, d_AP, d_BP)$ が分かっていたとしても ECDLP (ECDHH) が解けないので $d_Ad_BP$ が分からず、安全に共通鍵を共有することができます。
 
-```python
-```
-
 ## ECDLP を解く
 
 計算機代数の章で紹介する DLP を解く方法を楕円曲線に適用すればよいだけです。比較的簡単な Pollard-rho 法や GSBS 法はそれを見ながら実装して頂きたいです。あと数体ふるい法は ECDLP 上では有効ではないらしいです(多分)。ここではより発展的な Pohlig-Hellman と Index Calculus Algorithm とその派生を紹介します。量子アルゴリズムとしても ECDLP は位数発見問題なので Shor のアルゴリズムが使えます。
@@ -394,7 +391,7 @@ $$
 \frac{\#E}{p_i}Q = d_0\left(\frac{\#E}{p_i}P\right)
 $$
 
-この $d_0$ は ECDLP の他の方法を用いて $\mathcal{O}(\sqrt{p_i})$ で求まります。次に $d_0,\ldots,d_{j-1}$ を知っているときに $d_j$ を計算する為に次のように変形します。
+この $d_0$ は ECDLP の他の方法を用いて $\mathcal{O}(\sqrt{p_i})$ で求まります。次に $d_0,\ldots,d_{j-1}$ を知っているときに $d_j$ を計算します。点 $P, Q$ に $\#E/p_i^{j+1}$ を掛けた点について次の関係式が成り立ちます。
 
 $$
 \begin{aligned}
@@ -429,36 +426,6 @@ Index Calculus Algorithm は次のように抽象化されます。
 >
 > $$
 R_j = a_jP + b_jQ = \sum_{P_i\in\mathcal{F}}e_{ij}P_i
-$$
-
-有限体上の
-
-因子基底 $p_j$
-1. 小さな素因数 $p_j$ を用いて $yg^k = \prod_{j = 1}^m p_j^{e_{j}} \pmod p$ と書けるような $k$ を見つける。
-2. $g^{k_i} = \prod_{j = 1}^m p_j^{e_{ij}} \pmod{p}$ と素因数分解できるような $k_i$ を $n$ 個以上見つける。
-
-すると次のように書ける。
-
-$$
-\begin{aligned}
-  g^{k_i} & = \prod_{j = 1}^m p_j^{e_{ij}} & \pmod p \\
-  k_i & = \sum_{j = 1}^m e_{ij}\log_g{p_j} & \pmod{p-1} \\
-\begin{pmatrix}
-  k_1 \\
-  \vdots \\
-  k_n \\
-\end{pmatrix} & =
-\begin{pmatrix}
-  e_{11} & \cdots & e_{m1} \\
-  \vdots & \ddots & \vdots \\
-  e_{1n} & \cdots & e_{mn}\\
-\end{pmatrix}
-\begin{pmatrix}
-  \log_g p_1 \\
-  \vdots \\
-  \log_g p_m \\
-\end{pmatrix} & \pmod{p-1}
-\end{aligned}
 $$
 
 種数が大きい超楕円曲線上の ECDLP では Index Calculus Algorithm を応用することができます。超楕円曲線は後で解説しますが、楕円曲線の $x$ に関する式が 3 次方程式だったのに対し、一般の奇数次数の方程式となるものです。
@@ -498,9 +465,6 @@ $$
 と計算できます。
 
 この計算量は $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$ と知られています。
-
-```python
-```
 
 ### GHS-Weil descent 攻撃
 楕円曲線の $\mathbb{F}_{p^k}$ 有理点群 $E(\mathbb{F}_{p^k})$ を種数 $g\geq k$ の代数曲線 $C$ の Jacobian の有理点群 $\mathcal{J}_C(\mathbb{F}_p)$ に埋め込み、 $\mathcal{J}_C(\mathbb{F}_p)$ 上で Gaudry アルゴリズムで解く
