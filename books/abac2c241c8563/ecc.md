@@ -371,6 +371,95 @@ flowchart LR
     id3 --> id4(Index Calculus Algorithm) --> id5(GHS-Weil descent)
     id8(Shor のアルゴリズム)
 ```
+#### Baby-step Giant-step
+
+有限体 $\mathbb{F}_p$ について $m = \lceil \sqrt{p-1} \rceil$ とおき、$x$ を $m$ で割った商と余りを $q, r$ として次の集合 $B, G$ について考える。
+$x = qm + r$
+
+$$
+\begin{aligned}
+y &= g^x \\
+y &= g^{qm+r} \\
+yg^{-r} &= (g^m)^q \\
+B &= \{ yg^{-r} \mid 0 \leq r < m\} \\
+G &= \{ g^{mq} \mid 0 \leq q < m\}
+\end{aligned}
+$$
+
+まず集合 $B$ を構築し、集合 $G$ を1つずつ集合 $B$ に対して検索に掛け、存在したとき $x = qm + r$ とすることでDLPの解が求まります。
+
+楕円曲線 $E$ でも同様に $m = \lceil \sqrt{\#P} \rceil$ として集合 $B, G$  を考えれば解けます。
+
+$$
+\begin{aligned}
+Q &= dP \\
+Q &= (qm + r)P \\
+Q - rP &= q(mP) \\
+B &= \{ Q - rP \mid 0 \leq r < m \} \\
+G &= \{ qmP \mid 0 \leq q < m \}
+\end{aligned}
+$$
+
+これより計算量は位数 $n$ を用いて $O(\sqrt{n}\log n)$ メモリ空間は $O(\sqrt{n})$ だけ必要となります。
+
+#### Pollard's rho 法
+
+$\rho$ 法は文字 $\rho$ の形が由来となっていて、まず、ある点を決めます。そして疑似ランダム関数 $f$ にその点を入れると次の点が出ます。今まで出た点と衝突したらDLPが解けるという仕組みです。
+
+$$
+\begin{aligned}
+x_0 &= g^{a_0} \\
+x_{i+1} &= f(x_i) \\
+\end{aligned}
+$$
+
+$x_i = x_j$
+具体的には $t = ax + b$
+誕生日のパラドックス
+
+$$
+f(x)=
+\begin{cases}
+yx & (x \in G_1 \rm{のとき}) \\
+x^2 & (x \in G_2 \rm{のとき})\\
+gx & (x \in G_3 \rm{のとき})\\
+\end{cases}
+$$
+
+$$
+f(X)=
+\begin{cases}
+Y+X & (X \in P_1 \rm{のとき}) \\
+2X & (X \in P_2 \rm{のとき})\\
+G+X & (X \in P_3 \rm{のとき})\\
+\end{cases}
+$$
+
+$$
+\begin{aligned}
+x_0 &= g^{a_0}y^{b_0} \\
+x_i &= g^{a_i}y^{b_i} \\
+
+a_{i+1} &=
+\begin{cases}
+a_i & (x \in G_1 \rm{のとき}) \\
+2a_i & (x \in G_2 \rm{のとき})\\
+a_i + 1 & (x \in G_3 \rm{のとき})\\
+\end{cases}
+& b_{i+1} &=
+\begin{cases}
+b_i + 1 & (x \in G_1 \rm{のとき}) \\
+2b_i & (x \in G_2 \rm{のとき})\\
+b_i & (x \in G_3 \rm{のとき})\\
+\end{cases}\\
+
+x_i &= x_j \\
+g^{a_i}y^{b_i} &= g^{a_j}y^{b_j} \\
+g^{a_i - a_j} &= g^{x(b_j - b_i)} \\
+x &= (a_i - a_j)(b_j - b_i)^{-1} \pmod{p-1} \\
+\end{aligned}
+$$
+
 
 ### Pohlig-Hellman
 

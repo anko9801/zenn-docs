@@ -22,18 +22,6 @@ title: "共通鍵暗号"
 > - 同じ長さのバイト列 $B_1, B_2$ に対し、各ビットにおいて XOR 演算したバイト列を $B_1\oplus B_2$ と書き、$B_1$ と $B_2$ の XOR という。
 > - $n$-bit ブロックとして前置・後置ゼロパディングする関数をそれぞれ $Z_{f, n}(B), Z_{b, n}(B)$ と書く。
 
-```
-Examples:
-
-value (hex)        representation (hex)
------------        --------------------
-0
-9a378f9b2e332a7    09 a3 78 f9 b2 e3 32 a7
-80                 00 80
--1234              ed cc
--deadbeef          ff 21 52 41 11
-```
-
 ## AES
 AES (Advanced Encryption Standard) は 2000 年に NIST が公募し選定した暗号標準で、 2001 年 11 月に [FIPS PUB 197](https://nvlpubs.nist.gov/nistpubs/fips/nist.fips.197.pdf) として公表されました。
 

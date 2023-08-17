@@ -98,30 +98,14 @@ $$
 ```python
 class LFSR():
   def __init__(self, n):
+    self.init = init
+    self.mask = mask
     self.state = [getRandBit(1) for _ in range(n)]
     self.taps = [getRandBit(1) for _ in range(n)]
   def next(self):
     output = reduce(xor, [bit & tap for bit, tap in zip(self.state, self.taps)])
     self.state = self.state[1:] + [output]
     return output
-
-class lfsr():
-  def __init__(self, init, mask, length):
-    self.init = init
-    self.mask = mask
-    self.lengthmask = 2**(length+1)-1
-
-  def next(self):
-    nextdata = (self.init << 1) & self.lengthmask
-    i = self.init & self.mask & self.lengthmask
-    output = 0
-    while i != 0:
-      output ^= (i & 1)
-      i = i >> 1
-    nextdata ^= output
-    self.init = nextdata
-    return output
-
 ```
 
 :::message
@@ -168,21 +152,16 @@ https://www.ambionics.io/blog/php-mt-rand-prediction
 
 これらを論理的に計算するのはとても骨が折れます。
 
-こういうときには SMT で解けます！
-全探索より速いアルゴリズムがないときは SMT が強い
+こういうときには SMT を使います！SMT は簡単に言うと数学的な条件を与えると良い感じに全探索して解いてくれるツールです。中身は相当複雑らしいです。
 
 https://github.com/deut-erium/RNGeesus
 
-これでは乱数を予測されてしまうので暗号には使えません。暗号で使えるような DRBG はあるのでしょうか？それらを次節で紹介します。
+これらの乱数では予測されてしまうので暗号には使えません。暗号で使えるような PRNG はあるのでしょうか？それらを次節で紹介します。
 
 :::message
 **練習問題**
 Python の `random.random()` を読んでみよう。
 https://github.com/python/cpython/blob/main/Lib/random.py
-:::
-
-:::message
-**演習問題**
 [CTF archive](https://cryptohack.org/challenges/ctf-archive/) から出題
 - Z3 を
 - Twist and Shout (Zh3r0 CTF V2)

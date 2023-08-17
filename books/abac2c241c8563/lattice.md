@@ -420,6 +420,7 @@ print(LLL(B, 0.8))
 実際は LLL 簡約されていることを定義して、簡約されたときの上限などを示し、LLL 簡約された基底を返すアルゴリズムの well-defined 性や高速化を考えますが、前提知識などが不足していたり長くなるのでアルゴリズムとその特徴を天下り的に書いて終わらせます。
 
 ### より強い基底簡約アルゴリズム
+CTF では LLL で十分簡約化できますが CVP を解く際に強いと取れるときがあるので知識として BKZ を知っておきましょう。
 
 > **HKZ (Hermite-Korkine-Zolotareff) 基底簡約**
 > 1. サイズ基底簡約
@@ -427,7 +428,7 @@ print(LLL(B, 0.8))
 
 > **BKZ (Block Korkine-Zolotareff) 基底簡約**
 > 1. サイズ基底簡約
-> 2. すべての $1\leq k\leq n-\beta+1$ に対して $\beta$ 次元の格子 $L_{[k,k+\beta-1]} = \lbrace\pi_k(\bm{b}_k), \pi_k(\bm{b}_{k+1}), \ldots, \pi_k(\bm{b}_{k+\beta-1})\rbrace$ の基底が HKZ 基底簡約
+> 2. すべての $1\leq k\leq n-\beta+1$ に対して $\beta$ 次元の格子 $L_{[k,k+\beta-1]} = \lbrace\pi_k(\bm{b}_k), \pi_k(\bm{b}_{k+1}), \ldots, \pi_k(\bm{b}_{k+\beta-1})\rbrace$ の基底を HKZ 基底簡約
 
 ## 基底簡約アルゴリズムの応用
 
@@ -623,22 +624,15 @@ $$
 \end{pmatrix}
 $$
 
-これを改良する方法を考えます。まず剰余の方程式は係数がある程度小さければそのまま整数方程式となるよという主張をする Howgrave-Graham の補題を示します。
+これを改良する方法を考えます。まず剰余の方程式は係数がある程度小さければそのまま整数係数方程式となるよという主張をする Howgrave-Graham の補題を示します。
 
 > **Lemma. Howgrave-Graham の補題**
-> $N$ を法、 $g(x) \in \mathbb{Z}[x]$ を整数多項式とし、含まれる単項式の数を $\omega$ とする。$g(x)$ に対してある $X$ が存在し、$g(x_0) = 0 \pmod{N}$ なる $x_0 \in \mathbb{Z}$ について $|x_0| \leq X$ であると仮定する。このとき
+> 整数係数多項式 $g(x) = g_0 + g_1x + g_2x^2 + \cdots + g_{d-1} x^{d-1}$ について $N$ を法としたとき $|x_0| \leq X$ を満たす解 $g(x_0) = 0 \pmod{N}$ が整数係数多項式の解 $g(x_0) = 0$ となる十分条件は次のようになる。
 >
 > $$
-\|g(xX)\| < \frac{N}{\sqrt{\omega}}
+\|g(xX)\| = \sqrt{g_0^2 + (g_1X)^2 + (g_2X^2)^2 + \cdots + (g_{d-1}X^{d-1})^2} < \frac{N}{\sqrt{d}}
 $$
->
-> が成立するならば $g(x_0) = 0$ が整数方程式として成立する。ただし
->
-> $$
-\|g(x)\| = \left\|\sum_{i=0}^{\deg g(x)}g_i\right\| = \sqrt{\sum_{i=0}^{\deg g(x)}g_i^2}
-$$
->
-> であり、 $\deg g(x)$ は $g(x)$ の次数である。
+
 
 **Proof.**
 
@@ -648,8 +642,8 @@ $$
 &\leq \sum_{i}|g_ix_0^i| \\
 &\leq \sum_{i}|g_i|X^i \\
 &= \sum_{i}(1\cdot|g_i|X^i) \\
-&\leq \sqrt{\sum_{i, g_i \neq 0}1} \sqrt{\sum_{i}(|g_i|X^i)^2} && \left(\because \text{Cauchy–Schwarz の不等式}\right) \\
-&= \sqrt{\omega}\|g(xX)\| < N && \left(\because \|g(xX)\| < \frac{N}{\sqrt{\omega}}\right)
+&\leq \sqrt{\sum_{i=0, g_i \neq 0}^{d-1}1} \sqrt{\sum_{i=0}^{d-1}(|g_i|X^i)^2} && \left(\because \text{Cauchy–Schwarz の不等式}\right) \\
+&= \sqrt{d}\|g(xX)\| < N && \left(\because \|g(xX)\| < \frac{N}{\sqrt{d}}\right)
 \end{aligned}
 $$
 
@@ -700,12 +694,14 @@ $$
 
 これを基底簡約して出てきた方程式が Howgrave-Graham の補題の条件を満たしていれば整数係数方程式となって Berlekamp-Zassenhause 法などを用いて解けます。これらをまとめて Coppersmith Method と呼びます。
 
-> **Thm. Coppersmith の定理**
-> $N$ を法とし $f(x)$ をモニックな 1 変数 $\delta$ 次多項式とする。このとき $f(x_0) = 0 \pmod{N}$ と次の条件を満たすような $x_0$ を効率よく求めることができる
+> **Thm. Coppersmith's Theorem**
+> $f(x)$ を $N$ を法とするモニックな $d$ 次多項式について次の条件を満たすとき解 $x_0$ ($|x_0| < X$) を効率よく求めることができる。
 >
 > $$
-|x_0| \leq N^{\frac{1}{\delta}}
+\|f(xX)\| < \frac{N}{\sqrt{d}}
 $$
+
+条件式が覚えにくいので大体 $x_0 < \sqrt[d]{N}$ の解を探索してくれると思えばいいです。
 
 さらに Coppersmith Method には拡張できることが 2 つあります。
 
