@@ -616,10 +616,10 @@ $$
 
 $$
 \begin{pmatrix}
-  O(1) &&&& a_n \\
+  O(x^n) &&&& a_0 \\
   & \ddots &&& \vdots \\
-  && O(x^{n-1}) && a_1 \\
-  &&& O(x^n) & a_0 \\
+  && O(x) && a_{n-1} \\
+  &&& O(1) & a_n \\
   &&&& N \\
 \end{pmatrix}
 $$
