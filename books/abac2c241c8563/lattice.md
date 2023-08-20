@@ -638,11 +638,10 @@ $$
 
 $$
 \begin{aligned}
-|g(x_0)| &= \left|\sum_{i=0}^{\deg g(x_0)}g_ix_0^i\right| \\
-&\leq \sum_{i}|g_ix_0^i| \\
-&\leq \sum_{i}|g_i|X^i \\
-&= \sum_{i}(1\cdot|g_i|X^i) \\
-&\leq \sqrt{\sum_{i=0, g_i \neq 0}^{d-1}1} \sqrt{\sum_{i=0}^{d-1}(|g_i|X^i)^2} && \left(\because \text{Cauchy–Schwarz の不等式}\right) \\
+|g(x_0)| &= \left|\sum_{i=0}^{d-1}g_ix_0^i\right| \\
+&\leq \sum_{i=0}^{d-1}|g_ix_0^i| \\
+&\leq \sum_{i=0}^{d-1}|g_i|X^i \\
+&\leq \sqrt{\sum_{i=0}^{d-1}1} \sqrt{\sum_{i=0}^{d-1}(|g_i|X^i)^2} && \left(\because \text{Cauchy–Schwarz の不等式}\right) \\
 &= \sqrt{d}\|g(xX)\| < N && \left(\because \|g(xX)\| < \frac{N}{\sqrt{d}}\right)
 \end{aligned}
 $$
@@ -653,13 +652,13 @@ $\Box$
 剰余の方程式を基底簡約して係数を小さくすれば整数方程式に変換できて解けるのでは...！？と気付くでしょう。ただ基底簡約する為には同じ解を持つ複数の方程式が必要ですが今は 1 つしかありません。これに対しては剰余を $\bmod{N^m}$ に持ち上げることで複数の同じ解の方程式を作ることが出来ます。
 
 > **Lemma. Hensel の持ち上げ**
-> $N$ を法、$f(x)$ を多項式とする。自然数 $m, l$ について
+> 多項式 $f(x)$ の解 $f(x_0) = 0 \pmod N$ に対して多項式 $g_{i,j}(x)$ が $g_{i,j}(x_0) = 0 \pmod{N^m}$ を満たすには次のようにおけばよい。
 >
 > $$
-g_{i,j}(x) := N^{m−i}x^j f^i(x) \ (0 \leq i \leq m, 0 \leq j\leq l)
+g_{i,j}(x) := N^{m−i}x^j f^i(x) \qquad (0 \leq i \leq m, 0 \leq j\leq l)
 $$
 >
-> とおく。このとき、 $f(x_0) = 0 \pmod N$ をみたす $x_0 \in \mathbb{Z}$ について、 $g_{i,j}(x_0) = 0 \pmod{N^m}$ となる。
+> ただし $m, l$ は整数とする。
 
 **Proof.**
 $f(x_0) = 0 \pmod N$ なので $f(x_0) = kN$ とおける。
@@ -668,11 +667,11 @@ $$
 \begin{aligned}
 g_{i,j}(x_0) &= N^{m−i}x_0^j f^i(x_0) \\
 &= N^{m−i}x_0^j (kN)^i \\
-&= k^ix_0^j N^m \\
-g_{i,j}(x_0) &= 0 \pmod{N^m} \\
+&= k^ix_0^j N^m
 \end{aligned}
 $$
 
+より $g_{i,j}(x_0) = 0 \pmod{N^m}$ となる。
 $\Box$
 
 小さくしたい方程式は $g_{i,j}(xX)$ であることに注意して次の格子を基底簡約します。
