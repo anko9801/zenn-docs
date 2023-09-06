@@ -1,5 +1,5 @@
 ---
-title: "共通鍵暗号"
+title: "CTF ノート Crypto 編 共通鍵暗号"
 ---
 
 > **共通鍵暗号**
@@ -38,20 +38,13 @@ AES はあるラウンド関数を繰り返す SPN 構造 (Substitution Permutat
 1. AddRoundKey
 秘密鍵からラウンド数に応じたラウンド鍵を生成し XOR を取る。
 2. SubBytes (Substitution)
-1 バイトの置換表 S-box を用いてバイトごとに変換します。AES では下の S-box を用います。単純ですがほとんどの置換表は非線形変換となり、差分解析法などの攻撃に対してかなり強く、AES の安全性の要となっています。
+1 バイトの置換表 S-box を用いてバイトごとに変換します。AES では下の S-box を用います。単純ですが AES の置換表は非線形変換となり、差分解析法などの攻撃に対してかなり強く、AES の安全性の要となっています。
 3. ShiftRows (Permutation)
 16 バイトを 4×4 に分け、行ごとにシフトする。
 4. MixColumn (Permutation)
 16 バイトを 4×4 に分け、列ごとに有限体上で演算する。
 
 ![](/images/aes.png)
-
-細かい実装は練習問題に回すとして AES の応用について考えます。
-
-AES-NI: CPU 命令を追加することで高速化
-
-### SubBytes
-次の SBOX に
 
 ```c
 const uint8_t sbox[] = {
@@ -74,10 +67,12 @@ const uint8_t sbox[] = {
 };
 ```
 
+細かい実装は解説しません。CryptoHack を解いてると自然に実装できます。
+
+AES-NI: CPU 命令を追加することで高速化
+
 :::message
 **練習問題**
-- Medium: AES を自作してみましょう。[CryptoHack](https://cryptohack.org/challenges/aes/) を見るとよさ。
-- Easy: AES では暗号化関数だけで復号が出来ます。なぜでしょうか。
 - Hard: AES のラウンド回数が 2 回など少ない場合、解読出来てしまいます。どうすれば解読できるでしょうか。(Pwn2Win CTF 2021 A2S)
 :::
 
