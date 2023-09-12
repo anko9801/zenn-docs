@@ -6,26 +6,46 @@ topics: []
 published: false
 ---
 
-arena で管理されています。
+`malloc` 関数でヒープ領域にあるメモリを確保してそのポインタを返す。 `free` 関数はそのポインタのメモリを開放してくれる。
 
 ```c
-/*
-   Fastbins
+void *malloc(size_t size);
+void free(void *ptr);
+```
 
-    An array of lists holding recently freed small chunks.  Fastbins
-    are not doubly linked.  It is faster to single-link them, and
-    since chunks are never removed from the middles of these lists,
-    double linking is not necessary. Also, unlike regular bins, they
-    are not even processed in FIFO order (they use faster LIFO) since
-    ordering doesn't much matter in the transient contexts in which
-    fastbins are normally used.
+これらの関数が内部でどのように処理されるのかを調べていく。
 
-    Chunks in fastbins keep their inuse bit set, so they cannot
-    be consolidated with other free chunks. malloc_consolidate
-    releases all chunks in fastbins and consolidates them with
-    other free chunks.
- */
+[**最新の malloc.c のソースコード**](https://elixir.bootlin.com/glibc/latest/source/malloc/malloc.c) を用意しましょう。
 
+今回は malloc 関数の中身を中心に調べていく。
+
+glibc のバージョンは v2.38 です。
+
+### fastbins とは
+最近解放された小さなチャンクを保持している配列です。
+単方向リスト
+
+consolidate 統合された状態が保たれるようにする
+
+MORECORE sbrk
+
+| パラメータ | 説明 |
+| --- | --- |
+| `FASTBIN_CONSOLIDATION_THRESHOLD` | `FASTBIN_CONSOLIDATION_THRESHOLD` のチャンクが free されたときに自動的に周辺にある可能性のある fastbins の consolidation を行う。It is defined at half the default trim threshold as a compromise heuristic to only attempt consolidation if it is likely to lead to trimming. However, it is not dynamically tunable, since consolidation reduces fragmentation surrounding large chunks even if trimming is not used. |
+| `NONCONTIGUOS_BIT` | NONCONTIGUOUS_BIT indicates that MORECORE does not return contiguous regions.  Otherwise, contiguity is exploited in merging together, when possible, results from consecutive MORECORE calls. The initial value comes from MORECORE_CONTIGUOUS, but is changed dynamically if mmap is ever used as an sbrk substitute. |
+| `TRIM_FASTBINS` | 小さなチャンクも trim メモリ少なくなる代わりに処理が遅くなる TRIM_FASTBINS controls whether free() of a very small chunk can immediately lead to trimming. Setting to true (1) can reduce memory footprint, but will almost always slow down programs that use a lot of small chunks. Define this only if you are willing to give up some speed to more aggressively reduce system-level memory footprint when releasing memory in programs that use many small chunks.  You can get essentially the same effect by setting MXFAST to 0, but this can lead to even greater slowdowns in programs using many small chunks. TRIM_FASTBINS is an in-between compile-time option, that disables only those chunks bordering topmost memory from being placed in fastbins. |
+
+malloc_consolidate
+`global_max_fast`
+
+```
+An array of lists holding recently freed small chunks.  Fastbins are not doubly linked.  It is faster to single-link them, and since chunks are never removed from the middles of these lists, double linking is not necessary. Also, unlike regular bins, they are not even processed in FIFO order (they use faster LIFO) since ordering doesn't much matter in the transient contexts in which fastbins are normally used.
+
+Chunks in fastbins keep their inuse bit set, so they cannot be consolidated with other free chunks. malloc_consolidate releases all chunks in fastbins and consolidates them with other free chunks.
+```
+
+
+```c
 typedef struct malloc_chunk *mfastbinptr;
 #define fastbin(ar_ptr, idx) ((ar_ptr)->fastbinsY[idx])
 
@@ -39,27 +59,7 @@ typedef struct malloc_chunk *mfastbinptr;
 
 #define NFASTBINS  (fastbin_index (request2size (MAX_FAST_SIZE)) + 1)
 
-/*
-   FASTBIN_CONSOLIDATION_THRESHOLD is the size of a chunk in free()
-   that triggers automatic consolidation of possibly-surrounding
-   fastbin chunks. This is a heuristic, so the exact value should not
-   matter too much. It is defined at half the default trim threshold as a
-   compromise heuristic to only attempt consolidation if it is likely
-   to lead to trimming. However, it is not dynamically tunable, since
-   consolidation reduces fragmentation surrounding large chunks even
-   if trimming is not used.
- */
-
 #define FASTBIN_CONSOLIDATION_THRESHOLD  (65536UL)
-
-/*
-   NONCONTIGUOUS_BIT indicates that MORECORE does not return contiguous
-   regions.  Otherwise, contiguity is exploited in merging together,
-   when possible, results from consecutive MORECORE calls.
-
-   The initial value comes from MORECORE_CONTIGUOUS, but is
-   changed dynamically if mmap is ever used as an sbrk substitute.
- */
 
 #define NONCONTIGUOUS_BIT     (2U)
 
@@ -97,24 +97,6 @@ get_max_fast (void)
     __builtin_unreachable ();
   return global_max_fast;
 }
-```
-
-```c
-/*
-  TRIM_FASTBINS controls whether free() of a very small chunk can
-  immediately lead to trimming. Setting to true (1) can reduce memory
-  footprint, but will almost always slow down programs that use a lot
-  of small chunks.
-
-  Define this only if you are willing to give up some speed to more
-  aggressively reduce system-level memory footprint when releasing
-  memory in programs that use many small chunks.  You can get
-  essentially the same effect by setting MXFAST to 0, but this can
-  lead to even greater slowdowns in programs using many small chunks.
-  TRIM_FASTBINS is an in-between compile-time option, that disables
-  only those chunks bordering topmost memory from being placed in
-  fastbins.
-*/
 
 #ifndef TRIM_FASTBINS
 #define TRIM_FASTBINS  0
@@ -123,81 +105,29 @@ get_max_fast (void)
 
 ### malloc
 
-```c:_int_malloc#L3889
-  /*
-     If the size qualifies as a fastbin, first check corresponding bin.
-     This code is safe to execute even if av is not yet initialized, so we
-     can try it without checking, which saves some time on this fast path.
-   */
+まずは `_int_malloc()` での fastbins の処理は
 
-#define REMOVE_FB(fb, victim, pp)                       \
-  do                                                    \
-    {                                                   \
-      victim = pp;                                      \
-      if (victim == NULL)                               \
-        break;                                          \
-      pp = REVEAL_PTR (victim->fd);                                     \
-      if (__glibc_unlikely (pp != NULL && misaligned_chunk (pp)))       \
-        malloc_printerr ("malloc(): unaligned fastbin chunk detected"); \
-    }                                                   \
-  while ((pp = catomic_compare_and_exchange_val_acq (fb, pp, victim)) \
-         != victim);                                    \
+If the size qualifies as a fastbin, first check corresponding bin. This code is safe to execute even if av is not yet initialized, so we can try it without checking, which saves some time on this fast path.
 
-  if ((unsigned long) (nb) <= (unsigned long) (get_max_fast ()))
-    {
-      idx = fastbin_index (nb);
-      mfastbinptr *fb = &fastbin (av, idx);
-      mchunkptr pp;
-      victim = *fb;
+最も
 
-      if (victim != NULL)
-        {
-          if (__glibc_unlikely (misaligned_chunk (victim)))
-            malloc_printerr ("malloc(): unaligned fastbin chunk detected 2");
-          if (SINGLE_THREAD_P)
-            *fb = REVEAL_PTR (victim->fd);
-          else
-            REMOVE_FB (fb, pp, victim);
-          if (__glibc_likely (victim != NULL))
-            {
-              size_t victim_idx = fastbin_index (chunksize (victim));
-              if (__builtin_expect (victim_idx != idx, 0))
-                malloc_printerr ("malloc(): memory corruption (fast)");
-              check_remalloced_chunk (av, victim, nb);
-#if USE_TCACHE
-              /* While we're here, if we see other chunks of the same size,
-                stash them in the tcache.  */
-              size_t tc_idx = csize2tidx (nb);
-              if (tcache && tc_idx < mp_.tcache_bins)
-                {
-                  mchunkptr tc_victim;
 
-                  /* While bin not empty and tcache not full, copy chunks.  */
-                  while (tcache->counts[tc_idx] < mp_.tcache_count
-                        && (tc_victim = *fb) != NULL)
-                    {
-                      if (__glibc_unlikely (misaligned_chunk (tc_victim)))
-                        malloc_printerr ("malloc(): unaligned fastbin chunk detected 3");
-                      if (SINGLE_THREAD_P)
-                        *fb = REVEAL_PTR (tc_victim->fd);
-                      else
-                        {
-                          REMOVE_FB (fb, pp, tc_victim);
-                          if (__glibc_unlikely (tc_victim == NULL))
-                            break;
-                        }
-                      tcache_put (tc_victim, tc_idx);
-                    }
-                }
-#endif
-              void *p = chunk2mem (victim);
-              alloc_perturb (p, bytes);
-              return p;
-            }
-        }
-    }
+```c:L1972
+/* ------------------ Testing support ----------------------------------*/
+
+static int perturb_byte;
+
+static void
+alloc_perturb (char *p, size_t n)
+{
+  if (__glibc_unlikely (perturb_byte))
+    memset (p, perturb_byte ^ 0xff, n);
+}
+
+static void
+free_perturb (char *p, size_t n)
+{
+  if (__glibc_unlikely (perturb_byte))
+    memset (p, perturb_byte, n);
+}
 ```
-
-get_max_fast 以下
-victim fb
-
