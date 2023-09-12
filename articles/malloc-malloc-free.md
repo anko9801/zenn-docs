@@ -35,8 +35,8 @@ void free(void *ptr);
 | `__libc_free()` | `free()` のエイリアス。 |
 | `_int_malloc()` | malloc のほぼ全てが書かれてある。最も重要！ |
 | `_int_free()` | free のほぼ全てが書かれてある。重要 of 重要！ |
-| `sysmalloc()` | システムからメモリを貰う。mmap や MORECORE (sbrk) でヒープ領域を確保や拡張する。 |
-| `systrim()` | システムにメモリを返す。top chunk から切り出して返す。 |
+| `sysmalloc()` | OS からメモリを貰う。mmap や MORECORE (sbrk) でヒープ領域を確保や拡張する。 |
+| `systrim()` | OS にメモリを返す。top chunk から切り出して返す。 |
 | `malloc_consolidate()` | fastbins の統合を行う。 |
 
 実際の malloc.c は約 6000 行と結構長く、高速化の為にあまり抽象化されてないのでまずは擬似コードを読むことにしましょう。
