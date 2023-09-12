@@ -1644,3 +1644,19 @@ static void malloc_consolidate(mstate av)
   } while (fb++ != maxfb);
 }
 ```
+
+```shell
+pwndbg> vmmap
+pwndbg> heap
+pwndbg> arena
+pwndbg> bins
+pwndbg> fastbins
+pwndbg> tcachebins
+pwndbg> unsortedbin
+pwndbg> smallbins
+pwndbg> largebins
+pwndbg> tcache
+pwndbg> top_chunk
+pwndbg> try_free <address>
+pwndbg> malloc_chunk <address>
+```
