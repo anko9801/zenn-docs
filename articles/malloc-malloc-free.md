@@ -39,7 +39,7 @@ void free(void *ptr);
 実際の malloc.c は約 6000 行と結構長く、高速化の為にあまり抽象化されてないのでまずは擬似コードを読むことにしましょう。
 
 ### malloc() の擬似コード
-擬似コードを読んで各 bins の役割をよく考えてみましょう。
+擬似コードを読んでそれぞれの役割をよく考えてみましょう。
 
 ```c
 void *__libc_malloc (size_t bytes) {
@@ -51,9 +51,8 @@ void *__libc_malloc (size_t bytes) {
     if (tcache のサイズ)
         tcache から確保
     if (シングルスレッド)
-        _int_malloc(&main_arena, bytes) を返す
-    アリーナを mutex ロックして取得
-    _int_malloc (arena_ptr, bytes) を返す
+        main_arena で _int_malloc() を返す
+    アリーナを mutex ロックして取得し _int_malloc() を返す
     失敗したら 1 回だけリトライする
 }
 
@@ -84,38 +83,34 @@ static void *_int_malloc(mstate arena, size_t bytes) {
 
             unsortedbin から unlink
             if (同じサイズ) {
-                if (tcahce が埋まってない) {
-                    tcache に挿入して continue
-                } else {
-                    確保して返す
-                }
+                if (tcahce が埋まってない)
+                    unsortedbin から tcache に挿入して continue
+                else
+                    unsortedbin から確保
             }
-            smallbins, largebins に振り分け
+            unsortedbin を smallbins, largebins に振り分け
 
             if (++tcache_unsorted_count > tcache_unsorted_limit)
                 tcache から確保
             if (++iters >= 10000)
                 break
         }
-        if (tcache に挿入した)
-            tcache から確保
+        tcache に挿入していたらそこから確保
 
-        largebins から確保
-        smallbins, largebins から確保
+        smallbins / largebins から best-fit で確保
 
-        if (top chunk が要求サイズ以上) {
+        if (top chunk が要求サイズ以上)
             top chunk から切り出す
-        } else if (have_fastchunks) {
+        else if (have_fastchunks)
             malloc_consolidate()
-        } else {
+        else
             sysmalloc()
-        }
     }
 }
 
 
 static void *sysmalloc (INTERNAL_SIZE_T nb, mstate av) {
-    if (アリーナがない || mmap_threshold(0x20000) 以上で mmap 回数が n_mmaps_max 未満)
+    if (アリーナがない || mmap_threshold (0x20000) 以上で n_mmaps_max 回未満)
         sysmalloc_mmap() を返す
 
     assert (初期状態 ||
@@ -125,20 +120,21 @@ static void *sysmalloc (INTERNAL_SIZE_T nb, mstate av) {
 
     if (main_arena ではない) {
         if (mmap でヒープ拡張) {
+            top chunk の拡張
         } else if (新しいヒープ領域を mmap で作成) {
-            if (old_size >= MINSIZE) {
-                top chunk を _int_free()
-            }
+            新しい top chunk を確保したヒープ領域にする
+            古い top chunk の末尾に 1 つ fencepost を作って PREV_INUSE をマーク
+            古い top chunk を _int_free()
         }
     } else {
         sbrk でヒープ拡張
         if (拡張が失敗)
             mmap で確保
         if (確保成功) {
-            if (連続)
+            if (top chunk に隣接している)
                 top chunk の拡張
             else {
-                if (contiguous) {
+                if (アリーナが連続な領域しか扱わない) {
                     MALLOC_ALIGNMENT (0x10) の alignment 調整
                     sbrk でページ境界まで伸びるように出来るだけ調整
                 } else {
@@ -150,15 +146,29 @@ static void *sysmalloc (INTERNAL_SIZE_T nb, mstate av) {
             }
         }
     }
-
-    新しい top chunk から切り出す
+    top chunk から切り出す
 }
 ```
 
-smallbin の範囲のとき
-fastbin → smallbin → unsortedbin → 上位の bin → top → fastbin consolidate → unsortedbin
-largebin の範囲のとき
-fastbin consolidate → unsortedbin → largebin → 上位の bin → top → sysmalloc()
+これらを読むとよりマクロに考えれば次のような処理となる。
+
+```mermaid
+graph LR
+    A(tcache bins) --> B(fastbins)
+    B --> |smallbins| C(smallbins)
+    B --> |largebins| D(fastbins の統合)
+    C --> E(unsortedbin)
+    D --> E
+    E --> F(smallbins\nlargebins)
+    F --> G(top chunk)
+    G --> |fastbins| H(fastbins の統合)
+    G --> I(sysmalloc)
+    H --> E
+```
+
+こうして見ると大枠として smallbins / largebins から best-fit で割り当てて、足りなくなったら top chunk の切り出しや `sysmalloc()` で拡張します。それに加え、小さなチャンクを扱う fastbins では頻繁に確保・解放が行われ、局所参照性を高めるキャッシュ機構として tcache bins や unsortedbin があります。
+
+このように
 
 ### free() の擬似コード
 
@@ -198,7 +208,7 @@ static void _int_free (mstate av, mchunkptr p, int have_lock) {
             if (have_fastchunks)
                 malloc_consolidate()
             if (main_arena) {
-                if (top chunk が閾値より大きい)
+                if (top chunk が閾値 (0x20000) より大きい)
                     systrim()
             } else {
                 heap_trim()
@@ -212,8 +222,6 @@ static void _int_free (mstate av, mchunkptr p, int have_lock) {
 ```
 
 大量にメモリを持っていても無駄として systrim heap 削減
-0x20000
-
 
 ## まとめ
-擬似コードとソースコードを並べて読み、理解したことを書き起こすと深い理解を得られると思います。みんな記事を書こう！
+`malloc()` `free()` の大枠は理解できたと思います。これらの関数のより詳細については記事より直接ソースコードを読んで自分でまとめた方が絶対に良い理解と読解力が得られると思います。そしてソースコードを読み込んだ方はこの記事より良い記事を書いてほしいです。
