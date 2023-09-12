@@ -6,20 +6,20 @@ topics: []
 published: false
 ---
 
-`malloc` 関数でヒープ領域にあるメモリを確保してそのポインタを返す。 `free` 関数はそのポインタのメモリを開放してくれる。
+`malloc()` でヒープ領域にあるメモリを確保してそのポインタを返し、`free()` はそのポインタのメモリを開放してくれます。
 
 ```c
 void *malloc(size_t size);
 void free(void *ptr);
 ```
 
-これらの関数が内部でどのように処理されるのかを調べていきます。
-
-[**最新の malloc.c のソースコード**](https://elixir.bootlin.com/glibc/latest/source/malloc/malloc.c) を用意しましょう。ここで扱う glibc のバージョンは v2.38 です。
+このシリーズではこれらの関数が内部でどのように処理されるのかを調べていきます。
 
 今回は `malloc()` `free()` の全体像を紹介します。
 
 注意としてここでの目的は全体を俯瞰して、詳細を詰めずとも各 bins の役割を理解し、攻撃手法を理解できるようにすることです。それに合わないマルチスレッドや最適化などにおける緻密なトリックやコーナーケースなどは暗黙的に実装されていると仮定します。その詳細についてはソースコードや他の資料を参考にしていただきたいです。
+
+これを読んだら [**最新の malloc.c のソースコード**](https://elixir.bootlin.com/glibc/latest/source/malloc/malloc.c) を用意しましょう。ここで扱う glibc のバージョンは v2.38 です。
 
 ## malloc / free 全体像
 まずはざっくりと！
@@ -198,6 +198,7 @@ static void _int_free (mstate av, mchunkptr p, int have_lock) {
                 次のチャンクと統合して unlink
             else
                 次のチャンクの PREV_INUSE をクリアする
+
             unsortedbin に挿入
         } else {
             top chunk に統合する
@@ -209,16 +210,13 @@ static void _int_free (mstate av, mchunkptr p, int have_lock) {
             if (top chunk が閾値 (0x20000) より大きい)
                 systrim() または heap_trim()
         }
-        unlock
     } else {
         munmap
     }
 }
 ```
 
-よく見ると `free()` において smallbins や largebins は全く関与していません。
-
-ある程度ヒープ領域が拡張されて top chunk が肥大化すると `free()` で無駄と判断して `systrim()` でヒープ領域を削減します。
+`free()` では的確に統合して tcache bins, fastbins, unsortedbin に挿入します。よく見ると smallbins や largebins は関与してません。またある程度ヒープ領域が拡張されて top chunk が肥大化すると `free()` で無駄と判断して `systrim()` でヒープ領域を削減します。
 
 ## まとめ
-`malloc()` `free()` の大枠は理解できたと思います。これらの関数のより詳細については記事より直接ソースコードを読んで自分でまとめた方が絶対に良い理解と読解力が得られると思います。そしてソースコードを読み込んだ方はより良い記事を書いてほしいです！
+`malloc()` `free()` の大枠は理解できたかと思います。これらの関数のより詳細については記事より直接ソースコードを読んで自分でまとめた方が絶対に良い理解と読解力が得られると思います。そしてソースコードを読み込んだ方はより良い記事を書いてほしいです！
