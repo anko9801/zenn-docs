@@ -17,6 +17,8 @@ void free(void *ptr);
 
 今回はアリーナの処理を中心に調べていきます。
 
+シリーズは malloc.c を題材としていますがここでは arena.c を主に読むことになります。
+
 ここで扱う glibc のバージョンは v2.38 です。また glibc のソースコードはブラウザ上で読むことができます。
 
 - https://elixir.bootlin.com/glibc/latest/source/malloc/malloc.c
@@ -24,62 +26,37 @@ void free(void *ptr);
 
 ## アリーナとは
 
-```c
+`malloc_state` 構造体として定義される。
+
+```c:malloc_state#L
 struct malloc_state
 {
-  /* Serialize access.  */
-  __libc_lock_define (, mutex);
+  __libc_lock_define (, mutex);     // arena へのアクセスを serialize する
+  int flags;                        // ヒープメモリが連続であるか
 
-  /* Flags (formerly in max_fast).  */
-  int flags;
+  int have_fastchunks;              // fastbins が空ではないことを表す真偽値
+  mfastbinptr fastbinsY[NFASTBINS]; // fastbins
 
-  /* Set if the fastbin chunks contain recently inserted free blocks.  */
-  /* Note this is a bool but not all targets support atomics on booleans.  */
-  int have_fastchunks;
+  mchunkptr top;                    // ヒープ領域の最後にある未使用の大きなチャンク
+  mchunkptr last_remainder;         // 分割して確保した際に余った領域の最新のチャンク
 
-  /* Fastbins */
-  mfastbinptr fastbinsY[NFASTBINS];
+  mchunkptr bins[NBINS * 2 - 2];    // unsortedbin smallbins largebins の先頭・末尾
+  unsigned int binmap[BINMAPSIZE];  // これらを素早く見つける為に使われるビットベクタ
 
-  /* Base of the topmost chunk -- not otherwise kept in a bin */
-  mchunkptr top;
+  struct malloc_state *next;        // arena の単方向リスト
+  struct malloc_state *next_free;   // 使われていない arena の単方向リスト
+  INTERNAL_SIZE_T attached_threads; // arena にアクセスしているスレッドの数
 
-  /* The remainder from the most recent split of a small request */
-  mchunkptr last_remainder;
-
-  /* Normal bins packed as described above */
-  mchunkptr bins[NBINS * 2 - 2];
-
-  /* Bitmap of bins */
-  unsigned int binmap[BINMAPSIZE];
-
-  /* Linked list */
-  struct malloc_state *next;
-
-  /* Linked list for free arenas.  Access to this field is serialized
-     by free_list_lock in arena.c.  */
-  struct malloc_state *next_free;
-
-  /* Number of threads attached to this arena.  0 if the arena is on
-     the free list.  Access to this field is serialized by
-     free_list_lock in arena.c.  */
-  INTERNAL_SIZE_T attached_threads;
-
-  /* Memory allocated from the system in this arena.  */
-  INTERNAL_SIZE_T system_mem;
-  INTERNAL_SIZE_T max_system_mem;
+  INTERNAL_SIZE_T system_mem;       // arena によって現在確保されているメモリの合計値
+  INTERNAL_SIZE_T max_system_mem;   // system_mem の最大値
 };
 ```
 
 main arena は次のように定義されています。
 ループになっています。
 
+There are several instances of this struct ("arenas") in this malloc.  If you are adapting this malloc in a way that does NOT use a static or mmapped malloc_state, you MUST explicitly zero-fill it before using. This malloc relies on the property that malloc_state is initialized to all zeroes (as is true of C statics).
 ```c
-/* There are several instances of this struct ("arenas") in this
-   malloc.  If you are adapting this malloc in a way that does NOT use
-   a static or mmapped malloc_state, you MUST explicitly zero-fill it
-   before using. This malloc relies on the property that malloc_state
-   is initialized to all zeroes (as is true of C statics).  */
-
 static struct malloc_state main_arena =
 {
   .mutex = _LIBC_LOCK_INITIALIZER,
@@ -87,6 +64,12 @@ static struct malloc_state main_arena =
   .attached_threads = 1
 };
 ```
+
+## 各フィールドに関連する処理
+### fastbins
+
+`have_fastchunks` は fastbins に最近挿入された free chunk があるかどうかの bool 値
+`fastbinsY[]`
 
 ### Bins
 
@@ -228,72 +211,6 @@ malloc において大量の bin の検索を補う為に各瓶が空である�
 #define mark_bin(m, i)    ((m)->binmap[idx2block (i)] |= idx2bit (i))
 #define unmark_bin(m, i)  ((m)->binmap[idx2block (i)] &= ~(idx2bit (i)))
 #define get_binmap(m, i)  ((m)->binmap[idx2block (i)] & idx2bit (i))
-
-static void *
-_int_malloc (mstate av, size_t bytes)
-{
-  for (;; )
-    {
-      ...
-       /*
-         Search for a chunk by scanning bins, starting with next largest
-         bin. This search is strictly by best-fit; i.e., the smallest
-         (with ties going to approximately the least recently used) chunk
-         that fits is selected.
-
-         The bitmap avoids needing to check that most blocks are nonempty.
-         The particular case of skipping all bins during warm-up phases
-         when no chunks have been returned yet is faster than it might look.
-       */
-
-      ++idx;
-      bin = bin_at (av, idx);
-      block = idx2block (idx);
-      map = av->binmap[block];
-      bit = idx2bit (idx);
-
-      for (;; )
-        {
-          /* Skip rest of block if there are no more set bits in this block.  */
-          if (bit > map || bit == 0)
-            {
-              do
-                {
-                  if (++block >= BINMAPSIZE) /* out of bins */
-                    goto use_top;
-                }
-              while ((map = av->binmap[block]) == 0);
-
-              bin = bin_at (av, (block << BINMAPSHIFT));
-              bit = 1;
-            }
-
-          /* Advance to bin with set bit. There must be one. */
-          while ((bit & map) == 0)
-            {
-              bin = next_bin (bin);
-              bit <<= 1;
-              assert (bit != 0);
-            }
-
-          /* Inspect the bin. It is likely to be non-empty */
-          victim = last (bin);
-
-          /*  If a false alarm (empty bin), clear the bit. */
-          if (victim == bin)
-            {
-              av->binmap[block] = map &= ~bit; /* Write through */
-              bin = next_bin (bin);
-              bit <<= 1;
-            }
-
-          else
-            {
-              ...
-            }
-        }
-    }
-}
 ```
 
 これを読むと 32 bit のフラグを 4 block 用意してすべての bin のフラグを表現していて、
@@ -305,6 +222,13 @@ _int_malloc (mstate av, size_t bytes)
 /* Conveniently, the unsorted bin can be used as dummy top on first call */
 #define initial_top(M)              (unsorted_chunks (M))
 ```
+
+  /* Base of the topmost chunk -- not otherwise kept in a bin */
+  mchunkptr top;
+
+  /* The remainder from the most recent split of a small request */
+  mchunkptr last_remainder;
+
 
 ### last_remainder
 smallbins
@@ -342,7 +266,7 @@ smallbins
 
 これを読むと smallbins
 
-### パラメータ
+## パラメータ
 
 ```c
 struct malloc_par
