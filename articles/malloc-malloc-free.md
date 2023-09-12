@@ -44,7 +44,7 @@ void free(void *ptr);
 ### malloc() の擬似コード
 擬似コードを読んで各 bins や処理などの役割をよくよく考えてみましょう。
 
-```c
+```c:malloc()
 void *__libc_malloc (size_t bytes) {
     if (malloc の初期化をしてない)
         ptmalloc_init()
@@ -132,7 +132,7 @@ graph LR
 
 次に `sysmalloc()` を読んでいきましょう。
 
-```c
+```c:sysmalloc()
 static void *sysmalloc (INTERNAL_SIZE_T nb, mstate av) {
     if (アリーナがない || mmap_threshold (0x20000) 以上で n_mmaps_max 回未満)
         sysmalloc_mmap()
@@ -176,9 +176,9 @@ static void *sysmalloc (INTERNAL_SIZE_T nb, mstate av) {
 
 ### free() の擬似コード
 
-`free()` の方にも思いを馳せてみましょう。
+`free()` についても思いを馳せてみましょう。
 
-```c
+```c:free()
 void __libc_free(void *mem) {
     if (mmap されたチャンク)
         munmap

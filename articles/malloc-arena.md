@@ -2,24 +2,25 @@
 title: "malloc.c を読む (arena)"
 emoji: "🐷"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: []
+topics: ["CTF", "pwn", "Linux"]
 published: false
 ---
 
-`malloc` 関数でヒープ領域にあるメモリを確保してそのポインタを返す。 `free` 関数はそのポインタのメモリを開放してくれる。
+`malloc()` でヒープ領域にあるメモリを確保してそのポインタを返し、`free()` はそのポインタのメモリを開放してくれます。
 
 ```c
 void *malloc(size_t size);
 void free(void *ptr);
 ```
 
-これらの関数が内部でどのように処理されるのかを調べていく。
+このシリーズではこれらの関数が内部でどのように処理されるのかを調べていきます。
 
-[**最新の malloc.c のソースコード**](https://elixir.bootlin.com/glibc/latest/source/malloc/malloc.c) を用意しましょう。
+今回はアリーナの処理を中心に調べていきます。
 
-今回はアリーナの処理を中心に調べていく。
+ここで扱う glibc のバージョンは v2.38 です。また glibc のソースコードはブラウザ上で読むことができます。
 
-glibc のバージョンは v2.38 です。
+- https://elixir.bootlin.com/glibc/latest/source/malloc/malloc.c
+- https://codebrowser.dev/glibc/glibc/malloc/arena.c.html
 
 ## アリーナとは
 
