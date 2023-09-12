@@ -2,8 +2,8 @@
 title: "malloc.c を読む (malloc / free)"
 emoji: "😊"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: []
-published: false
+topics: ["CTF", "pwn", "Linux"]
+published: true
 ---
 
 `malloc()` でヒープ領域にあるメモリを確保してそのポインタを返し、`free()` はそのポインタのメモリを開放してくれます。
@@ -19,7 +19,10 @@ void free(void *ptr);
 
 注意としてここでの目的は全体を俯瞰して、詳細を詰めずとも各 bins の役割を理解し、攻撃手法を理解できるようにすることです。それに合わないマルチスレッドや最適化などにおける緻密なトリックやコーナーケースなどは暗黙的に実装されていると仮定します。その詳細についてはソースコードや他の資料を参考にしていただきたいです。
 
-これを読んだら [**最新の malloc.c のソースコード**](https://elixir.bootlin.com/glibc/latest/source/malloc/malloc.c) を用意しましょう。ここで扱う glibc のバージョンは v2.38 です。
+ここで扱う glibc のバージョンは v2.38 です。また glibc のソースコードはブラウザ上で読むことができます。
+
+- https://elixir.bootlin.com/glibc/latest/source/malloc/malloc.c
+- https://codebrowser.dev/glibc/glibc/malloc/arena.c.html
 
 ## malloc / free 全体像
 まずはざっくりと！
