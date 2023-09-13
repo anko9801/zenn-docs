@@ -3,7 +3,7 @@ title: "malloc.c を読む (bins)"
 emoji: "👏"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["CTF", "pwn", "Linux"]
-published: false
+published: true
 ---
 
 `malloc()` でヒープ領域にあるメモリを確保してそのポインタを返し、`free()` はそのポインタのメモリを開放してくれます。
