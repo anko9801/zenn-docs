@@ -15,6 +15,9 @@ void free(void *ptr);
 
 このシリーズではこれらの関数が内部でどのように処理されるのかを調べていきます。
 
+- [malloc.c を読む (malloc / free)](https://zenn.dev/anko/articles/malloc-malloc-free)
+- [malloc.c を読む (bins)](https://zenn.dev/anko/articles/malloc-each-bins)
+
 今回は `malloc()` `free()` の全体像を紹介します。
 
 注意としてここでの目的は全体を俯瞰して、詳細を詰めずとも各 bins の役割を理解し、攻撃手法を理解できるようにすることです。それに合わないマルチスレッドや最適化などにおける緻密なトリックやコーナーケースなどは暗黙的に実装されていると仮定します。その詳細についてはソースコードや他の資料を参考にしていただきたいです。
