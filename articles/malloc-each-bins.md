@@ -30,11 +30,11 @@ free list の正体は bins と呼ばれるリスト群です。bins はいく�
 
 | bins の種類 | チャンクサイズ (default) | 説明 | データ構造 |
 | --- | --- | --- | --- |
-| tcache bins | 0x20 ~ 0x410 | 最初に入れられる just-fit な bin | 単方向リスト |
-| fastbins | 0x20 ~ 0x80 | tcache が満杯になったら入れられる just-fit な bin | 単方向リスト |
-| unsortedbin | 0x20 ~ | 最近アクセスしたチャンクが入れられる bin | 双方向リスト |
-| smallbins | 0x20 ~ 0x3f0 | unsortedbin から来る小さなチャンクを管理する just-fit な bin | 双方向リスト |
-| largebins | 0x400 ~ | unsortedbin から来る大きなチャンクを管理する bin | 双方向リスト + スキップリスト |
+| tcache bins | 0x20 ~ 0x410 | 最近アクセスしたチャンクが入れられる bins | 単方向リスト |
+| fastbins | 0x20 ~ 0x80 | 頻繁に確保・解放されるような小さなチャンクを管理する bins | 単方向リスト |
+| unsortedbin | 0x20 ~ | tcache bins や fastbins では扱えないものを入れ、smallbins や largebins に渡す中間の bin | 双方向リスト |
+| smallbins | 0x20 ~ 0x3f0 | 小さなチャンクを管理する bins | 双方向リスト |
+| largebins | 0x400 ~ | 大きなチャンクを管理する bins | 双方向リスト + スキップリスト |
 
 ```mermaid
 graph LR
@@ -52,16 +52,54 @@ graph LR
 
 ## 各 bins の管理
 
-tcache bins は tcache
-fastbins は `arena.fastbinsY[NFASTBINS]` 配列に先頭が格納されています。
-unsortedbin, smallbins, largebins は `arena.bins[NBINS * 2 - 2]` 配列に先頭・末尾が格納されています。
+| bins の種類 | 管理先 |
+| --- | --- |
+| tcache bins | `tcache_perthread_struct` 構造体 |
+| fastbins | `arena->fastbinsY[NFASTBINS]` |
+| unsortedbin, smallbins, largebins | `arena->bins[NBINS * 2 - 2]` |
 
 データ構造は 2 つあり、それぞれの挿入 (link) や削除 (unlink) の処理は理解している前提で話を進めます。
 
 - 単方向リストは単方向にしか移動できない繋ぎ変えが簡単な高速なリストです。LIFO で先頭は arena で管理されています。チャンクのデータ部分の先頭 8 バイトは forward pointer (fd) として使われ、次のチャンクのポインターが格納されています。末尾の fd は NULL になります。
 - 双方向リストは双方向移動できる円形のリストです。FIFO で先頭と末尾は arena で管理されていて、チャンクのデータ部分の先頭 16 バイトは forward pointer (fd), back pointer (bk) として使われます。
 
+### tcache
+
+tcache bins の実体は `tcache_perthread_struct` 構造体です。 `entries` で各リストの HEAD のチャンクに繋げて、 `counts` でリストの長さを管理し、7 個になったら受け付けないようにします。チャンクが tcache bin に入るとデータ部分に `tcache_entry` 構造体が overlap されてリストに入ります。
+
+```c
+typedef struct tcache_entry
+{
+    // 次の tcache_entry へのポインタ
+    struct tcache_entry *next;
+    // 親の tcache_perthread_struct を指し double free を検知
+    struct tcache_perthread_struct *key;
+} tcache_entry;
+
+typedef struct tcache_perthread_struct
+{
+    // 各 tcache bin の長さの一覧
+    uint16_t counts[TCACHE_MAX_BINS];
+    // 各 tcache bin の最初の tcache へのポインタの一覧
+    tcache_entry *entries[TCACHE_MAX_BINS];
+} tcache_perthread_struct;
+```
+
+
 ### fastbinsY
+`global_max_fast` 0x80
+`MAX_FAST_SIZE` 0xa0
+
+   Set value of max_fast.
+   Use impossibly small value if 0.
+   Precondition: there are no existing fastbin chunks in the main arena.
+   Since do_check_malloc_state () checks this, we call malloc_consolidate ()
+   before changing max_fast.  Note other arenas will leak their fast bin
+   entries if max_fast is reduced.
+
+#define set_max_fast(s) \
+  global_max_fast = (((size_t) (s) <= MALLOC_ALIGN_MASK - SIZE_SZ)	\
+                     ? MIN_CHUNK_SIZE / 2 : ((s + SIZE_SZ) & ~MALLOC_ALIGN_MASK))
 
 ```c
 typedef struct malloc_chunk *mfastbinptr;
@@ -235,30 +273,12 @@ malloc において大量の bin の検索を補う為に各瓶が空である�
 
 glibc v2.26 以降に追加された bin。参照局所性を高める為に `malloc / free` で一番最初に処理されるのが tcache bins です。tcache bins はチャンクサイズが 0x20 から 0x410 までの 64 種類の tcache bin を持ち、それぞれ単方向リストとなっています。リストの長さは 7 個に制限されていて tcache が満杯になると他の bins に移されます。サイズごとに分けられているので just-fit で返せます。
 
-tcache bins の実体は `tcache_perthread_struct` 構造体です。 `entries` で各リストの HEAD のチャンクに繋げて、 `counts` でリストの長さを管理し、7 個になったら受け付けないようにします。チャンクが tcache bin に入るとデータ部分に `tcache_entry` 構造体が overlap されてリストに入ります。
-
-```c
-typedef struct tcache_entry
-{
-    // 次の tcache_entry へのポインタ
-    struct tcache_entry *next;
-    // 親の tcache_perthread_struct を指し double free を検知
-    struct tcache_perthread_struct *key;
-} tcache_entry;
-
-typedef struct tcache_perthread_struct
-{
-    // 各 tcache bin の長さの一覧
-    uint16_t counts[TCACHE_MAX_BINS];
-    // 各 tcache bin の最初の tcache へのポインタの一覧
-    tcache_entry *entries[TCACHE_MAX_BINS];
-} tcache_perthread_struct;
-```
-
 ![](/images/pwn/tcache.png =480x)
 
 ### fastbins
 glibc v2.3 からある小さなチャンクを管理する bin。fastbins はチャンクサイズが 0x20 から 0x80 まで 7 種類の fastbin を持ち、小さなチャンクは頻繁に確保・開放が起きやすいのでそれぞれ単方向リストとなっています。
+
+![](/images/pwn/fastbin.png =480x)
 
 consolidate 統合された状態が保たれるようにする
 `malloc()` では要求されたサイズに just-fit した fastbin の先頭から取ってきています。
@@ -278,42 +298,6 @@ An array of lists holding recently freed small chunks.  Fastbins are not doubly 
 
 Chunks in fastbins keep their inuse bit set, so they cannot be consolidated with other free chunks. malloc_consolidate releases all chunks in fastbins and consolidates them with other free chunks.
 ```
-
-
-```c
-// MAX_FAST_SIZE
-```
-
-`global_max_fast` 0x80
-`MAX_FAST_SIZE` 0xa0
-
-
-
-
-   Set value of max_fast.
-   Use impossibly small value if 0.
-   Precondition: there are no existing fastbin chunks in the main arena.
-   Since do_check_malloc_state () checks this, we call malloc_consolidate ()
-   before changing max_fast.  Note other arenas will leak their fast bin
-   entries if max_fast is reduced.
-
-#define set_max_fast(s) \
-  global_max_fast = (((size_t) (s) <= MALLOC_ALIGN_MASK - SIZE_SZ)	\
-                     ? MIN_CHUNK_SIZE / 2 : ((s + SIZE_SZ) & ~MALLOC_ALIGN_MASK))
-
-static inline INTERNAL_SIZE_T
-get_max_fast (void)
-{
-  /* Tell the GCC optimizers that global_max_fast is never larger
-     than MAX_FAST_SIZE.  This avoids out-of-bounds array accesses in
-     _int_malloc after constant propagation of the size parameter.
-     (The code never executes because malloc preserves the
-     global_max_fast invariant, but the optimizers may not recognize
-     this.)  */
-  if (global_max_fast > MAX_FAST_SIZE)
-    __builtin_unreachable ();
-  return global_max_fast;
-}
 
 `have_fastchunks` は fastbins に最近挿入された free chunk があるかどうかの bool 値
 `malloc_consolidate()` を呼び出す。
@@ -425,7 +409,6 @@ static void malloc_consolidate(mstate av)
 }
 ```
 
-![](/images/pwn/fastbin.png =480x)
 ### unsortedbin
 tcache や fastbins のおこぼれや fastbins の consolidation されたチャンクを unsortedbin が管理します。unsortedbin は 1 つの双方向リストとなっています。unsortedbin でソートが起こると smallbins か largebins に繋がれます。
 
@@ -433,9 +416,8 @@ unsortedbin の先頭・末尾は `bin_at(1)` つまり `arena` の `bins[0]` �
 unsortedbin の末尾チャンクの `fd` は `main_arena.top` を指します。
 
 ### smallbins
-unsortedbin に入れたチャンクで小さいチャンクは smallbins に繋がれます。smallbins はチャンクサイズが 0x20 から 0x3f0 まで 62 種類の smallbin を持ち、それぞれ双方向リストとなっています。
+unsortedbin に入れたチャンクで小さいチャンクは smallbins に繋がれます。smallbins はチャンクサイズが 0x20 から 0x3f0 まで 62 種類の smallbin を持ち、それぞれ双方向リストとなっています。それぞれの smallbin の先頭・末尾は `bin_at(2)` から `bin_at(63)` に格納されています。
 
-smallbins の先頭・末尾は `bin_at(2)` から `bin_at(63)` までに格納されています。
 ![](/images/pwn/smallbin.png =480x)
 
 ### largebins
@@ -451,10 +433,9 @@ smallbins の先頭・末尾は `bin_at(2)` から `bin_at(63)` までに格納�
 | 0x28000 ~ 0xBFFF0 | 160KB 以上 768KB 未満 | 0x40000 | 2 | 124 ~ 125 |
 | 0xC0000 ~  | 768KB 以上 | infinity | 1 | 126 |
 
-largebins の先頭・末尾は `bin_at(64)` から `bin_at(126)` までに格納されます。
-largebins から確保されたメモリは `last_remainder` はセットされません。
-
 ![](/images/pwn/largebin.png =480x)
+
+largebins から確保されたメモリは `last_remainder` はセットされません。
 
     if (largebins のサイズ) {
       if (largebins の末尾から取得) {
