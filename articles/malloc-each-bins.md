@@ -36,13 +36,6 @@ free list の正体は bins と呼ばれるリスト群です。bins はいく�
 | smallbins | 0x20 ~ 0x3f0 | unsortedbin から来る小さなチャンクを管理する just-fit な bin | 双方向リスト |
 | largebins | 0x400 ~ | unsortedbin から来る大きなチャンクを管理する bin | 双方向リスト + スキップリスト |
 
-glibc version
-glibc v2.3 からある小さなチャンクを管理する bin。fastbins はチャンクサイズが 0x20 から 0x80 まで 7 種類の fastbin を持ち、小さなチャンクは頻繁に確保・開放が起きやすいのでそれぞれ単方向リストとなっています。
-
-tcache や fastbins のおこぼれや fastbins の consolidation されたチャンクを unsortedbin が管理します。unsortedbin は 1 つの双方向リストとなっています。unsortedbin でソートが起こると smallbins か largebins に繋がれます。
-
-malloc
-
 ```mermaid
 graph LR
     A(tcache bins) --> B(fastbins)
@@ -70,8 +63,34 @@ unsortedbin, smallbins, largebins は `arena.bins[NBINS * 2 - 2]` 配列に先�
 
 ### fastbinsY
 
+```c
+typedef struct malloc_chunk *mfastbinptr;
+#define fastbin(ar_ptr, idx) ((ar_ptr)->fastbinsY[idx])
+
+/* offset 2 to use otherwise unindexable first 2 bins */
+#define fastbin_index(sz) \
+  ((((unsigned int) (sz)) >> (SIZE_SZ == 8 ? 4 : 3)) - 2)
+
+
+/* The maximum fastbin request size we support */
+#define MAX_FAST_SIZE     (80 * SIZE_SZ / 4)
+
+#define NFASTBINS  (fastbin_index (request2size (MAX_FAST_SIZE)) + 1)
+
+#define FASTBIN_CONSOLIDATION_THRESHOLD  (65536UL)
+
+#define NONCONTIGUOUS_BIT     (2U)
+
+#define contiguous(M)          (((M)->flags & NONCONTIGUOUS_BIT) == 0)
+#define noncontiguous(M)       (((M)->flags & NONCONTIGUOUS_BIT) != 0)
+#define set_noncontiguous(M)   ((M)->flags |= NONCONTIGUOUS_BIT)
+#define set_contiguous(M)      ((M)->flags &= ~NONCONTIGUOUS_BIT)
+
+static uint8_t global_max_fast;
+```
+
 ### bins
-bins は双方向の free list の先頭・末尾を格納する配列です。
+bins は free list の中で双方向リスト (unsortedbin / smallbins / largebins) を扱う bin の先頭・末尾を格納する配列です。
 
 全部で 128 個の bins があって、あるサイズ範囲ごとに保持されています。実際上、小さいほど頻繁に、大きいほど稀に malloc されることが知られている為、サイズが大きくなるに連れて指数的に間隔を大きくすることで効率的に管理することができます。
 
@@ -239,14 +258,13 @@ typedef struct tcache_perthread_struct
 ![](/images/pwn/tcache.png =480x)
 
 ### fastbins
-つまり要求されたサイズに just-fit した fastbin の先頭から取ってきています。
+glibc v2.3 からある小さなチャンクを管理する bin。fastbins はチャンクサイズが 0x20 から 0x80 まで 7 種類の fastbin を持ち、小さなチャンクは頻繁に確保・開放が起きやすいのでそれぞれ単方向リストとなっています。
+
+consolidate 統合された状態が保たれるようにする
+`malloc()` では要求されたサイズに just-fit した fastbin の先頭から取ってきています。
 さらに tcache を使っていたときにこのような処理が行われます。
-get_max_fast 以下
 malloc_consolidate()
 最近解放された小さなチャンクを保持している配列です。
-単方向リスト
-consolidate 統合された状態が保たれるようにする
-MORECORE sbrk
 
 | パラメータ | 説明 |
 | --- | --- |
@@ -255,15 +273,6 @@ MORECORE sbrk
 | `TRIM_FASTBINS` | 小さなチャンクも trim メモリ少なくなる代わりに処理が遅くなる TRIM_FASTBINS controls whether free() of a very small chunk can immediately lead to trimming. Setting to true (1) can reduce memory footprint, but will almost always slow down programs that use a lot of small chunks. Define this only if you are willing to give up some speed to more aggressively reduce system-level memory footprint when releasing memory in programs that use many small chunks.  You can get essentially the same effect by setting MXFAST to 0, but this can lead to even greater slowdowns in programs using many small chunks. TRIM_FASTBINS is an in-between compile-time option, that disables only those chunks bordering topmost memory from being placed in fastbins. |
 
 malloc_consolidate
-
-```c
-// MAX_FAST_SIZE
-static uint8_t global_max_fast;
-```
-
-`global_max_fast` 0x80
-`MAX_FAST_SIZE` 0xa0
-
 ```
 An array of lists holding recently freed small chunks.  Fastbins are not doubly linked.  It is faster to single-link them, and since chunks are never removed from the middles of these lists, double linking is not necessary. Also, unlike regular bins, they are not even processed in FIFO order (they use faster LIFO) since ordering doesn't much matter in the transient contexts in which fastbins are normally used.
 
@@ -272,28 +281,13 @@ Chunks in fastbins keep their inuse bit set, so they cannot be consolidated with
 
 
 ```c
-typedef struct malloc_chunk *mfastbinptr;
-#define fastbin(ar_ptr, idx) ((ar_ptr)->fastbinsY[idx])
-
-/* offset 2 to use otherwise unindexable first 2 bins */
-#define fastbin_index(sz) \
-  ((((unsigned int) (sz)) >> (SIZE_SZ == 8 ? 4 : 3)) - 2)
-
-
-/* The maximum fastbin request size we support */
-#define MAX_FAST_SIZE     (80 * SIZE_SZ / 4)
-
-#define NFASTBINS  (fastbin_index (request2size (MAX_FAST_SIZE)) + 1)
-
-#define FASTBIN_CONSOLIDATION_THRESHOLD  (65536UL)
-
-#define NONCONTIGUOUS_BIT     (2U)
-
-#define contiguous(M)          (((M)->flags & NONCONTIGUOUS_BIT) == 0)
-#define noncontiguous(M)       (((M)->flags & NONCONTIGUOUS_BIT) != 0)
-#define set_noncontiguous(M)   ((M)->flags |= NONCONTIGUOUS_BIT)
-#define set_contiguous(M)      ((M)->flags &= ~NONCONTIGUOUS_BIT)
+// MAX_FAST_SIZE
 ```
+
+`global_max_fast` 0x80
+`MAX_FAST_SIZE` 0xa0
+
+
 
 
    Set value of max_fast.
@@ -324,10 +318,117 @@ get_max_fast (void)
 `have_fastchunks` は fastbins に最近挿入された free chunk があるかどうかの bool 値
 `malloc_consolidate()` を呼び出す。
 
-`fastbinsY[]`
+```c
+/*
+  ------------------------- malloc_consolidate -------------------------
+
+  malloc_consolidate is a specialized version of free() that tears
+  down chunks held in fastbins.  Free itself cannot be used for this
+  purpose since, among other things, it might place chunks back onto
+  fastbins.  So, instead, we need to use a minor variant of the same
+  code.
+*/
+
+static void malloc_consolidate(mstate av)
+{
+  mfastbinptr*    fb;                 /* current fastbin being consolidated */
+  mfastbinptr*    maxfb;              /* last fastbin (for loop control) */
+  mchunkptr       p;                  /* current chunk being consolidated */
+  mchunkptr       nextp;              /* next chunk to consolidate */
+  mchunkptr       unsorted_bin;       /* bin header */
+  mchunkptr       first_unsorted;     /* chunk to link to */
+
+  /* These have same use as in free() */
+  mchunkptr       nextchunk;
+  INTERNAL_SIZE_T size;
+  INTERNAL_SIZE_T nextsize;
+  INTERNAL_SIZE_T prevsize;
+  int             nextinuse;
+
+  atomic_store_relaxed (&av->have_fastchunks, false);
+
+  unsorted_bin = unsorted_chunks(av);
+
+  /*
+    Remove each chunk from fast bin and consolidate it, placing it
+    then in unsorted bin. Among other reasons for doing this,
+    placing in unsorted bin avoids needing to calculate actual bins
+    until malloc is sure that chunks aren't immediately going to be
+    reused anyway.
+  */
+
+  maxfb = &fastbin (av, NFASTBINS - 1);
+  fb = &fastbin (av, 0);
+  do {
+    p = atomic_exchange_acquire (fb, NULL);
+    if (p != 0) {
+      do {
+        {
+          if (__glibc_unlikely (misaligned_chunk (p)))
+            malloc_printerr ("malloc_consolidate(): "
+                "unaligned fastbin chunk detected");
+
+          unsigned int idx = fastbin_index (chunksize (p));
+          if ((&fastbin (av, idx)) != fb)
+            malloc_printerr ("malloc_consolidate(): invalid chunk size");
+        }
+
+        check_inuse_chunk(av, p);
+        nextp = REVEAL_PTR (p->fd);
+
+        /* Slightly streamlined version of consolidation code in free() */
+        size = chunksize (p);
+        nextchunk = chunk_at_offset(p, size);
+        nextsize = chunksize(nextchunk);
+
+        if (!prev_inuse(p)) {
+          prevsize = prev_size (p);
+          size += prevsize;
+          p = chunk_at_offset(p, -((long) prevsize));
+          if (__glibc_unlikely (chunksize(p) != prevsize))
+            malloc_printerr ("corrupted size vs. prev_size in fastbins");
+          unlink_chunk (av, p);
+        }
+
+        if (nextchunk != av->top) {
+          nextinuse = inuse_bit_at_offset(nextchunk, nextsize);
+
+          if (!nextinuse) {
+            size += nextsize;
+            unlink_chunk (av, nextchunk);
+          } else
+            clear_inuse_bit_at_offset(nextchunk, 0);
+
+          first_unsorted = unsorted_bin->fd;
+          unsorted_bin->fd = p;
+          first_unsorted->bk = p;
+
+          if (!in_smallbin_range (size)) {
+            p->fd_nextsize = NULL;
+            p->bk_nextsize = NULL;
+          }
+
+          set_head(p, size | PREV_INUSE);
+          p->bk = unsorted_bin;
+          p->fd = first_unsorted;
+          set_foot(p, size);
+        }
+
+        else {
+          size += nextsize;
+          set_head(p, size | PREV_INUSE);
+          av->top = p;
+        }
+      } while ( (p = nextp) != 0);
+    }
+  } while (fb++ != maxfb);
+}
+```
 
 ![](/images/pwn/fastbin.png =480x)
 ### unsortedbin
+tcache や fastbins のおこぼれや fastbins の consolidation されたチャンクを unsortedbin が管理します。unsortedbin は 1 つの双方向リストとなっています。unsortedbin でソートが起こると smallbins か largebins に繋がれます。
+
 unsortedbin の先頭・末尾は `bin_at(1)` つまり `arena` の `bins[0]` と `bins[1]` に格納され、
 unsortedbin の末尾チャンクの `fd` は `main_arena.top` を指します。
 
@@ -387,6 +488,7 @@ largebins から確保されたメモリは `last_remainder` はセットされ�
     smallbins, largebins から確保
     binmap から検索、なければ clear
 
+## pwndbg
 
 ```shell
 pwndbg> vmmap
@@ -403,3 +505,6 @@ pwndbg> top_chunk
 pwndbg> try_free <address>
 pwndbg> malloc_chunk <address>
 ```
+
+## まとめ
+
