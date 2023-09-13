@@ -415,17 +415,19 @@ typedef struct malloc_chunk *mbinptr;
 #define get_binmap(m, i)  ((m)->binmap[idx2block (i)] & idx2bit (i))
 ```
 
-これを読むと 32 bit のフラグを 4 block 用意してすべての bin のフラグを表現していて、
+これを読むと 32 bit のフラグを 4 block 用意してフラグを表現していることが分かります。
 
 ## 各 bins の特徴
 ### tcache bins
 
 glibc v2.26 以降に追加された bin です。参照局所性を高める為に `malloc()` `free()` で一番最初に処理されるのが tcache bins です。tcache bins はチャンクサイズが 0x20 から 0x410 までの 64 種類の tcache bin を持ち、それぞれ単方向リストとなっています。リストの長さは 7 個に制限されていて tcache が満杯になると他の bins に移されます。サイズごとに分けられているので just-fit で返せます。
 
+整合性チェックとしては
+
 ![](/images/pwn/tcache.png =480x)
 
 ### fastbins
-glibc v2.3 からある小さなチャンクを管理する bin です。fastbins はチャンクサイズが 0x20 から 0x80 まで 7 種類の fastbin を持ち、小さなチャンクは頻繁に確保・開放が起きやすいのでそれぞれ単方向リストとなっています。また LIFO なので最近使われたチャンクではなく古いチャンクを返しますが、全体的に見て比較的最近のものしか入っていない為、あまり影響しません。
+glibc v2.3 からある小さなチャンクを管理する bin です。fastbins はチャンクサイズが 0x20 から 0x80 まで 7 種類の fastbin を持ち、小さなチャンクは頻繁に確保・開放が起きやすいのでそれぞれ単方向リストとなっています。また LIFO なので最近使われたチャンクではなく古いチャンクを返しますが、全体的に見て比較的最近のものしか入っていない為、あまり影響しません。そして末尾の `fd` は NULL となります。
 
 ![](/images/pwn/fastbin.png =480x)
 
@@ -548,14 +550,20 @@ static void malloc_consolidate(mstate av)
 ### unsortedbin
 tcache や fastbins のおこぼれや fastbins の consolidation されたチャンクを unsortedbin が管理します。unsortedbin は 1 つの双方向リストとなっています。unsortedbin でソートが起こると smallbins か largebins に繋がれます。重要なのは unsortedbin の末尾チャンクの `fd` は `main_arena.top` を指すということです。
 
+glibc-2.28 以降では `fd->bk` `bk->fd` がチャンク自身を指すという整合性がチェックされています。
+
+![](/images/pwn/smallbin.png =480x)
+
 ### smallbins
 unsortedbin に入れたチャンクで小さいチャンクは smallbins に繋がれます。smallbins はチャンクサイズが 0x20 から 0x3f0 まで 62 種類の smallbin を持ち、それぞれ双方向リストとなっています。それぞれの smallbin の先頭・末尾は `bin_at(2)` から `bin_at(63)` に格納されています。
+
+glibc-2.11 以降では `fd->bk` `bk->fd` がチャンク自身を指すという整合性がチェックされています。
 
 ![](/images/pwn/smallbin.png =480x)
 
 ### largebins
 
-大きなサイズのチャンクも 16 バイトごとに管理するのは現実的ではありません。チャンクサイズが大きくなるにつれて幅も指数的に大きくすることでリストの数を平均化し、最悪計算量を減らすことができます。それぞれサイズに応じて順序立てた双方向リストとなっています。これは双方向リストのメンバに加えて `fd_nextsize` `bk_nextsize` があり、それぞれチャンクの幅の中で次に大きなチャンクと次に小さなチャンクへのポインタが格納されます。
+大きなサイズのチャンクも 16 バイトごとに管理するのは現実的ではありません。チャンクサイズが大きくなるにつれて幅も指数的に大きくすることでリストの数を平均化し、最悪計算量を減らすことができます。それぞれサイズに応じて順序立てた双方向リストとなっています。これは双方向リストのメンバに加えて `fd_nextsize` `bk_nextsize` があり、それぞれチャンクの幅の中で次に大きなチャンクと次に小さなチャンクへのポインタが格納されます。ちなみに largebins で split したチャンクは `last_remainder` にセットされません。
 
 | 範囲 | 範囲 (バイト表示) | 間隔 | 個数 | `bin_at(n)` |
 | --- | --- | --- | :-: | --- |
@@ -566,9 +574,10 @@ unsortedbin に入れたチャンクで小さいチャンクは smallbins に繋
 | 0x28000 ~ 0xBFFF0 | 160KB 以上 768KB 未満 | 0x40000 | 2 | 124 ~ 125 |
 | 0xC0000 ~  | 768KB 以上 | infinity | 1 | 126 |
 
-![](/images/pwn/largebin.png =480x)
+glibc-2.3.4 以降では `fd->bk` `bk->fd` がチャンク自身を指すという整合性がチェックされています。
+また `nextsize` の仕組みは glibc-2.6 で導入されていて `fd_nextsize->bk_nextsize` `bk_nextsize->fd_nextsize` がチャンク自身を指すという整合性がチェックされています。
 
-largebins から確保されたメモリは `last_remainder` はセットされません。
+![](/images/pwn/largebin.png =480x)
 
 ## pwndbg
 最後に pwndbg でのコマンド一覧を残しておきます。とても便利なのでいつも使っています。
@@ -591,3 +600,5 @@ pwndbg> malloc_chunk <address>
 
 ## まとめ
 このように各 bins は役割を担い、セキュリティ機構を備えているということが分かったと思います。
+
+次はもっと大きな単位である arena に関してまとめようと思います。
