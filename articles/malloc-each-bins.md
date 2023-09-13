@@ -61,9 +61,9 @@ bins によって管理されている場所はそれぞれ異なり、次のよ
 | fastbins | `arena->fastbinsY` `arena->have_fastchunks` |
 | unsortedbin, smallbins, largebins | `arena->bins` `arena->binmap` |
 
-これらの仕組みを
+これらがどう管理しているかを最新の glibc ソースコードに倣いながら紐解いていきます。
 
-データ構造は 2 つあり、それぞれの挿入 (link) や削除 (unlink) の処理は理解している前提で話を進めます。
+前提知識として各 bin のデータ構造は単方向リストと双方向リストの 2 つがあります。それぞれの挿入 (link) や削除 (unlink) の処理は理解している前提で話を進めます。
 
 - 単方向リストは単方向にしか移動できない繋ぎ変えが簡単な高速なリストです。LIFO で先頭は arena で管理されています。チャンクのデータ部分の先頭 8 バイトは forward pointer (fd) として使われ、次のチャンクのポインターが格納されています。末尾の fd は NULL になります。
 - 双方向リストは双方向移動できる円形のリストです。FIFO で先頭と末尾は arena で管理されていて、チャンクのデータ部分の先頭 16 バイトは forward pointer (fd), back pointer (bk) として使われます。
@@ -111,7 +111,9 @@ static __thread tcache_perthread_struct *tcache = NULL;
 static uintptr_t tcache_key;
 ```
 
-`entries` で各リストの HEAD のチャンクに繋げて、 `counts` でリストの長さを管理し、7 個になったら受け付けないようにします。また tcache bin に入っているチャンクは `tcache_entry` 構造体が overlap されています。
+これを読むとチャンクサイズがそれぞれ 0x20 ~ 0x410 の `TCACHE_MAX_BINS == 64` 種類の tcache bin が作られていることが分かります。`tcache_perthread_struct` の `entries` では各 tcache bin の HEAD のチャンクに繋げており、ここからチャンクを link / unlink します。そして `counts` でリストの長さを管理し、7 個になったら受け付けないようにして局所参照性を高めています。そして tcache bin に入っているチャンクは `tcache_entry` 構造体が overlap されていて `next` によって単方向リストとなり、`key` にプログラム内共通の乱数 `tcache_key` を一時的に書き込むことで double free を検知しています。
+
+具体的には次のように実装されています。
 
 ```c
 /* The value of tcache_key does not really have to be a cryptographically
@@ -219,9 +221,8 @@ tcache_init(void)
 }
 ```
 
-
 ### fastbinsY
-fastbins は `arena->fastbinsY` `arena->have_fastchunks` で管理されています。
+`arena` にある `fastbinsY` では各チャンクサイズに対応する fastbin のリストの先頭が格納されています。チャンクサイズは次のソースを読むと `MAX_FAST_SIZE == 0xa0` より 0x20 ~ 0xa0 の 9 種類の fastbin が用意されてあるのですが、実際には `global_max_fast == DEFAULT_MXFAST == 0x80` より 0x20 ~ 0x80 の 7 種類を使います。さらに `malloc_consolidation()` をするかどうかの判断材料として `have_fastchunks` で fastbins 内に直近で入れられたかどうかの bool 値が書き込まれています。
 
 ```c
 #define DEFAULT_MXFAST     (64 * SIZE_SZ / 4)
@@ -275,8 +276,7 @@ malloc_init_state (mstate av)
 }
 ```
 
-これを読むと `MAX_FAST_SIZE == 0xa0` より 0x20 ~ 0xa0 の 9 種類の fastbin が用意されてあるが実際には `global_max_fast == DEFAULT_MXFAST == 0x80` より 0x20 ~ 0x80 の 7 種類を使います。
-fastbins が `max_fast` を変更するときには先に `malloc_consolidate()` を読んで `main_arena` の fastbins を空にしておくことが前提条件となっています。(何に繋がっているのかはわからない)
+ちなみに fastbins が `max_fast` を変更するときには先に `malloc_consolidate()` を呼んで `main_arena` の fastbins を空にしておくことが前提条件となっているようです。
 
 ### bins
 bins は free list の中で双方向リスト (unsortedbin / smallbins / largebins) を扱う bin の先頭・末尾を格納する配列です。
