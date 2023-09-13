@@ -420,35 +420,23 @@ typedef struct malloc_chunk *mbinptr;
 ## 各 bins の特徴
 ### tcache bins
 
-glibc v2.26 以降に追加された bin。参照局所性を高める為に `malloc / free` で一番最初に処理されるのが tcache bins です。tcache bins はチャンクサイズが 0x20 から 0x410 までの 64 種類の tcache bin を持ち、それぞれ単方向リストとなっています。リストの長さは 7 個に制限されていて tcache が満杯になると他の bins に移されます。サイズごとに分けられているので just-fit で返せます。
+glibc v2.26 以降に追加された bin です。参照局所性を高める為に `malloc()` `free()` で一番最初に処理されるのが tcache bins です。tcache bins はチャンクサイズが 0x20 から 0x410 までの 64 種類の tcache bin を持ち、それぞれ単方向リストとなっています。リストの長さは 7 個に制限されていて tcache が満杯になると他の bins に移されます。サイズごとに分けられているので just-fit で返せます。
 
 ![](/images/pwn/tcache.png =480x)
 
 ### fastbins
-glibc v2.3 からある小さなチャンクを管理する bin。fastbins はチャンクサイズが 0x20 から 0x80 まで 7 種類の fastbin を持ち、小さなチャンクは頻繁に確保・開放が起きやすいのでそれぞれ単方向リストとなっています。
+glibc v2.3 からある小さなチャンクを管理する bin です。fastbins はチャンクサイズが 0x20 から 0x80 まで 7 種類の fastbin を持ち、小さなチャンクは頻繁に確保・開放が起きやすいのでそれぞれ単方向リストとなっています。また LIFO なので最近使われたチャンクではなく古いチャンクを返しますが、全体的に見て比較的最近のものしか入っていない為、あまり影響しません。
 
 ![](/images/pwn/fastbin.png =480x)
 
-consolidate 統合された状態が保たれるようにする
-`malloc()` では要求されたサイズに just-fit した fastbin の先頭から取ってきています。
-さらに tcache を使っていたときにこのような処理が行われます。
-malloc_consolidate()
-最近解放された小さなチャンクを保持している配列です。
+また fastbins では consolidation と trim を頻繁に行い、unsortedbin で PREV_INUSE が必ず立っているようにすることで最適化が回ります。そして次のようなチューニングできるパラメータがあります。
 
 | パラメータ | 説明 |
 | --- | --- |
-| `FASTBIN_CONSOLIDATION_THRESHOLD` | `FASTBIN_CONSOLIDATION_THRESHOLD` のチャンクが free されたときに自動的に周辺にある可能性のある fastbins の consolidation を行う。It is defined at half the default trim threshold as a compromise heuristic to only attempt consolidation if it is likely to lead to trimming. However, it is not dynamically tunable, since consolidation reduces fragmentation surrounding large chunks even if trimming is not used. |
+| `FASTBIN_CONSOLIDATION_THRESHOLD` | `FASTBIN_CONSOLIDATION_THRESHOLD` のチャンクが free されたときに自動的に周辺にある可能性のある fastbins の consolidation を行い、フラグメンテーションを防ぐ。これはデフォルトの trim 閾値の半分と定義され、trim が起きそうなときに consolidation するというヒューリスティックとなっている。 |
 | `TRIM_FASTBINS` | 小さな `free()` でも毎回 trim するかどうかのフラグ。メモリフットプリントを削減する代わりにパフォーマンスが落ちる。 |
 
-malloc_consolidate
-```
-An array of lists holding recently freed small chunks.  Fastbins are not doubly linked.  It is faster to single-link them, and since chunks are never removed from the middles of these lists, double linking is not necessary. Also, unlike regular bins, they are not even processed in FIFO order (they use faster LIFO) since ordering doesn't much matter in the transient contexts in which fastbins are normally used.
-
-Chunks in fastbins keep their inuse bit set, so they cannot be consolidated with other free chunks. malloc_consolidate releases all chunks in fastbins and consolidates them with other free chunks.
-```
-
-`have_fastchunks` は fastbins に最近挿入された free chunk があるかどうかの bool 値
-`malloc_consolidate()` を呼び出す。
+`malloc_consolidate()` は具体的には次のように実装されています。
 
 ```c
 /*
@@ -558,10 +546,7 @@ static void malloc_consolidate(mstate av)
 ```
 
 ### unsortedbin
-tcache や fastbins のおこぼれや fastbins の consolidation されたチャンクを unsortedbin が管理します。unsortedbin は 1 つの双方向リストとなっています。unsortedbin でソートが起こると smallbins か largebins に繋がれます。
-
-unsortedbin の先頭・末尾は `bin_at(1)` つまり `arena` の `bins[0]` と `bins[1]` に格納され、
-unsortedbin の末尾チャンクの `fd` は `main_arena.top` を指します。
+tcache や fastbins のおこぼれや fastbins の consolidation されたチャンクを unsortedbin が管理します。unsortedbin は 1 つの双方向リストとなっています。unsortedbin でソートが起こると smallbins か largebins に繋がれます。重要なのは unsortedbin の末尾チャンクの `fd` は `main_arena.top` を指すということです。
 
 ### smallbins
 unsortedbin に入れたチャンクで小さいチャンクは smallbins に繋がれます。smallbins はチャンクサイズが 0x20 から 0x3f0 まで 62 種類の smallbin を持ち、それぞれ双方向リストとなっています。それぞれの smallbin の先頭・末尾は `bin_at(2)` から `bin_at(63)` に格納されています。
@@ -585,39 +570,8 @@ unsortedbin に入れたチャンクで小さいチャンクは smallbins に繋
 
 largebins から確保されたメモリは `last_remainder` はセットされません。
 
-    if (largebins のサイズ) {
-      if (largebins の末尾から取得) {
-        unlink
-        if (nb + MINSIZE 未満) {
-          exhaust
-        } else {
-          split
-          unsortedbin に挿入
-        }
-        返す
-      }
-    }
-
-    idx++;
-
-    for (;;) {
-      binmap から
-      if (何もついてない) {
-        binmap に書き込む
-      } else {
-        unlink
-        Exhaust
-        Split
-      }
-    }
-
-      smallbins, largebins に振り分け
-      binmap に書き込む
-
-    smallbins, largebins から確保
-    binmap から検索、なければ clear
-
 ## pwndbg
+最後に pwndbg でのコマンド一覧を残しておきます。とても便利なのでいつも使っています。
 
 ```shell
 pwndbg> vmmap
@@ -636,4 +590,4 @@ pwndbg> malloc_chunk <address>
 ```
 
 ## まとめ
-
+このように各 bins は役割を担い、セキュリティ機構を備えているということが分かったと思います。
