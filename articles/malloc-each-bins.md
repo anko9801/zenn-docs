@@ -51,12 +51,17 @@ graph LR
 ```
 
 ## 各 bins の管理
+入り口から free list を理解した方が分かりやすそうなので、まだチャンクには触らずに各 bins の管理方法を紹介します。
+
+bins によって管理されている場所はそれぞれ異なり、次のようにまとめられます。
 
 | bins の種類 | 管理先 |
 | --- | --- |
-| tcache bins | `tcache_perthread_struct` 構造体 |
-| fastbins | `arena->fastbinsY[NFASTBINS]` |
-| unsortedbin, smallbins, largebins | `arena->bins[NBINS * 2 - 2]` |
+| tcache bins | `tcache` |
+| fastbins | `arena->fastbinsY` `arena->have_fastchunks` |
+| unsortedbin, smallbins, largebins | `arena->bins` `arena->binmap` |
+
+これらの仕組みを
 
 データ構造は 2 つあり、それぞれの挿入 (link) や削除 (unlink) の処理は理解している前提で話を進めます。
 
@@ -65,50 +70,168 @@ graph LR
 
 ### tcache
 
-tcache bins の実体は `tcache_perthread_struct` 構造体です。 `entries` で各リストの HEAD のチャンクに繋げて、 `counts` でリストの長さを管理し、7 個になったら受け付けないようにします。チャンクが tcache bin に入るとデータ部分に `tcache_entry` 構造体が overlap されてリストに入ります。
+tcache bins の実体である `tcache_perthread_struct` 構造体 (0x280 bytes) の `tcache` は各スレッドにおいて `_int_malloc()` でヒープ上に確保されます。ヒープを利用したバイナリを起動すると始めから `size` が 0x291 のチャンクがあるのはこの為です。
 
 ```c
+/* We want 64 entries.  This is an arbitrary limit, which tunables can reduce.  */
+# define TCACHE_MAX_BINS 64
+# define MAX_TCACHE_SIZE tidx2usize (TCACHE_MAX_BINS-1)
+/* Only used to pre-fill the tunables.  */
+# define tidx2usize(idx) (((size_t) idx) * MALLOC_ALIGNMENT + MINSIZE - SIZE_SZ)
+/* When "x" is from chunksize().  */
+# define csize2tidx(x) (((x) - MINSIZE + MALLOC_ALIGNMENT - 1) / MALLOC_ALIGNMENT)
+/* When "x" is a user-provided size.  */
+# define usize2tidx(x) csize2tidx (request2size (x))
+/* With rounding and alignment, the bins are...
+   idx 0   bytes 0..24 (64-bit) or 0..12 (32-bit)
+   idx 1   bytes 25..40 or 13..20
+   idx 2   bytes 41..56 or 21..28
+   etc.  */
+/* This is another arbitrary limit, which tunables can change.  Each
+   tcache bin will hold at most this number of chunks.  */
+# define TCACHE_FILL_COUNT 7
+/* Maximum chunks in tcache bins for tunables.  This value must fit the range
+   of tcache->counts[] entries, else they may overflow.  */
+# define MAX_TCACHE_COUNT UINT16_MAX
+
 typedef struct tcache_entry
 {
-    // 次の tcache_entry へのポインタ
-    struct tcache_entry *next;
-    // 親の tcache_perthread_struct を指し double free を検知
-    struct tcache_perthread_struct *key;
+  struct tcache_entry *next;              // 次の tcache_entry へのポインタ
+  struct tcache_perthread_struct *key;    // 乱数を用いて double free を検知
 } tcache_entry;
 
 typedef struct tcache_perthread_struct
 {
-    // 各 tcache bin の長さの一覧
-    uint16_t counts[TCACHE_MAX_BINS];
-    // 各 tcache bin の最初の tcache へのポインタの一覧
-    tcache_entry *entries[TCACHE_MAX_BINS];
+  uint16_t counts[TCACHE_MAX_BINS];       // 各 bin の長さの一覧
+  tcache_entry *entries[TCACHE_MAX_BINS]; // 各 bin の最初の tcache へのポインタの一覧
 } tcache_perthread_struct;
+
+static __thread bool tcache_shutting_down = false;
+static __thread tcache_perthread_struct *tcache = NULL;
+static uintptr_t tcache_key;
+```
+
+`entries` で各リストの HEAD のチャンクに繋げて、 `counts` でリストの長さを管理し、7 個になったら受け付けないようにします。また tcache bin に入っているチャンクは `tcache_entry` 構造体が overlap されています。
+
+```c
+/* The value of tcache_key does not really have to be a cryptographically
+   secure random number.  It only needs to be arbitrary enough so that it does
+   not collide with values present in applications.  If a collision does happen
+   consistently enough, it could cause a degradation in performance since the
+   entire list is checked to check if the block indeed has been freed the
+   second time.  The odds of this happening are exceedingly low though, about 1
+   in 2^wordsize.  There is probably a higher chance of the performance
+   degradation being due to a double free where the first free happened in a
+   different thread; that's a case this check does not cover.  */
+static void
+tcache_key_initialize (void)
+{
+  if (__getrandom (&tcache_key, sizeof(tcache_key), GRND_NONBLOCK)
+      != sizeof (tcache_key))
+    {
+      tcache_key = random_bits ();
+#if __WORDSIZE == 64
+      tcache_key = (tcache_key << 32) | random_bits ();
+#endif
+    }
+}
+
+/* Caller must ensure that we know tc_idx is valid and there's room
+   for more chunks.  */
+static __always_inline void
+tcache_put (mchunkptr chunk, size_t tc_idx)
+{
+  tcache_entry *e = (tcache_entry *) chunk2mem (chunk);
+  /* Mark this chunk as "in the tcache" so the test in _int_free will
+     detect a double free.  */
+  e->key = tcache_key;
+  e->next = PROTECT_PTR (&e->next, tcache->entries[tc_idx]);
+  tcache->entries[tc_idx] = e;
+  ++(tcache->counts[tc_idx]);
+}
+/* Caller must ensure that we know tc_idx is valid and there's
+   available chunks to remove.  */
+static __always_inline void *
+tcache_get (size_t tc_idx)
+{
+  tcache_entry *e = tcache->entries[tc_idx];
+  if (__glibc_unlikely (!aligned_OK (e)))
+    malloc_printerr ("malloc(): unaligned tcache chunk detected");
+  tcache->entries[tc_idx] = REVEAL_PTR (e->next);
+  --(tcache->counts[tc_idx]);
+  e->key = 0;
+  return (void *) e;
+}
+static void
+tcache_thread_shutdown (void)
+{
+  int i;
+  tcache_perthread_struct *tcache_tmp = tcache;
+  tcache_shutting_down = true;
+  if (!tcache)
+    return;
+  /* Disable the tcache and prevent it from being reinitialized.  */
+  tcache = NULL;
+  /* Free all of the entries and the tcache itself back to the arena
+     heap for coalescing.  */
+  for (i = 0; i < TCACHE_MAX_BINS; ++i)
+    {
+      while (tcache_tmp->entries[i])
+	{
+	  tcache_entry *e = tcache_tmp->entries[i];
+	  if (__glibc_unlikely (!aligned_OK (e)))
+	    malloc_printerr ("tcache_thread_shutdown(): "
+			     "unaligned tcache chunk detected");
+	  tcache_tmp->entries[i] = REVEAL_PTR (e->next);
+	  __libc_free (e);
+	}
+    }
+  __libc_free (tcache_tmp);
+}
+
+static void
+tcache_init(void)
+{
+  mstate ar_ptr;
+  void *victim = 0;
+  const size_t bytes = sizeof (tcache_perthread_struct);
+  if (tcache_shutting_down)
+    return;
+  arena_get (ar_ptr, bytes);
+  victim = _int_malloc (ar_ptr, bytes);
+  if (!victim && ar_ptr != NULL)
+    {
+      ar_ptr = arena_get_retry (ar_ptr, bytes);
+      victim = _int_malloc (ar_ptr, bytes);
+    }
+  if (ar_ptr != NULL)
+    __libc_lock_unlock (ar_ptr->mutex);
+  /* In a low memory situation, we may not be able to allocate memory
+     - in which case, we just keep trying later.  However, we
+     typically do this very early, so either there is sufficient
+     memory, or there isn't enough memory to do non-trivial
+     allocations anyway.  */
+  if (victim)
+    {
+      tcache = (tcache_perthread_struct *) victim;
+      memset (tcache, 0, sizeof (tcache_perthread_struct));
+    }
+}
 ```
 
 
 ### fastbinsY
-`global_max_fast` 0x80
-`MAX_FAST_SIZE` 0xa0
-
-   Set value of max_fast.
-   Use impossibly small value if 0.
-   Precondition: there are no existing fastbin chunks in the main arena.
-   Since do_check_malloc_state () checks this, we call malloc_consolidate ()
-   before changing max_fast.  Note other arenas will leak their fast bin
-   entries if max_fast is reduced.
-
-#define set_max_fast(s) \
-  global_max_fast = (((size_t) (s) <= MALLOC_ALIGN_MASK - SIZE_SZ)	\
-                     ? MIN_CHUNK_SIZE / 2 : ((s + SIZE_SZ) & ~MALLOC_ALIGN_MASK))
+fastbins は `arena->fastbinsY` `arena->have_fastchunks` で管理されています。
 
 ```c
+#define DEFAULT_MXFAST     (64 * SIZE_SZ / 4)
+
 typedef struct malloc_chunk *mfastbinptr;
 #define fastbin(ar_ptr, idx) ((ar_ptr)->fastbinsY[idx])
 
 /* offset 2 to use otherwise unindexable first 2 bins */
 #define fastbin_index(sz) \
   ((((unsigned int) (sz)) >> (SIZE_SZ == 8 ? 4 : 3)) - 2)
-
 
 /* The maximum fastbin request size we support */
 #define MAX_FAST_SIZE     (80 * SIZE_SZ / 4)
@@ -117,15 +240,43 @@ typedef struct malloc_chunk *mfastbinptr;
 
 #define FASTBIN_CONSOLIDATION_THRESHOLD  (65536UL)
 
-#define NONCONTIGUOUS_BIT     (2U)
-
-#define contiguous(M)          (((M)->flags & NONCONTIGUOUS_BIT) == 0)
-#define noncontiguous(M)       (((M)->flags & NONCONTIGUOUS_BIT) != 0)
-#define set_noncontiguous(M)   ((M)->flags |= NONCONTIGUOUS_BIT)
-#define set_contiguous(M)      ((M)->flags &= ~NONCONTIGUOUS_BIT)
-
 static uint8_t global_max_fast;
+#define set_max_fast(s) \
+  global_max_fast = (((size_t) (s) <= MALLOC_ALIGN_MASK - SIZE_SZ)	\
+                     ? MIN_CHUNK_SIZE / 2 : ((s + SIZE_SZ) & ~MALLOC_ALIGN_MASK))
+
+struct malloc_state
+{
+  ...
+  int have_fastchunks;              // fastbins が空ではないことを表す真偽値
+  mfastbinptr fastbinsY[NFASTBINS]; // fastbins の先頭が格納されている
+  ...
+};
+
+static void
+malloc_init_state (mstate av)
+{
+  int i;
+  mbinptr bin;
+  /* Establish circular links for normal bins */
+  for (i = 1; i < NBINS; ++i)
+    {
+      bin = bin_at (av, i);
+      bin->fd = bin->bk = bin;
+    }
+#if MORECORE_CONTIGUOUS
+  if (av != &main_arena)
+#endif
+  set_noncontiguous (av);
+  if (av == &main_arena)
+    set_max_fast (DEFAULT_MXFAST);
+  atomic_store_relaxed (&av->have_fastchunks, false);
+  av->top = initial_top (av);
+}
 ```
+
+これを読むと `MAX_FAST_SIZE == 0xa0` より 0x20 ~ 0xa0 の 9 種類の fastbin が用意されてあるが実際には `global_max_fast == DEFAULT_MXFAST == 0x80` より 0x20 ~ 0x80 の 7 種類を使います。
+fastbins が `max_fast` を変更するときには先に `malloc_consolidate()` を読んで `main_arena` の fastbins を空にしておくことが前提条件となっています。(何に繋がっているのかはわからない)
 
 ### bins
 bins は free list の中で双方向リスト (unsortedbin / smallbins / largebins) を扱う bin の先頭・末尾を格納する配列です。
@@ -138,7 +289,7 @@ largebins はサイズ順に保持され、smallbins はすべて同じサイズ
 
 同じサイズのチャンクは、最近解放されたものを先頭にリンクされ、割り当ては後ろから行われます。 この結果、LRU (FIFO) 割り当て順となり、各チャンクに隣接する解放されたチャンクと連結される機会が均等に与えられる傾向があるため、空きチャンクが大きくなり、断片化が少なくなります。
 
-ここにも 1 つトリックがあり、各 bin のスライスを `malloc_chunk` の `fd` `bk` として扱うことで簡単に使用できます。
+ここにも 1 つトリックがあり、各 bin の先頭・末尾のスライスを `malloc_chunk` として捉えることで `fd` `bk` として扱えてリンクのアクセスがより簡単にできます。
 
 ```c
 typedef struct malloc_chunk *mbinptr;
@@ -246,11 +397,9 @@ typedef struct malloc_chunk *mbinptr;
 
 ちなみにパフォーマンスを上げる為に指数的に間隔が上昇せず、境界は綺麗に分けられてません。
 
-### Binmap
+### binmap
 
-malloc において大量の bin の検索を補う為に各瓶が空であるかどうかを記録されているビットベクタです。
-
-このビットはビンが空になるとすぐにクリアされるのではなく、mallocでの探索中にビンが空であることに気付いた時にクリアされます。
+`malloc()` において `arena->bins` にある大量の bin の検索を補う為に各 bin が空であるかどうかを記録されているビットベクタです。binmap 中の 1 ビットが 1 bin を指し、その bin にチャンクがあればフラグが立ち、空になるとクリアされます。注意としてこのビットはビンが空になってすぐクリアされるのではなく、`malloc` での探索中にビンが空であることに気付いた時にクリアされます。
 
 ```c
 /* Conservatively use 32 bits per map word, even if on 64bit system */
@@ -289,8 +438,7 @@ malloc_consolidate()
 | パラメータ | 説明 |
 | --- | --- |
 | `FASTBIN_CONSOLIDATION_THRESHOLD` | `FASTBIN_CONSOLIDATION_THRESHOLD` のチャンクが free されたときに自動的に周辺にある可能性のある fastbins の consolidation を行う。It is defined at half the default trim threshold as a compromise heuristic to only attempt consolidation if it is likely to lead to trimming. However, it is not dynamically tunable, since consolidation reduces fragmentation surrounding large chunks even if trimming is not used. |
-| `NONCONTIGUOS_BIT` | NONCONTIGUOUS_BIT indicates that MORECORE does not return contiguous regions.  Otherwise, contiguity is exploited in merging together, when possible, results from consecutive MORECORE calls. The initial value comes from MORECORE_CONTIGUOUS, but is changed dynamically if mmap is ever used as an sbrk substitute. |
-| `TRIM_FASTBINS` | 小さなチャンクも trim メモリ少なくなる代わりに処理が遅くなる TRIM_FASTBINS controls whether free() of a very small chunk can immediately lead to trimming. Setting to true (1) can reduce memory footprint, but will almost always slow down programs that use a lot of small chunks. Define this only if you are willing to give up some speed to more aggressively reduce system-level memory footprint when releasing memory in programs that use many small chunks.  You can get essentially the same effect by setting MXFAST to 0, but this can lead to even greater slowdowns in programs using many small chunks. TRIM_FASTBINS is an in-between compile-time option, that disables only those chunks bordering topmost memory from being placed in fastbins. |
+| `TRIM_FASTBINS` | 小さな `free()` でも毎回 trim するかどうかのフラグ。メモリフットプリントを削減する代わりにパフォーマンスが落ちる。 |
 
 malloc_consolidate
 ```

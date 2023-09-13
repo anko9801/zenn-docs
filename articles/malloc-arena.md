@@ -133,6 +133,16 @@ static struct malloc_par mp_ =
 ```
 
 ## 各フィールドに関連する処理
+### flags
+
+| `NONCONTIGUOS_BIT` | MORECORE したときに連続した領域を返すことを保証しないことを表すフラグ。そうでないとき可能な限り連続性が利用される。初期値は MORECORE_CONTIGUOUS mmap で拡張すると書き換えられる。 |
+
+#define NONCONTIGUOUS_BIT     (2U)
+
+#define contiguous(M)          (((M)->flags & NONCONTIGUOUS_BIT) == 0)
+#define noncontiguous(M)       (((M)->flags & NONCONTIGUOUS_BIT) != 0)
+#define set_noncontiguous(M)   ((M)->flags |= NONCONTIGUOUS_BIT)
+#define set_contiguous(M)      ((M)->flags &= ~NONCONTIGUOUS_BIT)
 
 ### top
  The top-most available chunk (i.e., the one bordering the end of available memory) is treated specially. It is never included in any bin, is used only if no other chunk is available, and is released back to the system if it is very large (see M_TRIM_THRESHOLD).  Because top initially points to its own bin with initial zero size, thus forcing extension on the first malloc request, we avoid having any special code in malloc to check whether it even exists yet. But we still need to do so when getting memory from system, so we make initial_top treat the bin as a legal but unusable chunk during the interval between initialization and the first call to sysmalloc. (This is somewhat delicate, since it relies on the 2 preceding words to be zero during this interval as well.)
