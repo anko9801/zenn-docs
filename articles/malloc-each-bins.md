@@ -584,16 +584,105 @@ glibc-2.3.4 以降では `fd->bk` `bk->fd` がチャンク自身を指すとい�
 
 ```shell
 pwndbg> vmmap
+LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA
+    0x555555554000     0x555555555000 r--p     1000 0      /home/anko/workspace/ctf/how2heap/glibc_2.36/fastbin_dup
+    0x555555555000     0x555555556000 r-xp     1000 1000   /home/anko/workspace/ctf/how2heap/glibc_2.36/fastbin_dup
+    0x555555556000     0x555555557000 r--p     1000 2000   /home/anko/workspace/ctf/how2heap/glibc_2.36/fastbin_dup
+    0x555555557000     0x555555558000 r--p     1000 2000   /home/anko/workspace/ctf/how2heap/glibc_2.36/fastbin_dup
+    0x555555558000     0x555555559000 rw-p     1000 3000   /home/anko/workspace/ctf/how2heap/glibc_2.36/fastbin_dup
+    0x555555559000     0x55555557a000 rw-p    21000 0      [heap]
+    0x7ffff7c00000     0x7ffff7c28000 r--p    28000 0      /usr/lib/x86_64-linux-gnu/libc.so.6
+    0x7ffff7c28000     0x7ffff7dbd000 r-xp   195000 28000  /usr/lib/x86_64-linux-gnu/libc.so.6
+    0x7ffff7dbd000     0x7ffff7e15000 r--p    58000 1bd000 /usr/lib/x86_64-linux-gnu/libc.so.6
+    0x7ffff7e15000     0x7ffff7e19000 r--p     4000 214000 /usr/lib/x86_64-linux-gnu/libc.so.6
+    0x7ffff7e19000     0x7ffff7e1b000 rw-p     2000 218000 /usr/lib/x86_64-linux-gnu/libc.so.6
+    0x7ffff7e1b000     0x7ffff7e28000 rw-p     d000 0      [anon_7ffff7e1b]
+    0x7ffff7fa7000     0x7ffff7faa000 rw-p     3000 0      [anon_7ffff7fa7]
+    0x7ffff7fbb000     0x7ffff7fbd000 rw-p     2000 0      [anon_7ffff7fbb]
+    0x7ffff7fbd000     0x7ffff7fc1000 r--p     4000 0      [vvar]
+    0x7ffff7fc1000     0x7ffff7fc3000 r-xp     2000 0      [vdso]
+    0x7ffff7fc3000     0x7ffff7fc5000 r--p     2000 0      /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+    0x7ffff7fc5000     0x7ffff7fef000 r-xp    2a000 2000   /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+    0x7ffff7fef000     0x7ffff7ffa000 r--p     b000 2c000  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+    0x7ffff7ffb000     0x7ffff7ffd000 r--p     2000 37000  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+    0x7ffff7ffd000     0x7ffff7fff000 rw-p     2000 39000  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+    0x7ffffffdd000     0x7ffffffff000 rw-p    22000 0      [stack]
 pwndbg> heap
+Allocated chunk | PREV_INUSE
+Addr: 0x555555559000
+Size: 0x291
+
+Free chunk (tcache) | PREV_INUSE
+Addr: 0x555555559290
+Size: 0x21
+fd: 0x555555559
+
+Allocated chunk | PREV_INUSE
+Addr: 0x5555555592b0
+Size: 0x21
 pwndbg> arena
+{
+  mutex = 0,
+  flags = 0,
+  have_fastchunks = 0,
+  fastbinsY = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+  top = 0x555555559390,
+  last_remainder = 0x0,
+  bins = {0x7ffff7e19ce0 <main_arena+96>, 0x7ffff7e19ce0 <main_arena+96>, 0x7ffff7e19cf0 <main_arena+112>, 0x7ffff7e19cf0 <main_arena+112>, 0x7ffff7e19d00 <main_arena+128>, 0x7ffff7e19d00 <main_arena+128>, 0x7ffff7e19d10 <main_arena+144>, 0x7ffff7e19d10 <main_arena+144>, 0x7ffff7e19d20 <main_arena+160>, 0x7ffff7e19d20 <main_arena+160>, 0x7ffff7e19d30 <main_arena+176>, 0x7ffff7e19d30 <main_arena+176>, 0x7ffff7e19d40 <main_arena+192>, 0x7ffff7e19d40 <main_arena+192>, 0x7ffff7e19d50 <main_arena+208>, 0x7ffff7e19d50 <main_arena+208>, 0x7ffff7e19d60 <main_arena+224>, 0x7ffff7e19d60 <main_arena+224>, 0x7ffff7e19d70 <main_arena+240>, 0x7ffff7e19d70 <main_arena+240>, 0x7ffff7e19d80 <main_arena+256>, 0x7ffff7e19d80 <main_arena+256>, 0x7ffff7e19d90 <main_arena+272>, 0x7ffff7e19d90 <main_arena+272>, 0x7ffff7e19da0 <main_arena+288>, 0x7ffff7e19da0 <main_arena+288>, 0x7ffff7e19db0 <main_arena+304>, 0x7ffff7e19db0 <main_arena+304>, 0x7ffff7e19dc0 <main_arena+320>, 0x7ffff7e19dc0 <main_arena+320>, 0x7ffff7e19dd0 <main_arena+336>, 0x7ffff7e19dd0 <main_arena+336>, 0x7ffff7e19de0 <main_arena+352>, 0x7ffff7e19de0 <main_arena+352>, 0x7ffff7e19df0 <main_arena+368>, 0x7ffff7e19df0 <main_arena+368>, 0x7ffff7e19e00 <main_arena+384>, 0x7ffff7e19e00 <main_arena+384>, 0x7ffff7e19e10 <main_arena+400>, 0x7ffff7e19e10 <main_arena+400>, 0x7ffff7e19e20 <main_arena+416>, 0x7ffff7e19e20 <main_arena+416>, 0x7ffff7e19e30 <main_arena+432>, 0x7ffff7e19e30 <main_arena+432>, 0x7ffff7e19e40 <main_arena+448>, 0x7ffff7e19e40 <main_arena+448>, 0x7ffff7e19e50 <main_arena+464>, 0x7ffff7e19e50 <main_arena+464>, 0x7ffff7e19e60 <main_arena+480>, 0x7ffff7e19e60 <main_arena+480>, 0x7ffff7e19e70 <main_arena+496>, 0x7ffff7e19e70 <main_arena+496>, 0x7ffff7e19e80 <main_arena+512>, 0x7ffff7e19e80 <main_arena+512>, 0x7ffff7e19e90 <main_arena+528>, 0x7ffff7e19e90 <main_arena+528>, 0x7ffff7e19ea0 <main_arena+544>, 0x7ffff7e19ea0 <main_arena+544>, 0x7ffff7e19eb0 <main_arena+560>, 0x7ffff7e19eb0 <main_arena+560>, 0x7ffff7e19ec0 <main_arena+576>, 0x7ffff7e19ec0 <main_arena+576>, 0x7ffff7e19ed0 <main_arena+592>, 0x7ffff7e19ed0 <main_arena+592>, 0x7ffff7e19ee0 <main_arena+608>, 0x7ffff7e19ee0 <main_arena+608>, 0x7ffff7e19ef0 <main_arena+624>, 0x7ffff7e19ef0 <main_arena+624>, 0x7ffff7e19f00 <main_arena+640>, 0x7ffff7e19f00 <main_arena+640>, 0x7ffff7e19f10 <main_arena+656>, 0x7ffff7e19f10 <main_arena+656>, 0x7ffff7e19f20 <main_arena+672>, 0x7ffff7e19f20 <main_arena+672>, 0x7ffff7e19f30 <main_arena+688>, 0x7ffff7e19f30 <main_arena+688>, 0x7ffff7e19f40 <main_arena+704>, 0x7ffff7e19f40 <main_arena+704>, 0x7ffff7e19f50 <main_arena+720>, 0x7ffff7e19f50 <main_arena+720>, 0x7ffff7e19f60 <main_arena+736>, 0x7ffff7e19f60 <main_arena+736>, 0x7ffff7e19f70 <main_arena+752>, 0x7ffff7e19f70 <main_arena+752>, 0x7ffff7e19f80 <main_arena+768>, 0x7ffff7e19f80 <main_arena+768>, 0x7ffff7e19f90 <main_arena+784>, 0x7ffff7e19f90 <main_arena+784>, 0x7ffff7e19fa0 <main_arena+800>, 0x7ffff7e19fa0 <main_arena+800>, 0x7ffff7e19fb0 <main_arena+816>, 0x7ffff7e19fb0 <main_arena+816>, 0x7ffff7e19fc0 <main_arena+832>, 0x7ffff7e19fc0 <main_arena+832>, 0x7ffff7e19fd0 <main_arena+848>, 0x7ffff7e19fd0 <main_arena+848>, 0x7ffff7e19fe0 <main_arena+864>, 0x7ffff7e19fe0 <main_arena+864>, 0x7ffff7e19ff0 <main_arena+880>, 0x7ffff7e19ff0 <main_arena+880>, 0x7ffff7e1a000 <main_arena+896>, 0x7ffff7e1a000 <main_arena+896>, 0x7ffff7e1a010 <main_arena+912>, 0x7ffff7e1a010 <main_arena+912>, 0x7ffff7e1a020 <main_arena+928>, 0x7ffff7e1a020 <main_arena+928>, 0x7ffff7e1a030 <main_arena+944>, 0x7ffff7e1a030 <main_arena+944>, 0x7ffff7e1a040 <main_arena+960>, 0x7ffff7e1a040 <main_arena+960>, 0x7ffff7e1a050 <main_arena+976>, 0x7ffff7e1a050 <main_arena+976>, 0x7ffff7e1a060 <main_arena+992>, 0x7ffff7e1a060 <main_arena+992>, 0x7ffff7e1a070 <main_arena+1008>, 0x7ffff7e1a070 <main_arena+1008>, 0x7ffff7e1a080 <main_arena+1024>, 0x7ffff7e1a080 <main_arena+1024>, 0x7ffff7e1a090 <main_arena+1040>, 0x7ffff7e1a090 <main_arena+1040>, 0x7ffff7e1a0a0 <main_arena+1056>, 0x7ffff7e1a0a0 <main_arena+1056>, 0x7ffff7e1a0b0 <main_arena+1072>, 0x7ffff7e1a0b0 <main_arena+1072>, 0x7ffff7e1a0c0 <main_arena+1088>, 0x7ffff7e1a0c0 <main_arena+1088>, 0x7ffff7e1a0d0 <main_arena+1104>, 0x7ffff7e1a0d0 <main_arena+1104>, 0x7ffff7e1a0e0 <main_arena+1120>, 0x7ffff7e1a0e0 <main_arena+1120>, 0x7ffff7e1a0f0 <main_arena+1136>, 0x7ffff7e1a0f0 <main_arena+1136>, 0x7ffff7e1a100 <main_arena+1152>, 0x7ffff7e1a100 <main_arena+1152>, 0x7ffff7e1a110 <main_arena+1168>, 0x7ffff7e1a110 <main_arena+1168>, 0x7ffff7e1a120 <main_arena+1184>, 0x7ffff7e1a120 <main_arena+1184>, 0x7ffff7e1a130 <main_arena+1200>, 0x7ffff7e1a130 <main_arena+1200>, 0x7ffff7e1a140 <main_arena+1216>, 0x7ffff7e1a140 <main_arena+1216>, 0x7ffff7e1a150 <main_arena+1232>, 0x7ffff7e1a150 <main_arena+1232>, 0x7ffff7e1a160 <main_arena+1248>, 0x7ffff7e1a160 <main_arena+1248>, 0x7ffff7e1a170 <main_arena+1264>, 0x7ffff7e1a170 <main_arena+1264>, 0x7ffff7e1a180 <main_arena+1280>, 0x7ffff7e1a180 <main_arena+1280>, 0x7ffff7e1a190 <main_arena+1296>, 0x7ffff7e1a190 <main_arena+1296>, 0x7ffff7e1a1a0 <main_arena+1312>, 0x7ffff7e1a1a0 <main_arena+1312>, 0x7ffff7e1a1b0 <main_arena+1328>, 0x7ffff7e1a1b0 <main_arena+1328>, 0x7ffff7e1a1c0 <main_arena+1344>, 0x7ffff7e1a1c0 <main_arena+1344>, 0x7ffff7e1a1d0 <main_arena+1360>, 0x7ffff7e1a1d0 <main_arena+1360>, 0x7ffff7e1a1e0 <main_arena+1376>, 0x7ffff7e1a1e0 <main_arena+1376>, 0x7ffff7e1a1f0 <main_arena+1392>, 0x7ffff7e1a1f0 <main_arena+1392>, 0x7ffff7e1a200 <main_arena+1408>, 0x7ffff7e1a200 <main_arena+1408>, 0x7ffff7e1a210 <main_arena+1424>, 0x7ffff7e1a210 <main_arena+1424>, 0x7ffff7e1a220 <main_arena+1440>, 0x7ffff7e1a220 <main_arena+1440>, 0x7ffff7e1a230 <main_arena+1456>, 0x7ffff7e1a230 <main_arena+1456>, 0x7ffff7e1a240 <main_arena+1472>, 0x7ffff7e1a240 <main_arena+1472>, 0x7ffff7e1a250 <main_arena+1488>, 0x7ffff7e1a250 <main_arena+1488>, 0x7ffff7e1a260 <main_arena+1504>, 0x7ffff7e1a260 <main_arena+1504>, 0x7ffff7e1a270 <main_arena+1520>, 0x7ffff7e1a270 <main_arena+1520>, 0x7ffff7e1a280 <main_arena+1536>, 0x7ffff7e1a280 <main_arena+1536>, 0x7ffff7e1a290 <main_arena+1552>, 0x7ffff7e1a290 <main_arena+1552>, 0x7ffff7e1a2a0 <main_arena+1568>, 0x7ffff7e1a2a0 <main_arena+1568>, 0x7ffff7e1a2b0 <main_arena+1584>, 0x7ffff7e1a2b0 <main_arena+1584>, 0x7ffff7e1a2c0 <main_arena+1600>, 0x7ffff7e1a2c0 <main_arena+1600>, 0x7ffff7e1a2d0 <main_arena+1616>, 0x7ffff7e1a2d0 <main_arena+1616>, 0x7ffff7e1a2e0 <main_arena+1632>, 0x7ffff7e1a2e0 <main_arena+1632>, 0x7ffff7e1a2f0 <main_arena+1648>, 0x7ffff7e1a2f0 <main_arena+1648>, 0x7ffff7e1a300 <main_arena+1664>, 0x7ffff7e1a300 <main_arena+1664>, 0x7ffff7e1a310 <main_arena+1680>, 0x7ffff7e1a310 <main_arena+1680>...},
+  binmap = {0, 0, 0, 0},
+  next = 0x7ffff7e19c80 <main_arena>,
+  next_free = 0x0,
+  attached_threads = 1,
+  system_mem = 135168,
+  max_system_mem = 135168
+}
 pwndbg> bins
+tcachebins
+0x20 [  1]: 0x5555555592a0 ◂— 0x0
+fastbins
+0x20: 0x0
+0x30: 0x0
+0x40: 0x0
+0x50: 0x0
+0x60: 0x0
+0x70: 0x0
+0x80: 0x0
+unsortedbin
+all: 0x0
+smallbins
+empty
+largebins
+empty
 pwndbg> fastbins
+fastbins
+0x20: 0x0
+0x30: 0x0
+0x40: 0x0
+0x50: 0x0
+0x60: 0x0
+0x70: 0x0
+0x80: 0x0
 pwndbg> tcachebins
+tcachebins
+0x20 [  1]: 0x5555555592a0 ◂— 0x0
 pwndbg> unsortedbin
+unsortedbin
+all: 0x0
 pwndbg> smallbins
+smallbins
+empty
 pwndbg> largebins
+largebins
+empty
 pwndbg> tcache
+{
+  counts = {1, 0 <repeats 63 times>},
+  entries = {0x5555555592a0, 0x0 <repeats 63 times>}
+}
 pwndbg> top_chunk
+Top chunk
+Addr: 0x555555559390
+Size: 0x20c71
 pwndbg> try_free <address>
 pwndbg> malloc_chunk <address>
 ```
