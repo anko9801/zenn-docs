@@ -30,9 +30,19 @@ void free(void *ptr);
 ## malloc / free 全体像
 まずはざっくりと！
 
-`malloc()` `free()` ではプロセスのアドレス空間のうちヒープ領域を利用しています。
+`malloc()` `free()` ではプロセスのアドレス空間のうちヒープ領域を利用しています。まず `sbrk()` や `mmap()` システムコールによって OS からメモリプールを貰います。このメモリプールを効率的に分配する機構を bin と呼びます。それにはいくつかの種類があります。
 
-読むべき関数は malloc.c 内の次の関数です。
+| bins の種類 | チャンクサイズ (default) | 説明 | データ構造 |
+| --- | --- | --- | --- |
+| tcache bins | 0x20 ~ 0x410 | 最近アクセスしたチャンクが入れられる bins | 単方向リスト |
+| fastbins | 0x20 ~ 0x80 | 頻繁に確保・解放されるような小さなチャンクを管理する bins | 単方向リスト |
+| unsortedbin | 0x20 ~ | tcache bins や fastbins では扱えないものを入れて smallbins や largebins に渡す前に一時的に管理する bin | 双方向リスト |
+| smallbins | 0x20 ~ 0x3f0 | 小さなチャンクを管理する bins | 双方向リスト |
+| largebins | 0x400 ~ | 大きなチャンクを管理する bins | 双方向リスト + スキップリスト |
+
+詳細はこのシリーズの bins において解説します。今はそういうものがあるんだと思っておいてください。
+
+そして `malloc()` `free()` を理解するために読むべき関数は malloc.c 内の次の関数です。
 
 | 関数名 | 説明 |
 | --- | --- |
@@ -46,7 +56,7 @@ void free(void *ptr);
 
 実際の malloc.c は約 6000 行と結構長く、高速化の為にあまり抽象化されてないのでまずは擬似コードを読むことにしましょう。
 
-また用語がよく出てくるのでここでまとめておきます。
+また次の用語がよく出てくるのでここでまとめておきます。
 
 | 用語 | 説明 |
 | --- | --- |
@@ -146,9 +156,10 @@ graph LR
 
 次に `sysmalloc()` を読んでいきましょう。
 
-```c:sysmalloc()
+```c
 static void *sysmalloc (INTERNAL_SIZE_T nb, mstate av) {
-    if (アリーナがない || mmap_threshold (0x20000) 以上で n_mmaps_max 回未満)
+    if (アリーナがない
+     || mmap_threshold (0x20000) 以上で mmap 回数が n_mmaps_max 回未満)
         sysmalloc_mmap()
 
     assert (初期状態 ||
@@ -172,7 +183,7 @@ static void *sysmalloc (INTERNAL_SIZE_T nb, mstate av) {
             else {
                 if (アリーナが連続な領域しか扱わない) {
                     MALLOC_ALIGNMENT (0x10) の alignment 調整
-                    出来たら sbrk でページ境界まで伸ばす
+                    出来たら 2 度目の sbrk でページ境界まで伸ばす
                 } else {
                     MALLOC_ALIGNMENT (0x10) の alignment 調整
                 }

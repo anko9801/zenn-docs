@@ -74,8 +74,6 @@ top chunk とは最上位つまり終端に置かれた特別なチャンクで�
 
 これは `malloc()` では他に割り当てられるチャンクがない場合にのみ切り出され、top chunk が肥大化した場合は `free()` 時に自動的に OS に返されます。top chunk は最初 `initiali_top` と呼ばれるサイズがゼロの bin を指しているので `malloc()` を呼ぶことで `sbrk()` が呼ばれてヒープ領域が拡張され、top chunk も拡張されます。
 
-ptmalloc_init () or from _int_new_arena ()
-
 ```c
 /* Conveniently, the unsorted bin can be used as dummy top on first call */
 #define initial_top(M)              (unsorted_chunks (M))
