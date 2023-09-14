@@ -579,7 +579,7 @@ glibc-2.3.4 以降では `fd->bk` `bk->fd` がチャンク自身を指すとい�
 
 ![](/images/pwn/largebin.png =480x)
 
-## pwndbg
+## pwndbg のコマンド集
 最後に pwndbg でのコマンド一覧を残しておきます。とても便利なのでいつも使っています。
 
 ```shell
