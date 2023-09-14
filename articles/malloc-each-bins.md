@@ -6,7 +6,7 @@ topics: ["CTF", "pwn", "Linux"]
 published: true
 ---
 
-`malloc()` でヒープ領域にあるメモリを確保してそのポインタを返し、`free()` はそのポインタのメモリを開放してくれます。
+`malloc()` は動的にメモリを確保して `free()` で開放してくれます。
 
 ```c
 void *malloc(size_t size);

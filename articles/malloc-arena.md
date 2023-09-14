@@ -6,7 +6,7 @@ topics: ["CTF", "pwn", "Linux"]
 published: false
 ---
 
-`malloc()` でヒープ領域にあるメモリを確保してそのポインタを返し、`free()` はそのポインタのメモリを開放してくれます。
+`malloc()` は動的にメモリを確保して `free()` で開放してくれます。
 
 ```c
 void *malloc(size_t size);
@@ -28,10 +28,9 @@ void free(void *ptr);
 - https://codebrowser.dev/glibc/glibc/malloc/malloc.c.html
 
 ## アリーナとは
-今まで見てきたようにヒープ領域ではデータをチャンクという単位で管理しており、そのチャンクを bin が管理していました。その bin を管理し、メモリプール全体を扱う機構がアリーナです。
+プロセスは `sbrk()` や `mmap()` システムコールによって OS からメモリプールを獲得します。このメモリプールをアプリケーションに高速に分配する bin と呼ばれる機構があります。bin はメモリプールとは別にメモリプールの管理部で管理されています。そしてメモリプールとその管理部を合わせてアリーナ (arena) と呼びます。
 
-アリーナの実体は `malloc_state` 構造体として定義されます。
-main arena は次のように定義されています。
+アリーナの管理部は `malloc_state` 構造体に書かれてあります。初期状態ではヒープ領域にサイズゼロのメモリプールとグローバル領域に `main_arena` と呼ばれる管理部があります。
 
 ```c
 struct malloc_state
@@ -83,47 +82,9 @@ top chunk とは最上位つまり終端に置かれた特別なチャンクで�
 ### last_remainder
 smallbins / largebins においてチャンクの分割を行ったときに残りのチャンク (remainder) を `last_remainder` に格納します。ただし残りが smallbins の大きさとなったチャンクしか扱わない。
 
+
+ptmalloc_init () or from _int_new_arena () から呼ばれる
 ```c
-              /* Split */
-              else
-                {
-                  remainder = chunk_at_offset (victim, nb);
-
-                  /* We cannot assume the unsorted list is empty and therefore
-                     have to perform a complete insert here.  */
-                  bck = unsorted_chunks (av);
-                  fwd = bck->fd;
-		  if (__glibc_unlikely (fwd->bk != bck))
-		    malloc_printerr ("malloc(): corrupted unsorted chunks 2");
-                  remainder->bk = bck;
-                  remainder->fd = fwd;
-                  bck->fd = remainder;
-                  fwd->bk = remainder;
-
-                  /* advertise as last remainder */
-                  if (in_smallbin_range (nb))
-                    av->last_remainder = remainder;
-                  if (!in_smallbin_range (remainder_size))
-                    {
-                      remainder->fd_nextsize = NULL;
-                      remainder->bk_nextsize = NULL;
-                    }
-                  set_head (victim, nb | PREV_INUSE |
-                            (av != &main_arena ? NON_MAIN_ARENA : 0));
-                  set_head (remainder, remainder_size | PREV_INUSE);
-                  set_foot (remainder, remainder_size);
-                }
-```
-
-
-```c
-/*
-   Initialize a malloc_state struct.
-
-   This is called from ptmalloc_init () or from _int_new_arena ()
-   when creating a new arena.
- */
-
 static void
 malloc_init_state (mstate av)
 {
@@ -149,8 +110,38 @@ malloc_init_state (mstate av)
 }
 ```
 
+### マルチスレッド
+アリーナは `mutex` を用いてロックし、複数のスレッドがメモリプールを共有することができます。
+
+ただし、あるスレッドがチャンクを確保しようとしたときに `main_arena` がロックされていた場合、`mmap()` で新たなヒープ領域を作ります。それで得られたヒープ領域では先頭に管理情報の実体 `heap_info` と管理部の実体 `malloc_state` を置き、各アリーナの管理部 `malloc_state` は `next` によって単方向リストが作られます。そしてスレッドが終了したときは `next_free` に繋がれます。
+
+### sbrk / mmap
+
+```c
+  INTERNAL_SIZE_T system_mem;       // arena によって現在確保されているメモリの合計値
+  INTERNAL_SIZE_T max_system_mem;   // system_mem の最大値
+```
+
+### heap_info
+
+```c
+typedef struct _heap_info
+{
+  mstate ar_ptr;           // このヒープのアリーナへのポインタ
+  struct _heap_info *prev; // 前のヒープ
+  size_t size;   /* Current size in bytes. */
+  size_t mprotect_size; /* Size in bytes that has been mprotected
+                           PROT_READ|PROT_WRITE.  */
+  size_t pagesize; /* Page size used when allocating the arena.  */
+  /* Make sure the following data is properly aligned, particularly
+     that sizeof (heap_info) + 2 * SIZE_SZ is a multiple of
+     MALLOC_ALIGNMENT. */
+  char pad[-3 * SIZE_SZ & MALLOC_ALIGN_MASK];
+} heap_info;
+```
 
 ## その他のパラメータ
+
 ```c
 struct malloc_par
 {
@@ -202,3 +193,6 @@ static struct malloc_par mp_ =
   .tcache_unsorted_limit = 0 /* No limit.  */
 };
 ```
+
+## まとめ
+
