@@ -112,9 +112,11 @@ static __thread tcache_perthread_struct *tcache = NULL;
 static uintptr_t tcache_key;
 ```
 
-これを読むとチャンクサイズがそれぞれ 0x20 ~ 0x410 の `TCACHE_MAX_BINS == 64` 種類の tcache bin が作られていることが分かります。`tcache_perthread_struct` の `entries` では各 tcache bin の HEAD のチャンクに繋げており、ここからチャンクを link / unlink します。そして `counts` でリストの長さを管理し、7 個になったら受け付けないようにして局所参照性を高めています。そして tcache bin に入っているチャンクは `tcache_entry` 構造体が overlap されていて `next` によって単方向リストとなり、`key` にプログラム内共通の乱数 `tcache_key` を一時的に書き込むことで double free を検知しています。
+これを読むと `TCACHE_MAX_BINS == 64` よりチャンクサイズがそれぞれ 0x20 ~ 0x410 の 64 種類の tcache bin が作られていて `tcache_perthread_struct` 構造体の `entries` では各 tcache bin の先頭のアドレスが書き込まれており、ここからチャンクを link / unlink します。そして `counts` でリストの長さを管理し、7 個になったら受け付けないようにしています。
 
-具体的には次のように実装されています。
+tcache bins に入っているチャンクの方については `tcache_entry` 構造体が overlap されていて `next` が単方向リストの次のポインタを指し、`key` に共通の乱数 `tcache_key` を書き込むことで 2 度目の `free()` で `tcache_key` か判定することで double free を検知しています。
+
+具体的には次のように実装されています。特に難しいことは書かれてないと思います。
 
 ```c
 /* The value of tcache_key does not really have to be a cryptographically
@@ -223,7 +225,11 @@ tcache_init(void)
 ```
 
 ### fastbinsY
-`arena` にある `fastbinsY` では各チャンクサイズに対応する fastbin のリストの先頭が格納されています。チャンクサイズは次のソースを読むと `MAX_FAST_SIZE == 0xa0` より 0x20 ~ 0xa0 の 9 種類の fastbin が用意されてあるのですが、実際には `global_max_fast == DEFAULT_MXFAST == 0x80` より 0x20 ~ 0x80 の 7 種類を使います。さらに `malloc_consolidation()` をするかどうかの判断材料として `have_fastchunks` で fastbins 内に直近で入れられたかどうかの bool 値が書き込まれています。
+fastbins は arena にある `fastbinsY` `have_fastchunks` によって管理されています。
+
+`fastbinsY` では各チャンクサイズに対応する fastbin のリストの先頭ポインタが格納されています。チャンクサイズは次のソースを読むと `MAX_FAST_SIZE == 0xa0` より 0x20 ~ 0xa0 の 9 種類の fastbin が用意されてあるのですが、実際には `global_max_fast == DEFAULT_MXFAST == 0x80` より 0x20 ~ 0x80 の 7 種類を使います。
+
+また `malloc_consolidation()` で fastbins を統合し、unsortedbin に link するのですが、 `have_fastchunks` で fastbins 内にチャンクが入っているかどうかの bool 値を書き込むことで高速化しています。
 
 ```c
 #define DEFAULT_MXFAST     (64 * SIZE_SZ / 4)
@@ -282,15 +288,9 @@ malloc_init_state (mstate av)
 ### bins
 bins は free list の中で双方向リスト (unsortedbin / smallbins / largebins) を扱う bin の先頭・末尾を格納する配列です。
 
-全部で 128 個の bins があって、あるサイズ範囲ごとに保持されています。実際上、小さいほど頻繁に、大きいほど稀に malloc されることが知られている為、サイズが大きくなるに連れて指数的に間隔を大きくすることで効率的に管理することができます。
-
-largebins はサイズ順に保持され、smallbins はすべて同じサイズのチャンクなので順序付けしなくても最適に割り当てられます。
-
-また bins において連結してから挿入される為、チャンクリスト内のチャンク同士は物理的に接しないという性質を持っています。
+全部で 128 個の bins があって、あるサイズ範囲ごとに保持されています。事実、小さいほど頻繁に、大きいほど稀に malloc されることが知られている為、サイズが大きくなるに連れて指数的に間隔を大きくすることで効率的に管理することができます。比較的小さいチャンクは smallbins に挿入されます。smallbins は 1 つの bin が扱うチャンクサイズは 1 通りだけになっていて、just-fit で割り当てられます。一方比較的大きなチャンクは largebins に挿入されます。largebins は 1 つの bin が扱うチャンクサイズは複数あり、サイズ順にソートされています。
 
 同じサイズのチャンクは、最近解放されたものを先頭にリンクされ、割り当ては後ろから行われます。 この結果、LRU (FIFO) 割り当て順となり、各チャンクに隣接する解放されたチャンクと連結される機会が均等に与えられる傾向があるため、空きチャンクが大きくなり、断片化が少なくなります。
-
-ここにも 1 つトリックがあり、各 bin の先頭・末尾のスライスを `malloc_chunk` として捉えることで `fd` `bk` として扱えてリンクのアクセスがより簡単にできます。
 
 ```c
 typedef struct malloc_chunk *mbinptr;
@@ -398,6 +398,8 @@ typedef struct malloc_chunk *mbinptr;
 
 ちなみにパフォーマンスを上げる為に指数的に間隔が上昇せず、境界は綺麗に分けられてません。
 
+各 bin の先頭・末尾のスライスを `malloc_chunk` として捉えることで `fd` `bk` と扱えてリスト構造を一般的に管理できます。
+
 ### binmap
 
 `malloc()` において `arena->bins` にある大量の bin の検索を補う為に各 bin が空であるかどうかを記録されているビットベクタです。binmap 中の 1 ビットが 1 bin を指し、その bin にチャンクがあればフラグが立ち、空になるとクリアされます。注意としてこのビットはビンが空になってすぐクリアされるのではなく、`malloc` での探索中にビンが空であることに気付いた時にクリアされます。
@@ -422,8 +424,6 @@ typedef struct malloc_chunk *mbinptr;
 ### tcache bins
 
 glibc v2.26 以降に追加された bin です。参照局所性を高める為に `malloc()` `free()` で一番最初に処理されるのが tcache bins です。tcache bins はチャンクサイズが 0x20 から 0x410 までの 64 種類の tcache bin を持ち、それぞれ単方向リストとなっています。リストの長さは 7 個に制限されていて tcache が満杯になると他の bins に移されます。サイズごとに分けられているので just-fit で返せます。
-
-整合性チェックとしては
 
 ![](/images/pwn/tcache.png =480x)
 
