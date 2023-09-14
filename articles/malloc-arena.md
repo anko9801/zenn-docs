@@ -72,19 +72,14 @@ static struct malloc_state main_arena =
 ### top
 top chunk とは最上位つまり終端に置かれた特別なチャンクでどの bin にも含まれていません。
 
-これは `malloc()` では他に割り当てられるチャンクがない場合にのみ切り出され、top chunk が肥大化した場合は `free()` 時に OS に返されます。top chunk は最初、`initiali_top` と呼ばれるサイズがゼロの bin を指しているので、最初の `malloc()` で拡張します。
+これは `malloc()` では他に割り当てられるチャンクがない場合にのみ切り出され、top chunk が肥大化した場合は `free()` 時に自動的に OS に返されます。top chunk は最初 `initiali_top` と呼ばれるサイズがゼロの bin を指しているので `malloc()` を呼ぶことで `sbrk()` が呼ばれてヒープ領域が拡張され、top chunk も拡張されます。
+
+ptmalloc_init () or from _int_new_arena ()
 
 ```c
 /* Conveniently, the unsorted bin can be used as dummy top on first call */
 #define initial_top(M)              (unsorted_chunks (M))
-```
 
-### last_remainder
-smallbins / largebins においてチャンクの分割を行ったときに残りのチャンク (remainder) を `last_remainder` に格納します。ただし残りが smallbins の大きさとなったチャンクしか扱わない。
-
-
-ptmalloc_init () or from _int_new_arena () から呼ばれる
-```c
 static void
 malloc_init_state (mstate av)
 {
@@ -110,22 +105,8 @@ malloc_init_state (mstate av)
 }
 ```
 
-### マルチスレッド
-アリーナは `mutex` を用いてロックし、複数のスレッドがメモリプールを共有することができます。
-
-ただし、あるスレッドがチャンクを確保しようとしたときに `main_arena` がロックされていた場合、`mmap()` で新たなヒープ領域を作ります。それで得られたヒープ領域では先頭に管理情報の実体 `heap_info` と管理部の実体 `malloc_state` を置き、各アリーナの管理部 `malloc_state` は `next` によって単方向リストが作られます。そしてスレッドが終了したときは `next_free` に繋がれます。
-
-```c
-typedef struct _heap_info
-{
-  mstate ar_ptr;            // このヒープのアリーナへのポインタ
-  struct _heap_info *prev;  // 前のヒープ
-  size_t size;              // アリーナのバイト数
-  size_t mprotect_size;     // PROT_READ|PROT_WRITE で mprotect されたバイト数
-  size_t pagesize;          // ページサイズ
-  char pad[-3 * SIZE_SZ & MALLOC_ALIGN_MASK]; // メモリ境界を揃える為のパディング
-} heap_info;
-```
+### last_remainder
+smallbins / largebins / last_remainder においてチャンクの分割を行ったときの残りのチャンク (remainder) を `last_remainder` に格納して参照局所性を活かします。ただし残りが smallbins の大きさとなったチャンクしか扱いません。
 
 ### sbrk / mmap
 
@@ -134,7 +115,29 @@ typedef struct _heap_info
   INTERNAL_SIZE_T max_system_mem;   // system_mem の最大値
 ```
 
-## その他のパラメータ
+### マルチスレッド
+アリーナは `mutex` を用いてロックし、複数のスレッドがメモリプールを共有することができます。
+
+ただし、あるスレッドがチャンクを確保しようとしたときに `main_arena` がロックされていた場合、`mmap()` で新たなヒープ領域を作ります。この為、最終的にヒープ領域の数はスレッド数くらいに落ち着きます。
+
+`mmap()` で得られたヒープ領域では先頭に管理情報の実体 `heap_info` と管理部の実体 `malloc_state` を置き、各ヒープ領域は `malloc_state.next` `_heap_info.prev` によって双方向リストが作られます。そしてスレッドが終了したときには `next_free` に繋がれます。ちなみに `main_arena` では `heap_info` に相当するものはありません。
+
+```c
+typedef struct _heap_info
+{
+  mstate ar_ptr;            // このヒープ領域のアリーナへのポインタ
+  struct _heap_info *prev;  // 前のヒープ領域
+  size_t size;              // アリーナのバイト数
+  size_t mprotect_size;     // PROT_READ|PROT_WRITE で mprotect されたバイト数
+  size_t pagesize;          // ページサイズ
+  char pad[-3 * SIZE_SZ & MALLOC_ALIGN_MASK]; // メモリ境界を揃える為のパディング
+} heap_info;
+```
+
+また `mmap()` で得られたヒープ領域は 1MB でアラインされているため、どんなチャンクのアドレスでも先頭 5 nibbles をクリアすることで `_heap_info` `malloc_state` を見つけてアリーナの管理部にアクセスできます。ちなみに `main_arena` のチャンクはそれは出来ず、直接アクセスする他ありません。チャンクにこの違いを教える為にチャンクには `NON_MAIN_ARENA` というフラグがあるという訳です。
+
+### アリーナのパラメータ
+アリーナに関するパラメータは `malloc_par` 構造体に書かれてあります。
 
 ```c
 struct malloc_par
@@ -189,4 +192,6 @@ static struct malloc_par mp_ =
 ```
 
 ## まとめ
+チャンクから始まり bins、アリーナまで紹介しました。これで malloc に関しては完璧なんじゃないでしょうか。
 
+これで malloc.c の読書は一旦終わりです。気が向いたら詳細についてや他の malloc 関数についても紹介したいと思います。
