@@ -607,6 +607,7 @@ LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA
     0x7ffff7ffb000     0x7ffff7ffd000 r--p     2000 37000  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
     0x7ffff7ffd000     0x7ffff7fff000 rw-p     2000 39000  /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
     0x7ffffffdd000     0x7ffffffff000 rw-p    22000 0      [stack]
+
 pwndbg> heap
 Allocated chunk | PREV_INUSE
 Addr: 0x555555559000
@@ -620,6 +621,7 @@ fd: 0x555555559
 Allocated chunk | PREV_INUSE
 Addr: 0x5555555592b0
 Size: 0x21
+
 pwndbg> arena
 {
   mutex = 0,
@@ -636,6 +638,7 @@ pwndbg> arena
   system_mem = 135168,
   max_system_mem = 135168
 }
+
 pwndbg> bins
 tcachebins
 0x20 [  1]: 0x5555555592a0 ◂— 0x0
@@ -653,6 +656,7 @@ smallbins
 empty
 largebins
 empty
+
 pwndbg> fastbins
 fastbins
 0x20: 0x0
@@ -662,27 +666,34 @@ fastbins
 0x60: 0x0
 0x70: 0x0
 0x80: 0x0
+
 pwndbg> tcachebins
 tcachebins
 0x20 [  1]: 0x5555555592a0 ◂— 0x0
+
 pwndbg> unsortedbin
 unsortedbin
 all: 0x0
+
 pwndbg> smallbins
 smallbins
 empty
+
 pwndbg> largebins
 largebins
 empty
+
 pwndbg> tcache
 {
   counts = {1, 0 <repeats 63 times>},
   entries = {0x5555555592a0, 0x0 <repeats 63 times>}
 }
+
 pwndbg> top_chunk
 Top chunk
 Addr: 0x555555559390
 Size: 0x20c71
+
 pwndbg> try_free <address>
 pwndbg> malloc_chunk <address>
 ```
