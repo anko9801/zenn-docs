@@ -104,7 +104,7 @@ malloc_init_state (mstate av)
 ```
 
 ### last_remainder
-smallbins / largebins / last_remainder においてチャンクの分割を行ったときの残りのチャンク (remainder) を `last_remainder` に格納して参照局所性を活かします。ただし残りが smallbins の大きさとなったチャンクしか扱いません。
+smallbins / largebins / last_remainder においてチャンクの分割を行ったときの残りのチャンク (remainder) を unsortedbin に入れるのと同時に `last_remainder` に格納することで参照局所性を活かします。ただし残りが smallbins の大きさとなったチャンクしか扱いません。
 
 ### マルチスレッド
 アリーナは `mutex` を用いてロックし、複数のスレッドがメモリプールを共有することができます。
