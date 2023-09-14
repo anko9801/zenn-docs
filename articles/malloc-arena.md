@@ -3,7 +3,7 @@ title: "malloc.c を読む (arena)"
 emoji: "🐷"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["CTF", "pwn", "Linux"]
-published: false
+published: true
 ---
 
 `malloc()` は動的にメモリを確保して `free()` で開放してくれます。
@@ -105,13 +105,6 @@ malloc_init_state (mstate av)
 
 ### last_remainder
 smallbins / largebins / last_remainder においてチャンクの分割を行ったときの残りのチャンク (remainder) を `last_remainder` に格納して参照局所性を活かします。ただし残りが smallbins の大きさとなったチャンクしか扱いません。
-
-### sbrk / mmap
-
-```c
-  INTERNAL_SIZE_T system_mem;       // arena によって現在確保されているメモリの合計値
-  INTERNAL_SIZE_T max_system_mem;   // system_mem の最大値
-```
 
 ### マルチスレッド
 アリーナは `mutex` を用いてロックし、複数のスレッドがメモリプールを共有することができます。
