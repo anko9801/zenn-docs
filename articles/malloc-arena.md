@@ -66,14 +66,14 @@ static struct malloc_state main_arena =
 
 ## 各フィールドに関連する処理
 ### flags
-アリーナの状態に関するフラグです。使うビットは `NONCONTIGUOS_BIT == 2` の 1 つだけだと思います。これは `MORECORE` したときに連続した領域を返すことを保証しないことを表すフラグです。そうでないとき可能な限り連続性が利用される。初期値は `MORECORE_CONTIGUOUS` から書き込まれ、mmap で拡張するとフラグが立ちます。
+アリーナの状態に関するフラグです。使うビットは `NONCONTIGUOS_BIT == 2` の 1 つだけだと思います。これは `MORECORE` したときに連続した領域を返すことを保証しないことを表すフラグです。フラグがクリアされているときは連続性をとことん利用して top chunk を大きくします。初期値は `MORECORE_CONTIGUOUS` から書き込まれ、mmap で拡張するとフラグが立ちます。
 
 ちなみにこのフィールドは前に `max_fast` として、各アリーナにおける fastbins が扱うチャンクサイズのパラメータに使われていました。
 
 ### top
 top chunk とは最上位つまり終端に置かれた特別なチャンクでどの bin にも含まれていません。
 
-`malloc()` では他に割り当てられるチャンクがない場合にのみ切り出され、`free()` で top chunk が肥大化した場合は OS に返されます。top chunk は最初、`initiali_top` と呼ばれるサイズがゼロの bin を指しているので、最初の `malloc()` で拡張します。
+これは `malloc()` では他に割り当てられるチャンクがない場合にのみ切り出され、top chunk が肥大化した場合は `free()` 時に OS に返されます。top chunk は最初、`initiali_top` と呼ばれるサイズがゼロの bin を指しているので、最初の `malloc()` で拡張します。
 
 ```c
 /* Conveniently, the unsorted bin can be used as dummy top on first call */
