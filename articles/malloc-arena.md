@@ -17,6 +17,7 @@ void free(void *ptr);
 
 - [malloc.c を読む (malloc / free)](https://zenn.dev/anko/articles/malloc-malloc-free)
 - [malloc.c を読む (bins)](https://zenn.dev/anko/articles/malloc-each-bins)
+- [malloc.c を読む (arena)](https://zenn.dev/anko/articles/malloc-arena)
 
 今回はアリーナの処理を中心に調べていきます。
 

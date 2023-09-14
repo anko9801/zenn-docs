@@ -17,6 +17,7 @@ void free(void *ptr);
 
 - [malloc.c を読む (malloc / free)](https://zenn.dev/anko/articles/malloc-malloc-free)
 - [malloc.c を読む (bins)](https://zenn.dev/anko/articles/malloc-each-bins)
+- [malloc.c を読む (arena)](https://zenn.dev/anko/articles/malloc-arena)
 
 前回全体像を把握しましたが今回は各 bins の処理を中心に調べていきます。
 
