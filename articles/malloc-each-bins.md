@@ -575,8 +575,7 @@ glibc-2.11 以降では `fd->bk` `bk->fd` がチャンク自身を指すとい�
 | 0x28000 ~ 0xBFFF0 | 160KB 以上 768KB 未満 | 0x40000 | 2 | 124 ~ 125 |
 | 0xC0000 ~  | 768KB 以上 | infinity | 1 | 126 |
 
-glibc-2.3.4 以降では `fd->bk` `bk->fd` がチャンク自身を指すという整合性がチェックされています。
-また `nextsize` の仕組みは glibc-2.6 で導入されていて `fd_nextsize->bk_nextsize` `bk_nextsize->fd_nextsize` がチャンク自身を指すという整合性がチェックされています。
+glibc-2.3.4 以降では `fd->bk` `bk->fd` がチャンク自身を指すという整合性がチェックされています。また `nextsize` の仕組みは glibc-2.6 で導入されていて `fd_nextsize->bk_nextsize` `bk_nextsize->fd_nextsize` がチャンク自身を指すという整合性がチェックされています。
 
 ![](/images/pwn/largebin.png =480x)
 
