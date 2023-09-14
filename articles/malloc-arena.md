@@ -115,29 +115,23 @@ malloc_init_state (mstate av)
 
 ただし、あるスレッドがチャンクを確保しようとしたときに `main_arena` がロックされていた場合、`mmap()` で新たなヒープ領域を作ります。それで得られたヒープ領域では先頭に管理情報の実体 `heap_info` と管理部の実体 `malloc_state` を置き、各アリーナの管理部 `malloc_state` は `next` によって単方向リストが作られます。そしてスレッドが終了したときは `next_free` に繋がれます。
 
+```c
+typedef struct _heap_info
+{
+  mstate ar_ptr;            // このヒープのアリーナへのポインタ
+  struct _heap_info *prev;  // 前のヒープ
+  size_t size;              // アリーナのバイト数
+  size_t mprotect_size;     // PROT_READ|PROT_WRITE で mprotect されたバイト数
+  size_t pagesize;          // ページサイズ
+  char pad[-3 * SIZE_SZ & MALLOC_ALIGN_MASK]; // メモリ境界を揃える為のパディング
+} heap_info;
+```
+
 ### sbrk / mmap
 
 ```c
   INTERNAL_SIZE_T system_mem;       // arena によって現在確保されているメモリの合計値
   INTERNAL_SIZE_T max_system_mem;   // system_mem の最大値
-```
-
-### heap_info
-
-```c
-typedef struct _heap_info
-{
-  mstate ar_ptr;           // このヒープのアリーナへのポインタ
-  struct _heap_info *prev; // 前のヒープ
-  size_t size;   /* Current size in bytes. */
-  size_t mprotect_size; /* Size in bytes that has been mprotected
-                           PROT_READ|PROT_WRITE.  */
-  size_t pagesize; /* Page size used when allocating the arena.  */
-  /* Make sure the following data is properly aligned, particularly
-     that sizeof (heap_info) + 2 * SIZE_SZ is a multiple of
-     MALLOC_ALIGNMENT. */
-  char pad[-3 * SIZE_SZ & MALLOC_ALIGN_MASK];
-} heap_info;
 ```
 
 ## その他のパラメータ
