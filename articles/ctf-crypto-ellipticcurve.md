@@ -680,87 +680,62 @@ def SingularNode(a, b, p):
 ### Anomalous な曲線を用いてはいけない (SSSA Attack)
 Anomalous な曲線とは $E/\mathbb{F}_p$ の位数が $p$ となる楕円曲線です。これには SSSA (Semaev-Smart-Satoh-Araki) Attack という攻撃が通ります。
 
-$\pi: \mathbb{P}^2(\mathbb{Q}_p)\to\mathbb{P}^2(\mathbb{F}_p)$ を還元写像 (reduction map) は $E(\mathbb{Q}_p)\to E(\mathbb{F}_p)$ の群準同型写像となる。 $E$ の形式群 $\mathcal{E}$ の形式対数 $\log_{\mathcal{E}}$ とします。
+楕円曲線は射影空間の部分空間 $E\subseteq\mathbb{P}^2$ となっているので還元写像 (reduction map) $\pi:E(\mathbb{Q}_p)\to E(\mathbb{F}_p)$ とその逆写像 $u: E(\mathbb{F}_p)\to E(\mathbb{Q}_p)$ が与えられ、これらは準同型となる。また $E$ の形式群 $\mathcal{E}$ の形式対数を $\log_{\mathcal{E}}$ とおきます。
 
 $$
 \begin{aligned}
-\pi &: \mathbb{P}^2(\mathbb{Q}_p)\to\mathbb{P}^2(\mathbb{F}_p) \\
-u &: E(\mathbb{F}_p)\to E(\mathbb{Q}_p) \\
 \psi &: (x:y:z) \mapsto \frac{x}{y} \\
 \lambda_E &: E(\mathbb{F}_p)\xrightarrow{u}E(\mathbb{Q}_p)\xrightarrow{\times p}\ker\pi\xrightarrow{\log_{\mathcal{E}}}p\mathbb{Z}_p\xrightarrow{\bmod{p^2}} p\mathbb{Z}_p/p^2\mathbb{Z}_p\cong \mathbb{F}_p
 \end{aligned}
 $$
 
-> **Prop.**
-> $\alpha\in E(\mathbb{F}_p)\setminus\mathcal{O}$ として $\pi(A) = \alpha$ を満たす点 $A\in E(\mathbb{Z}_p)$ とする。 $nA \neq \mathcal{O}$ となる $n\in\mathbb{N}$ に対して $nA = (x_n, y_n)$ とする。
-> 1. $1\leq n<p \implies nA\in E(\mathbb{Z}_p)\setminus\mathcal{O}$
-> 2. $1\leq n<m<p$ かつ $n + m \neq p\implies x_n \neq x_m \pmod{p}$
-> 3. $\lambda_E$ が零写像でなければ
+$\lambda_E$ が零写像でないときを考える。
+
+$$
+\pi: E(\mathbb{Q}_p)\ni A\mapsto P\in E(\mathbb{F}_p)\setminus\mathcal{O}
+$$
+
+$nA = (X_n, Y_n)$ と置く。 $n\pm m \neq 0 \pmod{p}$ のとき
+
+$$
+X_n = X_m \implies \pi(nA) = \pm \pi(mA) \iff (n\pm m) P = \mathcal{O} \iff P = \mathcal{O}
+$$
+
+と矛盾するので $X_n\neq X_m$ である。これより $n \neq 0 \pmod{p}$ ならば $nA \neq \mathcal{O}$ となる。
+
+$n = 1$ のとき $A\in E(\mathbb{Z}_p)$ である。
+$n = 2$ のとき $y_1\in\mathbb{Z}_p^\times$ より次のようになる。
+
+$$
+  2A = \left(\left(\frac{3X_1^2 + a_4}{2Y_1}\right)^2 - 2X_1, -\left(\frac{3X_1^2 + a_4}{2Y_1}\right)X_2 - \frac{-X_1^3 + a_4X_1 + 2a_6}{2Y_1}\right)\in E(\mathbb{Z}_p)
+$$
+
+$2<n<p$ のとき $x_{n-1} \neq x_1$ より $x_{n-1} - x_1 \in\mathbb{Z}_p^\times$ であるから次のようになる。
+
+$$
+\begin{aligned}
+  nA & = (c_n^2 - x_1 - x_{n-1}, -c_n^3 + c_n(x_1 + x_{n-1}) - (y_1 - x_1c_n))\in E(\mathbb{Z}_p) \\
+  c_n & = \frac{y_{n-1} - y_1}{x_{n-1} - x_1}
+\end{aligned}
+$$
+
+$n = p$ のときもし $nA = \mathcal{O}$ であれば
+
+$$
+\lambda_E(P) = (\bmod{p^2})\circ\log_{\mathcal{E}}\circ\psi(\mathcal{O}) = 0
+$$
+
+より $\lambda_E$ が零写像でないことに矛盾する。よって $pA \neq \mathcal{O}$ である。
+
+> **Thm.**
 >
 > $$
-y_{p-1} - y_1, \frac{x_{p-1} - x_1}{p}\in\mathbb{Z}_p^\times \\
-\lambda_E(\alpha) = - \frac{x_{p-1} - x_1}{p(y_{p-1} - y_1)} \pmod{p}
-$$
-
-1. 楕円曲線 $E(\mathbb{F}_p)$ が anomalous であるから $nA \neq \mathcal{O}$ である。次に $nA\in E(\mathbb{Z}_p)$ を数学的帰納法で示す。
-$n = 1$ のとき仮定の一部である。
-$n = 2$ のとき $y_1 \neq 0 \pmod{p}$ より $y_1\in\mathbb{Z}_p^\times$ であるから $2A\in E(\mathbb{Z}_p)$ である。
-
-$$
-\begin{aligned}
-  2A & = (x_2, y_2) = (c_2^2 - 2x_1, -c_2x_2 - d_2) \\
-  c_2 & = \frac{3x_1^2 + a_4}{2y_1}, d_2 = \frac{-x_1^3 + a_4x_1 + 2a_6}{2y_1}
-\end{aligned}
-$$
-
-$2<n<p$ のとき $x_{n-1} = x_1 \pmod{p}$ を仮定すると
-
-$$
-\begin{aligned}
-& \pi(A) = \pm\pi((n-1)A) \\
-\iff & (n - 1 \pm 1)\alpha = \mathcal{O} \\
-\implies & \alpha = \mathcal{O}
-\end{aligned}
-$$
-
-より矛盾する。$x_{n-1} \neq x_1 \pmod{p}$ より $x_{n-1} - x_1 \in\mathbb{Z}_p^\times$ であるから $nA\in E(\mathbb{Z}_p)$ である。
-
-$$
-\begin{aligned}
-  nA & = (x_n, y_n) = (c_n^2 - x_1 - x_{n-1}, -c_n^3 + c_n(x_1 + x_{n-1}) - d_n) \\
-  c_n & = \frac{y_{n-1} - y_1}{x_{n-1} - x_1}, d_n = y_1 - x_1c_n
-\end{aligned}
-$$
-$\Box$
-
-2. $x_n = x_m \pmod{p}$ と仮定すると 1 より $nA, mA\in E(\mathbb{Z}_p)\setminus\mathcal{O}$ であるから
-
-$$
-\begin{aligned}
-& \pi(nA) = \pm\pi(mA) \\
-\iff & (m\pm n)\alpha = \mathcal{O} \\
-\implies & \alpha = \mathcal{O}
-\end{aligned}
-$$
-
-より矛盾。
-
-3.
-もし $pA = \mathcal{O}$ であれば
-
-$$
-\lambda_E(\alpha) = (\bmod{p^2})\circ\log_{\mathcal{E}}\circ\psi(\mathcal{O}) = 0
-$$
-
-より $\lambda_E$ が零写像でないことに矛盾するので $pA \neq \mathcal{O}$ である。
-$\pi(pA) = \mathcal{O}$
-
-$A\in E(\mathbb{Z}/p^2\mathbb{Z})$ 写像 $\pi(A) = P$ となる
-$X_{p-1} \neq X_1$ なら
-
-$$
+Y_{p-1} - Y_1, \frac{X_{p-1} - X_1}{p}\in\mathbb{Z}_p^\times \\
 \lambda_E(P) = \frac{X_{p-1} - X_1}{p(Y_{p-1} - Y_1)}\pmod p
 $$
+
+$A\in E(\mathbb{Z}/p^2\mathbb{Z})$ となる
+$X_{p-1} \neq X_1$ なら
 
 ```python
 def hensel_lift(P):
