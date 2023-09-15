@@ -3,7 +3,7 @@ title: "【CTF 探訪記】楕円曲線暗号への攻撃"
 emoji: "✨"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["CTF", "crypto"]
-published: false
+published: true
 ---
 
 それで今回紹介するのは次のような内容です。
@@ -13,7 +13,7 @@ published: false
 - 超楕円曲線暗号の紹介
 - 超特異同種写像暗号の実装と攻撃
 
-楕円曲線の理論は本来、群環体、ガロア理論、可換環論、ホモロジー代数、代数幾何学と理解した先で学習します。私も楕円曲線暗号がわからなくて輪読会を生やして、最初は群環体から勉強していって 1 年以上掛けて紆余曲折しながらやっとここまで理解できるようになりました。ただ同じ道を歩ませたいという気持ちはあまりなくて、雰囲気で楕円曲線をより理解を深めてほしいという気持ちで書いています。でも運がよければ楕円曲線を勉強したいと思う人が一人でも増えてくれたらと思います。一番基礎となる群論などの部分は計算機代数の章で紹介しましたので、とりあえずそこだけは読んで頂きたいです。
+楕円曲線の理論は本来、群環体、ガロア理論、可換環論、ホモロジー代数、代数幾何学と理解した先で学習します。私も楕円曲線暗号がわからなくて輪読会を生やして、最初は群環体から勉強していって 1 年以上掛けて紆余曲折しながらやっとここまで理解できるようになりました。ただ同じ道を歩ませたいという気持ちはあまりなくて、雰囲気で楕円曲線をより理解を深めてほしいという気持ちで書いています。でも運がよければ楕円曲線を勉強したいと思う人が一人でも増えてくれたらと思います。といっても群論くらいは分かっていて欲しいです。
 
 ## 楕円曲線
 高校のときに習ったと思いますが、グラフで半径 1 の円といえば次のような式で表されました。
@@ -390,25 +390,17 @@ $$
 
 ### Pollard's rho 法
 
-$\rho$ 法は文字 $\rho$ の形が由来となっていて、まず、ある点を決めます。そして疑似ランダム関数 $f$ にその点を入れると次の点が出ます。今まで出た点と衝突したらDLPが解けるという仕組みです。
+$\rho$ 法は文字 $\rho$ の形が由来となっていて、まず、ある点を決めます。そして疑似ランダム関数 $f$ にその点を入れると次の点が出ます。今まで出た点と衝突したら DLP が解けるという仕組みです。
 
-$X_i$ の $P$ に関する対数を初期値から $a_i\in\mathbb{Z}/N\mathbb{Z}[d]$ で計算し、$X_i = X_j$ ならば $a_i = a_j$ であるから $d$ が求まる。
+各点の係数を $a_i\in\mathbb{Z}/N\mathbb{Z}[d]$ とすると初期値 $a_0 = 1$ から計算して $a_iP = a_jP$ ならば $a_i = a_j$ であるから $d$ が求まります。
 
 $$
 \begin{aligned}
-f(X) &=
+f(a_iP) &=
 \begin{cases}
-Q + X = dP + X & (X \in P_1 \rm{のとき}) \\
-2X & (X \in P_2 \rm{のとき})\\
-P + X & (X \in P_3 \rm{のとき})\\
-\end{cases} \\
-X_0 & = a_0P \\
-X_{i+1} &= f(X_i) \\
-a_{i+1} &=
-\begin{cases}
-a_i + d & (x \in G_1 \rm{のとき}) \\
-2a_i & (x \in G_2 \rm{のとき})\\
-a_i + 1 & (x \in G_3 \rm{のとき})\\
+Q + a_iP = (a_i + d)P & (a_iP \in G_1) \\
+2(a_iP) = 2a_iP & (a_iP \in G_2)\\
+P + a_iP = (a_i + 1)P & (a_iP \in G_3)
 \end{cases}
 \end{aligned}
 $$
@@ -420,7 +412,7 @@ $$
 中国剰余定理を用いて大きな群を複数の小さな群の直積に分けます。楕円曲線暗号の楕円曲線の位数は細かく素因数分解できることが多いので RSA とかと違って実用的な手法になります。
 
 > **Pohlig-Hellman**
-> 楕円曲線の位数が $\#E = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ と素因数分解できるとき $\mathcal{O}(\sum_ie_i\sqrt{p_i})$ で ECDLP が解ける。
+> 楕円曲線の位数が $\#E = p_1^{e_1}p_2^{e_2}\ldots p_k^{e_k}$ と素因数分解できるとき $\mathcal{O}\left(e_i\sqrt{p_i}\right)$ で ECDLP が解ける。
 
 $Q = dP$ に対して次のように $d_i$ を定義する。
 
@@ -460,27 +452,27 @@ def pohlig_hellman(G):
 ```
 
 ### 指数計算法 (Index Calculus Algorithm)
-Index Calculus Algorithm は次のように抽象化されます。
+楕円曲線上の DLP を Index Calculus Algorithm で解く試みは歴史が長く、以下のようなことがありました。
 
-> **Index Calculus Algorithm**
-> 巡回群 $G\subseteq \langle P\rangle\subseteq E$ $Q = dP$
-> 1. 因子基底 (Factor Base) $\mathcal{F}\subseteq G$ を決定する。
-> 2. $R_j = a_jP + b_jQ$ 分解する。
->
-> $$
-R_j = a_jP + b_jQ = \sum_{P_i\in\mathcal{F}}e_{ij}P_i
-$$
+| 手法 | 著者 | 説明 |
+| --- | --- | --- |
+| Index Calculus | 1991: Adleman-DeMarrais-Huang<br>1997: Gaudry | 超楕円曲線上の DLP を Index Calculus Algorithm で解く |
+| Weil descent | 1998: Frey | $\mathbb{F}_{p^n}$ 上の楕円曲線の DLP を $\mathbb{F}_p$ 上の超楕円曲線の DLP に置き換えて Index Calculus を用いる |
+| Generalized Weil descent | 2004: Gaudry<br>2007: Nagao | $\mathbb{F}_{p^n}$ 上の楕円曲線の DLP に直接 Index Calculus Algorithm を適用する |
 
-種数が大きい超楕円曲線上の ECDLP では Index Calculus Algorithm を応用することができます。超楕円曲線は後で解説しますが、楕円曲線の $x$ に関する式が 3 次方程式だったのに対し、一般の奇数次数の方程式となるものです。
+ここでは Gaudry の Generalized Weil descent を紹介しようと思います。
+$E/\mathbb{F}_{p^3}$ の $y^2 = x^3 + ax + b$ $a\in\mathbb{F}_p, b\in\mathbb{F}_{p^3}$ を解くことを考える。
 
-$B$ 以下の素数に代えて、
-
-> **Gaudry のアルゴリズム**
+> **Gaudry's algorithm**
+> 巡回群 $G\subseteq \langle P\rangle\subseteq E$
+> 1. 因子基底 $B$
 > 次数 $s$ 以下の多項式の因子基底をいくつか用意して Mumford 表現に現れる多項式 $U$ が因子基底の要素に分解される場合に対して
 >
 > $$
 B = \lbrace P_j\in C(\mathbb{F}_p)\setminus P_\infty\mid X(P_j)\neq X(P_i), i \neq j\rbrace
 $$
+
+種数が大きい超楕円曲線上の ECDLP では Index Calculus Algorithm を応用することができます。超楕円曲線は後で解説しますが、楕円曲線の $x$ に関する式が 3 次方程式だったのに対し、一般の奇数次数の方程式となるものです。
 
 $$
 \begin{aligned}
@@ -509,7 +501,10 @@ $$
 
 この計算量は $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$ と知られています。
 
-### GHS-Weil descent 攻撃
+1998 年に Frey が Weil descent
+
+2004 年に Gaudry のアルゴリズム、2007 年に Nagao のアルゴリズム
+
 楕円曲線の $\mathbb{F}_{p^k}$ 有理点群 $E(\mathbb{F}_{p^k})$ を種数 $g\geq k$ の代数曲線 $C$ の Jacobian の有理点群 $\mathcal{J}_C(\mathbb{F}_p)$ に埋め込み、 $\mathcal{J}_C(\mathbb{F}_p)$ 上で Gaudry アルゴリズムで解く
 
 GHS (Gaudry Hess Smart)
@@ -1195,8 +1190,6 @@ $$
 - [楕円曲線上の離散対数問題に関する指数計算法](https://www.cryptrec.go.jp/exreport/cryptrec-ex-2602-2016.pdf)
 - [Fermat Quotient と Anomalous 楕円曲線の離散対数の多項式時間解法アルゴリズムについて(代数的整数論とその周辺)](https://repository.kulib.kyoto-u.ac.jp/dspace/bitstream/2433/61761/1/1026-15.pdf)
 - [ECFFT1.pdf (toronto.edu)](https://www.math.toronto.edu/swastik/ECFFT1.pdf)
-
-この資料は CC0 ライセンスです。
 
 ## 楕円関数と楕円曲線と楕円積分の関係
 
