@@ -375,7 +375,7 @@ flowchart LR
 ```
 ### Baby-step Giant-step
 
-楕円曲線 $E$ について $m = \lceil \sqrt{\#P} \rceil$ として $d$ を $m$ で割ると $d = qm + r$ となるから集合 $B, G$ を作り、両方の元が一致したときに $d = qm + r$ とすることで DLP の解が求まります。
+楕円曲線 $E$ について $N = \#P, m = \lceil \sqrt{N} \rceil$ として $d$ を $m$ で割ると $d = qm + r$ となるから集合 $B, G$ を作り、両方の元が一致したときに $d = qm + r$ とすることで DLP の解が求まります。
 
 $$
 \begin{aligned}
@@ -386,7 +386,7 @@ G &= \{ qmP \mid 0 \leq q < m \}
 \end{aligned}
 $$
 
-これより計算量は位数 $n$ を用いて $O(\sqrt{n}\log n)$ メモリ空間は $O(\sqrt{n})$ だけ必要となります。
+これより計算量は $O(\sqrt{N}\log N)$ メモリ空間は $O(\sqrt{N})$ だけ必要となります。
 
 ### Pollard's rho 法
 
@@ -405,7 +405,7 @@ P + a_iP = (a_i + 1)P & (a_iP \in G_3)
 \end{aligned}
 $$
 
-これは誕生日のパラドックスによって $O(\sqrt{N})$ で求まる。
+これは誕生日のパラドックスによって $O(\sqrt{N})$ で求まります。
 
 ### Pohlig-Hellman
 
@@ -456,58 +456,84 @@ def pohlig_hellman(G):
 
 | 手法 | 著者 | 説明 |
 | --- | --- | --- |
-| Index Calculus | 1991: Adleman-DeMarrais-Huang<br>1997: Gaudry | 超楕円曲線上の DLP を Index Calculus Algorithm で解く |
+| Index Calculus | 1991: Adleman-DeMarrais-Huang<br>1997: Gaudry | 種数の大きい超楕円曲線上の DLP を Index Calculus Algorithm で解く |
 | Weil descent | 1998: Frey | $\mathbb{F}_{p^n}$ 上の楕円曲線の DLP を $\mathbb{F}_p$ 上の超楕円曲線の DLP に置き換えて Index Calculus を用いる |
-| Generalized Weil descent | 2004: Gaudry<br>2007: Nagao | $\mathbb{F}_{p^n}$ 上の楕円曲線の DLP に直接 Index Calculus Algorithm を適用する |
+| Generalized Weil descent | 2004: Gaudry-Hess-Smart<br>2007: Nagao | $\mathbb{F}_{p^n}$ 上の楕円曲線の DLP に直接 Index Calculus Algorithm を適用する |
 
-ここでは Gaudry の Generalized Weil descent を紹介しようと思います。
-$E/\mathbb{F}_{p^3}$ の $y^2 = x^3 + ax + b$ $a\in\mathbb{F}_p, b\in\mathbb{F}_{p^3}$ を解くことを考える。
+ここでは Generalized Weil descent を紹介しようと思います。
 
-> **Gaudry's algorithm**
-> 巡回群 $G\subseteq \langle P\rangle\subseteq E$
-> 1. 因子基底 $B$
-> 次数 $s$ 以下の多項式の因子基底をいくつか用意して Mumford 表現に現れる多項式 $U$ が因子基底の要素に分解される場合に対して
+> **Index Calculus Algorithm**
+> 1. 因子基底 $B = \lbrace P\in E(\mathbb{F}_{p^k})\mid P_x\in\mathbb{F}_p\rbrace = \lbrace B_1,\ldots,B_n\rbrace$ を作る。
+> 2. 次の関係式を与える。
 >
 > $$
-B = \lbrace P_j\in C(\mathbb{F}_p)\setminus P_\infty\mid X(P_j)\neq X(P_i), i \neq j\rbrace
+r_iP = \sum_{j=1}^n e_{ij}B_j
 $$
-
-種数が大きい超楕円曲線上の ECDLP では Index Calculus Algorithm を応用することができます。超楕円曲線は後で解説しますが、楕円曲線の $x$ に関する式が 3 次方程式だったのに対し、一般の奇数次数の方程式となるものです。
-
-$$
-\begin{aligned}
-r_i\mathcal{D}_b & = \sum_{j=1}^n e_{ij}P_j^{e_{ij}} - mP_\infty \\
+> 3. 行列で書くと次のようになるので $\log_P B_j$ を求める。
+>
+> $$
 \begin{pmatrix}
-r_i\mathcal{D}_b \\
+r_1 \\
 \vdots \\
-r_i\mathcal{D}_b
+r_n
 \end{pmatrix}
-& = \begin{pmatrix}
-e_{11} & \cdots & e_{m1} \\
+= \begin{pmatrix}
+e_{11} & \cdots & e_{1n} \\
 \vdots & \ddots & \vdots \\
-e_{1n} & \cdots & e_{mn}
+e_{n1} & \cdots & e_{nn}
 \end{pmatrix}
 \begin{pmatrix}
-\log_{\mathcal{D}_b} P_i \\
+\log_P B_1 \\
 \vdots \\
-\log_{\mathcal{D}_b} P_i
-\end{pmatrix} \\
-\mathcal{D}_a + r\mathcal{D}_b & = \prod_{j=1}^n s_jP_j - mP_\infty \\
-x = \log_{\mathcal{D}_b}\mathcal{D}_a & = \sum_{j=1}^ns_j\log_{\mathcal{D}_b}P_j - r \bmod N
+\log_P B_n
+\end{pmatrix}
+$$
+>
+> 4. 再び次の関係式を与えることで DLP が解ける。
+>
+> $$
+\begin{aligned}
+Q + rP &= \sum_{j=1}^n e_jB_j \\
+Q &= \sum_{j=1}^n (e_j\log_P B_j)P - rP \\
 \end{aligned}
 $$
 
-と計算できます。
+ここで関係式を見つける方法が最も重要です。Gaudry は Semaev の Summation polynomials を用いて関係式を見つけています。
+
+> **Thm. Semaev の Summation polynomials**
+> 楕円曲線 $E/k$ において $n$ 変数多項式 $S_n(x_1,\ldots,x_n)\in k[x_1,\ldots,x_n]$ が存在し、次の $P_i = (X_i, Y_i)\in E/k$ に対して次の式が成り立つ。
+>
+> $$
+\exists s_i = \pm 1\quad s_1P_1 + \cdots + s_nP_n = 0
+\iff
+S_n(X_1,\ldots,X_n) = 0
+$$
+>
+> $E:y^2 = 4x^3 + ax + b$ のとき $S_n(x_1,\ldots,x_n)$ は次の漸化式が成り立つ。
+>
+> $$
+\begin{aligned}
+S_2(x_1, x_2) & = x_1 - x_2 \\
+S_3(x_1,x_2,x_3) & = (x_1 - x_2)^2x_3^2 - 2\left((x_1 + x_2)\left(\frac{a}{4} + x_1x_2\right) + \frac{b}{2}\right)x_3 \\
+& + \left(x_1x_2 - \frac{a}{4}\right) - b(x_1 + x_2) \\
+S_n(x_1,\ldots,x_n) & = \mathrm{Res}_x(S_j(x_1,\ldots,x_{j-1}, x), S_{n-j+2}(x_j,\ldots,x_n,x))
+\end{aligned}
+$$
+
+> **Gaudry のアルゴリズム**
+> $E/\mathbb{F}_{p^3}$ の $y^2 = x^3 + ax + b$ $(a\in\mathbb{F}_p, b\in\mathbb{F}_{p^3})$ を解くことを考える。$Q$ の因子を $B_i = (X_i, Y_i)$ として $\mathbb{F}_{p^3} = \mathbb{F}_p[t]/(f(t))$ とおくと
+>
+> $$
+\begin{aligned}
+& Q + B_1 + B_2 + B_3 = 0 \\
+\iff & S_4(X_1, X_2, X_3, x) = \phi_0(X_1, X_2, X_3) + \phi_1(X_1, X_2, X_3)t + \phi_2(X_1, X_2, X_3)t^2 = 0 \\
+\iff & \phi_0(X_1, X_2, X_3) = 0, \phi_1(X_1, X_2, X_3) = 0, \phi_2(X_1, X_2, X_3) = 0
+\end{aligned}
+$$
+>
+> より 3 つの代数方程式が得られるので Gröbner 基底を計算することで $X_1, X_2, X_3$ が求まる。
 
 この計算量は $\mathcal{O}(g!g^3p(\log p)^3 + g^3p^2(\log p)^2)$ と知られています。
-
-1998 年に Frey が Weil descent
-
-2004 年に Gaudry のアルゴリズム、2007 年に Nagao のアルゴリズム
-
-楕円曲線の $\mathbb{F}_{p^k}$ 有理点群 $E(\mathbb{F}_{p^k})$ を種数 $g\geq k$ の代数曲線 $C$ の Jacobian の有理点群 $\mathcal{J}_C(\mathbb{F}_p)$ に埋め込み、 $\mathcal{J}_C(\mathbb{F}_p)$ 上で Gaudry アルゴリズムで解く
-
-GHS (Gaudry Hess Smart)
 
 ## 攻撃手法
 
@@ -525,23 +551,35 @@ GHS (Gaudry Hess Smart)
 ### 楕円曲線上に存在しない点や位数の少ない点を指定できてはいけない (Invalid Curve Attack / Small-Subgroup Attack)
 楕円曲線に乗らない点を乗っているように演算すると位数の小さい点となる。
 
-> **Prop.**
-> $b$ は点で与えられる情報で
-$b$ がずれた状態で計算しているのと同じ
+もう一度楕円曲線上の和について復習しましょう。
 
-TODO: 図
+> **Def. 楕円曲線上の和**
+> 楕円曲線 $E/K$ 上の点同士の演算 $+: E(K)\times E(K)\to E(K)$ の群 $(E, +)$ を次のように定義する。
+> 1. 単位元を無限遠点 $\mathcal{O}$ とする。
+> 2. 点 $P = (x, y)$ の逆元を $-P = (x, -y)$ とする。
+> 3. $P(x_1, y_1), Q(x_2, y_2)$ に対して $R(x_3, y_3) = P + Q$ を次のように定義する。
+>
+> $$
+\begin{aligned}
+x_3 &= \lambda^2 - x_1 - x_2 \\
+y_3 &= \lambda(x_1 - x_3) - y_1 \\
+\lambda &=
+\begin{dcases}
+\frac{y_2 - y_1}{x_2 - x_1} \quad (P \neq Q) \\
+\frac{3x_1^2 + a}{2y_1} \quad (P = Q)
+\end{dcases}
+\end{aligned}
+$$
 
-**Proof.**
+この定義をよく見てみると $b$ という情報はどこにも入っていません。
+
+つまり楕円曲線上に乗っていない点を計算しようとすると $b$ がずれた状態で計算しているのと同じになります。
 
 $$
-y^2 = x^3 + ax + b_1 \pmod{p}
+y^2 = x^3 + ax + b' \pmod{p}
 $$
 
-$\Box$
-
-これを用いて中国剰余定理で ECDLP が解ける。
-
-https://zenn.dev/kurenaif/articles/9cf509d9a15815
+そうすると $P$ の位数も変化し、大抵の場合かなり少ない数になります(未証明)。これを用いて様々な位数の点で計算することで中国剰余定理で ECDLP が解けます。
 
 :::message
 **練習問題**
@@ -559,31 +597,28 @@ Singular な楕円曲線のとき、特異点という特殊な点ができま�
 \left.\frac{\partial f}{\partial x}\right|_{(X, Y)} = \left.\frac{\partial f}{\partial y}\right|_{(X, Y)} = 0
 $$
 
-> **Prop. 楕円曲線の特異点**
-> 楕円曲線において特異点がある条件はかつあったときに $(X, Y) = (\pm\sqrt{-a/3}, 0)$ にある。
-
-**Proof.**
-$3x^2 + a = 2y = 0$
-
 このように微分値が不定となる点、グラフ上では関数の曲線が交差している点です。
 
-楕円曲線の曲線は高々 1 回交わることになるので 2 つのタイプに分けられます。1 つは普通に交わるノード、もう 1 つは自分自身と接しながら交わるカスプです。
+> **Prop.**
+> 楕円曲線の特異点は判別式が $\Delta = 0$ のときに存在し、 $(X, Y) = (\pm\sqrt{-a/3}, 0)$ にある。
 
-#### カスプ
+楕円曲線の曲線は高々 1 回交わることになるので 2 つのタイプに分けられます。1 つは十字に交わるノード、もう 1 つは接しながら交わるカスプです。
+
+そしてこのときある写像を用いることで ECDLP が FFDLP に落ちます。
+
+#### カスプの場合
 
 どんな尖っている楕円曲線も平行移動や線形変換により $y^2 = x^3$ の形になります。
 
 このとき $y = \lambda x$ との交点は $(\lambda^2, \lambda^3)$ 、接線は $y = 0$ となります。
-これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^+$ を次のように定義する。
+これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^+$ を次のように定義することで $\mathbb{F}_p^+$ の DLP に落ちます。
 
 $$
 f(x,y) = \frac{x}{y} \\
 f(\infty) = 0
 $$
 
-これは $\mathbb{F}_p^+$ の DLP となる。
-
-#### ノード
+#### ノードの場合
 
 $y = 0$ 上の特異点が原点 $O(0, 0)$ となるように平行移動させると $y^2 = x^3 + kx^2$ となる。
 
@@ -591,7 +626,7 @@ $$
 \left(\frac{\partial F}{\partial x}, \frac{\partial F}{\partial y}\right) = ((3x + 2k)x, 2y)
 $$
 
-より特異点が原点しかないことがわかります。このとき $y = \lambda x$ との交点を考えます。$P = (\lambda^2 - k, \lambda(\lambda^2 - k))$ これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^\times$ を次のように定義する。
+より特異点が原点しかないことがわかります。このとき $y = \lambda x$ との交点を考えます。そうすると各点を $P = (\lambda^2 - k, \lambda(\lambda^2 - k))$ と表現できます。これより $f: E/\mathbb{F}_p \to \mathbb{F}_p^\times$ を次のように定義することで $\mathbb{F}_p^\times$ の DLP に落ちます。
 
 $$
 \begin{aligned}
@@ -599,8 +634,6 @@ f(x,y) & = \frac{y + \sqrt{k}x}{y - \sqrt{k}x} \\
 f(\infty) & = 1
 \end{aligned}
 $$
-
-これは $\mathbb{F}_p^\times$ の DLP となる。
 
 ```python
 def SingularCusp(a, b, p):
@@ -645,21 +678,17 @@ def SingularNode(a, b, p):
 ```
 
 ### Anomalous な曲線を用いてはいけない (SSSA Attack)
-SSSA (Semaev-Smart-Satoh-Araki) Attack
+Anomalous な曲線とは $E/\mathbb{F}_p$ の位数が $p$ となる楕円曲線です。これには SSSA (Semaev-Smart-Satoh-Araki) Attack という攻撃が通ります。
 
-$\pi: \mathbb{P}^2(\mathbb{Q}_p)\to\mathbb{P}^2(\mathbb{F}_p)$ を還元写像 (reduction map) は $E(\mathbb{Q}_p)\to E(\mathbb{F}_p)$ の群準同型写像となる。 $E$ の形式群 $\mathcal{E}$ として $\log_{\mathcal{E}}$ を形式対数
+$\pi: \mathbb{P}^2(\mathbb{Q}_p)\to\mathbb{P}^2(\mathbb{F}_p)$ を還元写像 (reduction map) は $E(\mathbb{Q}_p)\to E(\mathbb{F}_p)$ の群準同型写像となる。 $E$ の形式群 $\mathcal{E}$ の形式対数 $\log_{\mathcal{E}}$ とします。
 
 $$
 \begin{aligned}
 \pi &: \mathbb{P}^2(\mathbb{Q}_p)\to\mathbb{P}^2(\mathbb{F}_p) \\
 u &: E(\mathbb{F}_p)\to E(\mathbb{Q}_p) \\
 \psi &: (x:y:z) \mapsto \frac{x}{y} \\
-\log_{\mathcal{E}} &: t\mapsto t - \frac{a_1}{2}t^2 + \frac{a_1^2 + a_2}{3}t^3 - \frac{a_1^3 + 2a_1a_2 + a_3}{4}t^4 + \cdots
+\lambda_E &: E(\mathbb{F}_p)\xrightarrow{u}E(\mathbb{Q}_p)\xrightarrow{\times p}\ker\pi\xrightarrow{\log_{\mathcal{E}}}p\mathbb{Z}_p\xrightarrow{\bmod{p^2}} p\mathbb{Z}_p/p^2\mathbb{Z}_p\cong \mathbb{F}_p
 \end{aligned}
-$$
-
-$$
-\lambda_E: E(\mathbb{F}_p)\xrightarrow{u}E(\mathbb{Q}_p)\xrightarrow{\times p}\ker\pi\xrightarrow{\log_{\mathcal{E}}}p\mathbb{Z}_p\xrightarrow{\bmod{p^2}} p\mathbb{Z}_p/p^2\mathbb{Z}_p\cong \mathbb{F}_p
 $$
 
 > **Prop.**
@@ -914,10 +943,10 @@ def tate_pairing(E, P, Q, m, k=2):
 
 > **埋め込み次数**
 > 必要となる最小の拡大次数 $d$ を埋め込み次数という。
-> $E(\mathbb{F}_{p^k}^\times)\cong\mathbb{Z}_{c_1n_1}\oplus\mathbb{Z}_{c_2n_1}$
 
-$\mu_m$ の埋め込み次数が小さい楕円曲線ならば ECDLP より FFDLP の方が素早く計算できそうです。そのような楕円曲線というのが Supersingular な楕円曲線です。
-任意の楕円曲線も FFDLP に落とし込めますが、埋め込み次数が高いと ECDLP を解いた方が早いともなります。
+$\mu_m$ の埋め込み次数が小さい楕円曲線ならば ECDLP より FFDLP の方が素早く計算できそうです。そのような楕円曲線というのが Supersingular な楕円曲線です。任意の楕円曲線を FFDLP に落とし込めますが、埋め込み次数が高いと ECDLP を解いた方が速くなるので、埋め込み次数を先に計算してから選択する必要があります。
+
+特に超特異楕円曲線において埋め込み次数は 6 以下となります。
 
 > **Prop.**
 > Supersingular な楕円曲線の埋め込み次数は $6$ 以下である。
@@ -1016,8 +1045,6 @@ def FR_reduction(P, R, max_k=6, max_tries=10):
     return None
 ```
 
-
-`tate_pairing(E, P, Q.distortion_map(), m)`
 
 ## 同種写像暗号
 
