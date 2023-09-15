@@ -724,9 +724,6 @@ Y_{p-1} - Y_1, \frac{X_{p-1} - X_1}{p}\in\mathbb{Z}_p^\times \\
 \lambda_E(P) = \frac{X_{p-1} - X_1}{p(Y_{p-1} - Y_1)}\pmod p
 $$
 
-$A\in E(\mathbb{Z}/p^2\mathbb{Z})$ となる
-$X_{p-1} \neq X_1$ なら
-
 ```python
 def hensel_lift(P):
     x, y = map(ZZ, P.xy())
