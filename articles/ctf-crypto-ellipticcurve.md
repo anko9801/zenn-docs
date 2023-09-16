@@ -439,7 +439,7 @@ def pohlig_hellman(G):
     return crt(dlogs, primes)
 ```
 
-### 指数計算法 (Index Calculus Algorithm)
+### Index Calculus Algorithm
 楕円曲線上の DLP を Index Calculus Algorithm で解く試みは歴史が長く、以下のようなことがありました。
 
 | 手法 | 著者 | 説明 |
