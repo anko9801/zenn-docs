@@ -793,7 +793,7 @@ def SSSA_attack(G, P):
     return int(gf((Px / Py) / (Gx / Gy)))
 ```
 
-### Supersingular な曲線を用いてはならない (MOV/FR Reduction)
+### Supersingular な曲線を用いてはならない (MOV / FR Reduction)
 Supersingular な楕円曲線のとき、ペアリングを用いて有限体上の DLP に帰着できるという方法です。
 
 まず Supersingular (超特異) な楕円曲線というのは位数が $q + 1$ となるような楕円曲線で、ペアリングというのは双線形写像のことです。
@@ -902,8 +902,8 @@ $\Box$
 
 これより Supersingular な楕円曲線上の ECDLP でペアリングを通すことで FFDLP に変換できる。
 
-> **MOV/FR Reduction**
-> ペアリング $e_m(P, Q)$
+> **MOV / FR Reduction**
+> ペアリング $e_n(P, Q)$ について次のように計算することで $\mathbb{F}_{p^k}^\times$ となる。
 > 1. $E[n]\subseteq E(\mathbb{F}_{p^k})$ となる最小の $k$ を持ってくる
 > 2. 位数 $n$ の $\alpha=e_n(P, Q)$ となるように $Q \in E[n]$ を取ってくる
 > 3. $\beta = e_n(dP, Q)$
