@@ -978,17 +978,15 @@ def FR_reduction(P, R, max_k=6, max_tries=10):
 ## まとめ
 楕円曲線暗号の雰囲気を味わうことができたと思います。
 
-ここでは天下り的な感じでしたが、代数幾何が分かると完全に理解できて楽しいので是非勉強してみてください！めちゃくちゃおもろいです。
+ここでは天下り的な感じでしたが、代数幾何が分かると楕円曲線と同型な幾何的な構造や特異点の分解などなど色々理解できて楽しいので是非勉強してみてください！
 
 ## 参考文献
 - [Imaginary hyperelliptic curve - Wikipedia](https://en.wikipedia.org/wiki/Imaginary_hyperelliptic_curve)
-- https://blog.z.cash/new-snark-curve/ : BLS12-381: New zk-SNARK Elliptic Curve Construction
 - Python での高速な実装 fastecdsa
-- https://www.iisec.ac.jp/proc/vol0002/iisec_proc_002_p043.pdf
-- http://www.ipc.tohoku-gakuin.ac.jp/atsushi/article/velu.pdf
-- https://eprint.iacr.org/2011/430.pdf
+- [超楕円曲線暗号と位数計算](https://www.iisec.ac.jp/proc/vol0002/iisec_proc_002_p043.pdf)
+- [Velu の公式とその応用](http://www.ipc.tohoku-gakuin.ac.jp/atsushi/article/velu.pdf)
+- [ANALOGUES OF VELU’S FORMULAS FOR ISOGENIES ON ALTERNATE MODELS OF ELLIPTIC CURVES](https://eprint.iacr.org/2011/430.pdf)
 - [Mathematics of Isogeny Based Cryptography](https://arxiv.org/pdf/1711.04062.pdf)
 - [Isogenies of Elliptic Curves](https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch25.pdf)
 - [楕円曲線上の離散対数問題に関する指数計算法](https://www.cryptrec.go.jp/exreport/cryptrec-ex-2602-2016.pdf)
 - [Fermat Quotient と Anomalous 楕円曲線の離散対数の多項式時間解法アルゴリズムについて(代数的整数論とその周辺)](https://repository.kulib.kyoto-u.ac.jp/dspace/bitstream/2433/61761/1/1026-15.pdf)
-- [ECFFT1.pdf (toronto.edu)](https://www.math.toronto.edu/swastik/ECFFT1.pdf)
