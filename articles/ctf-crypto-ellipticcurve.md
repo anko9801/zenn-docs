@@ -6,9 +6,9 @@ topics: ["CTF", "crypto"]
 published: true
 ---
 
-今回紹介するのは楕円曲線暗号です。
+今回紹介するのは楕円曲線暗号の基本です。
 
-楕円曲線の理論は本来、群環体、ガロア理論、可換環論、ホモロジー代数、代数幾何学と理解した先で学習しますが、記事ではそこまで書けないので高校数学だけで語れるものだけを取り扱います。
+楕円曲線の理論は本来、群環体、ガロア理論、可換環論、ホモロジー代数、代数幾何学と理解した先で学習しますが、記事ではそこまで書けないので高校数学だけで出来る限り紹介します。ただどうしようもないときにはちゃんと定義せずに言葉を使うと思うのでそこはすみません。
 
 ## 楕円曲線
 高校のときに習ったと思いますが、グラフで半径 1 の円といえば次のような式で表されました。
@@ -670,7 +670,7 @@ def SingularNode(a, b, p):
 ### Anomalous な曲線を用いてはいけない (SSSA Attack)
 Anomalous な曲線とは $E/\mathbb{F}_p$ の位数が $p$ となる楕円曲線です。これには SSSA (Semaev-Smart-Satoh-Araki) Attack という攻撃が通ります。
 
-楕円曲線は射影空間の部分空間 $E\subseteq\mathbb{P}^2$ となっているので還元写像 (reduction map) $\pi:E(\mathbb{Q}_p)\to E(\mathbb{F}_p)$ とその逆写像 $u: E(\mathbb{F}_p)\to E(\mathbb{Q}_p)$ が与えられ、これらは準同型となる。また $E$ の形式群 $\mathcal{E}$ の形式対数を $\log_{\mathcal{E}}$ とおきます。
+楕円曲線は射影空間の部分空間 $E\subseteq\mathbb{P}^2$ となっているので還元 $\pi:E(\mathbb{Q}_p)\to E(\mathbb{F}_p)$ と持ち上げ $u: E(\mathbb{F}_p)\to E(\mathbb{Q}_p)$ が与えられ、これらは準同型となる。また $E$ の形式群 $\mathcal{E}$ の形式対数を $\log_{\mathcal{E}}$ とおきます。
 
 $$
 \begin{aligned}
@@ -704,25 +704,50 @@ $2<n<p$ のとき $x_{n-1} \neq x_1$ より $x_{n-1} - x_1 \in\mathbb{Z}_p^\time
 
 $$
 \begin{aligned}
-  nA & = (c_n^2 - x_1 - x_{n-1}, -c_n^3 + c_n(x_1 + x_{n-1}) - (y_1 - x_1c_n))\in E(\mathbb{Z}_p) \\
-  c_n & = \frac{y_{n-1} - y_1}{x_{n-1} - x_1}
+  nA & = (c_n^2 - x_1 - x_{n-1}, -c_n^3 + c_n(x_1 + x_{n-1}) - d_n)\in E(\mathbb{Z}_p) \\
+  c_n & = \frac{y_{n-1} - y_1}{x_{n-1} - x_1}, d_n = y_1 - x_1c_n
 \end{aligned}
 $$
 
-$n = p$ のときもし $nA = \mathcal{O}$ であれば
+$n = p$ のとき、もし $pA = \mathcal{O}$ であれば
 
 $$
 \lambda_E(P) = (\bmod{p^2})\circ\log_{\mathcal{E}}\circ\psi(\mathcal{O}) = 0
 $$
 
-より $\lambda_E$ が零写像でないことに矛盾する。よって $pA \neq \mathcal{O}$ である。
+より $\lambda_E$ が零写像でないことに矛盾する。よって $pA \neq \mathcal{O}$ である。また具体的表式は次のようになる。
 
-> **Thm.**
->
-> $$
-Y_{p-1} - Y_1, \frac{X_{p-1} - X_1}{p}\in\mathbb{Z}_p^\times \\
-\lambda_E(P) = \frac{X_{p-1} - X_1}{p(Y_{p-1} - Y_1)}\pmod p
 $$
+\begin{aligned}
+  pA & = (c_p^2 - x_1 - x_{p-1}, -c_p^3 + c_p(x_1 + x_{p-1}) - d_p) \\
+  c_p & = \frac{y_{p-1} - y_1}{x_{p-1} - x_1}, d_p = y_1 - x_1c_p
+\end{aligned}
+$$
+
+ここで $c_p\in\mathbb{Z}_p$ とすると $d_p\in\mathbb{Z}_p, y_p\in\mathbb{Z}_p$ となるが $\pi((x_p:y_p:1)) = \mathcal{O}$ に矛盾する。これより $\mathrm{ord}_pc_p < 0$ となる。
+
+$$
+\begin{aligned}
+\mathrm{ord}_px_p &= \mathrm{ord}_p(c_p^2 - x_1 - x_{p-1}) = 2\mathrm{ord}_pc_p \\
+\mathrm{ord}_pd_p &\geq \min(\mathrm{ord}_py_1, \mathrm{ord}_px_1 + \mathrm{ord}_pc_p) \\
+&\geq \mathrm{ord}_pc_p \\
+\mathrm{ord}_py_p &= \mathrm{ord}_p(-c_p^3 + c_p(x_1 + x_{p-1}) - d_p) = 3\mathrm{ord}_pc_p \\
+\mathrm{ord}_p\psi(pA) &= \mathrm{ord}_p\left(\frac{x_p}{y_p}\right) = - \mathrm{ord}_pc_p > 0 \\
+\mathrm{ord}_p\log_{\mathcal{E}}(pA) &= -\mathrm{ord}_pc_p
+\end{aligned}
+$$
+
+ここで $\lambda_E(A)\neq 0$ であるから $\mathrm{ord}_pc_p = -1$ であることが分かる。よって次のように求まる。
+
+$$
+\begin{aligned}
+\mathrm{ord}_px_p & = -2, \mathrm{ord}_py_p = -3 \\
+p^2x_p & = p^2c_p^2 - p^2x_1 - p^2x_{p-1} = (pc_p)^2 \\
+p^3y_p & = -p^3c_p^3 + p^3c_p(x_1 + x_{p-1}) - p^3d_p = - (pc_p)^3 \\
+\lambda_E(A) & = \frac{x_p}{py_p} = \frac{p^2x_p}{p^3y_p} = -\frac{(pc_p)^2}{(pc_p)^3} = - \frac{x_{p-1} - x_1}{p(y_{p-1} - y_1)} \in \mathbb{Z}_p^\times
+\end{aligned}
+$$
+
 
 ```python
 def hensel_lift(P):
