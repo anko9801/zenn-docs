@@ -685,19 +685,19 @@ $$
 \pi: E(\mathbb{Q}_p)\ni A\mapsto P\in E(\mathbb{F}_p)\setminus\mathcal{O}
 $$
 
-$nA = (X_n, Y_n)$ と置く。 $n\pm m \neq 0 \pmod{p}$ のとき
+$nA = (x_n, y_n)$ と置く。 $n\pm m \neq 0 \pmod{p}$ のとき
 
 $$
-X_n = X_m \implies \pi(nA) = \pm \pi(mA) \iff (n\pm m) P = \mathcal{O} \iff P = \mathcal{O}
+x_n = x_m \implies \pi(nA) = \pm \pi(mA) \iff (n\pm m) P = \mathcal{O} \iff P = \mathcal{O}
 $$
 
-と矛盾するので $X_n\neq X_m$ である。これより $n \neq 0 \pmod{p}$ ならば $nA \neq \mathcal{O}$ となる。
+と矛盾するので $x_n\neq x_m$ である。これより $n \neq 0 \pmod{p}$ ならば $nA \neq \mathcal{O}$ となる。
 
 $n = 1$ のとき $A\in E(\mathbb{Z}_p)$ である。
 $n = 2$ のとき $y_1\in\mathbb{Z}_p^\times$ より次のようになる。
 
 $$
-  2A = \left(\left(\frac{3X_1^2 + a_4}{2Y_1}\right)^2 - 2X_1, -\left(\frac{3X_1^2 + a_4}{2Y_1}\right)X_2 - \frac{-X_1^3 + a_4X_1 + 2a_6}{2Y_1}\right)\in E(\mathbb{Z}_p)
+  2A = \left(\left(\frac{3x_1^2 + a_4}{2y_1}\right)^2 - 2x_1, -\left(\frac{3x_1^2 + a_4}{2y_1}\right)x_2 - \frac{-x_1^3 + a_4x_1 + 2a_6}{2y_1}\right)\in E(\mathbb{Z}_p)
 $$
 
 $2<n<p$ のとき $x_{n-1} \neq x_1$ より $x_{n-1} - x_1 \in\mathbb{Z}_p^\times$ であるから次のようになる。
@@ -737,17 +737,23 @@ $$
 \end{aligned}
 $$
 
-ここで $\lambda_E(A)\neq 0$ であるから $\mathrm{ord}_pc_p = -1$ であることが分かる。よって次のように求まる。
+ここで $\lambda_E(A)\neq 0$ であるから $\mathrm{ord}_pc_p = -1$ であることが分かる。よって $\lambda_E(A)$ は次のように求まる。
 
 $$
 \begin{aligned}
 \mathrm{ord}_px_p & = -2, \mathrm{ord}_py_p = -3 \\
 p^2x_p & = p^2c_p^2 - p^2x_1 - p^2x_{p-1} = (pc_p)^2 \\
 p^3y_p & = -p^3c_p^3 + p^3c_p(x_1 + x_{p-1}) - p^3d_p = - (pc_p)^3 \\
-\lambda_E(A) & = \frac{x_p}{py_p} = \frac{p^2x_p}{p^3y_p} = -\frac{(pc_p)^2}{(pc_p)^3} = - \frac{x_{p-1} - x_1}{p(y_{p-1} - y_1)} \in \mathbb{Z}_p^\times
+\lambda_E(P) & = \frac{x_p}{py_p} = \frac{p^2x_p}{p^3y_p} = -\frac{(pc_p)^2}{(pc_p)^3} = - \frac{x_{p-1} - x_1}{p(y_{p-1} - y_1)} \in \mathbb{Z}_p^\times
 \end{aligned}
 $$
 
+この手法をまとめると次のように計算することで DLP は $\mathbb{F}_p$ 上の割り算に変換できる。
+
+1. $A = \pi(P) \bmod p^2 = (x_1, y_1)\in E(\mathbb{Z}/p^2\mathbb{Z})$ を見つける。
+2. $(p-1)A = (x_{p-1}, y_{p-1})\in E(\mathbb{Z}/p^2\mathbb{Z})$ を計算する。
+3. $x_{p-1} \neq x_1$ のとき $\lambda_E(P) = 0$ または $\lambda_E(P) = \dfrac{x_{p-1} - x_1}{p(y_{p-1} - y_1)}$ になる。
+4. そして $d = \dfrac{\lambda_E(Q)}{\lambda_E(P)}$ と計算すると DLP が解ける。
 
 ```python
 def hensel_lift(P):
