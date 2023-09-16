@@ -808,20 +808,9 @@ f(x, y_1y_2) = f(x, y_1)f(x, y_2)
 \end{aligned}
 $$
 
-楕円曲線暗号では Weil pairing や Tate pairing などのペアリングを使いますが、これらのペアリングは因子 (divisor) と呼ばれる概念を通じて理解します。
-
-> **Def. 因子 (divisor)**
-> $\mathcal{D} \in\mathrm{Div}(C)$ 自由アーベル群
-
-この因子を求めるアルゴリズムを Miller's algorithm といいます。
+楕円曲線暗号では Weil pairing や Tate pairing などのペアリングを使いますが、これらのペアリングは因子 (divisor) と呼ばれる概念を通じて理解します。この因子を求めるアルゴリズムを Miller's algorithm といいます。
 
 > **Miller's algorithm**
->
-> $$
-N = \epsilon_0 + \epsilon_1\cdot 2 + \cdots + \epsilon_t\cdot 2^t
-$$
->
-> $\mu_m$ $\mu_m\subseteq\mathbb{F}_{q^d}^\times$
 >
 > $$
 h_{P, Q}(x, y) = \begin{dcases}
