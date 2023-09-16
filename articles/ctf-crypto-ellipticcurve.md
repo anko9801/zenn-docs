@@ -976,7 +976,9 @@ def FR_reduction(P, R, max_k=6, max_tries=10):
 ```
 
 ## まとめ
-楕円曲線暗号の雰囲気を味わうことができたと思います。ここらへんも代数幾何が分かると代数構造がはっきり見えるようになると思うので是非勉強してみてください。
+楕円曲線暗号の雰囲気を味わうことができたと思います。
+
+ここでは天下り的な感じでしたが、代数幾何が分かると完全に理解できて楽しいので是非勉強してみてください！めちゃくちゃおもろいです。
 
 ## 参考文献
 - [Imaginary hyperelliptic curve - Wikipedia](https://en.wikipedia.org/wiki/Imaginary_hyperelliptic_curve)
