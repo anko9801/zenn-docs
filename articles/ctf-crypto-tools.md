@@ -116,7 +116,7 @@ $$
 & A\land B \\
 & \lnot A\land(B\lor C) \\
 & (A\lor B)\land(\lnot B\lor C\lor\lnot D)\land(D\lor\lnot E) \\
-& (\lnot B\lor C).
+& (\lnot B\lor C)
 \end{aligned}
 $$
 
@@ -126,7 +126,7 @@ $$
 \begin{aligned}
 & \lnot(B\lor C) \\
 & (A\land B)\lor C \\
-& A\land(B\lor(D\land E)).
+& A\land(B\lor(D\land E))
 \end{aligned}
 $$
 
@@ -141,7 +141,7 @@ $$
 \begin{aligned}
 & \lnot B\land\lnot C \\
 & (A\lor C)\land(B\lor C) \\
-& A\land(B\lor D)\land(B\lor E).
+& A\land(B\lor D)\land(B\lor E)
 \end{aligned}
 $$
 
