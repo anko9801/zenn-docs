@@ -161,7 +161,7 @@ assert(plaintext == b"This is RSA")
 :::
 
 ### 安全性
-計算機代数において多項式時間で解けることを計算可能と言います。ぱっと見、自然なのですが例えば $o(n^{10000})$ と言われてもこれは計算可能と言いますし、$O(2^n)$ で多くの場合 $n = 1$ でも計算困難と言います。この定義にしたのは次の性質を満たして欲しかったからです。
+計算機代数において多項式時間で解けることを計算可能と言います。ぱっと見、自然なのですが例えば $o(n^{10000})$ でもこれは計算可能と言いますし、$O(2^n)$ で多くの場合 $n = 1$ でも計算困難と言います。この定義にしたのは次の性質を満たして欲しかったからです。
 
 - 1 つでも計算困難な処理が入れば全体として計算困難
 - 計算可能な処理で構成されていればどんなに色々呼び出して複雑にしても計算可能
@@ -693,7 +693,7 @@ load('coppersmith.sage')
 
 def boneh_durfee(N, e):
     bounds = (floor(N^.25), 2^1024)
-    P.<k, s> = PolynomialRing(Zmod(e))
+    P.<k, s> = Zmod(e)[]
     f = 2*k*((N+1)//2 - s) + 1
     print(small_roots(f, bounds, m=3, d=4))
 ```
@@ -863,7 +863,7 @@ $$
 
 ```python
 def partial_p_lower(p_lower: int, k: int, N: int) -> int:
-    PR.<x> = PolynomialRing(Zmod(N))
+    PR.<x> = Zmod(N)[]
     f = 2^k*x + p_lower
     f = f.monic()
     roots = f.small_roots(X=2^(N.nbits()//2-k), beta=0.3)
@@ -872,7 +872,7 @@ def partial_p_lower(p_lower: int, k: int, N: int) -> int:
     return 1
 
 def partial_p_upper(p_upper: int, k: int, N: int) -> int:
-    PR.<x> = PolynomialRing(Zmod(N))
+    PR.<x> = Zmod(N)[]
     f = x + p_upper
     roots = f.small_roots(X=2^(floor((n.nbits() / 4) * 6/7)), beta=0.3)
     for x0 in roots:
@@ -969,11 +969,9 @@ $$
 
 $x$ に関して $f_1$ と $f_2$ に同一の解があるとき、それらの終結式 $\mathrm{Res}(f_1, f_2)$ は $\mathrm{Res}(f_1, f_2) = 0$ を満たします。このとき $\mathrm{Res}(f_1, f_2) = 0$ は $y$ の方程式である為、小さい解 $r$ を持つ $y$ は Coppersmith Method を用いて $y = r$ と求まります。
 
-Approximate GCD Problem
-
 ```python
 def franklinReiter(n, e, r, c1, c2):
-    R.<x> = PolynomialRing(Zmod(n))
+    R.<x> = Zmod(n)[]
     f1 = x^e - c1
     f2 = (x + r)^e - c2
     return - polygcd(f1, f2).coefficients()[0]
@@ -985,12 +983,12 @@ def polygcd(a, b):
         return polygcd(b, a % b)
 
 def CoppersmithShortPadAttack(e, n, C1, C2, eps=1/30):
-    P.<x,y> = PolynomialRing(ZZ)
+    P.<x,y> = ZZ[]
     g1 = x^e - C1
     g2 = (x + y)^e - C2
     res = g1.resultant(g2)
 
-    Py.<y> = PolynomialRing(Zmod(n))
+    Py.<y> = Zmod(n)[]
     res = res.univariate_polynomial()
     res = res.change_ring(Py).subs(y=y)
     res = res.monic()
