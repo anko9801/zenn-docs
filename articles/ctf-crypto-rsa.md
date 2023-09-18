@@ -351,65 +351,34 @@ $$
 \end{aligned}
 $$
 
-**Proof.**
-Lucas 数列について
-
-$$
-\begin{aligned}
-  \alpha,\beta & = \frac{a \pm \sqrt{a^2 - 4b}}{2} \\
-  y_n & = \frac{\alpha^n - \beta^n}{\alpha - \beta}
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-  2^{n-1}x_n & = \sum_k^n {}_nC_{2k}a^{n-2k}d^k \\
-  2^{n-1}y_n & = \sum_k^n {}_nC_{2k+1}a^{n-2k-1}d^k
-\end{aligned}
-$$
-
-$n = p$ と素数となるとき
-
-$$
-\begin{aligned}
-  x_p & = \sum_{k=0}^{(p-1)/2} {}_pC_{2k}a^{p-2k}d^k = a & \pmod p \\
-  y_p & = \sum_{k=0}^{(p-1)/2} {}_pC_{2k+1}a^{p-2k-1}d^k = d^{(p-1)/2} & \pmod p
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-  y_{p+1} & = ay_p + by_{p-1} = -a + (x_p - y_{p+1}) = -y_{p+1} & \implies y_{p+1} & = 0 & (d^{(p-1)/2} = -1) \pmod p \\
-  by_{p-1} & = y_{p+1} - ay_p = (x_p - by_{p-1}) - ay_p = -by_{p-1} & \implies y_{p-1} & = 0 & (d^{(p-1)/2} = 1) \pmod p
-\end{aligned}
-$$
-
-繰り返し二乗法っぽく $y_k$ を $\mathcal{O}(\log k)$ で計算できる。
-
-$$
-\begin{aligned}
-  y_{2n} & = 2y_ny_{n+1} - ay_n^2 \\
-  y_{2n+1} & = y_{n+1}^2 + by_n^2 \\
-  y_{2n+2} & = ay_{n+1}^2 + 2by_ny_{n+1}
-\end{aligned}
-$$
-
-約数の多い $k$ を用意して $\gcd(y_k, N)$ が出てくる。確率はどれくらい？
-
 ```python
-def p_plus_1(B: int, N: int):
-    x = B % N
-    y = (B * B − 2) % N
-    M =
-    for i in range():
-    for each bit of M to the right of the most significant bit do
-        if the bit is 1 then:
-            x = (x * y − B) % N
-            y = (y * y − 2) % N
+from itertools import count
+
+def mlucas(v, a, n):
+    v1 = v
+    v2 = (v**2 - 2) % n
+    for bit in bin(a)[3:]:
+        if bit == "0":
+            v1 = (v1**2 - 2) % n
+            v2 = (v1*v2 - v) % n
         else:
-            y = (x * y − B) % N
-            x = (x * x − 2) % N
-    return x
+            v1 = (v1*v2 - v) % n
+            v2 = (v2**2 - 2) % n
+    return v1
+
+def pp1(n):
+    for v in count(3):
+        for p in Primes():
+            e = int(log(int(sqrt(n)), p)) + 1
+            if e == 0:
+                break
+            for _ in range(e):
+                v = mlucas(v, p, n)
+            g = gcd(v - 2, n)
+            if 1 < g < n:
+                return g
+            if g == n:
+                break
 ```
 
 ### 楕円曲線法
