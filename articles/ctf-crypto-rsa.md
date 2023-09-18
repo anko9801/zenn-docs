@@ -28,7 +28,7 @@ https://zenn.dev/anko/articles/ctf-crypto-publickey
 > 暗号化と復号で **別の鍵** を使い、暗号化で使う鍵を **公開** する方式
 > ex.) RSA暗号, 楕円曲線暗号 など
 
-RSA 暗号はその公開鍵暗号の 1 種で **素因数分解** の難しさをベースにした暗号です。
+RSA 暗号 (Rivest-Shamir-Adleman encryption) はその公開鍵暗号の 1 種で **素因数分解** の難しさをベースにした暗号です。
 
 どんな数も素数の積となります。
 
@@ -112,8 +112,6 @@ $$
 4. Alice は秘密鍵 $p, q$ を用いて $d$ を計算して復号し、平文を得る
 
 ここで $N, e$ を知っていても $p, q, d$ いずれも知らないとき、素因数分解の計算困難性を仮定すると復号は難しいと証明されています。
-
-このように暗号化された通信を RSA 暗号 (Rivest-Shamir-Adleman encryption) と呼びます。
 
 このようにして送っている最中に盗聴されても秘密鍵がなければ解読できず、安全な通信ができます。またこれ自体は一方向通信ですが、逆も同様に行えば双方向通信もできます。
 
@@ -401,6 +399,22 @@ $$
 $$
 
 約数の多い $k$ を用意して $\gcd(y_k, N)$ が出てくる。確率はどれくらい？
+
+```python
+def p_plus_1(B: int, N: int):
+    x = B % N
+    y = (B * B − 2) % N
+    M =
+    for i in range():
+    for each bit of M to the right of the most significant bit do
+        if the bit is 1 then:
+            x = (x * y − B) % N
+            y = (y * y − 2) % N
+        else:
+            y = (x * y − B) % N
+            x = (x * x − 2) % N
+    return x
+```
 
 ### 楕円曲線法
 一般に有効な素因数分解法です。
