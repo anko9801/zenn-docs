@@ -89,7 +89,7 @@ $$
 
 となります。おお！暗号化して復号すると同じ数になりました。ちゃんと暗号化と復号で逆の操作になっていそうです。
 
-ちなみに $e^{-1}$ の計算は少し難しく、カーマイケルの定理より $(\mathbb{Z}/pq\mathbb{Z})^×\cong\mathbb{Z}/\mathrm{lcm}(p−1, q-1)\mathbb{Z}$ となるので $\phi(N) = (p - 1)(q - 1)$ とおくと、その剰余の世界で逆数を計算して求まります。ちなみに $\phi(N)$ は素因数分解しないと求まりません。
+ちなみに $e^{-1}$ の計算は少し難しく、カーマイケルの定理より $(\mathbb{Z}/pq\mathbb{Z})^×\cong\mathbb{Z}/\mathrm{lcm}(p−1, q-1)\mathbb{Z}$ となるので $\phi(N) = (p - 1)(q - 1)$ とおくと、その剰余の世界で逆数を計算して求まります。ちなみに $\phi(N)$ は素数 $p, q$ を知らないと計算不可能です。
 
 $$
 d = e^{-1} \quad \pmod{\phi(N)}
@@ -102,13 +102,14 @@ $$
 このように RSA は計算できます。
 
 ### 実装
+計算方法が分かったので実装できそうです。
 
 具体的には次の手順で暗号化された通信を実現します。
 
 1. Alice が大きな素数 $p, q$ を生成し、Bob に公開鍵 $N, e$ を渡す
 2. Bob は公開鍵を用いて平文を暗号化
 3. Bob から Alice へ暗号文を送る
-4. Alice は秘密鍵 $p, q$ を用いて $d = e^{-1} \pmod{\phi(N)}$ を計算して復号化し、平文を得る
+4. Alice は秘密鍵 $p, q$ を用いて $d$ を計算して復号化し、平文を得る
 
 ここで $N, e$ を知っていても $p, q, d$ いずれも知らないとき、素因数分解の計算困難性を仮定すると復号化は難しいと証明されています。
 
@@ -145,10 +146,10 @@ def decrypt(cipher):
 
 cipher = encrypt(b"This is RSA")
 print(cipher)
-#
+
 plaintext = decrypt(cipher)
 print(plaintext)
-# This is RSA
+assert(plaintext == b"This is RSA")
 ```
 
 :::details ライブラリの説明
