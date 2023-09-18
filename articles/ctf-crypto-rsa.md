@@ -99,7 +99,9 @@ $$
 5^{-1} = 26285 \pmod{32856}
 $$
 
-このように RSA は計算できます。
+このように計算できます。
+
+また電子署名は暗号化と復号を逆転させればいいです。
 
 ### 実装
 計算方法が分かったので実装できそうです。
@@ -199,15 +201,15 @@ q_{inv} &= q^{-1} \bmod p \\
 \end{aligned}
 $$
 
-### パディング
+### RSA-OAEP
 メッセージが改ざんされずに届けられていること(完全性)を確認するのにパディングは用いられます。RSA では [RFC 8017: PKCS #1 V2.2 (RSA Cryptography Specifications Version 2.2)](https://datatracker.ietf.org/doc/html/rfc8017) の主に次の 3 つのパディングが使われます。
 
-- PKCS#1 v1.5; Public-Key Cryptography Standards#1 v1.5
+- PKCS#1 v1.5 (Public-Key Cryptography Standards#1 v1.5)
   - `0002<random>00<hashprefix><message>`
-- OAEP; Optimal Asymmetric Encryption Padding
+- OAEP (Optimal Asymmetric Encryption Padding)
   - Padding Oracle Attack で破られないようなパディング形式 InD-CCA2
   - https://inaz2.hatenablog.com/entry/2016/01/26/222303
-- PSS; Probabilistic Signature Scheme
+- PSS (Probabilistic Signature Scheme)
   - 署名でよく使われる
 
 このようなパディングを用いた RSA を RSA-[パディング名] などと呼んだりします。
@@ -322,12 +324,6 @@ $$
 $$
 
 この $M$ が $N$ のどれかの大きな素因数 $p$ に対して $p-1$ の倍数となったとき $\gcd(a^k - 1, N)$ を計算することで $p$ を取り出せます。計算量は $\mathcal{O}(B\log B\log\log n)$ らしいです。
-
-果たしてそんなうまくいくのだろうか？これを初めて聞いたとき大きな数は大体大きな素因数持ってるだろうからほとんど上手くいかなそうと感じました。
-
-考えてみればすぐわかります。
-
-適当に数を取ってきてある素数 $p$ が含まれている確率というのは $1/p$ 、つまり素数が大きければ大きいほど入ってるのは稀です。
 
 ```python
 from math import gcd, log
