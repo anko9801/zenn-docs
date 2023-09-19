@@ -343,8 +343,8 @@ $p + 1$ が Smooth number のとき有効な素因数分解法です。
 > **Prop.**
 > $k$ が $p+1$ の倍数であれば Lucas 数列 $u_i, v_i$ に対し、 $u_k$ は $p$ の倍数となる。ただし Lucas 数列は次のように定義される。
 >
-
-$$
+> 
+> $$
 \begin{aligned}
   u_0 & = 0, u_1 = 1, u_{n+1} = au_n - bu_{n-1} \\
   v_0 & = 2, v_1 = a, v_{n+1} = av_n - bv_{n-1}
@@ -390,6 +390,16 @@ def pp1(n):
 $N$ が 2, 3 の倍数でないとします。楕円曲線 $y^2 = x^3 + ax + b \pmod N$ について $a, b$ に様々な値を与えて $kP$ を計算します。
 
 計算量は準指数時間 $\mathcal{O}(\exp((1 + c)(\log p)^{1/2}(\log\log p)^{1/2}))$ らしい。
+
+```python:SageMath
+N = 1715761513
+E = EllipticCurve(Zmod(N), [3, -13])
+P = E(2, 1)
+try:
+    LCM([2..60]) * P
+except ZeroDivisionError as e:
+    print(e)
+```
 
 ### Fermat 法
 $p, q$ の比率が大体わかっているとその周辺を調べることで素数の組を見つけられます。まず $p \approx q$ のとき
