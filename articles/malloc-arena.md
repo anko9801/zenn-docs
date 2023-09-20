@@ -161,24 +161,17 @@ struct malloc_par
   size_t tcache_unsorted_limit;   // unsortedbin が持てる最大のチャンク数
 };
 
-/*
-    DEFAULT_MXFAST             64 (for 32bit), 128 (for 64bit)
-    DEFAULT_TRIM_THRESHOLD     128 * 1024
-    DEFAULT_TOP_PAD            0
-    DEFAULT_MMAP_THRESHOLD     128 * 1024
-    DEFAULT_MMAP_MAX           65536
-*/
 static struct malloc_par mp_ =
 {
-  .top_pad = DEFAULT_TOP_PAD,
-  .n_mmaps_max = DEFAULT_MMAP_MAX,
-  .mmap_threshold = DEFAULT_MMAP_THRESHOLD,
-  .trim_threshold = DEFAULT_TRIM_THRESHOLD,
+  .top_pad = DEFAULT_TOP_PAD,                           // 0
+  .n_mmaps_max = DEFAULT_MMAP_MAX,                      // 65536
+  .mmap_threshold = DEFAULT_MMAP_THRESHOLD,             // 128 * 1024
+  .trim_threshold = DEFAULT_TRIM_THRESHOLD,             // 128 * 1024
 #define NARENAS_FROM_NCORES(n) ((n) * (sizeof (long) == 4 ? 2 : 8))
   .arena_test = NARENAS_FROM_NCORES (1),
-  .tcache_count = TCACHE_FILL_COUNT,
-  .tcache_bins = TCACHE_MAX_BINS,
-  .tcache_max_bytes = tidx2usize (TCACHE_MAX_BINS-1),
+  .tcache_count = TCACHE_FILL_COUNT,                    // 7
+  .tcache_bins = TCACHE_MAX_BINS,                       // 64
+  .tcache_max_bytes = tidx2usize (TCACHE_MAX_BINS-1),   // 0x410
   .tcache_unsorted_limit = 0 /* No limit.  */
 };
 ```
