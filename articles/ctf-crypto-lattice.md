@@ -1,6 +1,6 @@
 ---
 title: "【CTF 探訪記】格子暗号への攻撃"
-emoji: "😎"
+emoji: "🐄"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["CTF", "crypto"]
 published: true
