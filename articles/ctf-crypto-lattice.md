@@ -6,6 +6,10 @@ topics: ["CTF", "crypto"]
 published: true
 ---
 
+この記事は各暗号を理解して解読できるようになるシリーズの一部です。一覧は次の記事を見てください。
+
+https://zenn.dev/anko/articles/ctf-crypto-begginer
+
 ## 格子とは
 格子というのは基底を足し引きすることで現れる空間上に等間隔で並ぶ点の集合です。
 

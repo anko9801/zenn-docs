@@ -6,6 +6,10 @@ topics: ["CTF", "crypto", "Z3"]
 published: true
 ---
 
+この記事は各暗号を理解して解読できるようになるシリーズの一部です。一覧は次の記事を見てください。
+
+https://zenn.dev/anko/articles/ctf-crypto-begginer
+
 CTF の Crypto で使うツール、と言っても主に SageMath しか使いませんが次の 3 つを紹介していこうと思います。
 
 - Python

@@ -6,6 +6,10 @@ topics: ["CTF", "crypto"]
 published: true
 ---
 
+この記事は各暗号を理解して解読できるようになるシリーズの一部です。一覧は次の記事を見てください。
+
+https://zenn.dev/anko/articles/ctf-crypto-begginer
+
 ここでは公開鍵暗号の入門とそれを応用した技術を理解します。ただ攻撃はしないので攻撃したい人はさらっと読み飛ばすといいかも。
 
 ## 公開鍵暗号

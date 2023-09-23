@@ -6,6 +6,10 @@ topics: ["CTF", "crypto"]
 published: true
 ---
 
+この記事は各暗号を理解して解読できるようになるシリーズの一部です。一覧は次の記事を見てください。
+
+https://zenn.dev/anko/articles/ctf-crypto-begginer
+
 誰にも予測できないような乱数を作るにはどうすればいいでしょうか？
 
 例えばこんな例を考えてみましょう。

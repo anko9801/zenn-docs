@@ -6,6 +6,12 @@ topics: ["CTF", "crypto"]
 published: true
 ---
 
+この記事は各暗号を理解して解読できるようになるシリーズの一部です。一覧は次の記事を見てください。
+
+https://zenn.dev/anko/articles/ctf-crypto-begginer
+
+今回は共通鍵暗号です。
+
 > **共通鍵暗号**
 > 暗号化と復号で **同じ鍵** を使い、暗号化で使う鍵を **秘密** にする方式
 > ex.) AES, DES, ChaCha20 など
