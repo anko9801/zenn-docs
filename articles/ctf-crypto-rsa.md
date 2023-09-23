@@ -20,7 +20,7 @@ published: true
 
 ## RSA暗号
 
-前の記事では公開鍵暗号を取り扱いました。
+前回の記事では公開鍵暗号を取り扱いました。
 
 https://zenn.dev/anko/articles/ctf-crypto-publickey
 
