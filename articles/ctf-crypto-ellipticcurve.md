@@ -996,7 +996,6 @@ def FR_reduction(P, R, max_k=6, max_tries=10):
 
 ## 参考文献
 - [Imaginary hyperelliptic curve - Wikipedia](https://en.wikipedia.org/wiki/Imaginary_hyperelliptic_curve)
-- Python での高速な実装 fastecdsa
 - [超楕円曲線暗号と位数計算](https://www.iisec.ac.jp/proc/vol0002/iisec_proc_002_p043.pdf)
 - [Velu の公式とその応用](http://www.ipc.tohoku-gakuin.ac.jp/atsushi/article/velu.pdf)
 - [ANALOGUES OF VELU’S FORMULAS FOR ISOGENIES ON ALTERNATE MODELS OF ELLIPTIC CURVES](https://eprint.iacr.org/2011/430.pdf)

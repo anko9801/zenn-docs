@@ -168,6 +168,7 @@ Oil and Vinegar からパラメータを修正する Kipnis ら 1999年
 
 > **QR-UOV**
 
+- [MAYO](https://pqmayo.org/)
 
 ## まとめ
 
@@ -175,7 +176,9 @@ Oil and Vinegar からパラメータを修正する Kipnis ら 1999年
 - Post-Quantum Cryptography
 - 耐量子計算機暗号
 - [量子コンピュータに耐性のある暗号技術の標準化動向：米国政府標準暗号について](https://www.imes.boj.or.jp/research/papers/japanese/19-J-04.pdf)
+- [耐量子計算機暗号の研究動向調査報告書](https://www.cryptrec.go.jp/report/cryptrec-tr-2001-2018.pdf)
 - [An efficient key recovery attack on SIDH](https://eprint.iacr.org/2022/975)
 - [Constructing Digital Signatures from a One Way Function](https://www.microsoft.com/en-us/research/publication/constructing-digital-signatures-one-way-function/)
+
 
 この資料は CC0 ライセンスです。
