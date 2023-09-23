@@ -396,9 +396,15 @@ $$
 \begin{aligned}
 a_{i+1}P &=
 \begin{cases}
-Q + a_iP = (a_i + d)P & (a_iP \in G_1) \\
-2(a_iP) = 2a_iP & (a_iP \in G_2)\\
-P + a_iP = (a_i + 1)P & (a_iP \in G_3)
+Q + a_iP & (a_iP \in G_1) \\
+2(a_iP) & (a_iP \in G_2)\\
+P + a_iP & (a_iP \in G_3)
+\end{cases} \\
+ &=
+\begin{cases}
+(a_i + d)P & (a_iP \in G_1) \\
+2a_iP & (a_iP \in G_2)\\
+(a_i + 1)P & (a_iP \in G_3)
 \end{cases}
 \end{aligned}
 $$
