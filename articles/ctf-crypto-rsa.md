@@ -223,14 +223,11 @@ $$
 - PKCS#1 v1.5 (Public-Key Cryptography Standards#1 v1.5)
   - `0002<random>00<hashprefix><message>`
 - OAEP (Optimal Asymmetric Encryption Padding)
-  - Padding Oracle Attack で破られないようなパディング形式 InD-CCA2
-  - https://inaz2.hatenablog.com/entry/2016/01/26/222303
+  - 攻撃に強いパディング (IND-CCA2) 証明: [OAEP Reconsidered - Victor Shoup](https://eprint.iacr.org/2000/060.pdf)
 - PSS (Probabilistic Signature Scheme)
   - 署名でよく使われる
 
 このようなパディングを用いた RSA を RSA-[パディング名] などと呼んだりします。
-
-RSA-OAEP は IND-CCA2 です。[OAEP Reconsidered - Victor Shoup](https://eprint.iacr.org/2000/060.pdf)
 
 ## 素因数分解
 
