@@ -1061,8 +1061,8 @@ $$
 
 $$
 \begin{aligned}
-x^2 + Bx - c = 0 \pmod{p} \\
-x^2 + Bx - c = 0 \pmod{q}
+x = \left(c + \frac{B^2}{4}\right)^{(p + 1)/4} - \frac{B}{2} \pmod{p} \\
+x = \left(c + \frac{B^2}{4}\right)^{(q + 1)/4} - \frac{B}{2} \pmod{q} \\
 \end{aligned}
 $$
 
