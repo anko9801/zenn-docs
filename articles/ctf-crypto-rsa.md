@@ -6,9 +6,17 @@ topics: ["CTF", "crypto"]
 published: true
 ---
 
-この記事は各暗号を理解して解読できるようになるシリーズの一部です。一覧は次の記事を見てください。
+この記事は各暗号を理解して解読できるようになるシリーズの一部です。このシリーズの一覧は次のようになっています。
 
-https://zenn.dev/anko/articles/ctf-crypto-begginer
+- [Crypto 入門](https://zenn.dev/anko/articles/ctf-crypto-begginer)
+- [共通鍵暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-commonkey)
+- [なぜ公開鍵暗号は安全なのか](https://zenn.dev/anko/articles/ctf-crypto-publickey)
+- [RSA 暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-rsa)
+- [楕円曲線暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-ellipticcurve)
+- [乱数とハッシュへの攻撃](https://zenn.dev/anko/articles/ctf-crypto-random)
+- [格子暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-lattice)
+
+## はじめに
 
 すぐそこに秘密の世界があります。この記事を読んでいるなら、あなたは暗号化された通信を通してサーバーから電気線を通り、遥々その端末に届いている文字を読んでいます。
 

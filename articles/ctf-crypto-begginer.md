@@ -10,15 +10,15 @@ CTF とは技術における高度な知識とパズルを解く発想力の両�
 
 ただ Crypto の知識を得る手段は実際に CTF に出て writeup を読んだり、大量の資料を読むことでしかがなかったと思います。そこで Crypto における体系的に解説するこのシリーズを作りました！私自身これが欲しくて助かりました！(?)
 
-一覧をまとめておきます。
+このシリーズの一覧は次のようになっています。
 
-https://zenn.dev/anko/articles/ctf-crypto-begginer
-https://zenn.dev/anko/articles/ctf-crypto-commonkey
-https://zenn.dev/anko/articles/ctf-crypto-publickey
-https://zenn.dev/anko/articles/ctf-crypto-rsa
-https://zenn.dev/anko/articles/ctf-crypto-ellipticcurve
-https://zenn.dev/anko/articles/ctf-crypto-random
-https://zenn.dev/anko/articles/ctf-crypto-lattice
+- [Crypto 入門](https://zenn.dev/anko/articles/ctf-crypto-begginer)
+- [共通鍵暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-commonkey)
+- [なぜ公開鍵暗号は安全なのか](https://zenn.dev/anko/articles/ctf-crypto-publickey)
+- [RSA 暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-rsa)
+- [楕円曲線暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-ellipticcurve)
+- [乱数とハッシュへの攻撃](https://zenn.dev/anko/articles/ctf-crypto-random)
+- [格子暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-lattice)
 
 今回は Crypto つまり暗号というのは何なのかを解説します。
 
