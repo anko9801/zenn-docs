@@ -6,7 +6,7 @@ topics: ["CTF", "crypto"]
 published: true
 ---
 
-この記事は各暗号を理解して解読できるようになるシリーズの一部です。このシリーズの一覧は次のようになっています。
+この記事は暗号を理解して解読できるようになろうというシリーズの一部です。シリーズの一覧は次のようになっています。
 
 - [Crypto 入門](https://zenn.dev/anko/articles/ctf-crypto-begginer)
 - [共通鍵暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-commonkey)
