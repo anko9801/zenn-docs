@@ -1,5 +1,5 @@
 ---
-title: "【CTF 探訪記】crypto 入門"
+title: "【CTF 探訪記】Crypto 入門"
 emoji: "😸"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["CTF", "crypto"]

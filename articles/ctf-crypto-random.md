@@ -1,5 +1,5 @@
 ---
-title: "【CTF 探訪記】ハッシュと乱数生成"
+title: "【CTF 探訪記】ハッシュと乱数への攻撃"
 emoji: "🥢"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["CTF", "crypto"]
