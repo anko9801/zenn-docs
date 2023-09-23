@@ -221,11 +221,11 @@ $$
 メッセージが改ざんされずに届けられていること(完全性)を確認するのにパディングは用いられます。RSA では [RFC 8017: PKCS #1 V2.2 (RSA Cryptography Specifications Version 2.2)](https://datatracker.ietf.org/doc/html/rfc8017) の主に次の 3 つのパディングが使われます。
 
 - PKCS#1 v1.5 (Public-Key Cryptography Standards#1 v1.5)
-  - `0002<random>00<hashprefix><message>`
+  - 簡単なパディング形式: `0002<random>00<hashprefix><message>`
 - OAEP (Optimal Asymmetric Encryption Padding)
-  - 攻撃に強いパディング (IND-CCA2) 証明: [OAEP Reconsidered - Victor Shoup](https://eprint.iacr.org/2000/060.pdf)
+  - 攻撃に強いパディング (IND-CCA2) 証明は [OAEP Reconsidered - Victor Shoup](https://eprint.iacr.org/2000/060.pdf) にある
 - PSS (Probabilistic Signature Scheme)
-  - 署名でよく使われる
+  - 署名でよく使われる確率的な検証を行うパディング形式
 
 このようなパディングを用いた RSA を RSA-[パディング名] などと呼んだりします。
 
