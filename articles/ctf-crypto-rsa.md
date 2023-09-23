@@ -101,8 +101,6 @@ $$
 
 このように計算できます。
 
-また電子署名は暗号化と復号を逆転させればいいです。
-
 ### 実装
 計算方法が分かったので実装できそうです。
 
@@ -343,7 +341,7 @@ $p + 1$ が Smooth number のとき有効な素因数分解法です。
 > **Prop.**
 > $k$ が $p+1$ の倍数であれば Lucas 数列 $u_i, v_i$ に対し、 $u_k$ は $p$ の倍数となる。ただし Lucas 数列は次のように定義される。
 >
-> 
+>
 > $$
 \begin{aligned}
   u_0 & = 0, u_1 = 1, u_{n+1} = au_n - bu_{n-1} \\
@@ -1014,14 +1012,34 @@ https://news.err.ee/616732/potential-security-risk-could-affect-750-000-estonian
 このとき位数 $se^n$ から $e^n$ 乗することで位数 $s$ の乗法群に落とし、そこでなら逆元を取れるので、位数 $se^n$ の元を $e^n$ 回掛けて全探索すると平文が見つかる。
 
 ## 素因数分解ベースの暗号
+大きな素数の合成数 $n = pq$ を使った
+$\phi = \mathrm{lcm}(p-1, q-1)$
+
 ### Paillier 暗号
-$r$ の位数の倍数 $\lambda$ を秘密鍵
+Paillier 暗号は 1999 年に考案された稀に見る加法準同型性を持つ暗号です ([元論文](https://link.springer.com/content/pdf/10.1007/3-540-48910-X_16.pdf))。ベースの環は $\mathbb{Z}/n^2\mathbb{Z}$ でカーマイケルの定理より $(\mathbb{Z}/n^2\mathbb{Z})^\times \cong \mathbb{Z}/n\phi\mathbb{Z}$ となります。
+
+適当に $k\in\mathbb{Z}/n\mathbb{Z}$ を取り $g = 1 + kn$ とすると
 
 $$
 \begin{aligned}
-c & = (1 + kn)^mr^n & \pmod{n^2} \\
-c^\lambda & = ((1 + kn)^mr^n)^\lambda = (1 + kn)^{m\lambda} = 1 + knm\lambda & \pmod{n^2}
+g & = 1 + kn & \pmod{n^2} \\
+g^\phi & = (1 + kn)^\phi = 1 + kn\phi & \pmod{n^2} \\
 \end{aligned}
+$$
+
+となる。乱数 $r$ を用いて暗号文 $c$ を次のように生成すると
+
+$$
+\begin{aligned}
+c & = g^mr^n & \pmod{n^2} \\
+c^\phi & = (g^mr^n)^\phi = g^{m\phi}\cdot 1 = 1 + knm\phi & \pmod{n^2} \\
+\end{aligned}
+$$
+
+次のように復号できる。
+
+$$
+m = \frac{(c^\phi - 1)/n}{(g^\phi - 1)/n} \pmod{n}
 $$
 
 ### Rabin 暗号
