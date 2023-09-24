@@ -8,8 +8,11 @@ published: false
 
 ## 仕様書を読む
 
-`man `
+`man proc`
+
 
 ## 発想する
+
+Injection
 もうこれは経験量に依存するので過去の問題を紹介しまくる。
 
