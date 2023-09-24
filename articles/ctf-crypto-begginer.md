@@ -19,6 +19,7 @@ CTF とは技術における高度な知識とパズルを解く発想力の両�
 - [楕円曲線暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-ellipticcurve)
 - [乱数とハッシュへの攻撃](https://zenn.dev/anko/articles/ctf-crypto-random)
 - [格子暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-lattice)
+- [Crypto に使うツール](https://zenn.dev/anko/articles/ctf-crypto-tools)
 
 今回は Crypto つまり暗号というのは何なのかを解説します。
 

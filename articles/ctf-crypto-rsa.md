@@ -15,6 +15,7 @@ published: true
 - [楕円曲線暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-ellipticcurve)
 - [乱数とハッシュへの攻撃](https://zenn.dev/anko/articles/ctf-crypto-random)
 - [格子暗号への攻撃](https://zenn.dev/anko/articles/ctf-crypto-lattice)
+- [Crypto に使うツール](https://zenn.dev/anko/articles/ctf-crypto-tools)
 
 ## はじめに
 
