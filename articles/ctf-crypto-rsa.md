@@ -852,10 +852,11 @@ $$
 
 ### 秘密鍵は部分的にでも知られてはいけない (Partial Key Exposure Attack)
 
-秘密鍵を部分的に知っていさえいれば、Coppersmith Method を用いて解けてしまう。
-$n$ を $N$ のビット数とする。
+秘密鍵を部分的に知っていさえいれば Coppersmith Method を用いて解けてしまいます。Coppersmith Method は剰余の多項式において小さな解を求めるアルゴリズムです。詳細は次の記事で紹介しています。
 
-`small_roots(X, beta)` 解が $x \leq X$ の範囲で剰余 $p \geq N^\beta$
+https://zenn.dev/anko/articles/ctf-crypto-lattice
+
+ここでは詳しいことは考えず SageMath の `small_roots(X, beta)` を使って多項式の解が求まると思えばいいです。
 
 #### $p, q$ のどちらかを $n/4$ ビット程度知っているとき
 
