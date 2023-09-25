@@ -7,10 +7,8 @@ published: false
 ---
 
 
-DOM Clobbering
-https://diary.shift-js.info/dom-clobbering/
 
-https://www.slideshare.net/x00mario/in-the-dom-no-one-will-hear-you-scream
+
 
 ### Path Traversal
 `../` を使って
@@ -20,3 +18,7 @@ https://www.slideshare.net/x00mario/in-the-dom-no-one-will-hear-you-scream
 例えば `"..././".relpace("../", "") == "../"`
 
 ### Prototype Pollution
+
+### DOM Clobbering
+https://diary.shift-js.info/dom-clobbering/
+https://www.slideshare.net/x00mario/in-the-dom-no-one-will-hear-you-scream
