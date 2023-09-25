@@ -1,5 +1,5 @@
 ---
-title: "web"
+title: "【CTF 探訪記】Web"
 emoji: "🦔"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: []
