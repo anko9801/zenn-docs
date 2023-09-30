@@ -1,5 +1,5 @@
 ---
-title: "【CTF 探訪記】楕円曲線暗号への攻撃"
+title: "楕円曲線暗号を実装して最先端の攻撃を試してみる"
 emoji: "🐢"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["CTF", "crypto"]
