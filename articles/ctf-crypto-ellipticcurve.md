@@ -553,7 +553,7 @@ $$
 もう一度楕円曲線上の和について復習しましょう。
 
 > **Def. 楕円曲線上の和**
-> 楕円曲線 $E/K$ 上の点同士の演算 $+: E(K)\times E(K)\to E(K)$ の群 $(E, +)$ を次のように定義する。
+> 楕円曲線 $E$ 上の点同士の和の群 $(E, +)$ を次のように定義する。
 > 1. 単位元を無限遠点 $\mathcal{O}$ とする。
 > 2. 点 $P = (x, y)$ の逆元を $-P = (x, -y)$ とする。
 > 3. $P(x_1, y_1), Q(x_2, y_2)$ に対して $R(x_3, y_3) = P + Q$ を次のように定義する。
@@ -990,7 +990,7 @@ def FR_reduction(P, R, max_k=6, max_tries=10):
 ここでは天下り的な感じでしたが、代数幾何が分かると楕円曲線と同型な幾何的な構造や特異点の分解などなど色々理解できて楽しいので是非勉強してみてください！
 
 ## 参考文献
-- [Imaginary hyperelliptic curve - Wikipedia](https://en.wikipedia.org/wiki/Imaginary_hyperelliptic_curve)
+- [代数幾何学 1, 2, 3 - 丸善出版 ハーツホーン著](https://www.maruzen-publishing.co.jp/item/?book_no=294648)
 - [超楕円曲線暗号と位数計算](https://www.iisec.ac.jp/proc/vol0002/iisec_proc_002_p043.pdf)
 - [Velu の公式とその応用](http://www.ipc.tohoku-gakuin.ac.jp/atsushi/article/velu.pdf)
 - [ANALOGUES OF VELU’S FORMULAS FOR ISOGENIES ON ALTERNATE MODELS OF ELLIPTIC CURVES](https://eprint.iacr.org/2011/430.pdf)
