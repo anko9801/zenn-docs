@@ -1,5 +1,5 @@
 ---
-title: "【CTF 探訪記】RSA 暗号への攻撃"
+title: "RSA 暗号を理解して有名な攻撃をしてみる"
 emoji: "➗"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["CTF", "crypto"]
