@@ -962,6 +962,19 @@ $P = NP$ のときすべての暗号が多項式時間で解けるようにな�
 
 累乗は多項式時間しか掛かりませんが、累乗根や対数は指数時間掛かるということを頭の隅に置いておいてください。
 
+### 数体ふるい法
+Schirokauer のアルゴリズム
+$L_q[1/3, (64/9)^{1/3}]$
+
+$$
+\begin{aligned}
+\phi(\delta^{q - 1}) = ut^x\phi(\gamma^{q - 1}) \\
+x = -\log_t u \pmod{q - 1}
+\end{aligned}
+$$
+
+
+
 ## 参考文献
 - [Finding a Small Root of a Univariate Modular Equation](https://static.aminer.org/pdf/PDF/000/192/854/finding_a_small_root_of_a_univariate_modular_equation.pdf)
 - [katagaitai workshop 2018 winter](http://elliptic-shiho.github.io/slide/katagaitai_winter_2018.pdf)
