@@ -132,8 +132,9 @@ CTF において楕円曲線の問題が出されたときに位数は解法を�
 |\#E(\mathbb{F}_q) - (q+1)|\leq 2\sqrt{q}
 $$
 
-ここでは標数が 2, 3 ではないときの証明の筋書きだけ記します。詳しくは [Hasse's Theorem on Elliptic Curves](https://fse.studenttheses.ub.rug.nl/10999/1/opzet.pdf) をご覧ください。
 **Sketch.**
+ここでは標数が 2, 3 ではないときの証明の筋書きだけ記します。詳しくは [Hasse's Theorem on Elliptic Curves](https://fse.studenttheses.ub.rug.nl/10999/1/opzet.pdf) をご覧ください。
+
 まずベースとなる楕円曲線 $E/\mathbb{F}_q$ を次のように定義する。
 
 $$
