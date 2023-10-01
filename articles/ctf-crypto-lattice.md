@@ -948,7 +948,7 @@ class CrystalsKyber:
 
     def __init__(self, q, k, eta, N):
         K = GF(q)
-        PR.<X> = PolynomialRing(GF(q))
+        PR.<X> = GF(q)[]
         Rq.<x> = PR.quotient(X^N + 1)
         self.Rq = Rq
         self.q = q
