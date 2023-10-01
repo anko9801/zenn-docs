@@ -670,19 +670,20 @@ def SingularNode(a, b, p):
 
 楕円曲線は射影空間の部分空間 $E\subseteq\mathbb{P}^2$ となっているので還元 $\pi:E(\mathbb{Q}_p)\to E(\mathbb{F}_p)$ と持ち上げ $u: E(\mathbb{F}_p)\to E(\mathbb{Q}_p)$ が与えられ、これらは準同型となる。また $E$ の形式群 $\mathcal{E}$ の形式対数を $\log_{\mathcal{E}}$ とおきます。
 
+このとき次の関数 $\lambda_E$ をおきます。
+
 $$
 \begin{aligned}
-\psi &: (x:y:z) \mapsto \frac{x}{y} \\
-\lambda_E &: E(\mathbb{F}_p)\xrightarrow{u}E(\mathbb{Q}_p)\xrightarrow{\times p}\ker\pi\xrightarrow{\log_{\mathcal{E}}}p\mathbb{Z}_p\xrightarrow{\bmod{p^2}} p\mathbb{Z}_p/p^2\mathbb{Z}_p\cong \mathbb{F}_p
+\lambda_E &: E(\mathbb{F}_p)\xrightarrow{u}E(\mathbb{Q}_p)\xrightarrow{\times p}\ker\pi\xrightarrow{\log_{\mathcal{E}}}p\mathbb{Z}_p\xrightarrow{\bmod{p^2}} p\mathbb{Z}_p/p^2\mathbb{Z}_p\cong \mathbb{F}_p \\
+\psi(x:y:z) & = \frac{x}{y} \\
+\lambda_E(P) & = (\bmod{p^2})\circ\log_{\mathcal{E}}\circ\psi(pu(P))
 \end{aligned}
 $$
 
-$$
-\lambda_E(P) = (\bmod{p^2})\circ\log_{\mathcal{E}}\circ\psi(pu(P))
-$$
+このとき次の定理が成り立ちます。
 
-> **Prop.**
-> $\lambda_E$ が零写像ではないとき次のようになる。
+> **Thm.**
+> $\lambda_E$ が零写像ではないとき点 $P\neq \mathcal{O}$ に対して次のようになる。
 >
 > $$
 \lambda_E(P) = -\frac{x_{p-1} - x_1}{p(y_{p-1} - y_1)}\in\mathbb{Z}_p^\times
@@ -691,12 +692,7 @@ $$
 > ただし $u(nP) = (x_n, y_n)\in E(\mathbb{Q}_p)$ とする。
 
 **Proof.**
-
-$$
-\pi: E(\mathbb{Q}_p)\ni A\mapsto P\in E(\mathbb{F}_p)\setminus\mathcal{O}
-$$
-
-$n\pm m \neq 0 \pmod{p}$ のとき
+まず $\pi(A) = P$ となる $A\in E(\mathbb{Q}_p)$ を取る。$n\pm m \neq 0 \pmod{p}$ のとき
 
 $$
 x_n = x_m \iff \pi(nA) = \pm \pi(mA) \iff (n\pm m) P = \mathcal{O} \iff P = \mathcal{O}
