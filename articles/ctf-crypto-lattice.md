@@ -307,6 +307,7 @@ $$
 > となる。 すると集合 $\pi_l(L)$ は $\lbrace\pi_l(\bm{b}_l), \ldots, \pi_l(\bm{b}_n)\rbrace$ を基底に持つ $n-l+1$ 次元の格子であり, $\pi_l(L)$ を射影格子 (projected lattice) と呼ぶ。
 
 ### サイズ基底簡約
+まずは愚直にユークリッドの互除法を一般の格子に適用します。これをサイズ基底簡約と言います。
 
 > **サイズ基底簡約**
 > $n$ 次元格子 $L$ の基底 $\\{\bm{b_1},\ldots,\bm{b_n}\\}$ を GSO 係数 $\mu_{i,j}$ が
@@ -333,43 +334,15 @@ def size_reduction(B):
     return B
 
 B = matrix([[5, -3, -7], [2, -7, -7], [3, -10, 0]])
+print(B)
 print(size_reduction(B))
 ```
 
-$$
-\begin{pmatrix}
-5 & -3 & -7 \\
-2 & -7 & -7 \\
-3 & -10 & 0
-\end{pmatrix}\to
-\begin{pmatrix}
- 5 & -3 & -7 \\
--3 & -4 & 0 \\
- 1 & -3 & 7
-\end{pmatrix}
-$$
-
 ### LLL 基底簡約
-
-$n$ 次元格子 $L$ の基底 $\lbrace\mathbf{b_1},\ldots,\mathbf{b_n}\rbrace$ について以下の条件を満たすとき、その基底は LLL 簡約されている (Lenstra-Lenstra-Lovasz(LLL)-reduced)と呼ぶ。
-
-1. 基底 $\lbrace\mathbf{b_1},\ldots,\mathbf{b_n}\rbrace$ がサイズ簡約されている。
-2. Lovasz条件: 任意の $2 \leq k \leq n$ に対して $\delta\|\mathbf{b}_{k-1}^*\| \leq \|\pi_{k-1}(\mathbf{b}_{k-1})\|$ を満たす。ただし、各 $1 \leq l \leq n$ に対して、$\pi_l$ は $\mathbb{R}$-ベクトル空間 $\langle\mathbf{b} _1,\ldots,\mathbf{b} _{l-1}\rangle _\mathbb{R}$ の直交補空間への直交射影とする。
-
-これに対し、LLL 基底簡約アルゴリズムは次のように行う。
-
-1. サイズ簡約する。
-2. Lovasz条件を満たすように隣り合う基底ベクトルを交換する。
-
-基底ベクトルを交換した際に GSO ベクトルも更新しなければならない。高速化出来る。
-
-さらに LLL について精度を上げたり、機能を拡張することができ、DeepLLLやMLLLなどの手法がある。
-
-- LLL は隣り合う基底ベクトルのみを比較するが、DeepLLL は全ての基底ベクトルを比較する。
-- MLLL は一次従属なベクトルでも適用できる。
+Lenstra-Lenstra-Lovasz (LLL) が考案した効率の良い基底簡約のアルゴリズムがあります。
 
 > **LLL (Lenstra-Lenstra-Lovasz) 基底簡約**
-> Lovasz 条件を $1/4 < \delta < 1$ としたときに任意の $2\leq k\leq n$ に対して次を満たすこととする。
+> Lovasz 条件を $1/4 < \delta < 1$ としたときに任意の $2\leq k\leq n$ に対して次を満たすこととする。ただし、各 $1 \leq l \leq n$ に対して、$\pi_l$ は $\mathbb{R}$-ベクトル空間 $\langle\mathbf{b} _1,\ldots,\mathbf{b} _{l-1}\rangle _\mathbb{R}$ の直交補空間への直交射影とする。
 >
 > $$
 \delta \|\bm{b}_{k-1}^*\|^2 \leq \|\pi_{k-1}(\bm{b}_k)\|^2
