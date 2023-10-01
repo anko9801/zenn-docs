@@ -999,8 +999,7 @@ _m = enc.decrypt(c)
 assert m == _m
 ```
 
-TODO: どのくらいの情報があれば破れるのかを具体的に話したい
-https://eprint.iacr.org/2023/777.pdf
+どのくらいの情報があれば LWE の暗号を破れるのかは [Too Many Hints – When LLL Breaks LWE](https://eprint.iacr.org/2023/777.pdf) を読むといいでしょう。
 
 ## まとめ
 格子の基底簡約アルゴリズムは格子暗号だけではなく様々な暗号の攻撃に応用でき、CTF では非常に重要なツールとなります。これが出来るようになれば Crypto 上級者の仲間入りなんじゃないでしょうか。
