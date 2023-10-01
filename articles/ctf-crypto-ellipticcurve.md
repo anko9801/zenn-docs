@@ -391,9 +391,9 @@ $$
 \begin{aligned}
 a_{i+1}P &=
 \begin{cases}
-Q + a_iP & (a_iP \in G_1) \\
-2(a_iP) & (a_iP \in G_2)\\
-P + a_iP & (a_iP \in G_3)
+a_iP + Q & (a_iP \in G_1) \\
+a_iP + a_iP & (a_iP \in G_2)\\
+a_iP + P & (a_iP \in G_3)
 \end{cases} \\
  &=
 \begin{cases}
@@ -575,23 +575,28 @@ $$
 - tiramisu (Google CTF)
 :::
 
-### Singularな曲線を用いてはいけない (Singular Curve Point Decompression Attack)
-
-Singular な楕円曲線のとき、特異点という特殊な点ができます。
+### Singular な曲線を用いてはいけない (Singular Curve Point Decompression Attack)
+特異点を持つ楕円曲線は写像を通して FFDLP に落ちます。
 
 > **Def. 特異点**
-> ある関数 $f(x, y) = 0$ の特異点とは次を満たす $(X, Y)$ である。
+> ある関数 $f(x, y) = 0$ の特異点とは次を満たす点 $(X, Y)$ である。
 >
 > $$
 \left.\frac{\partial f}{\partial x}\right|_{(X, Y)} = \left.\frac{\partial f}{\partial y}\right|_{(X, Y)} = 0
 $$
 
-このように微分値が不定となる点、グラフ上では関数の曲線が交差している点です。
+このように微分値が不定となる点、グラフ上では関数の曲線が交差している点を特異点と言います。楕円曲線では次のように計算できます。
 
-> **Prop.**
-> 楕円曲線の特異点は判別式が $\Delta = 0$ のときに存在し、 $(X, Y) = (\pm\sqrt{-a/3}, 0)$ にある。
+$$
+\begin{aligned}
+f(x, y) & = y^2 - (x^3 + ax + b) \\
+\frac{\partial f}{\partial x} & = -3x^2 - a, \quad \frac{\partial f}{\partial y} = 2y
+\end{aligned}
+$$
 
-楕円曲線の曲線は高々 1 回交わることになるので 2 つのタイプに分けられます。1 つは十字に交わるノード、もう 1 つは接しながら交わるカスプです。そしてそれぞれの場合について写像を用いることで ECDLP が FFDLP に落ちます。
+これより楕円曲線の特異点が存在すれば $\left(\pm\sqrt{-\dfrac{a}{3}}, 0\right)$ にあります。
+
+楕円曲線の曲線は高々 1 回交わることになるので 2 つのタイプに分けられます。1 つは十字に交わるノード、もう 1 つは接しながら交わるカスプです。
 
 #### カスプの場合
 
@@ -661,7 +666,7 @@ def SingularNode(a, b, p):
 ```
 
 ### Anomalous な曲線を用いてはいけない (SSSA Attack)
-Anomalous な曲線とは $E/\mathbb{F}_p$ の位数が $p$ となる楕円曲線です。これには SSSA (Semaev-Smart-Satoh-Araki) Attack という攻撃が通ります。
+位数が $p$ の楕円曲線を Anomalous な曲線と言います。これには SSSA (Semaev-Smart-Satoh-Araki) Attack という攻撃が通ります。
 
 楕円曲線は射影空間の部分空間 $E\subseteq\mathbb{P}^2$ となっているので還元 $\pi:E(\mathbb{Q}_p)\to E(\mathbb{F}_p)$ と持ち上げ $u: E(\mathbb{F}_p)\to E(\mathbb{Q}_p)$ が与えられ、これらは準同型となる。また $E$ の形式群 $\mathcal{E}$ の形式対数を $\log_{\mathcal{E}}$ とおきます。
 
@@ -672,7 +677,14 @@ $$
 \end{aligned}
 $$
 
-$\lambda_E$ が零写像でないときを考える。
+> **Prop.**
+> $\lambda_E$ が零写像ではないとき次のようになる。
+>
+> $$
+\lambda_E(P) = -\frac{x_{p-1} - x_1}{p(y_{p-1} - y_1)}\in\mathbb{Z}_p^\times
+$$
+
+**Proof.**
 
 $$
 \pi: E(\mathbb{Q}_p)\ni A\mapsto P\in E(\mathbb{F}_p)\setminus\mathcal{O}
@@ -681,7 +693,7 @@ $$
 $nA = (x_n, y_n)$ と置く。 $n\pm m \neq 0 \pmod{p}$ のとき
 
 $$
-x_n = x_m \implies \pi(nA) = \pm \pi(mA) \iff (n\pm m) P = \mathcal{O} \iff P = \mathcal{O}
+x_n = x_m \iff \pi(nA) = \pm \pi(mA) \iff (n\pm m) P = \mathcal{O} \iff P = \mathcal{O}
 $$
 
 と矛盾するので $x_n\neq x_m$ である。これより $n \neq 0 \pmod{p}$ ならば $nA \neq \mathcal{O}$ となる。
@@ -690,7 +702,10 @@ $n = 1$ のとき $A\in E(\mathbb{Z}_p)$ である。
 $n = 2$ のとき $y_1\in\mathbb{Z}_p^\times$ より次のようになる。
 
 $$
-  2A = \left(\left(\frac{3x_1^2 + a_4}{2y_1}\right)^2 - 2x_1, -\left(\frac{3x_1^2 + a_4}{2y_1}\right)x_2 - \frac{-x_1^3 + a_4x_1 + 2a_6}{2y_1}\right)\in E(\mathbb{Z}_p)
+\begin{aligned}
+  2A & = \left(c_2^2 - 2x_1, - c_2x_2 - d_2\right)\in E(\mathbb{Z}_p) \\
+  c_2 & = \frac{3x_1^2 + a_4}{2y_1}, \qquad d_2 = \frac{-x_1^3 + a_4x_1 + 2a_6}{2y_1}
+\end{aligned}
 $$
 
 $2<n<p$ のとき $x_{n-1} \neq x_1$ より $x_{n-1} - x_1 \in\mathbb{Z}_p^\times$ であるから次のようになる。
@@ -698,7 +713,7 @@ $2<n<p$ のとき $x_{n-1} \neq x_1$ より $x_{n-1} - x_1 \in\mathbb{Z}_p^\time
 $$
 \begin{aligned}
   nA & = (c_n^2 - x_1 - x_{n-1}, -c_n^3 + c_n(x_1 + x_{n-1}) - d_n)\in E(\mathbb{Z}_p) \\
-  c_n & = \frac{y_{n-1} - y_1}{x_{n-1} - x_1}, d_n = y_1 - x_1c_n
+  c_n & = \frac{y_{n-1} - y_1}{x_{n-1} - x_1}, \qquad d_n = y_1 - x_1c_n
 \end{aligned}
 $$
 
@@ -713,7 +728,7 @@ $$
 $$
 \begin{aligned}
   pA & = (c_p^2 - x_1 - x_{p-1}, -c_p^3 + c_p(x_1 + x_{p-1}) - d_p) \\
-  c_p & = \frac{y_{p-1} - y_1}{x_{p-1} - x_1}, d_p = y_1 - x_1c_p
+  c_p & = \frac{y_{p-1} - y_1}{x_{p-1} - x_1}, \qquad d_p = y_1 - x_1c_p
 \end{aligned}
 $$
 
@@ -819,7 +834,7 @@ def h(P, Q, R):
     q = R.x + P.x + Q.x - L * L
     return p / q
 
-def miller(E, P, Q, m):
+def miller(P, Q, m):
     if P == Q:
         return 1
     f = 1
@@ -852,15 +867,15 @@ $$
 def weil_pairing(E, P, Q, m, S=None):
     if S is None:
         S = E.random_point()
-    fpqs = miller(E, P, Q + S, m)
-    fps = miller(E, P, S, m)
-    fqps = miller(E, Q, P - S, m)
-    fqs = miller(E, Q, -S, m)
+    fpqs = miller(P, Q + S, m)
+    fps = miller(P, S, m)
+    fqps = miller(Q, P - S, m)
+    fqs = miller(Q, -S, m)
     return (fpqs / fps) / (fqps / fqs)
 
 
 def tate_pairing(E, P, Q, m, k=2):
-    f = miller(E, P, Q, m)
+    f = miller(P, Q, m)
     return f ^ ((p ^ k - 1) // m)
 ```
 
