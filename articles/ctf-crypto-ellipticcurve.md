@@ -110,7 +110,6 @@ $$
 定義の式自体はぱっと見不自然と感じる人が多いと思うのですが幾何的に見ると自然となっていて、楕円曲線上の点 $P, Q$ について直線 $PQ$ ($P = Q$ のとき接線) と曲線との交点が $-(P + Q)$ となり、その $y$ 座標の符号を反転した点が $P + Q$ となります。また縦一直線となると曲線と重ならず無限遠点 $\mathcal{O}$ と交点を持ちます。これは見るからに可換法則が成り立ちます。
 
 ![](/images/elliptic_addition.png)
-https://andrea.corbellini.name/ecc/interactive/reals-add.html
 
 例えば次の楕円曲線 $E: y^2 = x^3 - 7x + 10$ において $P = (1, 2)$, $Q = (3, 4)$ の和 $R = P + Q$ について直線 $PQ$ の傾きは $\lambda = 1$ より
 
@@ -122,6 +121,10 @@ y_3 & = \lambda(x_1 - x_3) - y_1 = 2
 $$
 
 よって $R = (-3, 2)$ となります。
+
+このような具体例は次のサイトが分かりやすいと思います。
+
+https://andrea.corbellini.name/ecc/interactive/reals-add.html
 
 ### 楕円曲線の位数
 
