@@ -762,7 +762,7 @@ def lambda_E(E, P):
     p = E.base_ring().order()
     x1, y1 = P.xy()
     xp_1, yp_1 = ((p - 1) * P).xy()
-    res = (ZZ(xp_1 - x1) // p) / (yp_1 - y1)
+    res = Zmod(p^2)(ZZ(xp_1 - x1) / p) / (yp_1 - y1)
     assert res != 0
     return res
 
@@ -770,10 +770,10 @@ def SSSA_attack(E, P, Q):
     p = E.base_ring().order()
     a, b = E.a4(), E.a6()
     assert E.cardinality() == p
+    assert E.trace_of_frobenius() == 1
 
     Px, Py = P = hensel_lift(E, P)
     Qx, Qy = Q = hensel_lift(E, Q)
-
     A = ((Qy^2 - Py^2) - (Qx^3 - Px^3)) / (Qx - Px)
     B = Py^2 - Px^3 - int(a)*Px
     R = Zmod(p^2)
