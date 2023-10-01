@@ -900,68 +900,7 @@ $\Box$
 > - Weil pairing を用いるものを MOV (Menezes-Okamoto-Vanstone) Reduction という。
 > - Tate pairing を用いるものを FR (Frey-Rück) Reduction という。
 
-```python
-def MOV_reduction():
-    E = P.curve()
-    q = E.base_ring().order()
-    n = P.order()
-    assert gcd(n, q) == 1, "GCD of base point order and curve base ring order should be 1."
 
-    logging.info("Calculating embedding degree...")
-    k = get_embedding_degree(q, n, max_k)
-    if k is None:
-        return None
-
-    logging.info(f"Found embedding degree {k}")
-    Ek = E.base_extend(GF(q ** k))
-    Pk = Ek(P)
-    Rk = Ek(R)
-    for i in range(max_tries):
-        Q_ = Ek.random_point()
-        m = Q_.order()
-        d = gcd(m, n)
-        Q = (m // d) * Q_
-        if Q.order() != n:
-            continue
-
-        if (alpha := Pk.weil_pairing(Q, n)) == 1:
-            continue
-
-        beta = Rk.weil_pairing(Q, n)
-        logging.info(f"Computing {beta}.log({alpha})...")
-        l = beta.log(alpha)
-        return int(l)
-
-    return None
-
-def FR_reduction(P, R, max_k=6, max_tries=10):
-    E = P.curve()
-    q = E.base_ring().order()
-    n = P.order()
-    assert gcd(n, q) == 1, "GCD of base point order and curve base ring order should be 1."
-
-    logging.info("Calculating embedding degree...")
-    k = get_embedding_degree(q, n, max_k)
-    if k is None:
-        return None
-
-    logging.info(f"Found embedding degree {k}")
-    Ek = E.base_extend(GF(q ** k))
-    Pk = Ek(P)
-    Rk = Ek(R)
-    for _ in range(max_tries):
-        S = Ek.random_point()
-        T = Ek.random_point()
-        if (gamma := Pk.tate_pairing(S, n, k) / Pk.tate_pairing(T, n, k)) == 1:
-            continue
-
-        delta = Rk.tate_pairing(S, n, k) / Rk.tate_pairing(T, n, k)
-        logging.info(f"Computing {delta}.log({gamma})...")
-        l = delta.log(gamma)
-        return int(l)
-
-    return None
-```
 
 ## まとめ
 楕円曲線暗号の雰囲気を味わうことができたと思います。
