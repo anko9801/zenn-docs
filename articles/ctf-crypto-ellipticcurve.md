@@ -677,12 +677,18 @@ $$
 \end{aligned}
 $$
 
+$$
+\lambda_E(P) = (\bmod{p^2})\circ\log_{\mathcal{E}}\circ\psi(pu(P))
+$$
+
 > **Prop.**
 > $\lambda_E$ が零写像ではないとき次のようになる。
 >
 > $$
 \lambda_E(P) = -\frac{x_{p-1} - x_1}{p(y_{p-1} - y_1)}\in\mathbb{Z}_p^\times
 $$
+>
+> ただし $u(nP) = (x_n, y_n)\in E(\mathbb{Q}_p)$ とする。
 
 **Proof.**
 
@@ -690,47 +696,27 @@ $$
 \pi: E(\mathbb{Q}_p)\ni A\mapsto P\in E(\mathbb{F}_p)\setminus\mathcal{O}
 $$
 
-$nA = (x_n, y_n)$ と置く。 $n\pm m \neq 0 \pmod{p}$ のとき
+$n\pm m \neq 0 \pmod{p}$ のとき
 
 $$
 x_n = x_m \iff \pi(nA) = \pm \pi(mA) \iff (n\pm m) P = \mathcal{O} \iff P = \mathcal{O}
 $$
 
-と矛盾するので $x_n\neq x_m$ である。これより $n \neq 0 \pmod{p}$ ならば $nA \neq \mathcal{O}$ となる。
+と矛盾するので $x_n\neq x_m$ である。
 
-$n = 1$ のとき $A\in E(\mathbb{Z}_p)$ である。
-$n = 2$ のとき $y_1\in\mathbb{Z}_p^\times$ より次のようになる。
-
-$$
-\begin{aligned}
-  2A & = \left(c_2^2 - 2x_1, - c_2x_2 - d_2\right)\in E(\mathbb{Z}_p) \\
-  c_2 & = \frac{3x_1^2 + a_4}{2y_1}, \qquad d_2 = \frac{-x_1^3 + a_4x_1 + 2a_6}{2y_1}
-\end{aligned}
-$$
-
-$2<n<p$ のとき $x_{n-1} \neq x_1$ より $x_{n-1} - x_1 \in\mathbb{Z}_p^\times$ であるから次のようになる。
+これより $n \neq 0 \pmod{p}$ ならば $nA \neq \mathcal{O}$ である。
 
 $$
 \begin{aligned}
-  nA & = (c_n^2 - x_1 - x_{n-1}, -c_n^3 + c_n(x_1 + x_{n-1}) - d_n)\in E(\mathbb{Z}_p) \\
+  A & = (x_1, y_1) \in E(\mathbb{Z}_p) \\
+  2A & = \left(c_2^2 - 2x_1, - c_2x_2 - d_2\right)\in E(\mathbb{Z}_p) & (\because y_1\in\mathbb{Z}_p^\times) \\
+  c_2 & = \frac{3x_1^2 + a_4}{2y_1}\in\mathbb{Z}_p, \qquad d_2 = \frac{-x_1^3 + a_4x_1 + 2a_6}{2y_1}\in\mathbb{Z}_p \\
+  nA & = (c_n^2 - x_1 - x_{n-1}, -c_n^3 + c_n(x_1 + x_{n-1}) - d_n) \\
   c_n & = \frac{y_{n-1} - y_1}{x_{n-1} - x_1}, \qquad d_n = y_1 - x_1c_n
 \end{aligned}
 $$
 
-$n = p$ のとき、もし $pA = \mathcal{O}$ であれば
-
-$$
-\lambda_E(P) = (\bmod{p^2})\circ\log_{\mathcal{E}}\circ\psi(\mathcal{O}) = 0
-$$
-
-より $\lambda_E$ が零写像でないことに矛盾する。よって $pA \neq \mathcal{O}$ である。また具体的表式は次のようになる。
-
-$$
-\begin{aligned}
-  pA & = (c_p^2 - x_1 - x_{p-1}, -c_p^3 + c_p(x_1 + x_{p-1}) - d_p) \\
-  c_p & = \frac{y_{p-1} - y_1}{x_{p-1} - x_1}, \qquad d_p = y_1 - x_1c_p
-\end{aligned}
-$$
+$2<n<p$ のとき $x_{n-1} \neq x_1$ より $x_{n-1} - x_1 \in\mathbb{Z}_p^\times$ であるから $nA\in E(\mathbb{Z}_p)$ です。$n = p$ のとき、もし $pA = \mathcal{O}$ であれば $\lambda_E(P) = 0$ となるので零写像でないことに矛盾する。よって $pA \neq \mathcal{O}$ である。
 
 ここで $c_p\in\mathbb{Z}_p$ とすると $d_p\in\mathbb{Z}_p, y_p\in\mathbb{Z}_p$ となるが $\pi((x_p:y_p:1)) = \mathcal{O}$ に矛盾する。これより $\mathrm{ord}_pc_p < 0$ となる。
 
