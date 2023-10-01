@@ -879,7 +879,7 @@ print(s)
 ### CRYSTALS-KYBER
 CRYSTALS-KYBER とは NIST が選考している耐量子暗号の一種で Module-LWE を用いた暗号です。
 
-Module-LWE は多項式 $\mathbb{F}_q[x]/(x^n + 1)$ 上の演算でした。注意として $x^n + 1$ は $\mathbb{F}_q[x]$ において既約多項式であるから $\mathbb{F}_q[x]/(x^n + 1)$ は体となります。簡単の為、$R_q = \mathbb{F}_q[x]/(x^n+1)$, $R = \mathbb{Z}[x]/(x^n+1)$ と書くことにします。多項式同士の積は数論変換 (NTT; Number Theoretic Transform) を用いて高速に計算できます。
+簡単の為、$R_q = \mathbb{F}_q[x]/(x^n+1)$, $R = \mathbb{Z}[x]/(x^n+1)$ と書くことにします。多項式同士の積は数論変換 (NTT; Number Theoretic Transform) を用いて高速に計算できます。
 
 > **Def. 多項式の圧縮**
 > また $R_q$ であれば各要素に対して圧縮を行う。
