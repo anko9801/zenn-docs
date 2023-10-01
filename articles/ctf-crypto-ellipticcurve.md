@@ -716,7 +716,7 @@ $$
 \end{aligned}
 $$
 
-$2<n<p$ のとき $x_{n-1} \neq x_1$ より $x_{n-1} - x_1 \in\mathbb{Z}_p^\times$ であるから $nA\in E(\mathbb{Z}_p)$ です。$n = p$ のとき、もし $pA = \mathcal{O}$ であれば $\lambda_E(P) = 0$ となるので零写像でないことに矛盾する。よって $pA \neq \mathcal{O}$ である。
+$2<n<p$ のとき $x_{n-1} \neq x_1$ より $x_{n-1} - x_1 \in\mathbb{Z}_p^\times$ であるから $nA\in E(\mathbb{Z}_p)$ である。そしてもし $pA = \mathcal{O}$ であれば $\lambda_E(P) = 0$ となるので零写像でないことに矛盾する。よって $pA \neq \mathcal{O}$ である。
 
 ここで $c_p\in\mathbb{Z}_p$ とすると $d_p\in\mathbb{Z}_p, y_p\in\mathbb{Z}_p$ となるが $\pi((x_p:y_p:1)) = \mathcal{O}$ に矛盾する。これより $\mathrm{ord}_pc_p < 0$ となる。
 
@@ -750,41 +750,37 @@ $$
 4. そして $d = \dfrac{\lambda_E(Q)}{\lambda_E(P)}$ と計算すると DLP が解ける。
 
 ```python
-def hensel_lift(P):
+def hensel_lift(E, P):
+    p = E.base_ring().order()
+    a, b = map(ZZ, [E.a4(), E.a6()])
     x, y = map(ZZ, P.xy())
-    t = GF(p)((x ^ 3 + a * x + b - y ^ 2) // p) / (2 * y)
-    return (x, y + p * lift(t))
+    s = (x^3 + a*x + b - y^2) // p
+    s = lift(GF(p)(s) / (2*y))
+    return (x, y + p * s)
 
+def lambda_E(E, P):
+    p = E.base_ring().order()
+    x1, y1 = P.xy()
+    xp_1, yp_1 = ((p - 1) * P).xy()
+    res = (ZZ(xp_1 - x1) // p) / (yp_1 - y1)
+    assert res != 0
+    return res
 
-def SSSA_attack(G, P):
-    E = G.curve()
-    gf = E.base_ring()
-    p = gf.order()
-    assert E.trace_of_frobenius() == 1, f"Curve should have trace of Frobenius = 1."
-    E = EllipticCurve(Qp(p), [int(a) + p * ZZ.random_element(1, p) for a in E.a_invariants()])
+def SSSA_attack(E, P, Q):
+    p = E.base_ring().order()
+    a, b = E.a4(), E.a6()
+    assert E.cardinality() == p
 
-    x1, y1 = hensel_lift(E, P)
-    x2, y2 = hensel_lift(E, Q)
-    A = Zmod(p^2)((y2^2 - y1^2) - (x2^3 - x1^3)) / (x2 - x1)
-    B = Zmod(p^2)(y1^2 - x1^3 - a * x1)
-    E = EllipticCurve(Zmod(p^2), A, B)
-    P = E(x1, y1)
-    Q = E(x2, y2)
-    U = (p - 1) * P
-    V = (p - 1) * Q
-    dx1 = Zmod(p^2)((U.x - x1) // p)
-    dy1 = Zmod(p^2)(U.y - y1)
-    dx2 = Zmod(p^2)((V.x - x2) // p)
-    dy2 = Zmod(p^2)(V.y - y2)
-    return (dy1 / dx1) / (dy2 / dx2)
+    Px, Py = P = hensel_lift(E, P)
+    Qx, Qy = Q = hensel_lift(E, Q)
 
+    A = ((Qy^2 - Py^2) - (Qx^3 - Px^3)) / (Qx - Px)
+    B = Py^2 - Px^3 - int(a)*Px
+    R = Zmod(p^2)
+    lE = EllipticCurve(R, [A, B])
+    P, Q = lE(P), lE(Q)
 
-    E = EllipticCurve(Qp(p), [int(a) + p * ZZ.random_element(1, p) for a in E.a_invariants()])
-    G = p * _lift(E, G, gf)
-    P = p * _lift(E, P, gf)
-    Gx, Gy = G.xy()
-    Px, Py = P.xy()
-    return int(gf((Px / Py) / (Gx / Gy)))
+    return lambda_E(E, P) / lambda_E(E, Q)
 ```
 
 ### Supersingular な曲線を用いてはならない (MOV / FR Reduction)
