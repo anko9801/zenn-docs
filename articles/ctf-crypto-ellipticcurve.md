@@ -891,12 +891,12 @@ $\Box$
 これより Supersingular な楕円曲線上の ECDLP でペアリングを通すことで FFDLP に変換できる。
 
 > **MOV / FR Reduction**
-> ペアリング $e_n(P, Q)$ について次のように計算することで $\mathbb{F}_{p^k}^\times$ となる。
-> 1. $E[n]\subseteq E(\mathbb{F}_{p^k})$ となる最小の $k$ を持ってくる
-> 2. 位数 $n$ の $\alpha=e_n(P, Q)$ となるように $Q \in E[n]$ を取ってくる
-> 3. $\beta = e_n(dP, Q)$
-> 4. $\mathbb{F}_{p^k}^\times$ 上のDLPを $\alpha, \beta$ を用いて解く
+> ペアリング $e_n$ とおいて次のように計算する。
+> 1. $E[n]\subseteq E(\mathbb{F}_{p^k})$ となる最小の $k$ を得る
+> 2. 位数 $n$ の $\alpha = e_n(P, S), \beta = e_n(Q, S)$ となるような $S\in E[n]$ を取る
+> 3. $\alpha, \beta$ に対して $\mathbb{F}_{p^k}^\times$ の FFDLP を解く
 >
+> これに関してペアリングの種類によって名前が異なる。
 > - Weil pairing を用いるものを MOV (Menezes-Okamoto-Vanstone) Reduction という。
 > - Tate pairing を用いるものを FR (Frey-Rück) Reduction という。
 
