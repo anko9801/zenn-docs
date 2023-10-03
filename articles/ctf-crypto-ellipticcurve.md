@@ -683,17 +683,16 @@ def SingularNode(a, b, p):
 ### Anomalous な曲線を用いてはいけない (SSSA Attack)
 位数が $p$ の楕円曲線を Anomalous な曲線と言います。これには SSSA (Semaev-Smart-Satoh-Araki) Attack という攻撃が通ります。
 
-楕円曲線は射影空間の部分空間 $E\subseteq\mathbb{P}^2$ となっているので還元 $\pi:E(\mathbb{Q}_p)\to E(\mathbb{F}_p)$ と持ち上げ $u: E(\mathbb{F}_p)\to E(\mathbb{Q}_p)$ が与えられ、これらは準同型となる。また $E$ の形式群 $\mathcal{E}$ の形式対数を $\log_{\mathcal{E}}$ とおきます。
-
-このとき次の関数 $\lambda_E$ をおきます。
+このとき次の関数 $\lambda_E: E\to\mathbb{F}_p$ をおきます。
 
 $$
 \begin{aligned}
 \lambda_E &: E(\mathbb{F}_p)\xrightarrow{u}E(\mathbb{Q}_p)\xrightarrow{\times p}\ker\pi\xrightarrow{\log_{\mathcal{E}}}p\mathbb{Z}_p\xrightarrow{\bmod{p^2}} p\mathbb{Z}_p/p^2\mathbb{Z}_p\cong \mathbb{F}_p \\
-\psi(x:y:z) & = \frac{x}{y} \\
-\lambda_E(P) & = (\bmod{p^2})\circ\log_{\mathcal{E}}\circ\psi(pu(P))
+\lambda_E(P) & = (\bmod{p^2})\circ\log_{\mathcal{E}}\circ\psi(pu(P)) \qquad \psi(x:y:z) = \frac{x}{y}
 \end{aligned}
 $$
+
+ただし還元写像 $\pi:E(\mathbb{Q}_p)\to E(\mathbb{F}_p)$ と持ち上げ写像 $u: E(\mathbb{F}_p)\to E(\mathbb{Q}_p)$、形式群 $\mathcal{E}$ の形式対数を $\log_{\mathcal{E}}$ とおいた。
 
 このとき次の定理が成り立ちます。
 
