@@ -733,8 +733,6 @@ LWE 問題を解く為にはまず CVP が解ける必要があります。SVP �
 > **Babai’s nearest plane algorithm**
 > $n$ 次元の格子について目標ベクトルに対して最も近い $n-1$ 次元超平面を $1$ つ選ぶことを帰納的に繰り返すことで CVP を解く。
 
-説明通りプログラムを書くとこんな感じです。
-
 ```python
 def babai_cvp(B, w):
     n = B.nrows()
