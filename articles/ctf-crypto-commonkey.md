@@ -111,7 +111,7 @@ b'Sound! Euphonium' -> b'Sound! Euphonium\x10\x10\x10\x10\x10\x10\x10\x10\x10\x1
 b'0123456789ab\x04\x04\x04\x04'    -> b'0123456789ab'
 b'0123456789ab\x04\x03\x04\x04'    -> error
 b'0123456789ab\x04\x03\x03\x03'    -> b'0123456789ab\x04'
-b'0123456789abc\x04\x04\x04'       -> error
+b'0123456789abcd\x03\x03'          -> error
 b'0123456789abcdef'                -> error
 b'0123456789abcdef' + b'\x10' * 16 -> b'0123456789abcdef'
 ```
