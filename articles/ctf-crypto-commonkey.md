@@ -109,7 +109,7 @@ b'Sound! Euphonium' -> b'Sound! Euphonium\x10\x10\x10\x10\x10\x10\x10\x10\x10\x1
 
 # text -> unpad(text, 16)
 b'0123456789ab\x04\x03\x04\x04'    -> error
-b'0123456789ab\x04\x04\x03\x03'    -> error
+b'0123456789ab\x04\x03\x03\x03'    -> b'0123456789ab\x04'
 b'0123456789abc\x03\x02\x01'       -> b'0123456789abc\x03\x02'
 b'0123456789abcd\x02\x02'          -> b'0123456789abcd'
 b'0123456789abcde\x02'             -> error
