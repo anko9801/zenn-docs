@@ -973,7 +973,7 @@ assert m == _m
 格子の基底簡約アルゴリズムは格子暗号だけではなく様々な暗号の攻撃に応用でき、CTF では非常に重要なツールとなります。これが出来るようになれば Crypto 上級者の仲間入りなんじゃないでしょうか。
 
 ## 参考文献
-- https://www.cryptrec.go.jp/exreport/cryptrec-ex-2404-2014.pdf
-- https://joint.imi.kyushu-u.ac.jp/wp-content/uploads/2022/08/220801_03hiromasa.pdf
-- [元論文](https://static.aminer.org/pdf/PDF/000/192/854/finding_a_small_root_of_a_univariate_modular_equation.pdf)
+- [格子問題等の困難性に関する調査](https://www.cryptrec.go.jp/exreport/cryptrec-ex-2404-2014.pdf)
+- [格子暗号 - 耐量子計算機暗号と量子情報の数理](https://joint.imi.kyushu-u.ac.jp/wp-content/uploads/2022/08/220801_03hiromasa.pdf)
+- [Finding a Small Root of a Univariate Modular Equation - Don Coppersmith](https://static.aminer.org/pdf/PDF/000/192/854/finding_a_small_root_of_a_univariate_modular_equation.pdf)
 - [katagaitai workshop 2018 winter](http://elliptic-shiho.github.io/slide/katagaitai_winter_2018.pdf)
