@@ -99,13 +99,13 @@ AES では [PKCS #7 Padding](https://datatracker.ietf.org/doc/html/rfc2315#sect
 from Crypto.Util.Padding import pad, unpad
 
 # text -> pad(text, 16)
-b''                 -> b'\x10' * 0x10
-b'a'                -> b'a' + b'\x0f' * 0xf
+b''                 -> b'\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10'
+b'a'                -> b'a\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f'
 b'Cryptography'     -> b'Cryptography\x04\x04\x04\x04'
 b'GettingOverIt'    -> b'GettingOverIt\x03\x03\x03'
 b'Lycoris Recoil'   -> b'Lycoris Recoil\x02\x02'
 b'No Game No Life'  -> b'No Game No Life\x01'
-b'Sound! Euphonium' -> b'Sound! Euphonium' + b'\x10' * 0x10
+b'Sound! Euphonium' -> b'Sound! Euphonium\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10'
 
 # text -> unpad(text, 16)
 b'0123456789ab\x04\x03\x04\x04'    -> error
