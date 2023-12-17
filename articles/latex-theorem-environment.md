@@ -1,3 +1,10 @@
+---
+title: "LaTeX 定理環境"
+emoji: "🦔"
+type: "tech" # tech: 技術記事 / idea: アイデア
+topics: []
+published: false
+---
 
 
 ## 定理環境
