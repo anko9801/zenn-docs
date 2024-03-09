@@ -169,7 +169,7 @@ def encrypt(plaintext):
 
 def decrypt(cipher):
     c = bytes_to_long(cipher)
-    m = pow(c, d, phi)
+    m = pow(c, d, N)
     plaintext = long_to_bytes(m)
     return plaintext
 
