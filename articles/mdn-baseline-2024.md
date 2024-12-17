@@ -43,14 +43,14 @@ https://web.dev/articles/content-visibility?hl=ja
 ## ブロック レイアウト上の Align-content
 
 
-## テキストの折り返しをより便利に text-wrap white-space-collapse
+## text-wrap white-space-collapse: テキストの折り返しをより便利に
 - `text-wrap`
 - `white-space-collapse`
 - `white-space`
 https://developer.mozilla.org/ja/docs/Web/CSS/text-wrap
 https://coliss.com/articles/build-websites/operation/css/about-text-wrap-balance.html
 
-## 異なるフォントが混ざってても綺麗なタイポグラフィ font-size-adjust
+## font-size-adjust: 異なるフォントが混ざっても綺麗なタイポグラフィ 
 
 これは英語圏限定の機能なのですが同じフォントサイズでも異なるフォントだと文字の大きさがズレてしまったり、ピッタリ合わず、辛い思いをします。小文字の高さ `x-height` で揃えることで綺麗に見えるというものが `font-size-adjust` です。
 
@@ -58,7 +58,7 @@ https://coliss.com/articles/build-websites/operation/css/about-text-wrap-balance
 
 @[codepen](https://codepen.io/anko9801/pen/MYgJQoo)
 
-## カラースキーマを相対的に表現 Relative colors
+## Relative colors: カラースキーマを相対的に表現
 
 カラーパレットの管理が大変なので色を決めたら後は OKLCH と Relative colors で表現してしまおう。
 
@@ -75,7 +75,7 @@ aside {
 }
 ```
 
-## ダークテーマが組み込みに！ light-dark()
+## light-dark(): ダークテーマが組み込みに！
 
 ```css
 @media (prefers-color-scheme: dark) {
@@ -106,24 +106,23 @@ body {
 https://developer.mozilla.org/ja/docs/Web/CSS/color_value/light-dark
 
 ## Gradient interpolation
+## backdrop-filter: 背景にぼかしや色変化を与える
 
 ## :state()
 https://developer.mozilla.org/en-US/docs/Web/API/CustomStateSet
 https://developer.mozilla.org/en-US/docs/Web/CSS/:state
 
-## レイアウトが変わる zoom
+## zoom: レイアウトが変わる transform-scale
 重なるようにその要素が大きくなる
 `transform: scale(3);`
 レイアウトの再計算をする
 `zoom: 3;`
 
-## transform-box
-## 背景にぼかしや色変化を与える backdrop-filter
-
+## transform-box: 
+## transition-behavior: 
+https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
 
 ## ステップ関数 `round()` `mod()` `rem()`
-
-**CSS でステップ関数が使えます。**
 
 値の丸め込みとして `round()` は `up` `down` `nearest` `to-zero`
 さらに割った余りを返す CSS 値関数として `mod()` `rem()` が追加されました。
@@ -137,9 +136,6 @@ rem(±, ?) = ±
 ```
 例えば
 ユースケースがあまり思い付かない
-
-## CSS: transition-behavior
-https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
 
 ## groupBy() 関数
 `Object.groupBy()` `Map.groupBy()`
