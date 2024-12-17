@@ -52,11 +52,11 @@ https://coliss.com/articles/build-websites/operation/css/about-text-wrap-balance
 
 ## 異なるフォントが混ざってても綺麗なタイポグラフィ font-size-adjust
 
-同じフォントサイズでも異なるフォントだと
-x-height
+これは英語圏限定の機能なのですが同じフォントサイズでも異なるフォントだと文字の大きさがズレてしまったり、ピッタリ合わず、辛い思いをします。小文字の高さ `x-height` で揃えることで綺麗に見えるというものが `font-size-adjust` です。
+
+`x-height = font-size * font-size-adjust` となるように揃えてくれます。
 
 @[codepen](https://codepen.io/anko9801/pen/MYgJQoo)
-
 
 ## カラースキーマを相対的に表現 Relative colors
 
@@ -141,15 +141,6 @@ rem(±, ?) = ±
 ## CSS: transition-behavior
 https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
 
-
-## Array.fromAsync() 静的メソッド
-Promise.all() 遅延評価版
-
-## ArrayBuffer transfer() と transferToFixedLength()
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/transfer
-
-## Resizable buffers
-https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/resize
 ## groupBy() 関数
 `Object.groupBy()` `Map.groupBy()`
 ```javascript
@@ -168,24 +159,37 @@ Object.groupBy(
 
 https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/groupBy
 
-## Set に新たな仲間が加わりました
+## `Array.fromAsync()`
+Promise.all() 遅延評価版
+
+## Promise.withResolvers
+https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers
+
+## ArrayBuffer や Set のメソッドが充実しました
+配列や集合の操作に便利なメソッドが生やされました
 Set は値の集合を表すデータ構造です。
 
-`Set.prototype.intersection()`
-`Set.prototype.union()`
-`Set.prototype.difference()`
-`Set.prototype.symmetricDifference()`
-`Set.prototype.isSubsetOf()`
-`Set.prototype.isSupersetOf()`
-`Set.prototype.isDisjointFrom()`
+- `ArrayBuffer.prototype.resize()`
+- `ArrayBuffer.prototype.transfer()`
+- `ArrayBuffer.prototype.transferToFixedLength()`
+- ArrayBuffer.prototype.detached
+- ArrayBuffer.prototype.maxByteLength
+- ArrayBuffer.prototype.resizable
+- `Set.prototype.intersection()`
+- `Set.prototype.union()`
+- `Set.prototype.difference()`
+- `Set.prototype.symmetricDifference()`
+- `Set.prototype.isSubsetOf()`
+- `Set.prototype.isSupersetOf()`
+- `Set.prototype.isDisjointFrom()`
 
 ```js
 const a = new Set([1, 2, 3]);
 const b = new Set([1, 3, 5]);
 ```
 
-## Promise.withResolvers
-https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/transfer
+https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/resize
 
 ## 単語分割 intl.Segmenter
 デフォルトで単語ごとに区切る
@@ -204,23 +208,15 @@ if (!navigator.cookieEnabled) {
   // ブラウザーが対応していないか、クッキーが設定されることをブロックしています。
 }
 ```
-### Mutually exclusive <details> elements
+## Mutually exclusive <details> elements
  Multiple <details> elements which use the same name attribute are mutually exclusive. When one member of the group is opened, all other members are closed.
 https://developer.mozilla.org/ja/docs/Web/API/HTMLDetailsElement/open
 
-
-
-
 ## Alt text for generated content
-
-
 ## Registered custom properties
 https://developer.mozilla.org/en-US/docs/Web/API/CSS/registerProperty_static
 
 ## API: Async clipboard
-
-
-
 ## Vertical form controls
 ## AbortSignal.any()
 ## Extended constant expressions (WebAssembly)
