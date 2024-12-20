@@ -11,6 +11,7 @@ published: false
 みなさん Baseline をご存知でしょうか。
 
 Can I Use
+各個人で違った指標で
 
 すべての主要なブラウザで対応されている機能なので
 開発での違いに頭を抱えずに
@@ -23,7 +24,10 @@ https://web.dev/series/baseline-newly-available?hl=ja
 
 ## 宣言型 Shadow DOM
 
-Web Components
+再利用できるようにしたのが Web Components です。Web Components
+
+- Shadow DOM
+- 
 
 動的 Declarative Shadow DOM
 
@@ -46,9 +50,15 @@ https://web.dev/articles/content-visibility?hl=ja
 
 ## offset-position と offsetpath の値
 
-## ブロックレイアウト上の Align-content
+## ブロックレイアウト上の align-content
+今まで flex や grid レイアウトで複数行あったときに各行間のスペースを調整するときに align-content を使います。
+
+ここで垂直方向に中央揃えするには `align-content: center` とすれば
+子要素を垂直方向の中央に持ってきたいとき、
+これがブロックレイアウトでも利用できるようになりました。
 
 ## text-wrap white-space-collapse: テキストの折り返しをより便利に
+
 - `text-wrap`
 - `white-space-collapse`
 - `white-space`
@@ -57,15 +67,16 @@ https://coliss.com/articles/build-websites/operation/css/about-text-wrap-balance
 
 ## font-size-adjust: 異なるフォントが混ざっても綺麗なタイポグラフィ 
 
-これは英語圏限定の機能なのですが同じフォントサイズでも異なるフォントだと文字の大きさがズレてしまったり、ピッタリ合わず、辛い思いをします。小文字の高さ `x-height` で揃えることで綺麗に見えるというものが `font-size-adjust` です。
+英語圏では異なるフォントを同じ文章で扱うとき、フォントサイズで揃えても文字の大きさがズレてしまってピッタリ合いません。そこでフォントサイズではなくフォントの小文字の高さ `x-height` で揃えることで合わせようというのが `font-size-adjust` です。
 
-`x-height = font-size * font-size-adjust` となるように揃えてくれます。
+`x-height = font-size * font-size-adjust` が小文字の高さとなるようにフォントサイズを調整してくれます。
 
 @[codepen](https://codepen.io/anko9801/pen/MYgJQoo)
 
-## Relative colors: カラースキーマを相対的に表現
+## Relative colors: 色を相対的に表現
 
-カラーパレットの管理が大変なので色を決めたら後は OKLCH と Relative colors で表現してしまおう。
+カラーパレットは
+色を決めたら後は OKLCH と Relative colors で表現してしまおう。
 
 ```css
 .lighten-by-25 {
@@ -80,23 +91,36 @@ aside {
 }
 ```
 
-## light-dark(): ダークテーマが組み込みに！
+## light-dark(): ダークモード対応が楽に
+ユーザーがライトモードとダークモードのどちらを指定しているかに合わせて色を変更したいとき、`prefers-color-scheme` メディアクエリを使用しています。これをより楽に設定できるようにしたのが `light-dark()` 関数
 
+`light-dark()` はユーザーがライトモードを指定しているときまたは不明な場合に第一引数を出力し、ダークモードのときに第二引数を出力する関数です。
+
+つまり、これまで `prefers-color-scheme` メディアクエリを用いて書いてきたものが 
 ```css
+body {
+  color: #333b3c;
+  background-color: #efedea;
+}
+
 @media (prefers-color-scheme: dark) {
+  body {
+    color: #efefec;
+    background-color: #223a2c;
+  }
 }
 ```
-
+`light-dark()` 関数を用いることでこのように書けます。
 ```css
 :root {
   color-scheme: light dark;
 }
+
 body {
   color: light-dark(#333b3c, #efefec);
   background-color: light-dark(#efedea, #223a2c);
 }
 ```
-https://developer.mozilla.org/ja/docs/Web/CSS/color_value/light-dark
 
 ## Gradient interpolation
 ## backdrop-filter: 背景にぼかしや色変化を与える
