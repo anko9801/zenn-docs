@@ -58,9 +58,7 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
   <p>I am a popover with more information.<p>
 </div>
 
-
-
-## コンテンツの公開設定
+## content-visibility: コンテンツ最適化
 - content-visibility
 - checkVisibility()
 
@@ -72,25 +70,25 @@ https://web.dev/articles/content-visibility?hl=ja
 
 これまで `align-content` プロパティはフレックスレイアウトやグリッドレイアウトで使用されていましたが、新たにブロックレイアウトでも使用可能になりました。
 
-`align-content` はフレックスやグリッドレイアウトで複数行あるときに各行の行間を調整するプロパティです。このプロパティは `justify-content` などの関連するプロパティと組み合わせて使用されますがそれぞれ役割が違います。
+`align-content` はフレックスやグリッドレイアウトで複数行あるときに各行の間隔を調整するプロパティです。このプロパティは `justify-content` などの関連するプロパティと組み合わせて使用されますがそれぞれ役割が違います。
 
-| プロパティ | 説明 |
-|---|---|
-| justify-content | 主軸方向 (要素が並ぶ方向) に沿ったスペース |
-| justify-items | 主軸方向におけるアイテムの配置方法 |
-| justify-self | 主軸方向における個々の要素の配置方法 |
-| align-content | 交差軸方向 (要素と直行する方向) に各行全体の間隔 (垂直方向) |
-| align-items | 交差軸方向にすべての子要素に適用する |
-| align-self | 交差軸方向に align-self を上書きする |
+| プロパティ | 説明 | 対象レイアウト |
+|---|---|---|
+| justify-content | 主軸方向 (通常は水平方向) に各列の子要素の集まりを<br>コンテナ内で左寄せ・中央寄せなどに配置します | block flex grid |
+| justify-items | 主軸方向に個々のアイテムをセル内で配置します | block grid |
+| justify-self | 主軸方向に特定のアイテムをセル内で個別に配置します | block grid absolute |
+| align-content | 交差軸方向 (通常は垂直方向) に各行の子要素の集まりを<br>コンテナ内で配置します。 | block flex grid |
+| align-items | 交差軸方向に個々のアイテムをセル内で配置します | flex grid |
+| align-self | 交差軸方向に特定のアイテムをセル内で個別に設定します | flex grid absolute |
 
-使用例として要素を垂直方向 (交差軸) で中央揃えするには、これまで以下のようにフレックスレイアウトを設定していました。
+使用例として要素を垂直方向 (交差軸) で中央揃えする場合において、これまで以下のようにフレックスレイアウトを設定していました。
 ```css
 display: flex;
 align-items: center;
 ```
 ブロックレイアウトでの対応により単に次のように設定するだけで垂直方向の中央揃えができます。
 ```css
-align-items: center;
+align-content: center;
 ```
 
 ## text-wrap white-space-collapse: テキストの折り返しをより便利に
