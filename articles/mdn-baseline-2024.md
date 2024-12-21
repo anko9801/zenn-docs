@@ -27,7 +27,8 @@ https://web.dev/series/baseline-newly-available?hl=ja
 再利用できるようにしたのが Web Components です。Web Components
 
 - Shadow DOM
-- 
+- Custom La
+- Template slot
 
 動的 Declarative Shadow DOM
 
@@ -42,6 +43,23 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 
 ## Popover API
 
+ポップオーバーはよく使われるのに対し、実装が大変でした。
+
+- 最上位レイヤーに昇格
+  - z-index を指定せずに
+- ライトディスミス機能
+- デフォルトのフォーカス管理
+- アクセシブルなキーボードバインディング
+- アクセシブルなコンポーネントバインディング
+
+<button popovertarget="my-popover"> Open Popover </button>
+
+<div id="my-popover" popover>
+  <p>I am a popover with more information.<p>
+</div>
+
+
+
 ## コンテンツの公開設定
 - content-visibility
 - checkVisibility()
@@ -51,11 +69,29 @@ https://web.dev/articles/content-visibility?hl=ja
 ## offset-position と offsetpath の値
 
 ## ブロックレイアウト上の align-content
-今まで flex や grid レイアウトで複数行あったときに各行間のスペースを調整するときに align-content を使います。
 
-ここで垂直方向に中央揃えするには `align-content: center` とすれば
-子要素を垂直方向の中央に持ってきたいとき、
-これがブロックレイアウトでも利用できるようになりました。
+これまで `align-content` プロパティはフレックスレイアウトやグリッドレイアウトで使用されていましたが、新たにブロックレイアウトでも使用可能になりました。
+
+`align-content` はフレックスやグリッドレイアウトで複数行あるときに各行の行間を調整するプロパティです。このプロパティは `justify-content` などの関連するプロパティと組み合わせて使用されますがそれぞれ役割が違います。
+
+| プロパティ | 説明 |
+|---|---|
+| justify-content | 主軸方向 (要素が並ぶ方向) に沿ったスペース |
+| justify-items | 主軸方向におけるアイテムの配置方法 |
+| justify-self | 主軸方向における個々の要素の配置方法 |
+| align-content | 交差軸方向 (要素と直行する方向) に各行全体の間隔 (垂直方向) |
+| align-items | 交差軸方向にすべての子要素に適用する |
+| align-self | 交差軸方向に align-self を上書きする |
+
+使用例として要素を垂直方向 (交差軸) で中央揃えするには、これまで以下のようにフレックスレイアウトを設定していました。
+```css
+display: flex;
+align-items: center;
+```
+ブロックレイアウトでの対応により単に次のように設定するだけで垂直方向の中央揃えができます。
+```css
+align-items: center;
+```
 
 ## text-wrap white-space-collapse: テキストの折り返しをより便利に
 
@@ -91,16 +127,21 @@ aside {
 }
 ```
 
-## light-dark(): ダークモード対応が楽に
-ユーザーがライトモードとダークモードのどちらを指定しているかに合わせて色を変更したいとき、`prefers-color-scheme` メディアクエリを使用しています。これをより楽に設定できるようにしたのが `light-dark()` 関数
+## light-dark(): ダークテーマのスタイルを簡単に当てられる！
 
-`light-dark()` はユーザーがライトモードを指定しているときまたは不明な場合に第一引数を出力し、ダークモードのときに第二引数を出力する関数です。
+[CSS Color Module Level 5](https://drafts.csswg.org/css-color-5/#light-dark) で追加された関数 `light-dark()` を使用すると簡単に実装できます。
 
-つまり、これまで `prefers-color-scheme` メディアクエリを用いて書いてきたものが 
+`light-dark()` はユーザーのシステムがライトモードを指定しているときまたは不明な場合に第一引数を出力し、ダークモードのときに第二引数を出力するユーティリティ関数です。具体的には `prefers-color-scheme` メディアクエリでこのように実装していたところを
 ```css
-body {
-  color: #333b3c;
-  background-color: #efedea;
+:root {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: light) {
+  body {
+    color: #333b3c;
+    background-color: #efedea;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -110,7 +151,7 @@ body {
   }
 }
 ```
-`light-dark()` 関数を用いることでこのように書けます。
+`light-dark()` 関数でこのように書けます。
 ```css
 :root {
   color-scheme: light dark;
@@ -121,6 +162,7 @@ body {
   background-color: light-dark(#efedea, #223a2c);
 }
 ```
+画像の切り替え
 
 ## Gradient interpolation
 ## backdrop-filter: 背景にぼかしや色変化を与える
