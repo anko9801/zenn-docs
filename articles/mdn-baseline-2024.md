@@ -22,13 +22,23 @@ Can I Use
 
 https://web.dev/series/baseline-newly-available?hl=ja
 
+
+30 ヶ月
+limited available newly avaliable widely available
+anchor position を popover api に
+toSorted
+
 ## 宣言型 Shadow DOM
+
+Web Comopnents の内の Shadow DOM が HTML 上で宣言的に書けるようになりました。
+
+Web Components とは
 
 再利用できるようにしたのが Web Components です。Web Components
 
 - Shadow DOM
-- Custom La
-- Template slot
+- Custom Elements
+- HTML Templates
 
 動的 Declarative Shadow DOM
 
@@ -40,6 +50,16 @@ https://web.dev/series/baseline-newly-available?hl=ja
 これまでは JavaScript
 
 https://azukiazusa.dev/blog/declarative-shadow-dom/
+
+- declarative shadow dom と HTML Templates の違い
+
+```html
+<div id="host">
+  <template shadowrootmode="open">
+    <span>I'm in the shadow DOM</span>
+  </template>
+</div>
+```
 
 ## Popover API
 
