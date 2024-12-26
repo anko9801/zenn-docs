@@ -134,11 +134,8 @@ https://coliss.com/articles/build-websites/operation/css/about-text-wrap-balance
 
 @[codepen](https://codepen.io/anko9801/pen/MYgJQoo)
 
-## Relative colors: 色を相対的に表現
-
-カラーパレットは
-色を決めたら後は OKLCH と Relative colors で表現してしまおう。
-
+## from <color>: 相対的な色表現
+例えば OKLCH と Relative colors を組み合わせることで 1 つの基準色からライトテーマやダークテーマの色などを生成する保守性の高いカラーパレットが作成できます。
 ```css
 .lighten-by-25 {
   background: oklch(from blue calc(l * 1.25) c h / 0.8);
@@ -151,12 +148,14 @@ aside {
   color: oklch(from var(--c) calc(l * 1.5) c h);
 }
 ```
+変数として柔軟に設定できるので
 
 ## light-dark(): ダークテーマのスタイルを簡単に当てられる！
 
-[CSS Color Module Level 5](https://drafts.csswg.org/css-color-5/#light-dark) で追加された関数 `light-dark()` を使用すると簡単に実装できます。
 
-`light-dark()` はユーザーのシステムがライトモードを指定しているときまたは不明な場合に第一引数を出力し、ダークモードのときに第二引数を出力するユーティリティ関数です。具体的には `prefers-color-scheme` メディアクエリでこのように実装していたところを
+`light-dark()` は [CSS Color Module Level 5](https://drafts.csswg.org/css-color-5/#light-dark) で追加されたユーティリティ関数で従来の `prefers-color-scheme` メディアクエリよりもライトテーマとダークテーマで異なるスタイルを簡潔に当てられます。
+
+`light-dark()` はユーザーがライトモード (または不明) のときに第一引数を出力し、ダークモードのときに第二引数を出力します。具体的には `prefers-color-scheme` メディアクエリでこのように実装していたところを
 ```css
 :root {
   color-scheme: light dark;
@@ -187,11 +186,10 @@ body {
   background-color: light-dark(#efedea, #223a2c);
 }
 ```
-画像の切り替え
+画像を切り替えたりしてもよさそう
 
 ## Gradient interpolation
 ## backdrop-filter: 背景にぼかしや色変化を与える
-
 ## Vertical form controls
 ## :state()
 https://developer.mozilla.org/en-US/docs/Web/API/CustomStateSet
@@ -214,6 +212,10 @@ JavaScript API である CSS.registerProperty() と、同等の仕組みを CSS 
 以下は @property の例です。--my-color という名前でカラーのみを受け付けるカスタムプロパティを定義しています。デフォルトカラーが宣言されており、inherits: false により、親要素で定義した値は子孫に継承されていないことがわかります。
 https://developer.mozilla.org/en-US/docs/Web/API/CSS/registerProperty_static
 
+
+```css
+--logo-color: #c0ffee
+```
 ```css
 @property --logo-color {
   syntax: "<color>";
@@ -222,7 +224,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/CSS/registerProperty_static
 }
 ```
 
-## ステップ関数 `round()` `mod()` `rem()`
+## CSS ステップ関数 `round()` `mod()` `rem()`
 
 値の丸め込みとして `round()` は `up` `down` `nearest` `to-zero`
 さらに割った余りを返す CSS 値関数として `mod()` `rem()` が追加されました。
@@ -262,7 +264,6 @@ Promise.all() 遅延評価版
 https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers
 
 ## AbortSignal.any()
-
 ## ArrayBuffer や Set のメソッドが充実しました
 配列や集合の操作に便利なメソッドが生やされました
 Set は値の集合を表すデータ構造です。
@@ -287,13 +288,11 @@ const b = new Set([1, 3, 5]);
 ```
 
 ## intl.Segmenter: 文章を単語ごとに分割する
-
 ## WebGL API
 Color management for WebGL
 Color management for WebGL2
 
 ## requestVideoFrameCallback(): HTMLVideoElement
-
 ## willReadFrequently: Canvas
 ## cookie の有効性
 ```
@@ -306,11 +305,8 @@ if (!navigator.cookieEnabled) {
 https://developer.mozilla.org/ja/docs/Web/API/HTMLDetailsElement/open
 
 ## Alt text for generated content
-
-
 ## API: Async clipboard
 ## Extended constant expressions (WebAssembly)
-
 ## 参考記事
 - https://webstatus.dev/?q=baseline_date%3A2024-01-01..2024-12-31&sort=baseline_status_desc&num=100
 - https://web.dev/series/baseline-newly-available?hl=ja
