@@ -6,9 +6,42 @@ topics: ["TypeScript"]
 published: false
 ---
 
-## 型
+## もし
 
-### プリミティブ型
+if 文 for 文
+```js
+function test(env: any[]) => {
+  if (env === 'production') {
+  }
+  for ()
+}
+```
+
+```js
+type test<T extends any[]> = 
+```
+と対応する
+
+Essence
+- ジェネリクスに extends をつけると、型に制約を設けることができる
+- keyof T は T のプロパティ名のユニオン型を返す
+
+Essence
+- infer は、「ここに入る型って何？」ってのを推論してくれる便利な機能
+
+## JavaScript のデータ型
+| データ型 | | |
+|---|---|---|
+| null | |
+| undefined | |
+| boolean | |
+| number | |
+| bigint | |
+| string | |
+| symbol | |
+| オブジェクト | key は string | symbol |
+| 配列 | key は number |
+| キー付きコレクション | Map, Set, WeakMap, WeakSet |
 
 ```ts
 type Primitive = number | string | boolean | bigint | symbol | undefined | null;
@@ -28,6 +61,8 @@ interface IsPositiveFunc {
   (arg: number): boolean;
 }
 ```
+
+
 
 オブジェクト型は key, value で構成され、配列は key が number なオブジェクト型といえる。
 hashable な型 `string | number | symbol` しか key にならない
@@ -91,6 +126,8 @@ infer
 
 
 ### 再帰構造
+再帰回数の上限
+- 終了判定条件をうまく設定することが重要
 
 次のように再帰構造は書くことができません。これは不可能となる条件が難しいので実装されてないようです。
 

@@ -6,27 +6,24 @@ topics: []
 published: false
 ---
 
-## Baseline
+## みなさん Baseline をご存知でしょうか
 
-みなさん Baseline をご存知でしょうか。
+MDN Web Docs を読んでいると、次のようなロゴを目にしませんか。
 
-Can I Use
-各個人で違った指標で
+![](/images/newly_available.png)
 
-すべての主要なブラウザで対応されている機能なので
-開発での違いに頭を抱えずに
+このロゴは Baseline というすべての主要なブラウザ (Chrome、Edge、Firefox、Safari など) である機能がサポートされているかを表す便利な指標です。これにより各ブラウザの挙動の違いに悩まされることなく、安心して開発に活用できます。
 
-こんな機能が開発で使えるんだ～という気持ちで
+Baseline は段階に応じて 3 種類のサポート状況に分けられます。
 
-順番は主観的に注目度が高かった順です。
+- Widely available: 2 年半以上すべての主要ブラウザで利用可能
+- Newly avaliable: 最新バージョンのブラウザで利用可能
+- Limited availability: 一部のブラウザでのみ利用可能
 
-https://web.dev/series/baseline-newly-available?hl=ja
+これを見れば、今までのように CSS や JavaScript などの最新技術を採用する際に [Can I Use](https://caniuse.com/) を逐一確認する必要がなく、ブラウザの互換性を素早く把握できます。ちなみに 2 年半という基準は企業や組織がシステムを更新する際の一般的なライフサイクルに基づいて決められています。
 
-
-30 ヶ月
-limited available newly avaliable widely available
-anchor position を popover api に
-toSorted
+2024 年に Newly Available
+こんな最新技術が開発で使えるんだ～って思いながら読んでってください。
 
 ## 宣言型 Shadow DOM
 
@@ -38,13 +35,13 @@ Web Components とは
 
 - Shadow DOM
 - Custom Elements
-- HTML Templates
+- HTML テンプレート
 
 動的 Declarative Shadow DOM
 
-    Document: parseHTMLUnsafe() static method
-    Element: setHTMLUnsafe() method
-    ShadowRoot: setHTMLUnsafe() method
+Document: parseHTMLUnsafe() static method
+Element: setHTMLUnsafe() method
+ShadowRoot: setHTMLUnsafe() method
 
 [Shadow DOM](https://developer.mozilla.org/ja/docs/Web/API/Web_components/Using_shadow_DOM) は再利用可能なコンポーネント
 これまでは JavaScript
@@ -77,8 +74,14 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 <div id="my-popover" popover>
   <p>I am a popover with more information.<p>
 </div>
+anchor position を popover api に
 
 ## content-visibility: コンテンツ最適化
+
+`content-visibility`
+要素がビューポート外にあるとき描画や計算を笑楽できるため、ブラウザの負担が軽減され、ページの読み込み速度が向上します。
+- レンダリングの最適化、レイアウト再計算の削減によりパフォーマンスが向上します。
+
 - content-visibility
 - checkVisibility()
 
@@ -290,3 +293,8 @@ https://developer.mozilla.org/en-US/docs/Web/API/CSS/registerProperty_static
 ## API: Async clipboard
 ## Extended constant expressions (WebAssembly)
 ## AVIF
+
+## 参考記事
+- https://webstatus.dev/?q=baseline_date%3A2024-01-01..2024-12-31&sort=baseline_status_desc&num=100
+- https://web.dev/series/baseline-newly-available?hl=ja
+- https://web-platform-dx.github.io/web-features/
