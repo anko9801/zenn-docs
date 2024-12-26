@@ -20,7 +20,7 @@ Baseline は段階に応じて 3 種類のサポート状況に分けられま�
 - Newly avaliable: 最新バージョンのブラウザで利用可能
 - Limited availability: 一部のブラウザでのみ利用可能
 
-これを見れば、今までのように CSS や JavaScript などの最新技術を採用する際に [Can I Use](https://caniuse.com/) を逐一確認する必要がなく、ブラウザの互換性を素早く把握できます。ちなみに 2 年半という基準は企業や組織がシステムを更新する際の一般的なライフサイクルに基づいて決められています。
+これを見れば、今までのように CSS や JavaScript などの最新技術を採用する際に [Can I Use](https://caniuse.com/) のサポート率を逐一確認する必要がなく、ブラウザの互換性を素早く把握できます。ちなみに 2 年半という基準は企業や組織がシステムを更新する際の一般的なライフサイクルに基づいて決められています。
 
 2024 年に Newly Available
 こんな最新技術が開発で使えるんだ～って思いながら読んでってください。
@@ -77,7 +77,12 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 </div>
 anchor position を popover api に
 
-## AVIF
+## AVIF: 画像の
+
+AVIF（AV1 Image File Format）は、AV1（AOMedia Video 1）ビデオコーデックを基盤とした、静止画や画像シーケンス用の高効率画像フォーマットです。次世代の画像フォーマットとして注目されており、JPEG、PNG、WebP などの既存のフォーマットよりも高い圧縮効率と優れた画質を提供します。
+
+これまで Google の WebP
+WebP よりも圧縮時間が長い分、画質が良くなりファイルサイズも小さくなる。
 
 ## content-visibility: コンテンツ最適化
 
