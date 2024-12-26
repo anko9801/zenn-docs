@@ -77,6 +77,8 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 </div>
 anchor position を popover api に
 
+## AVIF
+
 ## content-visibility: コンテンツ最適化
 
 `content-visibility`
@@ -85,6 +87,7 @@ anchor position を popover api に
 
 - content-visibility
 - checkVisibility()
+  - visibility プロパティによる不可視状態や opacity プロパティによる不透明度によるチェックも行えます。
 
 https://web.dev/articles/content-visibility?hl=ja
 
@@ -307,7 +310,6 @@ https://developer.mozilla.org/ja/docs/Web/API/HTMLDetailsElement/open
 
 ## API: Async clipboard
 ## Extended constant expressions (WebAssembly)
-## AVIF
 
 ## 参考記事
 - https://webstatus.dev/?q=baseline_date%3A2024-01-01..2024-12-31&sort=baseline_status_desc&num=100
