@@ -12,7 +12,7 @@ MDN Web Docs を読んでいると、次のようなロゴを目にしません�
 
 ![](/images/newly_available.png)
 
-このロゴは Baseline というすべての主要なブラウザ (Chrome、Edge、Firefox、Safari など) である機能がサポートされているかを表す便利な指標です。これにより各ブラウザの挙動の違いに悩まされることなく、安心して開発に活用できます。
+このロゴは Baseline というすべての主要なブラウザ (Chrome、Edge、Firefox、Safari など) である機能がサポートされているかを表す指標です。各ブラウザの挙動の違いに悩まされることなく、安心して開発に活用できます。
 
 Baseline は段階に応じて 3 種類のサポート状況に分けられます。
 
@@ -60,6 +60,7 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 
 ## Popover API
 
+従来は JavaScript を用いて実装しなければならなかったのを
 ポップオーバーはよく使われるのに対し、実装が大変でした。
 
 - 最上位レイヤーに昇格
@@ -203,6 +204,21 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/:state
 ## transition-behavior: 
 https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
 
+## @property: CSS カスタムプロパティの新たな表現
+カスタムプロパティに型やデフォルト値なども含めて表現できるようになりました。
+
+JavaScript API である CSS.registerProperty() と、同等の仕組みを CSS から直接利用するための @property
+以下は @property の例です。--my-color という名前でカラーのみを受け付けるカスタムプロパティを定義しています。デフォルトカラーが宣言されており、inherits: false により、親要素で定義した値は子孫に継承されていないことがわかります。
+https://developer.mozilla.org/en-US/docs/Web/API/CSS/registerProperty_static
+
+```css
+@property --logo-color {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #c0ffee;
+}
+```
+
 ## ステップ関数 `round()` `mod()` `rem()`
 
 値の丸め込みとして `round()` は `up` `down` `nearest` `to-zero`
@@ -287,8 +303,7 @@ if (!navigator.cookieEnabled) {
 https://developer.mozilla.org/ja/docs/Web/API/HTMLDetailsElement/open
 
 ## Alt text for generated content
-## Registered custom properties
-https://developer.mozilla.org/en-US/docs/Web/API/CSS/registerProperty_static
+
 
 ## API: Async clipboard
 ## Extended constant expressions (WebAssembly)
