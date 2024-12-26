@@ -77,12 +77,13 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 </div>
 anchor position を popover api に
 
-## AVIF: 画像の
+## AVIF: 高効率画像
 
 AVIF（AV1 Image File Format）は、AV1（AOMedia Video 1）ビデオコーデックを基盤とした、静止画や画像シーケンス用の高効率画像フォーマットです。次世代の画像フォーマットとして注目されており、JPEG、PNG、WebP などの既存のフォーマットよりも高い圧縮効率と優れた画質を提供します。
 
 これまで Google の WebP
-WebP よりも圧縮時間が長い分、画質が良くなりファイルサイズも小さくなる。
+MDN では一般的に WebP より AVIF の方が圧縮率が高いと主張しています。 (ref: https://developer.mozilla.org/ja/docs/Web/Media/Formats/Image_types#avif_%E7%94%BB%E5%83%8F)
+
 
 ## content-visibility: コンテンツ最適化
 
