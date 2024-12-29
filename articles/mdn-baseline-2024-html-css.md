@@ -93,9 +93,6 @@ Google が開発した WebP も高圧縮率で知られていますが、MDN で
 
 https://web.dev/articles/content-visibility?hl=ja
 
-## offset-position と offsetpath の値
-
-
 ## スクロールのガタツキを防ぐ
 scrollbar-gutter
 scrollbar-width
@@ -125,10 +122,6 @@ align-items: center;
 align-content: center;
 ```
 
-## ルビ
-ruby-align
-ruby-position
-
 ## text-wrap white-space-collapse: テキストの折り返しをより便利に
 
 - `text-wrap`
@@ -136,6 +129,10 @@ ruby-position
 - `white-space`
 https://developer.mozilla.org/ja/docs/Web/CSS/text-wrap
 https://coliss.com/articles/build-websites/operation/css/about-text-wrap-balance.html
+
+## ルビ
+ruby-align
+ruby-position
 
 ## font-size-adjust: 異なるフォントが混ざっても綺麗なタイポグラフィ 
 
@@ -217,10 +214,16 @@ body {
 画像を切り替えたりしてもよさそう
 
 ## backdrop-filter: 背景にぼかしや色変化を与える
+https://coliss.com/articles/build-websites/operation/css/css-property-backdrop-filter.html
+
 ## Vertical form controls
 ## :state()
 https://developer.mozilla.org/en-US/docs/Web/API/CustomStateSet
 https://developer.mozilla.org/en-US/docs/Web/CSS/:state
+
+## offset-position と offsetpath の値
+offset
+CSS animation
 
 ## zoom: レイアウトが変わる transform-scale
 重なるようにその要素が大きくなる
