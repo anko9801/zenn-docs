@@ -63,18 +63,21 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 ポップオーバーはよく使われるのに対し、実装が大変でした。
 
 - 最上位レイヤーに昇格
-  - z-index を指定せずに
+  - z-index を設定する必要がない
 - ライトディスミス機能
-- デフォルトのフォーカス管理
-- アクセシブルなキーボードバインディング
-- アクセシブルなコンポーネントバインディング
+  - ポップオーバー以外の部分をクリックすると、自動的に閉じる仕組みを標準で提供します
+- アクセシビリティ
+  - キーボードやスクリーンリーダーのユーザーにも優しい設計を簡単に実現可能
 
+```html
 <button popovertarget="my-popover">Open Popover</button>
 
 <div id="my-popover" popover>
   <p>I am a popover with more information.<p>
 </div>
-anchor position を popover api に
+```
+さらに Limited availability ですが CSS Anchor Positioning と組み合わせることで
+
 
 ## AVIF: 次世代の高効率画像フォーマット
 
