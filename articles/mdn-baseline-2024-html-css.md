@@ -22,8 +22,7 @@ Baseline は段階に応じて 3 種類のサポート状況に分けられま�
 
 これを見れば、今までのように CSS や JavaScript などの最新技術を採用する際に [Can I Use](https://caniuse.com/) のサポート率を逐一確認する必要がなく、ブラウザの互換性を素早く把握できます。ちなみに 2 年半という基準は企業や組織がシステムを更新する際の一般的なライフサイクルに基づいて決められています。
 
-2024 年に Newly Available
-こんな最新技術が開発で使えるんだ～って思いながら読んでってください。
+そして今年 Newly Available となったものは [53 個](https://webstatus.dev/?q=baseline_date%3A2024-01-01..2024-12-31&sort=baseline_status_desc) でした！この記事ではそれらを簡単に紹介していきます。こんな最新技術が開発で使えるようになったんだ～って思いながら読んでってください。
 
 ## 宣言型 Shadow DOM
 
@@ -70,34 +69,36 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 - アクセシブルなキーボードバインディング
 - アクセシブルなコンポーネントバインディング
 
-<button popovertarget="my-popover"> Open Popover </button>
+<button popovertarget="my-popover">Open Popover</button>
 
 <div id="my-popover" popover>
   <p>I am a popover with more information.<p>
 </div>
 anchor position を popover api に
 
-## AVIF: 高効率画像
+## AVIF: 次世代の高効率画像フォーマット
 
-AVIF（AV1 Image File Format）は、AV1（AOMedia Video 1）ビデオコーデックを基盤とした、静止画や画像シーケンス用の高効率画像フォーマットです。次世代の画像フォーマットとして注目されており、JPEG、PNG、WebP などの既存のフォーマットよりも高い圧縮効率と優れた画質を提供します。
+AVIF (AV1 Image File Format) は AV1 ビデオコーデックを基盤に開発された、静止画や画像シーケンス用のフォーマットです。その大きな特徴は JPEG PNG WebP といった既存フォーマットを超える圧縮効率と高画質です。
 
-これまで Google の WebP
-MDN では一般的に WebP より AVIF の方が圧縮率が高いと主張しています。 (ref: https://developer.mozilla.org/ja/docs/Web/Media/Formats/Image_types#avif_%E7%94%BB%E5%83%8F)
+Google が開発した WebP も高圧縮率で知られていますが、MDN では「AVIF は WebP より圧縮率が高い」と明確に評価されています。
+(参考: [MDNドキュメント](https://developer.mozilla.org/ja/docs/Web/Media/Formats/Image_types#avif_%E7%94%BB%E5%83%8F))
 
+かつて AVIF は一部のブラウザでサポートが不十分でしたが今回 Newly available となり「とりあえず AVIF で保存しておけば問題ない」ようになりました。
 
-## content-visibility: コンテンツ最適化
+## content-visibility: レンダリングパフォーマンスの向上
 
-`content-visibility`
-要素がビューポート外にあるとき描画や計算を笑楽できるため、ブラウザの負担が軽減され、ページの読み込み速度が向上します。
-- レンダリングの最適化、レイアウト再計算の削減によりパフォーマンスが向上します。
+通常ブラウザはすべてのコンテンツをレンダリングしているのですが、ページ読み込み時には不必要な画面外の要素までレンダリングしてしまいます。このレンダリングをスキップし、スクロール時に逐一レンダリングする `content-visibility: auto` がブラウザ互換となりました。
 
-- content-visibility
-- checkVisibility()
-  - visibility プロパティによる不可視状態や opacity プロパティによる不透明度によるチェックも行えます。
+これにより巨大または複雑なサイトにおいてレンダリングパフォーマンスが大幅に向上することが見込めます。加えてレンダリングがスキップされているかを確認できる `checkVisibility()` 関数も Newly Available となりました。
 
 https://web.dev/articles/content-visibility?hl=ja
 
 ## offset-position と offsetpath の値
+
+
+## スクロールのガタツキを防ぐ
+scrollbar-gutter
+scrollbar-width
 
 ## ブロックレイアウト上の align-content
 
@@ -110,7 +111,7 @@ https://web.dev/articles/content-visibility?hl=ja
 | justify-content | 主軸方向 (通常は水平方向) に各列の子要素の集まりを<br>コンテナ内で左寄せ・中央寄せなどに配置します | block flex grid |
 | justify-items | 主軸方向に個々のアイテムをセル内で配置します | block grid |
 | justify-self | 主軸方向に特定のアイテムをセル内で個別に配置します | block grid absolute |
-| align-content | 交差軸方向 (通常は垂直方向) に各行の子要素の集まりを<br>コンテナ内で配置します。 | block flex grid |
+| align-content | 交差軸方向 (通常は垂直方向) に各行の子要素の集まりを<br>コンテナ内で上寄せ・中央寄せなどに配置します | block flex grid |
 | align-items | 交差軸方向に個々のアイテムをセル内で配置します | flex grid |
 | align-self | 交差軸方向に特定のアイテムをセル内で個別に設定します | flex grid absolute |
 
@@ -123,6 +124,10 @@ align-items: center;
 ```css
 align-content: center;
 ```
+
+## ルビ
+ruby-align
+ruby-position
 
 ## text-wrap white-space-collapse: テキストの折り返しをより便利に
 
@@ -140,24 +145,41 @@ https://coliss.com/articles/build-websites/operation/css/about-text-wrap-balance
 
 @[codepen](https://codepen.io/anko9801/pen/MYgJQoo)
 
-## from <color>: 相対的な色表現
+## @property: CSS カスタムプロパティの新たな表現
+カスタムプロパティに型のチェックやデフォルト値の設定、プロパティの値の継承するかを設定することができるようになります。
+@property
+CSS.registerProperty()
+
+```css
+--logo-color: #c0ffee
+```
+```css
+@property --logo-color {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #c0ffee;
+}
+```
+
+## さまざまな色空間での相対色とグラデーション
+
+相対色
 例えば OKLCH と Relative colors を組み合わせることで 1 つの基準色からライトテーマやダークテーマの色などを生成する保守性の高いカラーパレットが作成できます。
 ```css
 .lighten-by-25 {
   background: oklch(from blue calc(l * 1.25) c h / 0.8);
-}
-.success {
-  --c: green;
 }
 aside {
   background: oklch(from var(--c) calc(l * 0.75) c h / 0.5);
   color: oklch(from var(--c) calc(l * 1.5) c h);
 }
 ```
-変数として柔軟に設定できるので
+グラデーションはこれまで `linear-gradient(from, to)` としていた所にさまざまな色空間におけるグラデーションが
+
+
+@[codepen](https://codepen.io/anko9801/pen/azoygqV)
 
 ## light-dark(): ダークテーマのスタイルを簡単に当てられる！
-
 
 `light-dark()` は [CSS Color Module Level 5](https://drafts.csswg.org/css-color-5/#light-dark) で追加されたユーティリティ関数で従来の `prefers-color-scheme` メディアクエリよりもライトテーマとダークテーマで異なるスタイルを簡潔に当てられます。
 
@@ -194,7 +216,6 @@ body {
 ```
 画像を切り替えたりしてもよさそう
 
-## Gradient interpolation
 ## backdrop-filter: 背景にぼかしや色変化を与える
 ## Vertical form controls
 ## :state()
@@ -211,108 +232,23 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/:state
 ## transition-behavior: 
 https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
 
-## @property: CSS カスタムプロパティの新たな表現
-カスタムプロパティに型やデフォルト値なども含めて表現できるようになりました。
+## @page 文書を印刷するときに一部の CSS プロパティを変更する
 
-JavaScript API である CSS.registerProperty() と、同等の仕組みを CSS から直接利用するための @property
-以下は @property の例です。--my-color という名前でカラーのみを受け付けるカスタムプロパティを定義しています。デフォルトカラーが宣言されており、inherits: false により、親要素で定義した値は子孫に継承されていないことがわかります。
-https://developer.mozilla.org/en-US/docs/Web/API/CSS/registerProperty_static
-
-
-```css
---logo-color: #c0ffee
-```
-```css
-@property --logo-color {
-  syntax: "<color>";
-  inherits: false;
-  initial-value: #c0ffee;
-}
-```
+## scroll-to-text フラグメント
+scroll-to-text
+::target-text
 
 ## CSS ステップ関数 `round()` `mod()` `rem()`
+四捨五入などを計算できる `round()` と剰余を計算する `mod()` `rem()` が追加されました。
 
-値の丸め込みとして `round()` は `up` `down` `nearest` `to-zero`
-さらに割った余りを返す CSS 値関数として `mod()` `rem()` が追加されました。
-```
-mod()
-```
-違いはマイナスになったときの挙動で、それぞれ割る数と割られる数の符号に依存して返す符号が変わります。
+`mod()` `rem()` 違いはマイナスになったときの挙動で、それぞれ割る数と割られる数の符号に依存して返す符号が変わります。
 ```js
 mod(?, ±) = ±
 rem(±, ?) = ±
 ```
-例えば
-ユースケースがあまり思い付かない
 
-## groupBy() 関数
-`Object.groupBy()` `Map.groupBy()`
-```javascript
-Object.groupBy(
-  [
-    { type: "bird", name: "Peacock" },
-    { type: "fish", name: "Tuna" },
-    { type: "animal", name: "Dog" },
-    { type: "animal", name: "Horse" },
-    { type: "fish", name: "Sardine" },
-    { type: "animal", name: "Lion" },
-  ],
-  ({ type }) => type
-);
-```
+## まとめ
 
-https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/groupBy
-
-## `Array.fromAsync()`
-Promise.all() 遅延評価版
-
-## Promise.withResolvers
-https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers
-
-## AbortSignal.any()
-## ArrayBuffer や Set のメソッドが充実しました
-配列や集合の操作に便利なメソッドが生やされました
-Set は値の集合を表すデータ構造です。
-
-- `ArrayBuffer.prototype.resize()`
-- `ArrayBuffer.prototype.transfer()`
-- `ArrayBuffer.prototype.transferToFixedLength()`
-- ArrayBuffer.prototype.detached
-- ArrayBuffer.prototype.maxByteLength
-- ArrayBuffer.prototype.resizable
-- `Set.prototype.intersection()`
-- `Set.prototype.union()`
-- `Set.prototype.difference()`
-- `Set.prototype.symmetricDifference()`
-- `Set.prototype.isSubsetOf()`
-- `Set.prototype.isSupersetOf()`
-- `Set.prototype.isDisjointFrom()`
-
-```js
-const a = new Set([1, 2, 3]);
-const b = new Set([1, 3, 5]);
-```
-
-## intl.Segmenter: 文章を単語ごとに分割する
-## WebGL API
-Color management for WebGL
-Color management for WebGL2
-
-## requestVideoFrameCallback(): HTMLVideoElement
-## willReadFrequently: Canvas
-## cookie の有効性
-```
-if (!navigator.cookieEnabled) {
-  // ブラウザーが対応していないか、クッキーが設定されることをブロックしています。
-}
-```
-## Mutually exclusive <details> elements
- Multiple <details> elements which use the same name attribute are mutually exclusive. When one member of the group is opened, all other members are closed.
-https://developer.mozilla.org/ja/docs/Web/API/HTMLDetailsElement/open
-
-## Alt text for generated content
-## API: Async clipboard
-## Extended constant expressions (WebAssembly)
 ## 参考記事
 - https://webstatus.dev/?q=baseline_date%3A2024-01-01..2024-12-31&sort=baseline_status_desc&num=100
 - https://web.dev/series/baseline-newly-available?hl=ja
