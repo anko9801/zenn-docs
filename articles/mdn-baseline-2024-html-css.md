@@ -83,10 +83,13 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 
 AVIF (AV1 Image File Format) は AV1 ビデオコーデックを基盤に開発された、静止画や画像シーケンス用のフォーマットです。その大きな特徴は JPEG PNG WebP といった既存フォーマットを超える圧縮効率と高画質です。
 
-Google が開発した WebP も高圧縮率で知られていますが、MDN では「AVIF は WebP より圧縮率が高い」と明確に評価されています。
+Google が開発した WebP も高圧縮率で知られていますが、MDN では「AVIF は WebP より圧縮率が高い」と評価されています。
 (参考: [MDNドキュメント](https://developer.mozilla.org/ja/docs/Web/Media/Formats/Image_types#avif_%E7%94%BB%E5%83%8F))
 
+![](/images/webp_vs_avif.webp)
+
 かつて AVIF は一部のブラウザでサポートが不十分でしたが今回 Newly available となり「とりあえず AVIF で保存しておけば問題ない」ようになりました。
+
 
 ## content-visibility: レンダリングパフォーマンスの向上
 
@@ -97,8 +100,11 @@ Google が開発した WebP も高圧縮率で知られていますが、MDN で
 https://web.dev/articles/content-visibility?hl=ja
 
 ## スクロールのガタツキを防ぐ
-scrollbar-gutter
-scrollbar-width
+
+スクロールバーの出現によってコンテンツが揺れる現象にイライラしたことはありませんか？
+ユーザー体験
+`scrollbar-gutter: stable`
+`scrollbar-width` を使えば、スクロールバーの太さを制御できます。
 
 ## ブロックレイアウト上の align-content
 
@@ -137,6 +143,8 @@ https://coliss.com/articles/build-websites/operation/css/about-text-wrap-balance
 ruby-align
 ruby-position
 
+親に向かってなんだその
+
 ## font-size-adjust: 異なるフォントが混ざっても綺麗なタイポグラフィ 
 
 英語圏では異なるフォントを同じ文章で扱うとき、フォントサイズで揃えても文字の大きさがズレてしまってピッタリ合いません。そこでフォントサイズではなくフォントの小文字の高さ `x-height` で揃えることで合わせようというのが `font-size-adjust` です。
@@ -147,12 +155,8 @@ ruby-position
 
 ## @property: CSS カスタムプロパティの新たな表現
 カスタムプロパティに型のチェックやデフォルト値の設定、プロパティの値の継承するかを設定することができるようになります。
-@property
-CSS.registerProperty()
 
-```css
---logo-color: #c0ffee
-```
+これは CSS では `@property` JavaScript では `CSS.registerProperty()` によって設定でき、特に JavaScript で動的にカスタムプロパティを追加する場合により安全に変数を初期化できるようになります。例えば次のコードは構文は `<color>` 継承せず初期値は `#c0ffee` となります。
 ```css
 @property --logo-color {
   syntax: "<color>";
@@ -163,20 +167,27 @@ CSS.registerProperty()
 
 ## さまざまな色空間での相対色とグラデーション
 
-相対色
-例えば OKLCH と Relative colors を組み合わせることで 1 つの基準色からライトテーマやダークテーマの色などを生成する保守性の高いカラーパレットが作成できます。
+OKLAB OKLCH など比較的最近実装された色空間での相対色とグラデーションの構文が実装されました。
+
 ```css
-.lighten-by-25 {
-  background: oklch(from blue calc(l * 1.25) c h / 0.8);
+html {
+  /* 背景は基準色の明度を下げて、文字は明度を上げた */
+  --base: green;
+  --base-bg: oklch(from var(--base) calc(l * 0.75) c h / 0.5);
+  --base-text: oklch(from var(--base) calc(l * 1.5) c h);
 }
-aside {
-  background: oklch(from var(--c) calc(l * 0.75) c h / 0.5);
-  color: oklch(from var(--c) calc(l * 1.5) c h);
+
+body {
+  background: var(--base-bg);
+  color: var(--base-text);
+}
+
+.gradation {
+  /* oklch 色空間において blue から red までのグラデーション */
+  background: linear-gradient(in oklch to right, blue, red);
 }
 ```
-グラデーションはこれまで `linear-gradient(from, to)` としていた所にさまざまな色空間におけるグラデーションが
-
-
+例えば OKLCH と相対色表現を組み合わせることで 1 つの基準色からライトテーマやダークテーマの色などを生成する保守性の高いカラーパレットが作成できます。
 @[codepen](https://codepen.io/anko9801/pen/azoygqV)
 
 ## light-dark(): ダークテーマのスタイルを簡単に当てられる！
@@ -219,23 +230,21 @@ body {
 ## backdrop-filter: 背景にぼかしや色変化を与える
 https://coliss.com/articles/build-websites/operation/css/css-property-backdrop-filter.html
 
-## Vertical form controls
+## フォーム要素が縦書きにできる
 ## :state()
 https://developer.mozilla.org/en-US/docs/Web/API/CustomStateSet
 https://developer.mozilla.org/en-US/docs/Web/CSS/:state
 
-## offset-position と offsetpath の値
-offset
-CSS animation
-
-## zoom: レイアウトが変わる transform-scale
+## CSS Animation 関連の充実
+- offset-position と offsetpath の値
+  - offset
+- zoom: レイアウトが変わる transform-scale
 重なるようにその要素が大きくなる
 `transform: scale(3);`
 レイアウトの再計算をする
 `zoom: 3;`
-
-## transform-box: 
-## transition-behavior: 
+- transform-box: 
+- transition-behavior: 
 https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
 
 ## @page 文書を印刷するときに一部の CSS プロパティを変更する
@@ -247,7 +256,7 @@ scroll-to-text
 ## CSS ステップ関数 `round()` `mod()` `rem()`
 四捨五入などを計算できる `round()` と剰余を計算する `mod()` `rem()` が追加されました。
 
-`mod()` `rem()` 違いはマイナスになったときの挙動で、それぞれ割る数と割られる数の符号に依存して返す符号が変わります。
+`mod()` `rem()` の違いはマイナスになったときの挙動で、それぞれ割る数と割られる数の符号に依存して返す符号が変わります。
 ```js
 mod(?, ±) = ±
 rem(±, ?) = ±
