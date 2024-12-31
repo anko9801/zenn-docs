@@ -111,12 +111,9 @@ Google が開発した WebP も高圧縮率で知られていますが、MDN で
 
 https://web.dev/articles/content-visibility?hl=ja
 
-## スクロールのガタツキを防ぐ
+## scrollbar-gutter: スクロールのガタツキを防ぐ
 
-スクロールバーの出現によってコンテンツが揺れる現象にイライラしたことはありませんか？
-ユーザー体験
-`scrollbar-gutter: stable`
-`scrollbar-width` を使えば、スクロールバーの太さを制御できます。
+スクロールバーの出現によってコンテンツが揺れてしまうという現象が時折発生します。これには `scrollbar-gutter: stable` とすることでスクロールできなくてもスクロールバーの幅をレイアウトに組み込むことでこのガタツキを防ぐことができます。また `scrollbar-width` によってスクロールバーの太さを調節することも出来るようになりました。
 
 ## ブロックレイアウト上の align-content
 
@@ -149,17 +146,13 @@ align-content: center;
 
 ページ内の特定へジャンプするにはこれまで id 属性を持つ要素にしか対応していませんでしたが、テキストフラグメントを活用することでどのテキストも指定できるように拡張されました。
 
-テキストフラグメントの構文は `#:~:text=[prefix-,]textStart[,textEnd][,-suffix]` で開始位置・終了位置・prefix・suffix を指定できます。これに一致した一番最初のテキストにスクロールし、ハイライトされます。例えば次のように使えます。
+テキストフラグメントの構文は `#:~:text=[prefix-,]textStart[,textEnd][,-suffix]` で開始位置・終了位置・prefix・suffix を指定できます。これに一致した一番最初のテキストにスクロールし、ハイライトされます。
 
 | フラグメント | 説明 |
 |---|---|
 | [`#テキストフラグメント`](#テキストフラグメント) | 従来通り id 属性に基づくリンク |
 | [`#:~:text=テキストフラグメント`](#:~:text=フラグメントディレクティブ) | ページ内の「テキストフラグメント」という文字列が最初に現れる箇所にスクロール |
-| [`#:~:text=これまでページ内の,ように拡張されました`](#:~:text=フラグメントディレクティブ) | 特定の開始位置と終了位置を指定し、その部分をハイライト |
-
-なぜ `:~:` という文字
-過去 5 年に検索
-フラグメントディレクティブ
+| [`#:~:text=これまでページ内の,ように拡張されました`](#:~:text=フラグメントディレクティブ) | 特定の開始位置と終了位置を指定する |
 
 指定したテキストフラグメントに飛び、ハイライトされます。ハイライトされるテキストについては `::target-text` によってスタイルを書き換えられます。
 ```css
@@ -174,14 +167,17 @@ align-content: center;
 - `text-wrap`
 - `white-space-collapse`
 - `white-space`
+
 https://developer.mozilla.org/ja/docs/Web/CSS/text-wrap
 https://coliss.com/articles/build-websites/operation/css/about-text-wrap-balance.html
 
 ## ルビ
-ruby-align
+
+ルビ
+`ruby-align`
 ruby-position
 
-親に向かってなんだその
+@[codepen](https://codepen.io/anko9801/pen/KwPvLbj)
 
 ## font-size-adjust: 異なるフォントが混ざっても綺麗なタイポグラフィ 
 
