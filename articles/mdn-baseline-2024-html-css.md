@@ -1,8 +1,8 @@
 ---
-title: "MDN Baseline Newly Available 2024 を振り返ってみよう"
+title: "MDN Baseline Newly Available 2024 を振り返ってみよう (HTML CSS 編)"
 emoji: "✅️"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: []
+topics: ["frontend", "Tech"]
 published: false
 ---
 
@@ -29,38 +29,23 @@ MDN Web Docs を読んでいると、次のようなロゴを目にしません�
 
 そして今年 Newly Available となったものは [53 個](https://webstatus.dev/?q=baseline_date%3A2024-01-01..2024-12-31&sort=baseline_status_desc) でした！この記事ではそれら全てを 1 つ 1 つ簡単に紹介していきます。こんな最新技術が開発で使えるようになったんだ～って思いながら流し読みしてってください。
 
-## 宣言型 Shadow DOM
+## Declarative Shadow DOM
 
-Web Comopnents の内の Shadow DOM が HTML 上で宣言的に書けるようになりました。
+Shadow DOM は Web Components を構成する重要な要素で、コンポーネント内の DOM を外部から分離し、スタイルやスクリプトをカプセル化する技術です。これまでは JavaScript を用いた構築が必要で SSR との組み合わせが難しい課題がありました。今回サポートされた Declarative Shadow DOM によって HTML 上で宣言的に書けるようになり、SSR に対応しました。
 
-Web Components とは
-
-再利用できるようにしたのが Web Components です。Web Components
-
-- Shadow DOM
-- Custom Elements
-- HTML テンプレート
-
-動的 Declarative Shadow DOM
-
-Document: parseHTMLUnsafe() static method
-Element: setHTMLUnsafe() method
-ShadowRoot: setHTMLUnsafe() method
-
-[Shadow DOM](https://developer.mozilla.org/ja/docs/Web/API/Web_components/Using_shadow_DOM) は再利用可能なコンポーネント
-これまでは JavaScript
-
-https://azukiazusa.dev/blog/declarative-shadow-dom/
-
-- declarative shadow dom と HTML Templates の違い
-
+`<template>` タグに `shadowrootmode` 属性を与えることで
 ```html
-<div id="host">
+<hello-shadow-dom>
   <template shadowrootmode="open">
     <span>I'm in the shadow DOM</span>
   </template>
-</div>
+</hello-shadow-dom>
 ```
+
+また Declarative Shadow DOM を動的に挿入する為に `innerHTML` を使うと XSS 攻撃などによる Shadow DOM のインジェクションなどセキュリティ上の問題が発生する為エラーが生じます。それでも使いたい場合には `document.parseHTMLUnsafe()` `element.setHTMLUnsafe()` が使えます。ただし上のような攻撃を防ぐことはできないので注意が必要です。
+
+https://azukiazusa.dev/blog/declarative-shadow-dom/
+https://zenn.dev/cybozu_frontend/articles/web-standardized-component-in-server-and-client
 
 ## Popover API
 
@@ -71,7 +56,7 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 - ポップオーバー以外の部分をクリックすると自動的に閉じるライトディスミス機能
 - キーボードやスクリーンリーダーのユーザーにも優しいアクセシビリティ
 
-実装は簡単でポップオーバーの UI に popover 属性を付けてトグルボタンに popovertarget 属性を付けるだけ。
+実装は簡単でポップオーバーの UI に popover 属性を付けてトグルボタンに popovertarget 属性を付けるだけでできます。
 
 ```html
 <button popovertarget="my-popover">Open Popover</button>
@@ -140,7 +125,10 @@ align-items: center;
 align-content: center;
 ```
 
-## フォーム要素が縦書きにできる
+## フォーム要素を縦書きにできる
+
+
+@[codepen](https://codepen.io/anko9801/pen/vEBeWEd)
 
 ## テキストフラグメント
 
@@ -162,24 +150,25 @@ align-content: center;
 }
 ```
 
-## text-wrap white-space-collapse: テキストの折り返しをより便利に
+## text-wrap: テキストの折り返しをより綺麗に
 
-- `text-wrap`
-- `white-space-collapse`
-- `white-space`
+テキストの 1 行の長さが丁度同じように折り返すなどといったアルゴリズムがサポートされました。
 
-https://developer.mozilla.org/ja/docs/Web/CSS/text-wrap
+`text-wrap` はよりよいアルゴリズムでテキストの折り返しを制御する組版の為のプロパティ、`white-space-collapse` は連続した空白やタブ、改行を 1 つの空白に置き換えたり、削除したりするプロパティです。
+
+これまで使われていた `white-space` はこれから `text-wrap` `white-space-collapse` を用いることで表現できるショートハンドプロパティとなります。
+
+@[codepen](https://codepen.io/anko9801/pen/JoPrOdW)
+
 https://coliss.com/articles/build-websites/operation/css/about-text-wrap-balance.html
 
-## ルビ
+## ルビの位置の調整
 
-ルビ
-`ruby-align`
-ruby-position
+ルビは文字の上に注釈する文字のことで日本語の振り仮名が発祥の概念です。もともとはフォントサイズが Perl Diamond などの宝石の名前として表されており、そのうち Ruby が日本活版の業界で振り仮名として使うようになったのが由来です。そのルビの位置を調節するプロパティ `ruby-align` `ruby-position` がサポートされました。
 
 @[codepen](https://codepen.io/anko9801/pen/KwPvLbj)
 
-## font-size-adjust: 異なるフォントが混ざっても綺麗なタイポグラフィ 
+## font-size-adjust: 異なるフォントが混ざっても綺麗なタイポグラフィ
 
 英語圏では異なるフォントを同じ文章で扱うとき、フォントサイズで揃えても文字の大きさがズレてしまってピッタリ合いません。そこでフォントサイズではなくフォントの小文字の高さ `x-height` で揃えることで合わせようというのが `font-size-adjust` です。
 
@@ -259,23 +248,38 @@ body {
   background-color: light-dark(#efedea, #223a2c);
 }
 ```
-画像を切り替えたりしてもよさそう
 
 ## :state()
-https://developer.mozilla.org/en-US/docs/Web/API/CustomStateSet
-https://developer.mozilla.org/en-US/docs/Web/CSS/:state
 
-## CSS Animation 関連の充実
-- offset-position と offsetpath の値
-  - offset
-- zoom: レイアウトが変わる transform-scale
-重なるようにその要素が大きくなる
-`transform: scale(3);`
-レイアウトの再計算をする
-`zoom: 3;`
-- transform-box: 
-- transition-behavior: 
-https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
+Web Components の 1 要素であるカスタム要素において `:hover` `:visited` などの疑似クラスのような状態を設定できるカスタム状態 `:state()` を扱うことが出来るようになりました。
+
+CustomStateSet は、ElementInternals オブジェクトの states プロパティ経由で操作できます。実際に利用する際には、カスタム要素の中で attachInternals() メソッドを呼び出すことで、カスタム要素に紐付いた ElementInternals オブジェクトを得られます。
+
+CustomStateSet に対して任意の状態を定義した場合には、同じ名前で :state() 擬似クラスを使うことで CSS 上でもマッチします。
+
+```html
+<labeled-checkbox>You need to check this</labeled-checkbox>
+```
+
+```css
+labeled-checkbox {
+  border: dashed red;
+}
+labeled-checkbox:state(checked) {
+  border: solid;
+}
+```
+
+## CSS Animation の充実
+
+CSS Animation に関してもいくつか新しくサポートされました。
+
+| プロパティ名 | 説明 |
+|---|---|
+| offset | 要素を動かすときの軌跡を表現するプロパティ |
+| zoom | 拡大するプロパティ。transform-scale は拡大しても要素の大きさが変わらず、zoom はレイアウトを再計算しながら拡大する。 |
+| transform-box | 変換の基準となる要素の枠組みを設定するプロパティ |
+| [transition-behavior](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior) | `background-image` `visibility` などの離散プロパティなども動かせるようにできる |
 
 ## @page Web ページの印刷時のスタイルを設定
 
