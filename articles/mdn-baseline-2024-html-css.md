@@ -83,7 +83,7 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 
 @[codepen](https://codepen.io/anko9801/pen/VYZMjeQ)
 
-さらにまだ実験的な機能ですが CSS Anchor Positioning と組み合わせることで
+さらにまだ実験的な機能ですが特定の要素からの相対位置で指定できる Anchor Positioning があります。これにより JavaScript を使わなくても toolchip を実装することができます。
 
 ## backdrop-filter: 背景にぼかしや色変化を与える
 
@@ -228,7 +228,7 @@ body {
 例えば OKLCH と相対色表現を組み合わせることで 1 つの基準色からライトテーマやダークテーマの色などを生成する保守性の高いカラーパレットが作成できます。
 @[codepen](https://codepen.io/anko9801/pen/azoygqV)
 
-## light-dark(): ダークテーマのスタイルを簡単に当てられる！
+## light-dark(): ダークテーマのスタイルを簡単に当てられる
 
 `light-dark()` は [CSS Color Module Level 5](https://drafts.csswg.org/css-color-5/#light-dark) で追加されたユーティリティ関数で従来の `prefers-color-scheme` メディアクエリよりもライトテーマとダークテーマで異なるスタイルを簡潔に当てられます。
 
@@ -281,9 +281,34 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/:state
 - transition-behavior: 
 https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
 
-## @page 文書を印刷するときに一部の CSS プロパティを変更する
+## @page 文書の印刷時の設定を指定
 
+Web ページを印刷したいときに `@page` ルールでページの余白や用紙サイズ、縦向き横向きなどを指定することができます。
 
+これは `@media print` と合わせて CSS 組版である Vivliostyle でよく使われています。`@media print` は印刷時にスタイルを変更する際に使います。例えば、ヘッダーやナビゲーションを消したり、段組みで縦に 2 列に文章を分けたりできます。
+
+```css
+@page {
+  size: A4 portrait;
+  margin: 8mm 2.5mm 2.5mm 2.5mm;
+
+  @top-left {
+    content: "Newly available 2024";
+  }
+
+  @top-right {
+    content: "Page " counter(pageNumber);
+  }
+}
+
+@media print {
+  body {
+    column-count: 2;
+    column-rule: 1px solid;
+    column-gap: 6mm;
+  }
+}
+```
 
 ## CSS ステップ関数 `round()` `mod()` `rem()`
 四捨五入などを計算できる `round()` と剰余を計算する `mod()` `rem()` が追加されました。
