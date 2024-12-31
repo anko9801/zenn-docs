@@ -281,11 +281,11 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/:state
 - transition-behavior: 
 https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
 
-## @page 文書の印刷時の設定を指定
+## @page Web ページの印刷時のスタイルを設定
 
 Web ページを印刷したいときに `@page` ルールでページの余白や用紙サイズ、縦向き横向きなどを指定することができます。
 
-これは `@media print` と合わせて CSS 組版である Vivliostyle でよく使われています。`@media print` は印刷時にスタイルを変更する際に使います。例えば、ヘッダーやナビゲーションを消したり、段組みで縦に 2 列に文章を分けたりできます。
+これは `@media print` と合わせて CSS 組版である Vivliostyle でよく使われています。`@media print` は印刷時にスタイルを変更する際に使えて、例えばヘッダーやナビゲーションを消したり、段組みで縦に 2 列に文章を分けたりできます。
 
 ```css
 @page {
