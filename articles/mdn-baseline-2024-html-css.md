@@ -12,9 +12,14 @@ MDN Web Docs を読んでいると、次のようなロゴを目にしません�
 
 ![](/images/newly_available.png)
 
-このロゴは Baseline というすべての主要なブラウザ (Chrome、Edge、Firefox、Safari など) である機能がサポートされているかを表す指標です。各ブラウザの挙動の違いに悩まされることなく、安心して開発に活用できます。
+このロゴは Baseline という主要なブラウザにおいて、ある機能がサポートされているかを表す指標です。これにより各ブラウザの挙動の違いに悩まされることなく、安心して開発に活用できます。ここで扱われる主要なブラウザとは以下のようなものです。
 
-Baseline は段階に応じて 3 種類のサポート状況に分けられます。
+- Chrome (PC、Android)
+- Edge
+- Firefox (PC、Android)
+- Safari (macOS、iOS)
+
+そして Baseline は段階に応じて 3 種類のサポート状況に分けられます。
 
 - Widely available: 2 年半以上すべての主要ブラウザで利用可能
 - Newly avaliable: 最新バージョンのブラウザで利用可能
@@ -22,7 +27,7 @@ Baseline は段階に応じて 3 種類のサポート状況に分けられま�
 
 これを見れば、今までのように CSS や JavaScript などの最新技術を採用する際に [Can I Use](https://caniuse.com/) のサポート率を逐一確認する必要がなく、ブラウザの互換性を素早く把握できます。ちなみに 2 年半という基準は企業や組織がシステムを更新する際の一般的なライフサイクルに基づいて決められています。
 
-そして今年 Newly Available となったものは [53 個](https://webstatus.dev/?q=baseline_date%3A2024-01-01..2024-12-31&sort=baseline_status_desc) でした！この記事ではそれらを簡単に紹介していきます。こんな最新技術が開発で使えるようになったんだ～って思いながら読んでってください。
+そして今年 Newly Available となったものは [53 個](https://webstatus.dev/?q=baseline_date%3A2024-01-01..2024-12-31&sort=baseline_status_desc) でした！この記事ではそれら全てを 1 つ 1 つ簡単に紹介していきます。こんな最新技術が開発で使えるようになったんだ～って思いながら流し読みしてってください。
 
 ## 宣言型 Shadow DOM
 
@@ -62,12 +67,11 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
 従来は JavaScript を用いて実装しなければならなかったのを
 ポップオーバーはよく使われるのに対し、実装が大変でした。
 
-- 最上位レイヤーに昇格
-  - z-index を設定する必要がない
-- ライトディスミス機能
-  - ポップオーバー以外の部分をクリックすると、自動的に閉じる仕組みを標準で提供します
-- アクセシビリティ
-  - キーボードやスクリーンリーダーのユーザーにも優しい設計を簡単に実現可能
+- トップレイヤーに昇格z-index を設定する必要がない
+- ポップオーバー以外の部分をクリックすると自動的に閉じるライトディスミス機能
+- キーボードやスクリーンリーダーのユーザーにも優しいアクセシビリティ
+
+実装は簡単でポップオーバーの UI に popover 属性を付けてトグルボタンに popovertarget 属性を付けるだけ。
 
 ```html
 <button popovertarget="my-popover">Open Popover</button>
@@ -76,7 +80,15 @@ https://azukiazusa.dev/blog/declarative-shadow-dom/
   <p>I am a popover with more information.<p>
 </div>
 ```
-さらに Limited availability ですが CSS Anchor Positioning と組み合わせることで
+
+@[codepen](https://codepen.io/anko9801/pen/VYZMjeQ)
+
+さらにまだ実験的な機能ですが CSS Anchor Positioning と組み合わせることで
+
+## backdrop-filter: 背景にぼかしや色変化を与える
+
+Popover API の codepen で
+https://coliss.com/articles/build-websites/operation/css/css-property-backdrop-filter.html
 
 
 ## AVIF: 次世代の高効率画像フォーマット
@@ -95,7 +107,7 @@ Google が開発した WebP も高圧縮率で知られていますが、MDN で
 
 通常ブラウザはすべてのコンテンツをレンダリングしているのですが、ページ読み込み時には不必要な画面外の要素までレンダリングしてしまいます。このレンダリングをスキップし、スクロール時に逐一レンダリングする `content-visibility: auto` がブラウザ互換となりました。
 
-これにより巨大または複雑なサイトにおいてレンダリングパフォーマンスが大幅に向上することが見込めます。加えてレンダリングがスキップされているかを確認できる `checkVisibility()` 関数も Newly Available となりました。
+これにより巨大または複雑なサイトにおいてレンダリングパフォーマンスが大幅に向上することが見込めます。加えてレンダリングがスキップされているかを確認できる `checkVisibility()` 関数も Newly available となりました。
 
 https://web.dev/articles/content-visibility?hl=ja
 
@@ -130,6 +142,12 @@ align-items: center;
 ```css
 align-content: center;
 ```
+
+## フォーム要素が縦書きにできる
+## scroll-to-text フラグメント
+https://labs.jxck.io/scroll-to-text-fragment/#:~:text=しかし,ない
+scroll-to-text
+::target-text
 
 ## text-wrap white-space-collapse: テキストの折り返しをより便利に
 
@@ -227,10 +245,6 @@ body {
 ```
 画像を切り替えたりしてもよさそう
 
-## backdrop-filter: 背景にぼかしや色変化を与える
-https://coliss.com/articles/build-websites/operation/css/css-property-backdrop-filter.html
-
-## フォーム要素が縦書きにできる
 ## :state()
 https://developer.mozilla.org/en-US/docs/Web/API/CustomStateSet
 https://developer.mozilla.org/en-US/docs/Web/CSS/:state
@@ -249,9 +263,7 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/transition-behavior
 
 ## @page 文書を印刷するときに一部の CSS プロパティを変更する
 
-## scroll-to-text フラグメント
-scroll-to-text
-::target-text
+
 
 ## CSS ステップ関数 `round()` `mod()` `rem()`
 四捨五入などを計算できる `round()` と剰余を計算する `mod()` `rem()` が追加されました。
