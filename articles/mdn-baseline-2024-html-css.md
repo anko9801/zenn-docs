@@ -3,7 +3,7 @@ title: "MDN Baseline Newly Available 2024 を振り返ってみよう (HTML CSS 
 emoji: "✅️"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["frontend", "Tech"]
-published: false
+published: true
 ---
 
 ## みなさん Baseline をご存知でしょうか
@@ -27,17 +27,19 @@ MDN Web Docs を読んでいると、次のようなロゴを目にしません�
 
 これを見れば、今までのように CSS や JavaScript などの最新技術を採用する際に [Can I Use](https://caniuse.com/) のサポート率を逐一確認する必要がなく、ブラウザの互換性を素早く把握できます。ちなみに 2 年半という基準は企業や組織がシステムを更新する際の一般的なライフサイクルに基づいて決められています。
 
-そして今年 Newly Available となったものは [53 個](https://webstatus.dev/?q=baseline_date%3A2024-01-01..2024-12-31&sort=baseline_status_desc) でした！この記事ではそれら全てを 1 つ 1 つ簡単に紹介していきます。こんな最新技術が開発で使えるようになったんだ～って思いながら流し読みしてってください。
+そして今年 Newly Available となったものは [53 個](https://webstatus.dev/?q=baseline_date%3A2024-01-01..2024-12-31&sort=baseline_status_desc) でした！この記事ではそれら全てを 1 つ 1 つ簡単に紹介していきます。前半は HTML CSS に絞ります。こんな最新技術が開発で使えるようになったんだ～って思いながら流し読みしてってください。
 
 ## Declarative Shadow DOM
 
 Shadow DOM は Web Components を構成する重要な要素で、コンポーネント内の DOM を外部から分離し、スタイルやスクリプトをカプセル化する技術です。これまでは JavaScript を用いた構築が必要で SSR との組み合わせが難しい課題がありました。今回サポートされた Declarative Shadow DOM によって HTML 上で宣言的に書けるようになり、SSR に対応しました。
 
-`<template>` タグに `shadowrootmode` 属性を与えることで
+実装としては `<template>` タグに `shadowrootmode` 属性を与えることで Shadow DOM が作れます。
 ```html
 <hello-shadow-dom>
   <template shadowrootmode="open">
     <span>I'm in the shadow DOM</span>
+    <style>~~</style>
+    <script>~~</script>
   </template>
 </hello-shadow-dom>
 ```
@@ -46,6 +48,12 @@ Shadow DOM は Web Components を構成する重要な要素で、コンポー�
 
 https://azukiazusa.dev/blog/declarative-shadow-dom/
 https://zenn.dev/cybozu_frontend/articles/web-standardized-component-in-server-and-client
+
+## CustomStateSet: カスタム要素も状態を扱えるように
+
+Web Components の 1 要素であるカスタム要素において `:hover` `:visited` などの疑似クラスのような状態を設定できるカスタム状態を扱うことが出来るようになりました。
+
+JavaScript で CustomStateSet という API を通すことでカスタム状態を定義できます。 CustomStateSet はカスタム要素の中で `attachInternals()` メソッドから得られる ElementInternals オブジェクトの states プロパティで操作できます。そしてそこで追加されたカスタム状態は CSS で `:state()` 擬似クラスを用いてアクセスできます。
 
 ## Popover API
 
@@ -72,9 +80,9 @@ https://zenn.dev/cybozu_frontend/articles/web-standardized-component-in-server-a
 
 ## backdrop-filter: 背景にぼかしや色変化を与える
 
-Popover API の codepen で
-https://coliss.com/articles/build-websites/operation/css/css-property-backdrop-filter.html
+背景にぼかしや色変化を入れることができ、重要な情報をわかりやすく伝えるようになりました。上のポップオーバーを開くと背景にブラーを掛けているのも `backdrop-filter: blur(4px)` と指定しています。詳しくは次の記事を参考にしてください。
 
+https://coliss.com/articles/build-websites/operation/css/css-property-backdrop-filter.html
 
 ## AVIF: 次世代の高効率画像フォーマット
 
@@ -86,7 +94,6 @@ Google が開発した WebP も高圧縮率で知られていますが、MDN で
 ![](/images/webp_vs_avif.webp)
 
 かつて AVIF は一部のブラウザでサポートが不十分でしたが今回 Newly available となり「とりあえず AVIF で保存しておけば問題ない」ようになりました。
-
 
 ## content-visibility: レンダリングパフォーマンスの向上
 
@@ -127,6 +134,7 @@ align-content: center;
 
 ## フォーム要素を縦書きにできる
 
+`<input>` `<textarea>` などのフォーム要素で縦書きがサポートされました。
 
 @[codepen](https://codepen.io/anko9801/pen/vEBeWEd)
 
@@ -159,8 +167,6 @@ align-content: center;
 これまで使われていた `white-space` はこれから `text-wrap` `white-space-collapse` を用いることで表現できるショートハンドプロパティとなります。
 
 @[codepen](https://codepen.io/anko9801/pen/JoPrOdW)
-
-https://coliss.com/articles/build-websites/operation/css/about-text-wrap-balance.html
 
 ## ルビの位置の調整
 
@@ -249,30 +255,9 @@ body {
 }
 ```
 
-## :state()
+## CSS Animation の機能の充実
 
-Web Components の 1 要素であるカスタム要素において `:hover` `:visited` などの疑似クラスのような状態を設定できるカスタム状態 `:state()` を扱うことが出来るようになりました。
-
-CustomStateSet は、ElementInternals オブジェクトの states プロパティ経由で操作できます。実際に利用する際には、カスタム要素の中で attachInternals() メソッドを呼び出すことで、カスタム要素に紐付いた ElementInternals オブジェクトを得られます。
-
-CustomStateSet に対して任意の状態を定義した場合には、同じ名前で :state() 擬似クラスを使うことで CSS 上でもマッチします。
-
-```html
-<labeled-checkbox>You need to check this</labeled-checkbox>
-```
-
-```css
-labeled-checkbox {
-  border: dashed red;
-}
-labeled-checkbox:state(checked) {
-  border: solid;
-}
-```
-
-## CSS Animation の充実
-
-CSS Animation に関してもいくつか新しくサポートされました。
+CSS Animation に関していくつか新しくサポートされました。
 
 | プロパティ名 | 説明 |
 |---|---|
@@ -321,7 +306,8 @@ rem(±, ?) = ±
 
 ## まとめ
 
+今年の Newly available は Web Components, i18n, アクセシビリティ周りがよく進んでいる感じがありました。次の記事で JavaScript、API 編も紹介するのでぜひそちらも読んでみてください。
+
 ## 参考記事
-- https://webstatus.dev/?q=baseline_date%3A2024-01-01..2024-12-31&sort=baseline_status_desc&num=100
-- https://web.dev/series/baseline-newly-available?hl=ja
-- https://web-platform-dx.github.io/web-features/
+https://web.dev/series/baseline-newly-available?hl=ja
+https://web-platform-dx.github.io/web-features/
