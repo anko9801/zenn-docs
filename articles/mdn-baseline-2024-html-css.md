@@ -12,7 +12,7 @@ MDN Web Docs を読んでいると、次のようなロゴを目にしません�
 
 ![](/images/newly_available.png)
 
-このロゴは Baseline という主要なブラウザにおいて、ある機能がサポートされているかを表す指標です。これにより各ブラウザの挙動の違いに悩まされることなく、安心して開発に活用できます。Baseline がサポートを保証している主要なブラウザとは次のブラウザです。。
+このロゴは Baseline という主要なブラウザにおいて、ある機能がサポートされているかを表す指標です。これにより各ブラウザの挙動の違いに悩まされることなく、安心して開発に活用できます。Baseline がサポートを保証している主要なブラウザとは次のブラウザです。
 
 - Chrome (PC、Android)
 - Edge
@@ -306,7 +306,7 @@ rem(±, ?) = ±
 
 ## まとめ
 
-今年の Newly available は Web Components, i18n, アクセシビリティ周りがよく進んでいる感じがありました。次の記事で JavaScript、API 編も紹介するのでぜひそちらも読んでみてください。
+Web フロントエンドにおいて既に知っていても使いにくかった技術が存分に使えるようになった Newly available の紹介でした。今年の Newly available は Web Components, i18n, アクセシビリティ周りがよく進んでいる感じがありました。次の記事で JavaScript、API 編も紹介するのでぜひそちらも読んでみてください。
 
 ## 参考記事
 https://web.dev/series/baseline-newly-available?hl=ja
