@@ -196,27 +196,18 @@ align-content: center;
 
 ## さまざまな色空間での相対色とグラデーション
 
-OKLAB OKLCH など比較的最近実装された色空間での相対色とグラデーションの構文が実装されました。
+OKLAB OKLCH など比較的最近実装された色空間での相対色とグラデーションの構文が実装されました。例えば OKLCH と相対色表現を組み合わせることで 1 つの基準色からライトテーマやダークテーマの色などを生成する保守性の高いカラーパレットが作成できます。
 
 ```css
-html {
-  /* 背景は基準色の明度を下げて、文字は明度を上げた */
-  --base: green;
-  --base-bg: oklch(from var(--base) calc(l * 0.75) c h / 0.5);
-  --base-text: oklch(from var(--base) calc(l * 1.5) c h);
-}
-
-body {
-  background: var(--base-bg);
-  color: var(--base-text);
+.badge {
+  background: oklch(from green calc(l * 0.75) c h / 0.5);
+  color: oklch(from green calc(l * 1.5) c h);
 }
 
 .gradation {
-  /* oklch 色空間において blue から red までのグラデーション */
   background: linear-gradient(in oklch to right, blue, red);
 }
 ```
-例えば OKLCH と相対色表現を組み合わせることで 1 つの基準色からライトテーマやダークテーマの色などを生成する保守性の高いカラーパレットが作成できます。
 @[codepen](https://codepen.io/anko9801/pen/azoygqV)
 
 ## light-dark(): ダークテーマのスタイルを簡単に当てられる
