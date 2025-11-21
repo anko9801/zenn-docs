@@ -1,3 +1,11 @@
+---
+title: "関数型ってなんなんだ"
+emoji: "🦔"
+type: "tech"
+topics: []
+published: false
+---
+
 ## 役立つ場面を教えてくれ
 
 関数型プログラミングむずかしいがち
