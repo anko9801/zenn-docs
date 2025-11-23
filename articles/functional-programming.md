@@ -346,7 +346,9 @@ getCurrentTime :: IO UTCTime
 ```
 
 > **Def. Effect**
-> 効果 (effect) とは観測可能な変化を引き起こす副作用 (side effect) を型に組み込んだもの
+> 効果 (effect) とは観測可能な変化を引き起こす副作用 (side effect) を型に組み込んで代数的な扱いができるようになったもの。次を満たすもの
+
+Effect は副作用と同じと思ってください。
 
 Effect を管理する方法を Effect System と呼びます。Effect System にはいくつかのライブラリがあります。
 
@@ -360,15 +362,11 @@ class (forall m. Monad m => Monad (t m)) => MonadTrans (t :: (Type -> Type) -> T
   -- 合成律: lift (m >>= f) = lift m >>= (lift . f)
 ```
 
-モナド変換子の課題を解決するために生まれたアプローチです。
-Open Union（拡張可能な直和型）を用いて複数の Effect を 1 つの `Eff` モナドにまとめ、ハンドラによって順次 Effect を解釈して取り除いていきます。
+Extensible Effects は $N^2$ 問題を解決するために生まれたアプローチです。Open Union（拡張可能な直和型）を用いて複数の Effect を 1 つの `Eff` モナドにまとめ、ハンドラによって順次 Effect を解釈して取り除いていきます。
+
 Haskell では `freer-simple` や `polysemy` といったライブラリで実装されており、モナド変換子よりも合成しやすく、パフォーマンスも最適化しやすいという特徴があります。
 
-これでは問題があります。
-
-それを Freer モナドを用いて解決したのが Extensible Effects ですが、これは毎回解釈し直さなければいけなく処理が遅いという問題があります。これを鋭い解決をし、さらに
-$O(n^2)$
-
+これを何の Effect がくるのか意識しなくても良くなり、パフォーマンスも上がったものが Algebraic Effects です。
 
 ### Algebraic Effects and handlers
 Extensible Effects の理論的背景でもありますが、言語機能として「作用（Effect）」と「ハンドラ（Handler）」を分離するアプローチを指します。
@@ -493,10 +491,10 @@ $$
 - 高階述語論理
 - 型演算子
 - 依存型
-Hindley Milner 型推論器が発明され、
-CPS, 限定継続
-末尾再帰最適化
-Effect の合成
+- Hindley Milner 型推論器が発明され、
+- CPS, 限定継続
+- 末尾再帰最適化
+- Effect の合成
 
 部分型
 帰納型 再帰型
@@ -518,9 +516,10 @@ Microsoft が策定したエディタとエコシステム間のインターフ�
 
 **Entry No 3. 圏論**
 
+圏論は型理論に別の角度から意味を与える方法として使われています。
+
 圏論はもともと代数的トポロジー、特にホモロジー論の技法として考案され、それが大数学者グロタンディークによって代数幾何に応用され、数学全般に適用されてきた経緯があります。
 
-この型理論をより強化す
 しかもこれまでの型付きラムダ計算をうまく説明することができるし、
 今まで内部の構造を作って見える性質を考えていたのですが外側から見た性質だけで話そうというのが圏論の魅力です。
 
@@ -530,6 +529,7 @@ Microsoft が策定したエディタとエコシステム間のインターフ�
 
 **Entry No 4. ホモトピー型理論 (HoTT)**
 
+これは型理論をより数学基礎論の立場から強化する方法として扱われています。
 トポロジーの枠組みを用いて型理論を構築する
 帰納法を用いて証明する
 構造に埋め込む
@@ -674,3 +674,4 @@ lax monoidal functor
 [^monad]: 概念ならモナド、型クラスなら Monad と書きます
 [^state]: [React ステート管理 比較考察](https://blog.uhy.ooo/entry/2021-07-24/react-state-management/)
 [^1lab]: [1Lab](https://1lab.dev/)
+[^tagless]: [Typed Tagless Final Interpreters](https://okmij.org/ftp/tagless-final/course/lecture.pdf)
