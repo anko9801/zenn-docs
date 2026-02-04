@@ -14,7 +14,7 @@ published: false
 
 ## マシンをどう管理すべきか
 
-まずは dotfiles がこれまでの形でいいのか？よりよい管理は存在しないのか？
+dotfiles がこれまでの形でいいのか？よりよい管理は存在しないのか？
 
 こういうことを考える為により広くマシンを管理する方法について考えましょう。年々管理するマシンは増えてきました。
 
@@ -44,14 +44,14 @@ published: false
 
 ここらへんの管理手法はメリデリ色々ありますが、怠惰な僕にとっては yadm が一番好きです。git と全く同じインターフェースで覚えるのが少ないし、直接管理するから Single Source of Truth でわかりやすいし楽ちん、さらにはシークレット管理までしてくれます。
 
-さらにインストールするとこまで自動化したい！ってなると
+さらにインストールするとこまで自動化したい！ってなると次のツールを使います。
 
 - 構成管理ツール ([Ansible](https://github.com/ansible/ansible), [mitamae](https://github.com/itamae-kitchen/mitamae))
 - パッケージマネージャー ([Nix](https://github.com/NixOS/nix), [Homebrew](https://brew.sh/ja/), [WinGet](https://github.com/microsoft/winget-cli))
 
 これについては構成管理ツールで手続き的に管理するよりかはパッケージマネージャーで宣言的な管理をした方が認知負荷が低いので後者がおすすめです。
 
-今回は Nix を採用しました。毎回ちまちまインストール方法調べてコマンド叩いて間違えたら修正を繰り返すより、すべてを宣言的に管理しておいてコマンド 1 発で確実に起動する安心感はすごいです。ただ Nix にもデメリットもあってそれについてはあとでお伝えします。
+今回は Nix を採用しました。毎回ちまちまインストール方法調べてコマンド叩いて間違えたら修正を繰り返してたのが、すべてを宣言的に管理しておいてコマンド 1 発で確実に起動する安心感はすごいです。ただ Nix にもデメリットもあってそれについてはあとでお伝えします。
 
 ## 結論構成
 
@@ -62,7 +62,7 @@ published: false
 | システム | なし | NixOS | nix-darwin | WinGet + PowerShell |
 | ツール | Home Manager | Home Manager | Home Manager | なし |
 
-ファイル構造はこんな感じです。
+ディレクトリ構造はこんな感じです。ホスト別には管理できてなくて
 
 ```
 dotfiles/
@@ -89,7 +89,6 @@ dotfiles/
 ガベコレを回すとよくストレージの書き換えが頻繁に起こるので SSD を長持ちさせたい方はあまり向いてないかもしれません。
 
 mise devenv
-
 
 ### セットアップ
 
@@ -133,7 +132,7 @@ iwr https://raw.githubusercontent.com/anko9801/dotfiles/master/setup | iex
 
 ターミナルは Ghostty と Windows Terminal を使っています。Wezterm を作り込みたいな～と思って放置してます。ターミナルマルチプレクサはターミナルのデフォルト使うより選択コピーや prefix key のキーバインドができて便利なので Zellij を使ってます。
 
-シェルは zsh を使っています。fish や Nushell などの非 POSIX 準拠シェルだと書き換えが必要だったり LLM で間違うことが多くて使いづらいのと、今や zsh でも補完などの体験が良くて困ってないです。起動時間は 200ms 以下だと体感が変わらなくなるので 200ms になるように遅延読み込みを調整しています。プラグインについては次を使っています。
+シェルは zsh を使っています。fish shell や Nushell などの非 POSIX 準拠シェルだと書き換えが必要だったり LLM で間違うことが多くて使いづらいのと、今やプラグインが充実して zsh でも補完などの体験が良くて困ってないです。これらのプラグインを入れてます。
 
 | zsh プラグイン | 説明 |
 |---|---|
@@ -143,9 +142,9 @@ iwr https://raw.githubusercontent.com/anko9801/dotfiles/master/setup | iex
 | zsh-defer | 遅延読み込み |
 | zsh-fast-syntax-highlighting | シンタックスハイライト |
 
-プロンプトは Starship、IME は SKK、ランチャーは Raycast
+シェルの起動時間は 200ms 以下だと体感変わらなくなるので 200ms になるように遅延読み込みを調整しています。
 
-エディターはデスクトップなら VSCode、ノパソなら Zed、気分で Neovim です。やっぱりノパソで VSCode fork app 動かしてると重い！動かん！って思うことが多いです。
+プロンプトは Starship、IME は SKK、ランチャーは Raycast、エディターはデスクトップなら Cursor ノパソは Zed 気分で Neovim を入れてます。
 
 ### カラースキーム & フォント & キーバインディング
 
@@ -162,7 +161,7 @@ Vim/Emacs は Esc が Tab の位置だったり、Meta Super Hyper などのキ�
 
 私は ghq より zoxide が好きでディレクトリで自由にカテゴリ分けできる分リポジトリ名を忘れたときに探しやすいし、新しく覚えなくていいので助かります。差分は構文解析した上で表示してくれる difftastic、コンフリクトは差分に加えて共通祖先も表示する zdiff3、コミットは絵文字や Conventional Commit がインタラクティブにできる czg か Claude Code、TUI は機能が豊富な lazygit を使ってます。
 
-ジジイが気に入ってるエイリアス 5 選
+気に入ってるエイリアス 5 選
 
 ```bash
 # pull してマージされたブランチを削除
