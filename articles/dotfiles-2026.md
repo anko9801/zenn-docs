@@ -153,14 +153,11 @@ iwr https://raw.githubusercontent.com/anko9801/dotfiles/master/setup | iex
 | zsh-defer | 遅延読み込み |
 | zsh-fast-syntax-highlighting | シンタックスハイライト |
 
-シェルの起動時間は 200ms 以下だと体感変わらなくなるので 200ms に収まるように zsh-defer で遅延読み込みを調整しています。compinit / fzf / direnv / atuin / 補完系のプラグイン
-は一覧
-OSC 52 の pbcopy を用意して SSH 越しでもクリップボードが飛ぶ
+シェルの起動時間は 200ms 以下だと体感変わらなくなるので 200ms に収まるように zsh-defer で遅延読み込みを調整しています。
 
+GNU 系コマンドの置き換えは find → fd, grep → rg, htop → btm みたいに zsh-abbr でエイリアスを貼ると、スペース押した瞬間に展開されるので移行コストなく自然に覚えます。
 
-fzf は fd をデフォルトコマンドにして隠しファイルも拾うようにしています。履歴は atuin を使って不要な履歴を落とし、移動は zoxide を cd に割り当てて最短経路で飛べるようにしてます。CLI は rg/fd/sd/ast-grep を中心に、jless/dasel/dyff/yq でデータ処理、btm/procs で観測、yazi でファイルブラウズ、といった感じで「速さ」と「見やすさ」を優先してます。
-
-ランタイムと linter formatter などの開発ツールは mise でまとめて管理していて、Node / Deno / Bun / Python / uv / Go / Rust / Java とかを揃えています。
+他にはコマンド履歴は atuin、移動は zoxide を cd に割り当て、ランタイムと linter / formatter は mise で管理してます。Neovim や pbcopy コマンドで OSC 52 に対応して SSH 越しでもクリップボードが飛ぶようにしてます。
 
 ### カラースキーム & フォント & キーバインディング
 
