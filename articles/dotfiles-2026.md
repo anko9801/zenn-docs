@@ -22,7 +22,9 @@ dotfiles がこれまでの形でいいのか？よりよい管理は存在し�
 - コンテナ、Kubernetes
 - クラウドリソース、外部サービス
 
-これらすべてを網羅的に管理する為にはどうすべきかを私なりに考えてみると、複数のマシンを総合的に記述するレイヤーと各マシンの詳細を記述するレイヤーだと上手く切り分けられて便利そう。これはクラスター構成 manifest とマシン設定 dotfiles という 2 つのリポジトリと対応していて、じゃもうすでに完成されてるじゃん！...のように見えますがこの視点から見ると私の dotfiles は設定を網羅できてない上にインストールしてくれなくて私用 PC に密結合していて汎用性・可読性・再現性の低いものになっていました。
+これらすべてを網羅的に管理する為にはどうすべきかを私なりに考えてみると、複数のマシンを総合的に記述するレイヤーと各マシンの詳細を記述するレイヤーだと上手く切り分けられて便利そう。これはクラスター構成 manifest とマシン設定 dotfiles という 2 つのリポジトリと対応していて、じゃもうすでに完成されてるじゃん！
+
+...のように見えますが、この視点から見ると私の dotfiles は設定を網羅できてない上にインストールしてくれなくて私用 PC に密結合していて汎用性・可読性・再現性の低いものになっていました。
 
 これをミニマルに設定してマシン間で同期して他の人の良い設定をすぐに取り込めて後で見返してもなぜこの設定があるかに悩まなくて良いようなものがほしい。そして普段使っていてバグらなくてパフォーマンスが上がり生産性が向上する。これを目指して作っていきます。
 
@@ -42,27 +44,35 @@ dotfiles がこれまでの形でいいのか？よりよい管理は存在し�
 2. コピー ([chezmoi](https://github.com/twpayne/chezmoi), [dotdrop](https://github.com/deadc0de6/dotdrop), [dotter](https://github.com/SuperCuber/dotter))
 3. 直接管理 (Bare Git, [yadm](https://yadm.io/))
 
-ここらへんの管理手法はメリデリ色々ありますが、怠惰な僕にとっては yadm が一番好きです。git と全く同じインターフェースで覚えるのが少ないし、直接管理するから Single Source of Truth でわかりやすいし楽ちん、さらにはシークレット管理までしてくれます。
+ここらへんの管理手法はメリデリ色々ありますが、怠惰な僕にとっては yadm が一番好きです。git と全く同じインターフェースで覚えるのが少ないし、直接管理するから Single Source of Truth でわかりやすいし楽ちん、さらにはテンプレート機能、シークレット管理までしてくれます。
 
 さらにインストールするとこまで自動化したい！ってなると次のツールを使います。
 
 - 構成管理ツール ([Ansible](https://github.com/ansible/ansible), [mitamae](https://github.com/itamae-kitchen/mitamae))
 - パッケージマネージャー ([Nix](https://github.com/NixOS/nix), [Homebrew](https://brew.sh/ja/), [WinGet](https://github.com/microsoft/winget-cli))
 
-これについては構成管理ツールで手続き的に管理するよりかはパッケージマネージャーで宣言的な管理をした方が認知負荷が低いので後者がおすすめです。
+これについては構成管理ツールで手続き的に管理するよりパッケージマネージャーで宣言的にやった方が認知負荷が低いので後者がおすすめです。
 
-今回は Nix を採用しました。毎回ちまちまインストール方法調べてコマンド叩いて間違えたら修正を繰り返してたのが、すべてを宣言的に管理しておいてコマンド 1 発で確実に起動する安心感はすごいです。ただ Nix にもデメリットもあってそれについてはあとでお伝えします。
+今回は Nix を採用しました。毎回ちまちまインストール方法調べてコマンド叩いて間違えたら修正を繰り返してたのが、すべてを宣言的に管理しておいてコマンド 1 発で確実に起動する安心感はすごいです。宣言的に文字で書かれてあるから LLM とも相性がよくて、大量に生産性向上記事を読み込ませて適用！みたいなことも楽にできます。
+
+じゃあデメリットないの？というとストレージ周りがちょっと気になっています。Nix はすべてのパッケージをハッシュ付きでストアに保存していて、環境の切り替えはシンボリックリンクの付け替えでやっています。これで古い世代がストアに残り続けるからこそ即座にロールバックできるんだけど、裏を返せばガベージコレクションしない限りストレージを食い続けてしまいます。以前はこれを手動でやるのが面倒で敬遠していたんですが、`nix.gc.automatic` で定期的に走らせれば一切気にならなくなりました。ただし世代の蓄積と GC による大量削除を繰り返す性質上、ストレージへの書き込みは多くなるので SSD の寿命や容量が気になる環境にはあまり向かないかもしれないです。
 
 ## 結論構成
 
-ベースは Nix を用いて管理しています。例外的に Windows は Nix が対応してないので WinGet を用いて宣言的に管理しています。
+管理におけるこだわりとしては 3 つあります。
+
+- ユーザー (人の好み) / テーマ (統一デザイン) / システム (OS 固有) / ツール (マシン共通) で責務を分離
+- 1 コマンドで再現・同期
+- 機密情報はすべて外部管理に逃がす
+
+ベースは Nix を用いて管理しています。例外的に Windows は Nix が対応してないので Windows のパッケージマネージャ WinGet を用いて JSON で宣言的に管理しています。
 
 | | Linux | NixOS | macOS | Windows |
 |---|---|---|---|---|
 | システム | なし | NixOS | nix-darwin | WinGet + PowerShell |
 | ツール | Home Manager | Home Manager | Home Manager | なし |
 
-ディレクトリ構造はこんな感じです。ホスト別には管理できてなくて
+ディレクトリ構造はこんな感じです。
 
 ```
 dotfiles/
@@ -84,11 +94,11 @@ dotfiles/
 └── users/              # Per-user settings (setup generates)
 ```
 
-これまで Nix は便利だけどガベージコレクションがあまりにひどい機能でそれだけで避けていたのですが、ガベコレを自動的にしてくれるデーモンが付けられるのに気が付いてからはもう虜です。宣言的に書かれてあるから LLM とも相性がよくて、大量に生産性向上記事を読み込ませて適用！みたいなことが楽にできます。
+運用: setup → apply → update の流れ
 
-ガベコレを回すとよくストレージの書き換えが頻繁に起こるので SSD を長持ちさせたい方はあまり向いてないかもしれません。
+OS差分: Linux/NixOS/macOS/Windows の扱い
 
-mise devenv
+クロスプラットフォームじゃないツールは os-specific にまとめて
 
 ### セットアップ
 
@@ -115,6 +125,7 @@ curl -fsSL https://raw.githubusercontent.com/anko9801/dotfiles/master/setup | sh
 iwr https://raw.githubusercontent.com/anko9801/dotfiles/master/setup | iex
 ```
 
+このセットアップでは Determinate Systems の Nix インストーラーを使って Nix を入れ、`~/dotfiles` をクローンして `users/$USER.nix` にユーザー情報を書き込んで適用します。
 
 ## おまけ: ツールへのこだわり
 
@@ -130,27 +141,40 @@ iwr https://raw.githubusercontent.com/anko9801/dotfiles/master/setup | iex
 
 ### 日用系ツール
 
-ターミナルは Ghostty と Windows Terminal を使っています。Wezterm を作り込みたいな～と思って放置してます。ターミナルマルチプレクサはターミナルのデフォルト使うより選択コピーや prefix key のキーバインドができて便利なので Zellij を使ってます。
+ターミナルは Ghostty と Windows Terminal を使っています。Wezterm を作り込みたいな～と思って放置してます。ターミナルマルチプレクサは Ghostty でコピーオンセレクトやキーバインドなど再現できるので入れてないです。プロンプトは Starship、IME は SKK、ランチャーは Raycast、エディターはデスクトップなら Cursor ノパソは Zed 気分で Neovim にしています。
 
 シェルは zsh を使っています。fish shell や Nushell などの非 POSIX 準拠シェルだと書き換えが必要だったり LLM で間違うことが多くて使いづらいのと、今やプラグインが充実して zsh でも補完などの体験が良くて困ってないです。これらのプラグインを入れてます。
 
-| zsh プラグイン | 説明 |
+| zsh プラグイン | 設定 |
 |---|---|
-| fzf-tab | いろんなコマンドで fzf を設定する |
+| fzf-tab | git / ssh / kubectl / terraform などで fzf を使えるように |
 | zsh-abbr | スペースを押すと展開されるエイリアス |
 | zsh-autosuggestions | 補完 |
 | zsh-defer | 遅延読み込み |
 | zsh-fast-syntax-highlighting | シンタックスハイライト |
 
-シェルの起動時間は 200ms 以下だと体感変わらなくなるので 200ms になるように遅延読み込みを調整しています。
+シェルの起動時間は 200ms 以下だと体感変わらなくなるので 200ms に収まるように zsh-defer で遅延読み込みを調整しています。compinit / fzf / direnv / atuin / 補完系のプラグイン
+は一覧
+OSC 52 の pbcopy を用意して SSH 越しでもクリップボードが飛ぶ
 
-プロンプトは Starship、IME は SKK、ランチャーは Raycast、エディターはデスクトップなら Cursor ノパソは Zed 気分で Neovim を入れてます。
+
+fzf は fd をデフォルトコマンドにして隠しファイルも拾うようにしています。履歴は atuin を使って不要な履歴を落とし、移動は zoxide を cd に割り当てて最短経路で飛べるようにしてます。CLI は rg/fd/sd/ast-grep を中心に、jless/dasel/dyff/yq でデータ処理、btm/procs で観測、yazi でファイルブラウズ、といった感じで「速さ」と「見やすさ」を優先してます。
+
+ランタイムと linter formatter などの開発ツールは mise でまとめて管理していて、Node / Deno / Bun / Python / uv / Go / Rust / Java とかを揃えています。
 
 ### カラースキーム & フォント & キーバインディング
 
 認知負荷を下げる為にもツール全体で統一したいものっていくつかあって Stylix と温かみのある手作業でやってます。私の設定だとテーマは [Catppuccin Mocha](https://github.com/catppuccin)、フォントは [Moralerspace](https://github.com/yuru7/moralerspace)、キーリマッパーは [Kanata](https://github.com/jtroo/kanata)、キーバインディングは「目的語 + 動詞」で統一してます。
 
-現代において Ctrl, Alt, Win/Cmd の 3 種類のキーがあり、目的語であるアプリケーションについてウィンドウマネージャーは Win/Cmd、ペインは Ctrl-q、タブは Ctrl-t、シェルは Ctrl-g、Vim は Space みたいに対応しています。何をするかは上下左右に動かすときは hjkl、リサイズは HJKL、縦横分割は |-、閉じるは x、ズームは z、新規は n みたいな感じでやってます。
+Ctrl, Alt, Win/Cmd の 3 種類のキーがあって、目的語であるアプリケーションについてこう対応させています。
+
+- ウィンドウマネージャー → Win/Cmd
+- ペイン → Ctrl-q
+- タブ → Ctrl-t
+- シェル → Ctrl-g
+- Vim → Space
+
+動詞は上下左右に動かすときは hjkl、リサイズは HJKL、縦横分割は |-、閉じるは x、ズームは z、新規は n みたいな感じでやってます。
 
 こうすると覚えることが少なくてめっちゃ楽です。ただしマウスでやるよりキーボードでやった方が基本速いですが、キーボードに偏りすぎると認知負荷が高くなって疲れてしまうので人それぞれの良いバランスでやるといいかなと思ってます。本当は英語の文法順にあわせて動詞 + 目的語にして認知負荷減らしたいですがむずい。あと目的語の方の名前空間が枯渇しがちなのでリマップをもっと凝ったり自作キーボードもこだわりたいなとも思ってます。
 
@@ -159,7 +183,7 @@ Vim/Emacs は Esc が Tab の位置だったり、Meta Super Hyper などのキ�
 
 ### Git
 
-私は ghq より zoxide が好きでディレクトリで自由にカテゴリ分けできる分リポジトリ名を忘れたときに探しやすいし、新しく覚えなくていいので助かります。差分は構文解析した上で表示してくれる difftastic、コンフリクトは差分に加えて共通祖先も表示する zdiff3、コミットは絵文字や Conventional Commit がインタラクティブにできる czg か Claude Code、TUI は機能が豊富な lazygit を使ってます。
+私は ghq より zoxide が好きでディレクトリで自由にカテゴリ分けできるからリポジトリ名を忘れたときに探しやすいし、新しくコマンドを覚えなくていいので助かります。差分は構文解析した上で表示してくれる difftastic、コンフリクトは差分に加えて共通祖先も表示する zdiff3、コミットは絵文字や Conventional Commit がインタラクティブにできる czg か Claude Code、TUI は機能が豊富な lazygit を使ってます。
 
 気に入ってるエイリアス 5 選
 
@@ -178,6 +202,10 @@ git undo
 
 pre-commit に gitleaks を設定してシークレット漏洩を防ぎ、GitHub の noreply アドレスを使ってコミットにアドレスを残さないようにしています。
 
+SSH 署名は allowed_signers を自動生成して Git の `gpg.ssh.allowedSignersFile` に流し込み、delta は side-by-side で読む前提です。worktree は `.worktrees` に集約、absorb は `--and-rebase` でまとめて整える流れにしています。
+
+lazygit には czg を直接叩くカスタムコマンドを入れていて、TUI からそのまま Conventional Commit + emoji で書けるようにしています。jj も一応入れていて、署名は ssh backend、pager は delta で合わせてます。
+
 jujutsu 使えたらいいな。
 
 
@@ -189,14 +217,24 @@ jujutsu 使えたらいいな。
 
 1Password で管理しているのは Git コミット署名、SSH エージェント、API キーです。Git コミット署名は SSH 鍵で署名していて秘密鍵がディスクに存在せず 1Password がロック中は署名できないようになっています。SSH エージェントも `~/.1password/agent.sock` 経由で GitHub/GitLab へ接続していて秘密鍵はディスクに書かず生体認証で呼び出します。例えば API キーは env ファイルに `OPENAI_API_KEY=op://Personal/OpenAI/credential` みたいに書くと op コマンドを使って起動時に展開してくれます。生体認証は Touch ID や Windows Hello とかを使ってます。
 
+セキュリティ周りは gitleaks を入れて op:// の参照文字列は誤検知しないように許可リスト化してます。GPG は pinentry-curses でキャッシュ TTL を長めに取りつつ、SSH は addKeysToAgent を有効にして GitHub/GitLab の接続を素直に通す設定にしています。あと脆弱性スキャン系として trivy も入れておいて、最低限のチェックをいつでも回せるようにしています。
+
+1Password CLI は WSL のときは Windows 側の op.exe を使う前提で、非 WSL は Nix で入れて config の `biometric_unlock` を true にしています。シェル側では op のプラグインを遅延ロードして、gh/aws/gcloud/az などを初回実行時に初期化する設計です。
+
 
 ### LLM
 
 Claude Code のみを使ってます。インターフェースはちょっと悩んでいてキーボードの他に音声操作を使っていて割と適当に指示しても動いてくれます。しかしなにか別の作業をしているときにお口がフリーなのでお菓子で忙しくないときは自分の作業に干渉しない音声操作がすごく欲しいです。
 
+Claude Code は自作のスラッシュコマンドをいくつか用意していて、/commit や /check みたいな流れを一瞬で回せるようにしています。
+
 ### その他
 
 [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/latest/)
-OSC 52
 
-## まとめ
+### まとめ
+
+最近の環境構築系の記事を眺めると、流れはだいぶ「宣言的・再現性・安全性」に寄っていて、手続き的に手で直すより、差分が追える形で設計するのが主流になっています。Nix はストアの分離とロールバック、バイナリキャッシュで「壊れにくい更新」と「再現性」を優先する設計が明確で、Home Manager でユーザー環境まで統一するのが定番っぽいです。
+
+dotfiles 管理は、Git の素朴さで押し切る yadm と、テンプレートやパスワードマネージャ連携まで面倒を見てくれる chezmoi に分かれていて、マシン差分や秘密情報の扱いをどう吸収するかが評価軸になっています。Ansible はプレイブックとインベントリで構成を整理する王道ですが、最近は「セットアップの入口は軽く、定常運用は宣言的に」の組み合わせが強く、ブートストラップを軽いスクリプトに寄せて、日常は Nix/chezmoi/yadm に寄せる構成が多い印象です。
+
