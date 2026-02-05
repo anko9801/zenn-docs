@@ -59,20 +59,17 @@ dotfiles がこれまでの形でいいのか？よりよい管理は存在し�
 
 ## 結論構成
 
-管理におけるこだわりとしては 3 つあります。
+管理におけるこだわりは 3 つあります。
 
-- ユーザー (人の好み) / テーマ (統一デザイン) / システム (OS 固有) / ツール (マシン共通) で責務を分離
+- ユーザー、テーマ、システム、ツール で責務を分離
 - 1 コマンドで再現・同期
 - 機密情報はすべて外部管理に逃がす
 
-ベースは Nix を用いて管理しています。例外的に Windows は Nix が対応してないので Windows のパッケージマネージャ WinGet を用いて JSON で宣言的に管理しています。
+それぞれ解説していきます。
 
-| | Linux | NixOS | macOS | Windows |
-|---|---|---|---|---|
-| システム | なし | NixOS | nix-darwin | WinGet + PowerShell |
-| ツール | Home Manager | Home Manager | Home Manager | なし |
+### 責務の分離
 
-ディレクトリ構造はこんな感じです。
+ベースは Nix を用いて管理していて、ディレクトリ構造はこんな感じです。
 
 ```
 dotfiles/
@@ -94,11 +91,21 @@ dotfiles/
 └── users/              # Per-user settings (setup generates)
 ```
 
-運用: setup → apply → update の流れ
+Nix は flake.nix → theme, users → system → home の順で読み込んでいます。
 
-OS差分: Linux/NixOS/macOS/Windows の扱い
+まず flake.nix には unfree
+その後ツール全体で統一したデザインの theme とユーザー固有の users
 
-クロスプラットフォームじゃないツールは os-specific にまとめて
+そして system は Linux / NixOS / macOS / Windows の OS 差分を吸収する為のレイヤーです。Nix は Windows を対応してないので Windows のパッケージマネージャ WinGet を用いて JSON で宣言的に管理しています。
+
+| | Linux | NixOS | macOS | Windows |
+|---|---|---|---|---|
+| システム | なし | NixOS | nix-darwin | WinGet + PowerShell |
+| ツール | Home Manager | Home Manager | Home Manager | なし |
+
+次に home マシン共通のツールを読み込む感じです。
+
+
 
 ### セットアップ
 
@@ -125,7 +132,22 @@ curl -fsSL https://raw.githubusercontent.com/anko9801/dotfiles/master/setup | sh
 iwr https://raw.githubusercontent.com/anko9801/dotfiles/master/setup | iex
 ```
 
-このセットアップでは Determinate Systems の Nix インストーラーを使って Nix を入れ、`~/dotfiles` をクローンして `users/$USER.nix` にユーザー情報を書き込んで適用します。
+このセットアップでは公式ではなく UX のいい Determinate Systems の Nix インストーラーを使って Nix を入れ、`~/dotfiles` をクローンして `users/$USER.nix` にユーザー情報を書き込んで適用します。バイナリキャッシュが効くようになっています。
+
+### セキュリティ
+
+例えば AWS の API キーとか SSH の秘密鍵とかを管理するとき、いつも gitignore でやってるけど万が一 push しちゃったら...とか社用 PC がウイルスに感染したら...みたいな想定しますよね。
+
+こういうのは雑に管理したり気軽にセルフホストすると脆弱性を埋め込むので外部サービスに全部置きましょう。僕は 1Password が好きですべての機密情報をここで管理してます。E2EE でユーザー以外は暗号化されておりサーバー管理者にも復号できないようになっているので、サーバーが攻撃されても解読できず事実上安全。ただし E2EE だからといって完全に信用はできなくて、バックドアを仕込まれてる可能性もあるっちゃあるので法律が機能する法人に頼みましょう。
+
+1Password のおすすめ機能はこちら。
+
+- SSH エージェント: `~/.1password/agent.sock` 経由で GitHub/GitLab に接続。秘密鍵はディスクに書かず Touch ID や Windows Hello の生体認証で呼び出す
+- API キー: env ファイルに `OPENAI_API_KEY=op://Personal/OpenAI/credential` みたいに書くと op コマンドで起動時に展開してくれる
+- Git コミット署名: SSH 鍵で署名していて秘密鍵がディスクに存在しない。1Password がロック中は署名できない
+
+1Password CLI は WSL では Windows 側の `op.exe` を使っていて、シェル側では op プラグインを遅延ロードして gh / aws / gcloud / az を初回実行時に初期化しています。漏洩防止として pre-commit に gitleaks を入れていて、`op://` の参照文字列は誤検知しないよう許可リスト化してます。
+
 
 ## おまけ: ツールへのこだわり
 
@@ -143,7 +165,7 @@ iwr https://raw.githubusercontent.com/anko9801/dotfiles/master/setup | iex
 
 ターミナルは Ghostty と Windows Terminal を使っています。Wezterm を作り込みたいな～と思って放置してます。ターミナルマルチプレクサは Ghostty でコピーオンセレクトやキーバインドなど再現できるので入れてないです。プロンプトは Starship、IME は SKK、ランチャーは Raycast、エディターはデスクトップなら Cursor ノパソは Zed 気分で Neovim にしています。
 
-シェルは zsh を使っています。fish shell や Nushell などの非 POSIX 準拠シェルだと書き換えが必要だったり LLM で間違うことが多くて使いづらいのと、今やプラグインが充実して zsh でも補完などの体験が良くて困ってないです。これらのプラグインを入れてます。
+シェルは zsh を使っています。fish shell や Nushell などの非 POSIX 準拠シェルだと書き換えが必要だったり LLM で間違うことが多くて使いづらいのと、今やプラグインが充実して zsh でも補完などの体験が良くて困ってないです。
 
 | zsh プラグイン | 設定 |
 |---|---|
@@ -155,9 +177,7 @@ iwr https://raw.githubusercontent.com/anko9801/dotfiles/master/setup | iex
 
 シェルの起動時間は 200ms 以下だと体感変わらなくなるので 200ms に収まるように zsh-defer で遅延読み込みを調整しています。
 
-GNU 系コマンドの置き換えは find → fd, grep → rg, htop → btm みたいに zsh-abbr でエイリアスを貼ると、スペース押した瞬間に展開されるので移行コストなく自然に覚えます。
-
-他にはコマンド履歴は atuin、移動は zoxide を cd に割り当て、ランタイムと linter / formatter は mise で管理してます。Neovim や pbcopy コマンドで OSC 52 に対応して SSH 越しでもクリップボードが飛ぶようにしてます。
+その他ツールについてはコマンド履歴は atuin、移動は zoxide を cd に割り当て、ランタイムと linter / formatter は mise で管理してます。Nix あるなら mise いらんやろ。Neovim や pbcopy コマンドで OSC 52 に対応して SSH 越しでもクリップボードが飛ぶようにしてます。地味に便利なのは GNU 系コマンドの置き換えで find → fd, grep → rg, htop → btm みたいに zsh-abbr でエイリアスを貼ると、スペース押した瞬間に展開されるので移行コストなく自然に覚えられます。
 
 ### カラースキーム & フォント & キーバインディング
 
@@ -180,7 +200,7 @@ Vim/Emacs は Esc が Tab の位置だったり、Meta Super Hyper などのキ�
 
 ### Git
 
-私は ghq より zoxide が好きでディレクトリで自由にカテゴリ分けできるからリポジトリ名を忘れたときに探しやすいし、新しくコマンドを覚えなくていいので助かります。差分は構文解析した上で表示してくれる difftastic、コンフリクトは差分に加えて共通祖先も表示する zdiff3、コミットは絵文字や Conventional Commit がインタラクティブにできる czg か Claude Code、TUI は機能が豊富な lazygit を使ってます。
+私は ghq より zoxide が好きでディレクトリで自由にカテゴリ分けできるからリポジトリ名を忘れたときに探しやすいし、新しくコマンドを覚えなくていいので助かります。差分は構文解析した上で表示してくれる difftastic、コンフリクトは差分に加えて共通祖先も表示する zdiff3、コミットは絵文字や Conventional Commit がインタラクティブにできる czg を使っています。
 
 気に入ってるエイリアス 5 選
 
@@ -197,41 +217,20 @@ git absorb
 git undo
 ```
 
-pre-commit に gitleaks を設定してシークレット漏洩を防ぎ、GitHub の noreply アドレスを使ってコミットにアドレスを残さないようにしています。
+設定としては pre-commit に gitleaks を設定してシークレット漏洩を防ぎ、GitHub の noreply アドレスを使ってコミットにアドレスを残さないようにしています。
 
-SSH 署名は allowed_signers を自動生成して Git の `gpg.ssh.allowedSignersFile` に流し込み、delta は side-by-side で読む前提です。worktree は `.worktrees` に集約、absorb は `--and-rebase` でまとめて整える流れにしています。
+lazygit には czg を直接叩くカスタムコマンドを入れていて、TUI からそのまま Conventional Commit + emoji で書けるようにしています。
 
-lazygit には czg を直接叩くカスタムコマンドを入れていて、TUI からそのまま Conventional Commit + emoji で書けるようにしています。jj も一応入れていて、署名は ssh backend、pager は delta で合わせてます。
-
-jujutsu 使えたらいいな。
-
-
-### セキュリティ
-
-例えば AWS の API キーとか SSH の秘密鍵とかを管理するとき、いつも gitignore でやってるけど万が一 push しちゃったら...とか社用 PC がウイルスに感染したら...みたいな想定しますよね。
-
-こういうのは雑に管理したり気軽にセルフホストすると脆弱性を埋め込むので外部サービスに全部置きましょう。私は 1Password が好きですべての機密情報をここで管理しています。このサービスは E2EE というユーザー以外は暗号化されておりサーバー管理者にも復号できないようになっていて、サーバーを攻撃されても解読できず事実上安全という訳です。注意ですが E2EE だからといって信用はできなくて、バックドアを仕込んで機密情報を奪ってる可能性もあるっちゃあるので法律が機能する法人に頼みましょう。
-
-1Password で管理しているのは Git コミット署名、SSH エージェント、API キーです。Git コミット署名は SSH 鍵で署名していて秘密鍵がディスクに存在せず 1Password がロック中は署名できないようになっています。SSH エージェントも `~/.1password/agent.sock` 経由で GitHub/GitLab へ接続していて秘密鍵はディスクに書かず生体認証で呼び出します。例えば API キーは env ファイルに `OPENAI_API_KEY=op://Personal/OpenAI/credential` みたいに書くと op コマンドを使って起動時に展開してくれます。生体認証は Touch ID や Windows Hello とかを使ってます。
-
-セキュリティ周りは gitleaks を入れて op:// の参照文字列は誤検知しないように許可リスト化してます。GPG は pinentry-curses でキャッシュ TTL を長めに取りつつ、SSH は addKeysToAgent を有効にして GitHub/GitLab の接続を素直に通す設定にしています。あと脆弱性スキャン系として trivy も入れておいて、最低限のチェックをいつでも回せるようにしています。
-
-1Password CLI は WSL のときは Windows 側の op.exe を使う前提で、非 WSL は Nix で入れて config の `biometric_unlock` を true にしています。シェル側では op のプラグインを遅延ロードして、gh/aws/gcloud/az などを初回実行時に初期化する設計です。
+jj は一応入れてる状態で使えてないので今後活用していきたいです。
 
 
 ### LLM
 
-Claude Code のみを使ってます。インターフェースはちょっと悩んでいてキーボードの他に音声操作を使っていて割と適当に指示しても動いてくれます。しかしなにか別の作業をしているときにお口がフリーなのでお菓子で忙しくないときは自分の作業に干渉しない音声操作がすごく欲しいです。
+Claude Code のみを使ってます。CLAUDE.md やスラッシュコマンドを管理しています。インターフェースはちょっと悩んでいてキーボードの他に音声操作を使っていて割と適当に指示しても動いてくれます。しかしなにか別の作業をしているときにお口がフリーなのでお菓子で忙しくないときは自分の作業に干渉しない音声操作がすごく欲しいです。
 
-Claude Code は自作のスラッシュコマンドをいくつか用意していて、/commit や /check みたいな流れを一瞬で回せるようにしています。
-
-### その他
-
-[XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/latest/)
 
 ### まとめ
 
 最近の環境構築系の記事を眺めると、流れはだいぶ「宣言的・再現性・安全性」に寄っていて、手続き的に手で直すより、差分が追える形で設計するのが主流になっています。Nix はストアの分離とロールバック、バイナリキャッシュで「壊れにくい更新」と「再現性」を優先する設計が明確で、Home Manager でユーザー環境まで統一するのが定番っぽいです。
 
 dotfiles 管理は、Git の素朴さで押し切る yadm と、テンプレートやパスワードマネージャ連携まで面倒を見てくれる chezmoi に分かれていて、マシン差分や秘密情報の扱いをどう吸収するかが評価軸になっています。Ansible はプレイブックとインベントリで構成を整理する王道ですが、最近は「セットアップの入口は軽く、定常運用は宣言的に」の組み合わせが強く、ブートストラップを軽いスクリプトに寄せて、日常は Nix/chezmoi/yadm に寄せる構成が多い印象です。
-
