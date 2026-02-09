@@ -1,5 +1,5 @@
 ---
-title: "今一度 dotfiles を考え直そう 2026"
+title: "dotfiles"
 emoji: "🦔"
 type: "tech"
 topics: []
@@ -61,13 +61,11 @@ dotfiles がこれまでの形でいいのか？よりよい管理は存在し�
 
 ## 結論構成
 
-1 コマンドでどんな OS でもどんなユーザーでもセットアップが完了し、情報を流し込むだけで生産性が向上する仕組みを実現する為に必要な
+1 コマンドでどんな OS でもどんなユーザーでもセットアップが完了し、情報を流し込むだけで生産性が向上する仕組みを実現する。さらに機密情報は外部に逃がしたい。
 
-- ユーザー、テーマ、システム、ツール で責務を分離
-- 機密情報は外部に逃がす
+### 膨大な設定を管理する
 
-
-### 責務の分離
+膨大な設定を管理するためには責務を分離しないといけません。ユーザー、テーマ、システム、ツールで責務を分離します。
 
 ベースは Nix を用いて管理していて、ディレクトリ構造はこんな感じです。
 
@@ -75,37 +73,42 @@ dotfiles がこれまでの形でいいのか？よりよい管理は存在し�
 dotfiles/
 ├── flake.nix           # Flake entry point
 ├── setup               # Bootstrap script (Unix/Windows polyglot)
-├── system/             # System-level config
+├── system/
+│   ├── shared.nix      # User, versions, nix settings, helpers
+│   ├── home-manager/
+│   │   ├── builder.nix # mkStandaloneHome, mkSystemHomeConfig
+│   │   └── core.nix    # Base settings, platform detection
 │   ├── darwin/         # nix-darwin, Homebrew
 │   ├── nixos/          # NixOS modules
 │   └── windows/        # winget, Windows Terminal, wsl.conf
-├── home/               # Home Manager modules
-│   ├── shell/          # zsh, starship, fzf, atuin, zoxide
-│   ├── editor/         # neovim (nixvim), vscode, zed
-│   ├── tools/          # git, lazygit, ghostty, CLI tools (rg, fd, jq...)
-│   ├── dev/            # mise, language toolchains
-│   ├── desktop/        # niri, fuzzel, swaync (Linux Wayland)
-│   ├── security/       # 1password, ssh, gitleaks
-│   └── os-specific/    # wsl, darwin, linux
-├── theme/              # Stylix: colors, fonts, cursor
+├── ai/                 # Claude Code, Aider, Ollama
+├── shell/              # zsh, fish, bash, starship, atuin, zoxide
+├── editor/             # neovim (nixvim), vscode, zed
+├── tools/              # git, lazygit, yazi, CLI tools (rg, fd, bat...)
+├── terminal/           # ghostty, zellij, tmux
+├── dev/                # mise, rust, go, python
+├── desktop/            # niri, fuzzel, swaync, IME
+├── security/           # 1password, ssh, gpg, gitleaks
+├── theme/              # Stylix: Catppuccin Mocha
 └── users/              # Per-user settings (setup generates)
 ```
 
 flake.nix が全体のエントリポイントです。外部依存（nixpkgs, home-manager, nixvim 等）を宣言し、wsl, mac, nixos-desktop といったプラットフォームごとの構成を定義します。各構成は 共通モジュール + プラットフォーム固有モジュール の組み合わせで作られます。
 
+以前は `home/` ディレクトリの中にモジュールを入れていましたが、階層が深くなりすぎるのでルートにフラット化しました。`system/home-manager/` には Home Manager のビルダー関数とコアモジュールを置いて、darwin/nixos の builder.nix と対称的な構造にしています。
+
+`system/shared.nix` には共通ヘルパーがあって、`mkNixConfig` で darwin/nixos 両方の nix 設定を生成、`basePackages` と `desktopFonts` で共通パッケージ・フォントを定義しています。重複を減らして変更箇所を一箇所に集約するためです。
+
 theme/ は Stylix でカラー・フォント・カーソルを一括管理し、ターミナルからエディタまで統一されたデザインを適用します。users/ は setup スクリプトが生成するユーザー固有の設定（git の名前・email 等）です。
 
-home/shell/, home/dev/, home/security/, theme/ はディレクトリにファイルを置くだけで自動読み込みされます（haumea）。一方 home/tools/ と home/editor/ は os-specific/*.nix から明示的に import されます。これにより、サーバー構成から GUI エディタを外す、といった制御ができます。
+workstation フラグで GUI ツールの有無を切り替えられます。`workstation = true`（デフォルト）だと ai/ + tools/ + editor/ + terminal/ が含まれ、`workstation = false` だとサーバー向けのミニマル構成になります。
 
 system/ は OS レベルの設定を担当します。NixOS と macOS は Nix で管理しますが、Windows は Nix が対応していないため WinGet の JSON で宣言的に管理しています。
 
 | | Linux | NixOS | macOS | Windows |
 |---|---|---|---|---|
-| システム | なし | NixOS | nix-darwin | WinGet + PowerShell |
-| ツール | Home Manager | Home Manager | Home Manager | なし |
-
-最後に home マシン共通のツールを読み込みます。
-
+| インストール | なし | NixOS | nix-darwin | WinGet |
+| 設定 | Home Manager | Home Manager | Home Manager | Home Manager (from WSL) |
 
 ### セットアップ
 
