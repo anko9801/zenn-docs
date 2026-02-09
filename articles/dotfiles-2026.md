@@ -38,7 +38,7 @@ published: false
 - 設定を適用するにはコピペやリンクしないとでめんどくさい
 - インストールもやらないといけない
 
-それじゃ適用を自動化しよう！自分でスクリプトを書くと既存の設定とコンフリクトしたときに正しく適用できるかな、設定が増えたらスクリプトも書き足さないと、 Windows のリンクの仕様がトリッキーだったりして考えることが多いのでツールに任せた方が楽です。代表的なツールは管理手法で主に 3 種類に分けられます。
+それじゃ適用を自動化しよう！となるんですが、自分でスクリプトを書くと「既存の設定とコンフリクトしたらどうしよう」「設定が増えたらスクリプトも書き足さないと」「Windows のリンクの仕様がトリッキー」だったりして考えることが多いのでツールに任せた方が楽です。代表的なツールは管理手法で主に 3 種類に分けられます。
 
 1. シンボリックリンク ([Dotbot](https://github.com/anishathalye/dotbot), [GNU Stow](https://www.gnu.org/software/stow/), [Mackup](https://github.com/lra/mackup), [rcm](https://github.com/thoughtbot/rcm))
 2. コピー ([chezmoi](https://github.com/twpayne/chezmoi), [dotdrop](https://github.com/deadc0de6/dotdrop), [dotter](https://github.com/SuperCuber/dotter))
