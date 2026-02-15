@@ -1,5 +1,5 @@
 ---
-title: "Nix + LLM で便利になり続ける dotfiles の仕組み"
+title: "Nix + LLM で便利になり続ける dotfiles"
 emoji: "🦔"
 type: "tech"
 topics: ["nix", "dotfiles", "llm"]
