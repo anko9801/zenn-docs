@@ -2,7 +2,7 @@
 title: "Nix + LLM で便利になり続ける仕組みを作る"
 emoji: "🦔"
 type: "tech"
-topics: ["nix"]
+topics: ["nix", "dotfiles", "llm"]
 published: false
 ---
 
@@ -189,11 +189,11 @@ AWS の API キーとか SSH の秘密鍵とかを管理するとき、いつも
 1Password CLI は WSL では Windows 側の `op.exe` を使っていて、シェル側では op プラグインを遅延ロードして gh / aws / gcloud / az を初回実行時に初期化しています。漏洩防止として pre-commit に gitleaks を入れていて、`op://` の参照文字列は誤検知しないよう許可リスト化してます。
 
 
-### GitHub Actions で全ホストのビルドを検証する
+### GitHub Actions で全ホストテストする
 
-`config.nix` に CI 用の `runner` ユーザーが定義してあります。
+GitHub Actions で全ホスト構成の `nix flake check` と `home-manager build` を実行していて、ちゃんと動くことをテストして保証しています。
 
-GitHub Actions で全ホスト構成の `nix flake check` と `home-manager build` を実行すれば、壊れた設定が main に入ることを防げます。CI 環境では Nerd Fonts のインストールや systemd のサービス起動を自動でスキップするように `platform.environment` で分岐しています。
+`config.nix` に CI 用の `runner` ユーザーが定義して CI 環境では Nerd Fonts のインストールや systemd のサービス起動を自動でスキップするように `platform.environment` で分岐しています。
 
 ### Windows 対応
 
