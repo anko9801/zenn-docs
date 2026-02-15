@@ -250,6 +250,88 @@ When user shares a URL (article, repository, dotfiles):
 1Password CLI は WSL では Windows 側の `op.exe` を使っていて、シェル側では op プラグインを遅延ロードして gh / aws / gcloud / az を初回実行時に初期化しています。漏洩防止として pre-commit に gitleaks を入れていて、`op://` の参照文字列は誤検知しないよう許可リスト化してます。
 
 ## 移行
+setupスクリプトは書かない
+
+ここまで解説してきた設計はすべて、以下のリポジトリに実装されている。`config.nix` のユーザー情報を書き換えるだけで動く。
+
+```bash
+# 1. fork して clone
+git clone https://github.com/your-username/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+```
+
+```nix
+# 2. config.nix のユーザー情報を自分のものに書き換える
+users = {
+  your-name = {
+    editor = "nvim";
+    git = {
+      name = "your-name";
+      email = "your-email@example.com";
+      sshKey = "ssh-ed25519 AAAA...";
+    };
+  };
+};
+```
+
+#### 既存の設定との衝突を避ける
+
+
+**既存ファイルは自動でバックアップされる。** このリポジトリでは `home-manager.backupFileExtension = "backup"` が設定済みなので、`.zshrc` が既にあれば `.zshrc.backup` にリネームされてから新しい設定が適用される。何も考えずに `nix run .#switch` して大丈夫だ。何か問題があれば `.backup` ファイルから戻せる。
+
+それでも不安なら、`config.nix` の `modules` を絞って段階的に有効化することもできる。
+
+```nix
+# 最初は git と基本ツールだけ — シェルやエディタの設定には触らない
+linux-wsl = {
+  system = "x86_64-linux";
+  manager = "home-manager";
+  modules = [
+    ./tools/git
+    ./tools/cli.nix
+    ./tools/bat.nix
+  ];
+};
+```
+
+これなら既存の `.zshrc` や `.vimrc` はそのまま残る。慣れてきたら `./shell/zsh` を追加して移行していけばいい。モジュール単位で段階的に移行できるのは Nix の強みだ。
+
+```bash
+# 3. 適用する
+nix run .#switch
+```
+
+これだけでシェル、エディタ、Git、ターミナルまで全部揃った環境が立ち上がる。
+
+そこから自分に合わない部分を削ったり、足りないものを追加したりすればいい。`config.nix` の `hosts` でマシンごとのモジュール構成を変えられるし、`moduleSets.workstation` と `moduleSets.server` で GUI の有無も切り替えられる。
+
+```nix
+# 例：WSL ではワークステーション構成 + zellij
+linux-wsl = {
+  system = "x86_64-linux";
+  manager = "home-manager";
+  modules = moduleSets.workstation ++ [ ./terminal/zellij ];
+};
+
+# 例：サーバーはミニマル構成
+linux-server-arm = {
+  system = "aarch64-linux";
+  manager = "home-manager";
+  modules = moduleSets.server;
+};
+```
+
+`AGENTS.md` と `docs/tool-selection.md` も入っているので、前述の LLM 調査もそのまま使える。選定基準は自分の価値観に合わせて書き換えていけばいい。
+
+
+## 締め
+
+dotfiles は 50 年前のバグから生まれた。最初はただの設定ファイルの寄せ集めだったが、宣言的に管理することで「マシンのあるべき姿の記述」になる。どの OS でも 1 コマンドで同じ環境が立ち上がり、こだわりの設定が確実に再現される。認知負荷を削って、自分が本当に集中したいことに向かうための土台だ。
+
+fork して `config.nix` のユーザー情報を書き換えて `nix run .#switch` する。そこから自分のこだわりを載せていってほしい。
+
+https://github.com/anko9801/dotfiles
+
 
 
 ## おまけ: ツールへのこだわり
@@ -350,17 +432,6 @@ https://github.com/anko9801/dotfiles
 
 
 
-## 導入
-
-生産性を上げたい。だからキーバインドを揃え、シェルの補完を整え、エディタを鍛える。新しいツールを試し、良かったら設定を書き、前より速くなる。この積み重ねで `.zshrc` は育ち、`.vimrc` は鍛えられ、dotfiles は自分専用の道具箱になっていく。
-
-しかし道具箱が育つほど、別のマシンで同じ体験を再現するのが難しくなる。新しい PC を買った。WSL を入れ直した。dotfiles を clone して適用したのに動かない。何かが足りない。何が足りないかもわからない。3 時間溶かして、ようやく動いたけど何を直したかもう覚えていない。
-
-マシンが 1 台なら困らなかった。しかし私用 PC、社用 PC、WSL、クラウド、コンテナ――管理するマシンは増え続ける。LLM で開発効率が上がるほど新しいツールが次々と現れて設定も増える。道具箱を育てるのは楽しい。でもその管理に溺れたら本末転倒だ。
-
-この記事では dotfiles 管理の歴史を振り返り「結局何が足りなかったのか」を整理した上で、Nix による宣言的管理と、既存の dotfiles からの具体的な移行方法を示す。
-
-
 ## なぜ Nix なのか
 
 ここまでの進化をまとめると、dotfiles に求められる性質は 3 つある。
@@ -383,85 +454,3 @@ Nix はこの 3 つをすべて満たす。すべてのパッケージをその�
 
 
 ## 移行ステップ
-
-setupスクリプトは書かない
-
-ここまで解説してきた設計はすべて、以下のリポジトリに実装されている。`config.nix` のユーザー情報を書き換えるだけで動く。
-
-```bash
-# 1. fork して clone
-git clone https://github.com/your-username/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-```
-
-```nix
-# 2. config.nix のユーザー情報を自分のものに書き換える
-users = {
-  your-name = {
-    editor = "nvim";
-    git = {
-      name = "your-name";
-      email = "your-email@example.com";
-      sshKey = "ssh-ed25519 AAAA...";
-    };
-  };
-};
-```
-
-#### 既存の設定との衝突を避ける
-
-
-**既存ファイルは自動でバックアップされる。** このリポジトリでは `home-manager.backupFileExtension = "backup"` が設定済みなので、`.zshrc` が既にあれば `.zshrc.backup` にリネームされてから新しい設定が適用される。何も考えずに `nix run .#switch` して大丈夫だ。何か問題があれば `.backup` ファイルから戻せる。
-
-それでも不安なら、`config.nix` の `modules` を絞って段階的に有効化することもできる。
-
-```nix
-# 最初は git と基本ツールだけ — シェルやエディタの設定には触らない
-linux-wsl = {
-  system = "x86_64-linux";
-  manager = "home-manager";
-  modules = [
-    ./tools/git
-    ./tools/cli.nix
-    ./tools/bat.nix
-  ];
-};
-```
-
-これなら既存の `.zshrc` や `.vimrc` はそのまま残る。慣れてきたら `./shell/zsh` を追加して移行していけばいい。モジュール単位で段階的に移行できるのは Nix の強みだ。
-
-```bash
-# 3. 適用する
-nix run .#switch
-```
-
-これだけでシェル、エディタ、Git、ターミナルまで全部揃った環境が立ち上がる。
-
-そこから自分に合わない部分を削ったり、足りないものを追加したりすればいい。`config.nix` の `hosts` でマシンごとのモジュール構成を変えられるし、`moduleSets.workstation` と `moduleSets.server` で GUI の有無も切り替えられる。
-
-```nix
-# 例：WSL ではワークステーション構成 + zellij
-linux-wsl = {
-  system = "x86_64-linux";
-  manager = "home-manager";
-  modules = moduleSets.workstation ++ [ ./terminal/zellij ];
-};
-
-# 例：サーバーはミニマル構成
-linux-server-arm = {
-  system = "aarch64-linux";
-  manager = "home-manager";
-  modules = moduleSets.server;
-};
-```
-
-`AGENTS.md` と `docs/tool-selection.md` も入っているので、前述の LLM 調査もそのまま使える。選定基準は自分の価値観に合わせて書き換えていけばいい。
-
-
-## 締め
-
-dotfiles は 50 年前のバグから生まれた。最初はただの設定ファイルの寄せ集めだったが、宣言的に管理することで「マシンのあるべき姿の記述」になる。どの OS でも 1 コマンドで同じ環境が立ち上がり、こだわりの設定が確実に再現される。認知負荷を削って、自分が本当に集中したいことに向かうための土台だ。
-
-fork して `config.nix` のユーザー情報を書き換えて `nix run .#switch` する。そこから自分のこだわりを載せていってほしい。
-
-https://github.com/anko9801/dotfiles
