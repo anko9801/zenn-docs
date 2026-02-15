@@ -93,9 +93,7 @@ dotfiles を育てるのも少し大変です。
 
 ### 全体構造
 
-カテゴリごとにディレクトリを分け、各 `.nix` ファイルが 1 つの責務を持つ。「シェルの設定を変えたい」→ `shell/` を見ればいい。
-
-Nix はシステムレベルでは NixOS は `/etc/nix/configuration.nix`、macOS では nix-darwin を用いて設定し、ユーザーレベルは Home Manager を用いて管理しています。そのようなシステムレベルやユーザーレベルの全体的な設定を `system/` が管理しています。
+Nix は割と自由なディレクトリ構成をすることができてエントリーポイントの flake.nix のみあれば他はほとんど制約はありません。逆に言えばどんなディレクトリ構成にすべきかで使いやすさが変わります。
 
 ```
 dotfiles/
@@ -118,6 +116,10 @@ dotfiles/
 ├── ai/                # Claude Code, Aider
 └── desktop/           # Wayland, IME
 ```
+
+基本的にカテゴリごとにディレクトリを分け、各 `.nix` ファイルが 1 つのアプリの責務を持っています。たとえば fish の設定を変えたかったら `shell/fish.nix` を編集します。
+
+Nix はシステムレベルでは NixOS は `/etc/nix/configuration.nix`、macOS では nix-darwin を用いて設定し、ユーザーレベルは Home Manager を用いて管理しています。そのようなシステムレベルやユーザーレベルの全体的な設定を `system/` が管理しています。
 
 
 ### `config.nix` で全ホストを宣言する
@@ -200,7 +202,6 @@ GitHub Actions で全ホスト構成の `nix flake check` と `home-manager buil
 
 Nix は Windows をネイティブサポートしない。しかし「すべての OS を宣言的に管理する」という原則は崩さない。WSL 上で Home Manager を使いつつ、Windows ネイティブ側は WinGet の JSON で宣言的に管理する。
 
-<!-- polyglot スクリプトと WinGet 管理の具体例を入れる -->
 
 ### LLM に調査を任せる
 
