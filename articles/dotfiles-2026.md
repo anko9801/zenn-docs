@@ -49,6 +49,8 @@ Linux において `.zshrc` `.vimrc` など `.` から始まるファイルた�
 - 構成管理ツール ([Ansible](https://github.com/ansible/ansible), [mitamae](https://github.com/itamae-kitchen/mitamae))
 - パッケージマネージャー ([Homebrew](https://brew.sh/ja/), [WinGet](https://github.com/microsoft/winget-cli))
 
+このようなツールでインストールすべきものやどのようにビルドし、設定するかを管理します。
+
 しかしこれだと他のマシンに適用したときに動的ライブラリやランタイムのバージョンやパスの違いなどの暗黙的な依存関係よって動かないときがよくあります。動く環境そのものが欲しいのだからこういった問題は起きてほしくないです。そこで暗黙的な依存関係を明示し、それをそのまま持ってくるようにすることでどこでも環境が再現するでしょと言ったのがパッケージマネージャー [Nix](https://github.com/NixOS/nix) です。
 
 さらに Nix によりすべてのツールを宣言的に管理することで、単なる設定集ではなく、マシンの環境を記述したものと言えるようになります。
