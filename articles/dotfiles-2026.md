@@ -36,28 +36,67 @@ dotfiles という言葉は UNIX を開発した Ken Thompson が ls コマン�
 
 - シンボリックリンク方式 ([Dotbot](https://github.com/anishathalye/dotbot), [GNU Stow](https://www.gnu.org/software/stow/), [Mackup](https://github.com/lra/mackup), [rcm](https://github.com/thoughtbot/rcm))
 - コピー方式 ([chezmoi](https://github.com/twpayne/chezmoi), [dotdrop](https://github.com/deadc0de6/dotdrop), [dotter](https://github.com/SuperCuber/dotter))
-- 直接管理 (Bare Git, [yadm](https://yadm.io/))
+- 直接 Git 管理 (Bare Git, [yadm](https://yadm.io/))
 
 それぞれメリデメありますが、怠惰な僕にとっては yadm が好みです。git と全く同じインターフェースで覚えることが少ないし、直接管理するから Single Source of Truth でわかりやすい。テンプレート機能、シークレット管理もしてくれます。
 
 ### 環境そのものを再現したい
 
-設定が楽に適用できたからといって、何もないのに設定だけいれても何もできてません。インストールしないといけない。でも新しいマシンで毎回ちまちまインストール方法調べてコマンド叩いて間違えたら修正を繰り返すのは辛いです。
+設定が適用できたからといって、まっさらな状態に設定だけいれても動きません。インストールしないと動きません。でも新しいマシンで毎回ちまちまインストール方法調べてコマンド叩いて間違えたら修正を繰り返すのは辛いです。
 
-それじゃインストールも自動化しちゃおう！
+それじゃインストールも自動化しちゃおう！ってことでよくこんなツールを使います。
 
 - 構成管理ツール ([Ansible](https://github.com/ansible/ansible), [mitamae](https://github.com/itamae-kitchen/mitamae))
 - パッケージマネージャー ([Homebrew](https://brew.sh/ja/), [WinGet](https://github.com/microsoft/winget-cli))
 
-このようなツールでインストールすべきものやどのようにビルドし、設定するかを管理します。
+しかしこれだと他のマシンに適用したときに動的ライブラリやランタイムのバージョンやパスの違いなどの暗黙的な依存関係よって動かないときがよくあります。動く環境そのものが欲しいのだからこういった問題は起きてほしくないです。そこで暗黙的な依存関係を明示し、それをそのまま持ってくるようにすることでどこでも環境が再現するでしょと言ったのが Nix です。
 
-しかしこれだと他のマシンに適用したときに動的ライブラリやランタイムのバージョンやパスの違いなどの暗黙的な依存関係よって動かないときがよくあります。動く環境そのものが欲しいのだからこういった問題は起きてほしくないです。そこで暗黙的な依存関係を明示し、それをそのまま持ってくるようにすることでどこでも環境が再現するでしょと言ったのがビルドシステムでありパッケージマネージャーの [Nix](https://github.com/NixOS/nix) です。
+https://github.com/NixOS/nix
 
-Nix は Home Manager
+Nix はビルドシステムでありパッケージマネージャーでいろんな概念があってむずかしいですが、すべてのベースとなるのはNix 言語と `derivation` (ビルドレシピの基本単位) です。その上に Flakes という依存関係のバージョンを `flake.lock` で固定して再現性を保つ仕組みがあります。
 
-flake
+| 機能 | 説明 |
+|---|---|
+| nixpkgs | ビルドレシピの集まり。レシピに沿ってビルドして `/nix/store/` に配置する |
+| Home Manager | nixpkgs のパッケージを使いつつ、`~/.config/` や `~/.zshrc` などの設定ファイルを配置する |
+| devShells | プロジェクトごとの開発環境を定義する。`nix develop` で有効化すると PATH が変わる |
+| devenv | devShells と同じく PATH を変えるが、 DB や開発サーバーなどのプロセス起動・管理も担う |
+| direnv | ディレクトリの出入りをシェルの hook で検知して、devShells を自動で有効化・無効化する |
 
-さらに Nix によりすべてのツールを宣言的に管理することで、単なる設定集ではなく、マシンの環境を記述したものと言えるようになります。
+今回 dotfiles では nixpkgs のパッケージを入れて Home Manager を用いて設定します。具体的にはこのようなコードを書いて管理していきます。
+
+```nix:flake.nix
+{
+  description = "dotfiles";
+
+  # 依存する外部flake。バージョンは flake.lock に固定される
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  # 外部に公開するもの。inputs の各flakeが引数に渡ってくる
+  outputs = { home-manager, nixpkgs, ... }:
+  let
+    system = "aarch64-darwin";
+    pkgs = import nixpkgs { inherit system; };
+  in
+  {
+    # `home-manager switch --flake .#default` で適用される
+    homeConfigurations.default =
+      home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = [ ./home/home.nix ];
+      };
+  };
+}
+```
+
+このように Nix によりすべてのツールを宣言的に管理することで、単なる設定集ではなく、マシンの環境を記述したものと言えるようになります。それはスナップショットになるし、具体的な操作から抜け出せます。
 
 ### LLM で管理コストを下げたい
 
