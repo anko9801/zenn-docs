@@ -32,7 +32,7 @@ dotfiles という言葉は UNIX を開発した Ken Thompson が ls コマン�
 
 そこで dotfiles というリポジトリにコピペして同期させるようにしました。これで他のマシンにも設定を入れやすいし、ついでに他の人の工夫も参考にできてうれしいです。
 
-ただリポジトリに入れただけじゃ適用されなくて、ファイルをホームディレクトリにコピペしたり、リンクを貼らないといけません。自分でスクリプトを書くと「既存の設定とコンフリクトしたときに正しくマージできてるかな」「設定が増えたらスクリプトも書き足さないと」「Windows のリンクの仕様がトリッキー」みたいに考えることが多いのでツールが生まれました。
+ただリポジトリに入れただけじゃ適用されなくて、ファイルをホームディレクトリにコピペしたり、リンクを貼らないといけません。これを自分でスクリプトを書くと「既存の設定とコンフリクトしたとき大変」「設定が増えたらスクリプトも書き足さないといけない」「Windows のリンクの仕様がトリッキー」みたいに考えることが多いのでツールが生まれました。
 
 - シンボリックリンク方式 ([Dotbot](https://github.com/anishathalye/dotbot), [GNU Stow](https://www.gnu.org/software/stow/), [Mackup](https://github.com/lra/mackup), [rcm](https://github.com/thoughtbot/rcm))
 - コピー方式 ([chezmoi](https://github.com/twpayne/chezmoi), [dotdrop](https://github.com/deadc0de6/dotdrop), [dotter](https://github.com/SuperCuber/dotter))
@@ -40,13 +40,11 @@ dotfiles という言葉は UNIX を開発した Ken Thompson が ls コマン�
 
 それぞれメリデメありますが、怠惰な僕にとっては yadm が好みです。git と全く同じインターフェースで覚えることが少ないし、直接管理するから Single Source of Truth でわかりやすい。テンプレート機能、シークレット管理もしてくれます。
 
-これで設定を管理するのは楽になりました。
-
 ### 環境そのものを再現したい
 
-設定ができても新しいマシンで毎回ちまちまインストール方法調べてコマンド叩いて間違えたら修正を繰り返すのは辛いです。
+設定が楽に適用できたからといって、何もないのに設定だけいれても何もできてません。インストールしないといけない。でも新しいマシンで毎回ちまちまインストール方法調べてコマンド叩いて間違えたら修正を繰り返すのは辛いです。
 
-じゃあインストールも自動化しちゃおう！
+それじゃインストールも自動化しちゃおう！
 
 - 構成管理ツール ([Ansible](https://github.com/ansible/ansible), [mitamae](https://github.com/itamae-kitchen/mitamae))
 - パッケージマネージャー ([Homebrew](https://brew.sh/ja/), [WinGet](https://github.com/microsoft/winget-cli))
