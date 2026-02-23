@@ -94,8 +94,8 @@ Nix はビルドシステムかつパッケージマネージャーで多機能�
 | Home Manager | PATH へのツール追加や `~/.zshrc` などの設定ファイル配置を管理する |
 | NixOS | カーネル・サービス・ユーザーまで OS 全体を宣言的に管理する |
 | devShells | プロジェクトごとの開発環境を Nix で定義する |
-| nixos-anywhere | リモートマシンに SSH で NixOS を自動でインストール・セットアップする |
-| agenix / sops-nix | API キーやパスワードなどを暗号化して Git で安全に管理するツール |
+| nixos-anywhere | リモートマシンに SSH で NixOS を自動でセットアップする |
+| agenix / sops-nix | API キーやパスワードなどを暗号化して Git で安全に管理する |
 
 他にも便利なエコシステムはたくさんありますが、今回は nixpkgs と Home Manager を使って dotfiles を管理していきます。
 
