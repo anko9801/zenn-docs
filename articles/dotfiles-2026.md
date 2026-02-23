@@ -53,20 +53,23 @@ dotfiles という言葉は UNIX を開発した Ken Thompson が ls コマン�
 
 https://github.com/NixOS/nix
 
-Nix はビルドシステムかつパッケージマネージャーで、多機能すぎてとても紹介しきれません。ただ、すべての基盤となる考え方はシンプルです。Nix 言語で環境を宣言的に記述し、Flakes という仕組みで依存するパッケージのバージョンを `flake.lock` に固定して再現性を保ちます。
+Nix はビルドシステムかつパッケージマネージャーで多機能すぎて紹介しきれません。ただすべての基盤となる考え方はシンプルで、Nix 言語で環境を宣言的に記述し、Flakes という仕組みで依存するパッケージのバージョンを `flake.lock` に固定して再現性を保ちます。
+
+たとえば Nix 言語はこんな感じで複数の flake から flake を作るように作られています。
 
 ```nix:flake.nix
 {
   description = "dotfiles";
+  # 依存する外部 flake。バージョンは flake.lock に自動で固定される
   inputs = {
-    # 依存する外部 flake。バージョンは flake.lock に自動で固定される
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
-      # home-manager が参照する nixpkgs を上と同じバージョンに揃える
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+
+  # inputs を用いて外部に公開するもの
   outputs = { home-manager, nixpkgs, ... }:
   let
     system = "aarch64-darwin";
@@ -96,7 +99,7 @@ Nix はビルドシステムかつパッケージマネージャーで、多機�
 
 他にも便利なエコシステムはたくさんありますが、今回は nixpkgs と Home Manager を使って dotfiles を管理していきます。
 
-すべてのツールを Nix で宣言的に管理すると、dotfiles は単なる設定集を超え、マシン環境そのものの記述になります。これにより、
+このようにすべてのツールを Nix で宣言的に管理すると dotfiles は単なる設定集を超えて、マシン環境そのものの記述になります。これにより、
 
 1. 環境のスナップショットがとれて、以前の状態にいつでも戻せる
 2. 具体的な操作から離れてどんな環境にしたいかだけを考えればよくなる
