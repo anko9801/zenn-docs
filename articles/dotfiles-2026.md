@@ -1,5 +1,5 @@
 ---
-title: "Nix + LLM で加速的に成長し続ける dotfiles"
+title: "Nix × LLM で加速的に成長し続ける dotfiles"
 emoji: "🦔"
 type: "tech"
 topics: ["nix", "dotfiles", "llm"]
@@ -53,30 +53,27 @@ dotfiles という言葉は UNIX を開発した Ken Thompson が ls コマン�
 
 https://github.com/NixOS/nix
 
-Nix はビルドシステムでありパッケージマネージャーでいろんな機能があって紹介しきれませんが、すべてのベースとなるのは Nix 言語と Flakes という依存関係のバージョンを `flake.lock` で固定して再現性を保つ仕組みです。
+Nix はビルドシステムかつパッケージマネージャーで、多機能すぎてとても紹介しきれません。ただ、すべての基盤となる考え方はシンプルです。Nix 言語で環境を宣言的に記述し、Flakes という仕組みで依存するパッケージのバージョンを `flake.lock` に固定して再現性を保ちます。
 
 ```nix:flake.nix
 {
   description = "dotfiles";
-
-  # inputs: 依存する外部 flake。バージョンは flake.lock に固定される
   inputs = {
+    # 依存する外部 flake。バージョンは flake.lock に自動で固定される
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-
     home-manager = {
       url = "github:nix-community/home-manager";
+      # home-manager が参照する nixpkgs を上と同じバージョンに揃える
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-
-  # outputs: 外部に公開するもの。inputs の各 flake が引数に渡ってくる
   outputs = { home-manager, nixpkgs, ... }:
   let
     system = "aarch64-darwin";
     pkgs = import nixpkgs { inherit system; };
   in
   {
-    # `home-manager switch --flake .#default` で適用される
+    # `home-manager switch --flake .#default` を実行すると設定が適用される
     homeConfigurations.default =
       home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
@@ -86,29 +83,26 @@ Nix はビルドシステムでありパッケージマネージャーでいろ�
 }
 ```
 
-このシステムの上に便利な機能として例えばこんなものがあります。今回は nixpkgs のパッケージを入れて Home Manager を用いて設定します。
+この仕組みの上に、さまざまなエコシステムが構築されています。
 
 | 機能 | 説明 |
 |---|---|
-| nixpkgs | ビルドレシピの集まり。ビルドして `/nix/store/` に配置する |
-| Home Manager | PATH にツールを置いたり `~/.zshrc` などの設定ファイルを配置する |
-| NixOS | カーネル・サービス・ユーザーまで OS 全体の設定を Nix で宣言的に管理する |
-| nixos-anywhere | リモートマシンに SSH で NixOS を自動でインストール・セットアップする |
-| devShells | プロジェクトごとの開発環境を定義する |
-| devenv | devShells に加えて、DB や開発サーバーなどのプロセス起動・管理も担う |
-| direnv | ディレクトリに入るだけで devShells を自動で有効化する |
-| Stylix | システム全体のカラースキームやフォントなどを一元管理する |
-| agenix / sops-nix | API キーやパスワードなどを暗号化して Git で安全に管理するツール |
-| cachix | 個人・チーム向けのバイナリキャッシュホスティングサービス |
-| Hydra | Nix の CI/CD システム。ビルドを自動実行しバイナリキャッシュに結果を流す |
+| nixpkgs | パッケージのビルドレシピ集。12万以上のパッケージが揃っている |
+| Home Manager | PATH へのツール追加や `~/.zshrc` などの設定ファイル配置を Nix で管理する |
+| NixOS | カーネル・サービス・ユーザーまで OS 全体を Nix で宣言的に管理する |
+| devShells | プロジェクトごとの開発環境を Nix で定義する |
 
-このように Nix によりすべてのツールを宣言的に管理することで、単なる設定集ではなく、マシンの環境を記述したものと言えるようになります。すると色々うれしいことがあります。
+他にも便利なエコシステムはたくさんありますが、今回は nixpkgs と Home Manager を使って dotfiles を管理していきます。
 
-1. 環境のスナップショットがとれて、昔の状態に戻すのが簡単
-2. 具体的な操作から切り離して環境の管理のみに専念できる
-3. 壊したり盗まれたり紛失したり水没しても、すぐ復帰できて安心
+すべてのツールを Nix で宣言的に管理すると、dotfiles は単なる設定集を超え、マシン環境そのものの記述になります。これにより、
 
-さてこんな便利な Nix ですが学習コストが高くて手が伸びにくいと思います。
+1. 環境のスナップショットがとれて、以前の状態にいつでも戻せる
+2. 「どのコマンドを叩くか」ではなく「どんな環境にしたいか」だけを考えればよくなる
+3. マシンが壊れても、新しいマシンで同じ環境をすぐに再現できる
+
+といった恩恵があります。
+
+ただ、独自の言語仕様、読みにくいエラーメッセージ、少ない日本語情報で Nix の学習コストは高いです。そこで LLM に管理コストを肩代わりしてもらうことを考えました。
 
 ### LLM で管理コストを下げたい
 
