@@ -232,17 +232,34 @@ hosts = {
 Nix ですべてを宣言的に書いているので、環境全体を LLM に渡して「自分の環境にとって最善の選択は何か」を問えます。具体的には `AGENTS.md` に「URL を渡されたらどう分析するか」を書いています。生産性向上に関する記事や他の dotfiles で良いと思ったものを貼ると、LLM がそれをよく調べて改善案を提示してくれます。
 
 ```text
-すぐできる系
+改善点まとめ（48記事から抽出）
 
-1. config.nix から basePackages 関数を system/lib.nix に移動 — config.nix は純粋なデータだけにする
-2. Neovim の lsp.nix (282行) を言語別に分割 — lsp/nix.nix, lsp/rust.nix 等。1 tool = 1 file の徹底
-3. git の pager 設定を一箇所に — delta の設定が git.nix と lazygit.nix に散っている
+High Priority
 
-構造改善系
+1. nixd に home-manager options 補完を追加
+現状 nixpkgs.expr しか設定してない。options を追加すると .nix ファイル編集時に home-manager
+のオプション補完・定義ジャンプが効くようになる。
+# lsp/servers.nix の nixd.settings.nixd に追加
+options.home-manager.expr = ''
+  (builtins.getFlake "/home/anko/dotfiles").homeConfigurations."wsl".options
+'';
+出典: momeemt/dotfiles2025
 
-4. Zsh deferred init を shell/zsh/deferred.nix に分離 — 現在 default.nix の早期初期化ロジックが複雑
-5. Helix/Zed をデフォルト無効化 — workstation 全部にロードされているが Neovim がプライマリ
-6. Claude commands を用途別に整理 — ai/claude/commands/ に 18 ファイルが flat に並んでいて分類がない
+2. checks flake output の追加
+今は pre-commit.check.enable = false で、CI も nix build を直接叩いてる。checks を定義すれば nix flake check
+一発で全構成を検証できる。--option abort-on-warn true で deprecation warning も検出可能。
+出典: soracat/nix-flake-check
+
+3. nix-output-monitor を devShell に追加
+ビルド出力が見やすくなる。switch スクリプトにも | nom をパイプできる。
+出典: nazozokc/dotfiles
+
+4. gh extension の宣言的管理
+programs.gh.extensions で gh-dash 等を mkDerivation + fetchurl で管理できる。今は extensions が空。
+出典: atrae/gh-aw
+
+Medium Priority
+...
 ```
 
 さらにツールの選定基準を `docs/` で言語化して LLM に読ませることで、意図を汲み取った提案をしてくれるようになります。こうした言語化を積み重ねることで LLM の提案精度が上がり、すべて任せて大丈夫な環境に育っていきます。
