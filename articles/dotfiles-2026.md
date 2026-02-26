@@ -226,33 +226,48 @@ hosts = {
 Nix ですべてを宣言的に書いているので、環境全体を LLM に渡して「自分の環境にとって最善の選択は何か」を問えます。具体的には `AGENTS.md` に「URL を渡されたらどう分析するか」を書いています。生産性向上に関する記事や他の dotfiles で良いと思ったものを貼ると、LLM がそれをよく調べて改善案を提示してくれます。
 
 ```text
-改善点まとめ（48記事から抽出）
+高インパクト改善案
 
-High Priority
+1. nh — nixos-rebuild/home-manager switchの上位互換
 
-1. nixd に home-manager options 補完を追加
-現状 nixpkgs.expr しか設定してない。options を追加すると .nix ファイル編集時に home-manager
-のオプション補完・定義ジャンプが効くようになる。
-# lsp/servers.nix の nixd.settings.nixd に追加
-options.home-manager.expr = ''
-  (builtins.getFlake "/home/anko/dotfiles").homeConfigurations."wsl".options
-'';
-出典: momeemt/dotfiles2025
+viperML作、nix-community公式
 
-2. checks flake output の追加
-今は pre-commit.check.enable = false で、CI も nix build を直接叩いてる。checks を定義すれば nix flake check
-一発で全構成を検証できる。--option abort-on-warn true で deprecation warning も検出可能。
-出典: soracat/nix-flake-check
+現状の nix run .#switch を置き換える。差分をカラー表示し、ビルド進捗を nix-output-monitor で可視化する。
 
-3. nix-output-monitor を devShell に追加
-ビルド出力が見やすくなる。switch スクリプトにも | nom をパイプできる。
-出典: nazozokc/dotfiles
+nh os switch .        # nixos-rebuild switch --flake .
+nh home switch .      # home-manager switch --flake .
+nh search ripgrep     # nix search の高速版
+nh clean all --keep 5 # 世代管理
 
-4. gh extension の宣言的管理
-programs.gh.extensions で gh-dash 等を mkDerivation + fetchurl で管理できる。今は extensions が空。
-出典: atrae/gh-aw
+あなたの哲学との合致: 速さ（Rust製）、認知負荷削減（1コマンドで全操作）、安全（差分プレビュー付き）
 
-Medium Priority
+2. Neovimをflake outputとしてエクスポート
+
+Mic92パターン
+
+任意のマシンで nix run github:anko/dotfiles#nvim すれば自分のNeovim環境が即座に使える。サーバーにsshした時もホストを汚さず自分の環境を持ち込める。
+
+# flake.nix outputs に追加
+packages.${system}.nvim = config.programs.nixvim.build;
+
+あなたの哲学との合致: 環境統一（どこでも同じエディタ）、復元可能（nix store内で完結）
+
+3. Self-gating modules
+
+wimpysworld パターン (19ホスト管理者)
+
+現状: config.nix で各ホストのモジュールリストを手動管理
+# 今
+modules = moduleSets.workstation ++ [ ./system/darwin/desktop.nix ];
+
+改善: 全モジュールを全ホストにimportし、モジュール自身が条件判定
+# モジュール内部
+{ config, lib, ... }:
+lib.mkIf config.myHost.isWorkstation {
+  programs.wezterm.enable = true;
+}
+
+あなたの哲学との合致: 認知負荷削減（「どのホストにどのモジュール」を覚えなくていい）。ただし現状の moduleSets パターンも十分シンプルなので、ホスト数が増えた時に検討。
 ...
 ```
 
