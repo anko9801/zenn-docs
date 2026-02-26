@@ -30,7 +30,7 @@ dotfiles という言葉の由来は Ken Thompson が書いたバグです。ls 
 
 そこで dotfiles というリポジトリにコピペして同期させるようにしました。これで他のマシンにも設定を入れやすいし、ついでに他の人の工夫も参考にできてうれしいです。
 
-ただリポジトリに入れただけじゃ適用されなくて、ファイルをホームディレクトリにコピペしたり、リンクを貼らないといけません。自分でスクリプトを書くと、既存の設定とのコンフリクト、設定が増えるたびの書き足し、Windows のリンクの仕様のトリッキーさ...と考えることが多いです。そこでツールが生まれました。
+ただリポジトリに入れただけじゃ適用されなくて、ファイルをホームディレクトリにコピペしたり、リンクを貼らないといけません。それに自分でスクリプトを書くと、既存の設定とのコンフリクト、設定が増えるたびの書き足し、Windows のリンクの仕様のトリッキーさ...と考えることが多いです。そこでツールが生まれました。
 
 - シンボリックリンク方式 ([Dotbot](https://github.com/anishathalye/dotbot), [GNU Stow](https://www.gnu.org/software/stow/), [Mackup](https://github.com/lra/mackup), [rcm](https://github.com/thoughtbot/rcm))
 - コピー方式 ([chezmoi](https://github.com/twpayne/chezmoi), [dotdrop](https://github.com/deadc0de6/dotdrop), [dotter](https://github.com/SuperCuber/dotter))
