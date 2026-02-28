@@ -164,6 +164,9 @@ dotfiles/
 │   └── windows/
 ├── theme/                  # Stylix (全ツールの色・フォント・カーソル)
 ├── shell/                  # Zsh, Fish, Starship, ...
+│   ├── zsh/
+│   ├── fish.nix
+│   └── starship.nix
 ├── editor/                 # Neovim, Vim, VSCode, Helix, Zed
 ├── terminal/               # Ghostty, WezTerm, Zellij, tmux
 ├── tools/                  # Git, Yazi, Bat, ...
