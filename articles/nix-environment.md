@@ -1,5 +1,5 @@
 ---
-title: "Nix × LLM で作業環境が加速的に改善する"
+title: "Nix × LLM で作る、使うほど賢くなる作業環境"
 emoji: "🦔"
 type: "tech"
 topics: ["nix", "dotfiles", "llm"]
