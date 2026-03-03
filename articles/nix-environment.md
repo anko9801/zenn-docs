@@ -166,7 +166,8 @@ dotfiles/
 ├── shell/                  # Zsh, Fish, Starship, ...
 │   ├── zsh/
 │   ├── fish.nix
-│   └── starship.nix
+│   ├── starship.nix
+│   └── ...
 ├── editor/                 # Neovim, Vim, VSCode, Helix, Zed
 ├── terminal/               # Ghostty, WezTerm, Zellij, tmux
 ├── tools/                  # Git, Yazi, Bat, ...
