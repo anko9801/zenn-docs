@@ -290,7 +290,7 @@ lib.mkIf config.myHost.isWorkstation {
 
 ```shell
 # 1. Nix をインストール
-curl -L https://nixos.org/nix/install | sh -s -- --daemon
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 
 # 2. テンプレートから初期化
 mkdir ~/dotfiles && cd ~/dotfiles
