@@ -326,14 +326,18 @@ AWS の API キーとか SSH の秘密鍵とかを管理するとき、いつも
 
 ## 始め方
 
+ここまで設計がわかりました。これからどうやって始めるべきか考えましょう。
+
 ### ステップ 1: テンプレートを取得
+
+まずは Nix をインストールしてテンプレートを入れてください。
 
 ```bash
 mkdir ~/dotfiles && cd ~/dotfiles
 nix flake init -t github:anko9801/dotfiles
 ```
 
-以下の構造が生成される。
+そうするとこのような構造が生成されますk。
 
 ```text
 dotfiles/
@@ -353,7 +357,7 @@ dotfiles/
 
 ### ステップ 2: ユーザー情報を記入
 
-`config.nix` を開いて `your-username` を自分の `$USER` に合わせる:
+`config.nix` を開いて `your-username` を自分の `$USER` に合わせます。
 
 ```nix:config.nix
 users = {
@@ -364,7 +368,7 @@ users = {
 };
 ```
 
-この情報は `system/common.nix` の `defaults.identity` を経由して `tools/git.nix` など各モジュールに自動で伝わる。一箇所変えれば全体に反映される仕組み。
+この情報は `system/common.nix` の `defaults.identity` を経由して `tools/git.nix` など各モジュールに自動で伝わります。
 
 ### ステップ 3: 適用
 
@@ -374,7 +378,7 @@ nix run .#switch
 
 ### ステップ 4: モジュールを追加して拡張
 
-例えば `tmux` を追加したい場合:
+例えば `tmux` を追加したい場合は、まず適切な場所にファイルを置きます。
 
 ```nix:tools/tmux.nix
 _:
@@ -387,7 +391,7 @@ _:
 }
 ```
 
-`config.nix` の `baseModules` にパスを追加して `nix run .#switch`:
+そして `config.nix` の `baseModules` にパスを追加して `nix run .#switch` すれば完了です。
 
 ```nix:config.nix
 baseModules = [
@@ -398,7 +402,7 @@ baseModules = [
 ];
 ```
 
-この「ファイルを作る → `config.nix` に登録 → switch」のサイクルで環境が育っていく。
+このように「ファイルを作る → `config.nix` に登録 → switch」のサイクルで環境が改善していきます。これを LLM に任せることで高速に環境が改善していきます。
 
 ## 参考実装
 
@@ -406,7 +410,7 @@ baseModules = [
 
 https://github.com/anko9801/dotfiles
 
-ちなみに私のデッキは認知負荷の削減です。考えることを減らすほど、仕事やアイデアや環境改善に割けるリソースが増え、改善のループが速く回るようになります。
+私のデッキは認知負荷の削減です。考えることを減らすほど、仕事やアイデアや環境改善に割けるリソースが増え、改善のループが速く回るようになります。
 
 - 1 ツール 1 役割を徹底してコマンドやプラグインを可能な限り削る
 - キーバインドは「目的語 + 動詞」の文法で統一し、人間工学に則った位置に置く
@@ -415,8 +419,7 @@ https://github.com/anko9801/dotfiles
 - 安全に操作できるようにして、何かを壊すのを恐れなくていい
 - 毎日自分のワークフローに省略・自動化できる部分がないか見直して削る
 
-これをもとにツールや設定を考えてます。
-
+この考えをもとにツールの選定や設定を行っています。
 
 
 ## まとめ
