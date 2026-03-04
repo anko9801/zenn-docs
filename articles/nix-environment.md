@@ -303,7 +303,7 @@ nix flake init -t github:anko9801/dotfiles
 nix run .#switch
 ```
 
-これだけで bash, starship, git, vim が宣言的に管理される状態になる。既存の `.bashrc` や `.gitconfig` は `.bashrc.backup` のようにリネームされるだけなので、元の環境が壊れることはなく、戻したくなったら backup を元に戻せばいいです。
+これだけで bash, starship, git, vim が宣言的に管理される状態になります。既存の `.bashrc` や `.gitconfig` は `.bashrc.backup` のようにリネームされるだけなので、元の環境が壊れることはなく、戻したくなったら backup を元に戻せばいいです。
 
 
 ### どの OS でもバグなく同じ環境が再現される
@@ -387,7 +387,7 @@ users = {
 nix run .#switch
 ```
 
-これで完了です。
+これで bash, starship, git, vim のツールと設定が入ります。
 
 ### ステップ 4: モジュールを追加して拡張
 
