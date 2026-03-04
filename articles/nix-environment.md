@@ -337,7 +337,7 @@ mkdir ~/dotfiles && cd ~/dotfiles
 nix flake init -t github:anko9801/dotfiles
 ```
 
-そうするとこのような構造が生成されますk。
+そうするとこのような構造が生成されます。
 
 ```text
 dotfiles/
