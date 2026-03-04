@@ -336,18 +336,18 @@ nix flake init -t github:anko9801/dotfiles
 以下の構造が生成される:
 
 ```text
-flake.nix              # エントリポイント
-config.nix             # ユーザー情報・ホスト・モジュール一覧
-system/
-  hosts.nix            # config.nix → homeConfigurations ビルダー
-  common.nix           # platform 検出、共通設定
-shell/
-  bash.nix             # coreModule: 最小 bash
-  starship.nix         # baseModule: プロンプト
-tools/
-  git.nix              # baseModule: git（identity wiring のデモ）
-editor/
-  vim.nix              # baseModule: エディタ
+├── flake.nix          # エントリポイント
+├── config.nix         # ユーザー情報・ホスト・モジュール一覧
+├── system/
+│   ├── hosts.nix      # config.nix → homeConfigurations ビルダー
+│   └── common.nix     # platform 検出、共通設定
+├── shell/
+│   ├── bash.nix       # coreModule: 最小 bash
+│   └── starship.nix   # baseModule: プロンプト
+├── tools/
+│   └── git.nix        # baseModule: git（identity wiring のデモ）
+└── editor/
+    └── vim.nix        # baseModule: エディタ
 ```
 
 ### ステップ 2: ユーザー情報を記入
