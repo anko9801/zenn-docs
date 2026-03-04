@@ -406,9 +406,7 @@ baseModules = [
 
 ## 参考実装
 
-より多機能なものは自分の dotfiles を参考にしてください。先ほどのはこれの縮小版になります。
-
-https://github.com/anko9801/dotfiles
+参考として私の dotfiles もおいておきます。
 
 私のデッキは認知負荷の削減です。考えることを減らすほど、仕事やアイデアや環境改善に割けるリソースが増え、改善のループが速く回るようになります。
 
@@ -421,6 +419,7 @@ https://github.com/anko9801/dotfiles
 
 この考えをもとにツールの選定や設定を行っています。
 
+https://github.com/anko9801/dotfiles
 
 ## まとめ
 
