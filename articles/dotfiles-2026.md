@@ -1,20 +1,20 @@
 ---
-title: "Nix × LLM で加速的に成長し続ける dotfiles"
+title: "Nix × LLM で作る、使うほど賢くなる作業環境"
 emoji: "🦔"
 type: "tech"
 topics: ["nix", "dotfiles", "llm"]
 published: false
 ---
 
-みなさん dotfiles 作ってますか！
+dotfiles 作っていますか！
 
 エンジニアはキーボード、チェア、ガジェットに加え、便利なツールを日々こだわり抜いて生産性を上げてると思います。
 
 しかし手持ちの PC に加え、大量のサーバーを持っていると扱うマシンは多く、LLM で開発効率が上がった分だけアプリも増えて、それに比例して設定やキーバインドも増えていき、そんなの覚えてらんないし、それぞれのマシンにインストール方法しらべて前の設定みつけて入れるなんて苦行だよ～
 
-...と日々新しいアプリがでているけれど、すっと手が伸びにくくなってるんじゃないでしょうか。私も 500 個ほどアプリを管理していて辛くなってきました。
+...と日々新しいアプリがでているけれど、すっと手が伸びにくくなってるんじゃないでしょうか。私も 500 個ほどアプリを管理していて LLM でツールの整理やインストールさせたりして自動化したりしても時間効率が悪いです。
 
-そこでこの記事では管理の歴史をたどりながら、LLM × Nix で新しくて便利なものをすぐに使える環境を目指します。
+そこでこの記事では dotfiles の歴史をたどりながら、Nix で環境を記述したものを LLM に読ませて環境を高速に改善していくシステムを作ることを目指します。
 
 ## dotfiles はどう進化してきたか
 
@@ -102,6 +102,7 @@ Nix はビルドシステムかつパッケージマネージャーです。Nix 
 - 環境のスナップショットがとれて、以前の状態にいつでも戻せる
 - 具体的な操作から離れてどんな環境にしたいかだけを考えればよくなる
 - 壊れたり紛失したり水没しても、新しいマシンで同じ環境をすぐに再現できる
+- バックアップがほとんど不要になる
 
 といった恩恵があります。ただしデメリットもあり、
 
@@ -137,7 +138,7 @@ Nix は便利ですが dotfiles を育て続けるのは管理がめんどくさ
 3. 壊れてもロールバックで即座に戻せる
 4. 全マシンに適用
 
-さらに「どんな環境にしたいか」という自分の哲学を文章にして渡せば、判断の部分まで自動化できます。バグの修正、日々のアップデート、改善点の発見といったフィードバックループを LLM に回してもらい、修正からデプロイまでを一気通貫で行うのが理想の姿です。
+さらに「どんな環境にしたいか」という自分の哲学を文章にして渡せば、LLM の提案が意図に近づき、採否の判断コストも下がっていきます。週次で改善提案を通知する仕組みを組んでおけば、あとは流れてくる提案に「採用 / 却下」を返すだけで環境が育ち続けます。バグの修正、日々のアップデート、改善点の発見——修正からデプロイまでを一気通貫で回すのが理想の姿です。
 
 
 ## じゃあどう設計するか
@@ -166,7 +167,8 @@ dotfiles/
 ├── shell/                  # Zsh, Fish, Starship, ...
 │   ├── zsh/
 │   ├── fish.nix
-│   └── starship.nix
+│   ├── starship.nix
+│   └── ...
 ├── editor/                 # Neovim, Vim, VSCode, Helix, Zed
 ├── terminal/               # Ghostty, WezTerm, Zellij, tmux
 ├── tools/                  # Git, Yazi, Bat, ...
@@ -283,13 +285,25 @@ lib.mkIf config.myHost.isWorkstation {
 
 まず setup スクリプトは用意していません。他人のスクリプトをそのまま実行するのはセキュリティ面でも環境破壊のリスク面でも抵抗が大きいので、自分で Nix をインストールしてこれを叩いてセットアップできるようになっています。
 
-```sh
-nix run github:anko9801/dotfiles#switch
+テンプレートから自分の dotfiles を作れる。既存の設定ファイルは .backup
+拡張子で自動退避されるので、元の環境が壊れることはない。
+
+```shell
+# 1. Nix をインストール
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+
+# 2. テンプレートから初期化
+mkdir ~/dotfiles && cd ~/dotfiles
+nix flake init -t github:anko9801/dotfiles
+
+# 3. config.nix を編集（$USER と一致させる）
+# users.your-username の部分を書き換え
+
+# 4. 適用
+nix run .#switch
 ```
 
-適用時の安全網として `home-manager.backupFileExtension = "backup"` を設定しています。既存の `.zshrc` があれば `.zshrc.backup` に自動でリネームしてから新しい設定が適用されるので、脳死で実行して大丈夫です。何か問題があれば `.backup` ファイルから即座に戻せます。
-
-移行も段階的に進められます。fork するユーザーは `config.nix` のユーザー情報とホスト構成を書き換えるだけで最低限の環境が立ち上がり、既存の `.zshrc` や `.vimrc` はそのまま残ります。慣れてきたところで `./shell/zsh` を追加するように、モジュール単位で少しずつ乗り換えられるように設計しています。
+これだけで bash, starship, git, vim が宣言的に管理される状態になる。既存の `.bashrc` や `.gitconfig` は `.bashrc.backup` のようにリネームされるだけなので、戻したくなったら backup を元に戻せばいい。
 
 
 ### どの OS でもバグなく同じ環境が再現される
@@ -310,19 +324,99 @@ AWS の API キーとか SSH の秘密鍵とかを管理するとき、いつも
 パスワードマネージャーは E2EE でサーバー管理者にも復号できないようになっているので、サーバーが攻撃されても解読できず事実上安全です。ただし E2EE だからといって完全に信用はできなくて、バックドアを仕込まれてる可能性もあるっちゃあるので SOC 2 認証を受けたサービスを選びましょう。
 
 
-## 移行方法
+## 始め方
 
-3 ステップで既存の環境にツールが揃った状態で立ち上がります。
+ここまで設計がわかりました。これからどうやって始めるべきか考えましょう。
 
-1. リポジトリを fork して clone する
-2. `config.nix` にユーザー情報とホストに入れる環境を最小限に選択する
-3. Nix を入れて `nix run .#switch -- <ホスト名>` と適用する
+### ステップ 1: テンプレートを取得
 
-そこから自分に合わない部分を削ったり、足りないものを追加したりすればいいです。`config.nix` の `hosts` でマシンごとのモジュール構成を変えられるし、GUI の有無も切り替えられます。また既存の環境を取り込みたい場合は nix-migrate というスキルを叩いて LLM に Nix へ移行してもらうこともできます。
+まずは Nix をインストールしてテンプレートを入れてください。
 
-https://github.com/anko9801/dotfiles
+```bash
+mkdir ~/dotfiles && cd ~/dotfiles
+nix flake init -t github:anko9801/dotfiles
+```
 
-ちなみに私のデッキは認知負荷の削減です。考えることを減らすほど、仕事やアイデアや環境改善に割けるリソースが増え、改善のループが速く回るようになります。
+そうするとこのような構造が生成されます。
+
+```text
+template/
+├── .github/workflows/check.yml   # CI: build + format check
+├── .gitignore                     # result, .claude, .codex
+├── AGENTS.md                      # LLM agent guide
+├── README.md                      # Quick start guide
+├── config.nix                     # Users, hosts, modules
+├── docs/tool-selection.md         # Tool decision template
+├── editor/vim.nix                 # Vim/Neovim config
+├── flake.nix                      # Inputs, apps (switch/windows), checks
+├── renovate.json                  # Weekly flake.lock updates
+├── shell/
+│   ├── bash.nix                   # Bash config (coreModule)
+│   └── starship.nix               # Cross-shell prompt
+├── system/
+│   ├── common.nix                 # Platform detection, defaults, HM bootstrap
+│   ├── hosts.nix                  # Host builder, flake module resolution
+│   └── windows/
+│       ├── setup.sh               # WSL → Windows deployment
+│       └── winget-packages.json   # Starter packages
+├── theme/default.nix              # Stylix (Catppuccin Mocha)
+└── tools/git.nix                  # Git config
+```
+
+### ステップ 2: ユーザー情報を記入
+
+`config.nix` を開いて `your-username` を自分の `$USER` に合わせます。
+
+```nix:config.nix
+users = {
+  your-username = {
+    userName = "Your Name";
+    userEmail = "you@example.com";
+  };
+};
+```
+
+この情報は `system/common.nix` の `defaults.identity` を経由して `tools/git.nix` など各モジュールに自動で伝わります。
+
+### ステップ 3: 適用
+
+```bash
+nix run .#switch
+```
+
+### ステップ 4: モジュールを追加して拡張
+
+例えば `tmux` を追加したい場合は、まず適切な場所にファイルを置きます。
+
+```nix:tools/tmux.nix
+_:
+{
+  programs.tmux = {
+    enable = true;
+    terminal = "tmux-256color";
+    escapeTime = 0;
+  };
+}
+```
+
+そして `config.nix` の `baseModules` にパスを追加して `nix run .#switch` すれば完了です。
+
+```nix:config.nix
+baseModules = [
+  ./shell/starship.nix
+  ./tools/git.nix
+  ./tools/tmux.nix     # 追加
+  ./editor/vim.nix
+];
+```
+
+このように「ファイルを作る → `config.nix` に登録 → switch」のサイクルで環境が改善していきます。これを LLM に任せることで高速に環境が改善していきます。
+
+## 参考実装
+
+参考として私の dotfiles もおいておきます。
+
+私のデッキは認知負荷の削減です。考えることを減らすほど、仕事やアイデアや環境改善に割けるリソースが増え、改善のループが速く回るようになります。
 
 - 1 ツール 1 役割を徹底してコマンドやプラグインを可能な限り削る
 - キーバインドは「目的語 + 動詞」の文法で統一し、人間工学に則った位置に置く
@@ -331,7 +425,9 @@ https://github.com/anko9801/dotfiles
 - 安全に操作できるようにして、何かを壊すのを恐れなくていい
 - 毎日自分のワークフローに省略・自動化できる部分がないか見直して削る
 
-これをもとにツールや設定を考えてます。
+この考えをもとにツールの選定や設定を行っています。
+
+https://github.com/anko9801/dotfiles
 
 ## まとめ
 
