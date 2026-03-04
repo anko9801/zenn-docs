@@ -288,7 +288,7 @@ lib.mkIf config.myHost.isWorkstation {
 テンプレートから自分の dotfiles を作れる。既存の設定ファイルは .backup
 拡張子で自動退避されるので、元の環境が壊れることはない。
 
-```
+```shell
 # 1. Nix をインストール
 curl -L https://nixos.org/nix/install | sh -s -- --daemon
 
@@ -303,7 +303,7 @@ nix flake init -t github:anko9801/dotfiles
 nix run .#switch
 ```
 
-これだけで bash, starship, git, vim が宣言的に管理される状態になる。既存の .bashrc や .gitconfig は .bashrc.backup のようにリネームされるだけなので、戻したくなったら backup を元に戻せばいい。
+これだけで bash, starship, git, vim が宣言的に管理される状態になる。既存の `.bashrc` や `.gitconfig` は `.bashrc.backup` のようにリネームされるだけなので、戻したくなったら backup を元に戻せばいい。
 
 
 ### どの OS でもバグなく同じ環境が再現される
@@ -333,9 +333,10 @@ mkdir ~/dotfiles && cd ~/dotfiles
 nix flake init -t github:anko9801/dotfiles
 ```
 
-以下の構造が生成される:
+以下の構造が生成される。
 
 ```text
+dotfiles/
 ├── flake.nix          # エントリポイント
 ├── config.nix         # ユーザー情報・ホスト・モジュール一覧
 ├── system/
