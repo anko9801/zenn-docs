@@ -340,19 +340,27 @@ nix flake init -t github:anko9801/dotfiles
 そうするとこのような構造が生成されます。
 
 ```text
-dotfiles/
-├── flake.nix          # エントリポイント
-├── config.nix         # ユーザー情報・ホスト・モジュール一覧
-├── system/
-│   ├── hosts.nix      # config.nix → homeConfigurations ビルダー
-│   └── common.nix     # platform 検出、共通設定
+template/
+├── .github/workflows/check.yml   # CI: build + format check
+├── .gitignore                     # result, .claude, .codex
+├── AGENTS.md                      # LLM agent guide
+├── README.md                      # Quick start guide
+├── config.nix                     # Users, hosts, modules
+├── docs/tool-selection.md         # Tool decision template
+├── editor/vim.nix                 # Vim/Neovim config
+├── flake.nix                      # Inputs, apps (switch/windows), checks
+├── renovate.json                  # Weekly flake.lock updates
 ├── shell/
-│   ├── bash.nix       # coreModule: 最小 bash
-│   └── starship.nix   # baseModule: プロンプト
-├── tools/
-│   └── git.nix        # baseModule: git（identity wiring のデモ）
-└── editor/
-    └── vim.nix        # baseModule: エディタ
+│   ├── bash.nix                   # Bash config (coreModule)
+│   └── starship.nix               # Cross-shell prompt
+├── system/
+│   ├── common.nix                 # Platform detection, defaults, HM bootstrap
+│   ├── hosts.nix                  # Host builder, flake module resolution
+│   └── windows/
+│       ├── setup.sh               # WSL → Windows deployment
+│       └── winget-packages.json   # Starter packages
+├── theme/default.nix              # Stylix (Catppuccin Mocha)
+└── tools/git.nix                  # Git config
 ```
 
 ### ステップ 2: ユーザー情報を記入
