@@ -285,13 +285,25 @@ lib.mkIf config.myHost.isWorkstation {
 
 まず setup スクリプトは用意していません。他人のスクリプトをそのまま実行するのはセキュリティ面でも環境破壊のリスク面でも抵抗が大きいので、自分で Nix をインストールしてこれを叩いてセットアップできるようになっています。
 
-```sh
-nix run github:anko9801/dotfiles#switch
+テンプレートから自分の dotfiles を作れる。既存の設定ファイルは .backup
+拡張子で自動退避されるので、元の環境が壊れることはない。
+
+```
+# 1. Nix をインストール
+curl -L https://nixos.org/nix/install | sh -s -- --daemon
+
+# 2. テンプレートから初期化
+mkdir ~/dotfiles && cd ~/dotfiles
+nix flake init -t github:anko9801/dotfiles
+
+# 3. config.nix を編集（$USER と一致させる）
+# users.your-username の部分を書き換え
+
+# 4. 適用
+nix run .#switch
 ```
 
-適用時の安全網として `home-manager.backupFileExtension = "backup"` を設定しています。既存の `.zshrc` があれば `.zshrc.backup` に自動でリネームしてから新しい設定が適用されるので、脳死で実行して大丈夫です。何か問題があれば `.backup` ファイルから即座に戻せます。
-
-移行も段階的に進められます。fork するユーザーは `config.nix` のユーザー情報とホスト構成を書き換えるだけで最低限の環境が立ち上がり、既存の `.zshrc` や `.vimrc` はそのまま残ります。慣れてきたところで `./shell/zsh` を追加するように、モジュール単位で少しずつ乗り換えられるように設計しています。
+これだけで bash, starship, git, vim が宣言的に管理される状態になる。既存の .bashrc や .gitconfig は .bashrc.backup のようにリネームされるだけなので、戻したくなったら backup を元に戻せばいい。
 
 
 ### どの OS でもバグなく同じ環境が再現される
@@ -312,15 +324,84 @@ AWS の API キーとか SSH の秘密鍵とかを管理するとき、いつも
 パスワードマネージャーは E2EE でサーバー管理者にも復号できないようになっているので、サーバーが攻撃されても解読できず事実上安全です。ただし E2EE だからといって完全に信用はできなくて、バックドアを仕込まれてる可能性もあるっちゃあるので SOC 2 認証を受けたサービスを選びましょう。
 
 
-## 移行方法
+## 始め方
 
-3 ステップで既存の環境にツールが揃った状態で立ち上がります。
+### ステップ 1: テンプレートを取得
 
-1. リポジトリを fork して clone する
-2. `config.nix` にユーザー情報とホストに入れる環境を最小限に選択する
-3. Nix を入れて `nix run .#switch -- <ホスト名>` と適用する
+```
+mkdir ~/dotfiles && cd ~/dotfiles
+nix flake init -t github:anko9801/dotfiles
+```
 
-そこから自分に合わない部分を削ったり、足りないものを追加したりすればいいです。`config.nix` の `hosts` でマシンごとのモジュール構成を変えられるし、GUI の有無も切り替えられます。また既存の環境を取り込みたい場合は nix-migrate というスキルを叩いて LLM に Nix へ移行してもらうこともできます。
+以下の構造が生成される:
+
+```
+flake.nix              # エントリポイント
+config.nix             # ユーザー情報・ホスト・モジュール一覧
+system/
+  hosts.nix            # config.nix → homeConfigurations ビルダー
+  common.nix           # platform 検出、共通設定
+shell/
+  bash.nix             # coreModule: 最小 bash
+  starship.nix         # baseModule: プロンプト
+tools/
+  git.nix              # baseModule: git（identity wiring のデモ）
+editor/
+  vim.nix              # baseModule: エディタ
+```
+
+### ステップ 2: ユーザー情報を記入
+
+config.nix を開いて your-username を自分の $USER に合わせる:
+
+```
+users = {
+  your-username = {
+    userName = "Your Name";
+    userEmail = "you@example.com";
+  };
+};
+```
+
+この情報は system/common.nix の defaults.identity を経由して tools/git.nix
+など各モジュールに自動で伝わる。一箇所変えれば全体に反映される仕組み。
+
+### ステップ 3: 適用
+
+nix run .#switch
+
+### ステップ 4: モジュールを追加して拡張
+
+例えば tmux を追加したい場合:
+
+```
+# tools/tmux.nix
+_:
+{
+  programs.tmux = {
+    enable = true;
+    terminal = "tmux-256color";
+    escapeTime = 0;
+  };
+}
+```
+
+config.nix の baseModules にパスを追加して nix run .#switch:
+
+```
+baseModules = [
+  ./shell/starship.nix
+  ./tools/git.nix
+  ./tools/tmux.nix     # 追加
+  ./editor/vim.nix
+];
+```
+
+この「ファイルを作る → config.nix に登録 → switch」のサイクルで環境が育っていく。
+
+## 参考実装
+
+より多機能なものは自分の dotfiles を参考にしてください。先ほどのはこれの縮小版になります。
 
 https://github.com/anko9801/dotfiles
 
@@ -334,6 +415,8 @@ https://github.com/anko9801/dotfiles
 - 毎日自分のワークフローに省略・自動化できる部分がないか見直して削る
 
 これをもとにツールや設定を考えてます。
+
+
 
 ## まとめ
 
