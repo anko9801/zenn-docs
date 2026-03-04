@@ -328,14 +328,14 @@ AWS の API キーとか SSH の秘密鍵とかを管理するとき、いつも
 
 ### ステップ 1: テンプレートを取得
 
-```
+```bash
 mkdir ~/dotfiles && cd ~/dotfiles
 nix flake init -t github:anko9801/dotfiles
 ```
 
 以下の構造が生成される:
 
-```
+```text
 flake.nix              # エントリポイント
 config.nix             # ユーザー情報・ホスト・モジュール一覧
 system/
@@ -352,9 +352,9 @@ editor/
 
 ### ステップ 2: ユーザー情報を記入
 
-config.nix を開いて your-username を自分の $USER に合わせる:
+`config.nix` を開いて `your-username` を自分の `$USER` に合わせる:
 
-```
+```nix:config.nix
 users = {
   your-username = {
     userName = "Your Name";
@@ -363,19 +363,19 @@ users = {
 };
 ```
 
-この情報は system/common.nix の defaults.identity を経由して tools/git.nix
-など各モジュールに自動で伝わる。一箇所変えれば全体に反映される仕組み。
+この情報は `system/common.nix` の `defaults.identity` を経由して `tools/git.nix` など各モジュールに自動で伝わる。一箇所変えれば全体に反映される仕組み。
 
 ### ステップ 3: 適用
 
+```bash
 nix run .#switch
+```
 
 ### ステップ 4: モジュールを追加して拡張
 
-例えば tmux を追加したい場合:
+例えば `tmux` を追加したい場合:
 
-```
-# tools/tmux.nix
+```nix:tools/tmux.nix
 _:
 {
   programs.tmux = {
@@ -386,9 +386,9 @@ _:
 }
 ```
 
-config.nix の baseModules にパスを追加して nix run .#switch:
+`config.nix` の `baseModules` にパスを追加して `nix run .#switch`:
 
-```
+```nix:config.nix
 baseModules = [
   ./shell/starship.nix
   ./tools/git.nix
@@ -397,7 +397,7 @@ baseModules = [
 ];
 ```
 
-この「ファイルを作る → config.nix に登録 → switch」のサイクルで環境が育っていく。
+この「ファイルを作る → `config.nix` に登録 → switch」のサイクルで環境が育っていく。
 
 ## 参考実装
 
