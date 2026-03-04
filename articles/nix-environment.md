@@ -341,15 +341,12 @@ nix flake init -t github:anko9801/dotfiles
 
 ```text
 template/
-├── .github/workflows/check.yml   # CI: build + format check
-├── .gitignore                     # result, .claude, .codex
 ├── AGENTS.md                      # LLM agent guide
 ├── README.md                      # Quick start guide
+├── flake.nix                      # Inputs, apps (switch/windows), checks
 ├── config.nix                     # Users, hosts, modules
 ├── docs/tool-selection.md         # Tool decision template
 ├── editor/vim.nix                 # Vim/Neovim config
-├── flake.nix                      # Inputs, apps (switch/windows), checks
-├── renovate.json                  # Weekly flake.lock updates
 ├── shell/
 │   ├── bash.nix                   # Bash config (coreModule)
 │   └── starship.nix               # Cross-shell prompt
