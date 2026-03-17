@@ -158,7 +158,7 @@ dotfiles/
 https://github.com/anko9801/dotfiles/blob/master/config.nix
 
 `AGENTS.md` は
-URL を渡されたら `docs/md` を読んで
+URL を渡されたら `docs/md` の解析方法を読んで
 
 Nix の型システムは豊富ではなく静的解析が弱く書く精度が落ちがち → 設計とロールバック
 
@@ -258,14 +258,14 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 mkdir ~/dotfiles && cd ~/dotfiles
 nix flake init -t github:anko9801/dotfiles
 
-# config.nix を編集（$USER と一致させる）
+# config.nix を編集
 # users.your-username の部分を書き換え
 
 # 適用
 nix run .#switch
 ```
 
-ここで生成された `config.nix` を開いて `your-username` を自分のユーザー名に合わせてもろもろを設定します。ホスト部分、デフォルトで bash, starship, git, vim をセットアップするようにしています。
+ここで生成された `config.nix` を開いて `your-username` を自分のユーザー名に合わせてもろもろを設定します。デフォルトで bash, starship, git, vim をセットアップするようにしているので自分で調整してください。
 
 https://github.com/anko9801/dotfiles/blob/master/template/config.nix
 
