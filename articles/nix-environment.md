@@ -265,18 +265,9 @@ nix flake init -t github:anko9801/dotfiles
 nix run .#switch
 ```
 
-ここで生成された `config.nix` を開いて `your-username` を自分のユーザー名 (`$USER`) に合わせてもろもろを設定します。
+ここで生成された `config.nix` を開いて `your-username` を自分のユーザー名に合わせてもろもろを設定します。ホスト部分、デフォルトで bash, starship, git, vim をセットアップするようにしています。
 
-```nix:config.nix
-users = {
-  your-username = {
-    userName = "Your Name";
-    userEmail = "you@example.com";
-  };
-};
-```
-
-ホスト部分、デフォルトで bash, starship, git, vim をセットアップするようにしています。適宜
+https://github.com/anko9801/dotfiles/blob/master/template/config.nix
 
 例えば `tmux` を追加したければ適切な場所に Nix ファイルを書いて
 
