@@ -157,22 +157,7 @@ dotfiles/
 
 https://github.com/anko9801/dotfiles/blob/master/config.nix
 
-`AGENTS.md` は
-URL を渡されたら `docs/md` の解析方法を読んで
-
-Nix の型システムは豊富ではなく静的解析が弱く書く精度が落ちがち → 設計とロールバック
-
-### Windows 対応
-
-Nix は Windows をサポートしていません。パッケージ定義がほぼすべて Linux/macOS 向けに書かれており、Windows のファイルシステムやシステムコールとそもそも相性が悪いためです。
-
-そこで nix-windows という WSL から Windows のアプリやレジストリなどを設定する Flake を作りました。これで Linux NixOS macOS Windows すべてに対応できて、その上で GitHub Actions でビルド・テスト・ベンチマークを回して、動くことを保証しています。
-
-https://github.com/anko9801/nix-windows
-
-### LLM に改善案を出してもらう
-
-Nix ですべてを宣言的に書いているので、環境全体を LLM に渡して「自分の環境にとって最善の選択は何か」を問えます。具体的には `AGENTS.md` に「URL を渡されたらどう分析するか」を書いています。生産性向上に関する記事や他の dotfiles で良いと思ったものを貼ると、LLM がそれをよく調べて改善案を提示してくれます。
+`AGENTS.md` はやることが `docs/` へのハブを用意しています。例えば URL を渡されたら `docs/url.md` の解析方法を読んで効率良く解析して、意思決定が必要な場合は `docs/philosophy.md` の哲学を読んで自分の理想にあった判断をしてくれます。こうした言語化を積み重ねることで、すべて任せて放置しているだけで環境が改善していくようにしていきます。
 
 ```
 高インパクト改善案
@@ -220,7 +205,15 @@ lib.mkIf config.myHost.isWorkstation {
 ...
 ```
 
-さらにツールの選定基準を `docs/` で言語化して LLM に読ませることで、意図を汲み取った提案をしてくれるようになります。こうした言語化を積み重ねることで LLM の提案精度が上がり、すべて任せて放置しているだけで環境が改善していくようにしていきます。
+また書き間違えた場合はリンターやロールバックを使ってすぐに修正できる体制を組んでいます。
+
+### Windows 対応
+
+Nix は Windows をサポートしていません。パッケージ定義がほぼすべて Linux/macOS 向けに書かれており、Windows のファイルシステムやシステムコールとそもそも相性が悪いためです。
+
+そこで nix-windows という WSL から Windows のアプリやレジストリなどを設定する Flake を作りました。これで Linux NixOS macOS Windows すべてに対応できて、その上で GitHub Actions でビルド・テスト・ベンチマークを回して、動くことを保証しています。
+
+https://github.com/anko9801/nix-windows
 
 ### 既存の環境を壊さず段階的に採用する
 
