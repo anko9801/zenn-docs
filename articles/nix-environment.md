@@ -153,42 +153,14 @@ dotfiles/
 3. **テーマ** (`theme/`)
    Stylix が読んで各ツールのカラースキーム・フォント・カーソルなどを一元管理する
 
-`config.nix` がこれらを束ねていて、ホストやユーザーごとにどのモジュールを有効にするかを切り替えます。
+`config.nix` がこれらを束ねていて、ホストやユーザーごとにどのモジュールを有効にするかを切り替えています。
 
+https://github.com/anko9801/dotfiles/blob/master/config.nix
 
+`AGENTS.md` は
+URL を渡されたら `docs/md` を読んで
 
-
-```nix:config.nix
-users = {
-  your-name = {
-    editor = "nvim";
-    git = {
-      name = "your-name";
-      email = "your-email@example.com";
-      sshKey = "ssh-ed25519 AAAA...";
-    };
-  };
-};
-
-hosts = {
-  linux-wsl = {
-    system = "x86_64-linux";
-    manager = "home-manager";
-    modules = moduleSets.workstation ++ [ ./terminal/zellij ];
-  };
-  mac-arm = {
-    system = "aarch64-darwin";
-    manager = "nix-darwin";
-    modules = moduleSets.workstation;
-    systemModules = [ ./system/darwin/desktop.nix ];
-  };
-  # ...
-};
-```
-
-なにをするときにこの情報を参照してください
-
-Nix の型システムは豊富ではなく静的解析が弱く書く精度が落ちがち→ 設計とロールバック
+Nix の型システムは豊富ではなく静的解析が弱く書く精度が落ちがち → 設計とロールバック
 
 ### Windows 対応
 
@@ -261,7 +233,8 @@ lib.mkIf config.myHost.isWorkstation {
 ### ストレージ消費を減らす
 
 依存関係をバージョンごとに隔離しているので同じライブラリの異なるバージョンが複数あったり、ロールバック用の古い世代が残ってディスクが圧迫します。そのため定期的なガベージコレクションが必要となります。
-   → 毎週自動でガベコレすることで軽減
+
+これを毎週自動でガベコレすることで軽減します。
 
 ### 機密情報を外に逃す
 
